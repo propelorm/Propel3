@@ -8,11 +8,11 @@ use Propel\Generator\Builder\Om\Component\RelationTrait;
 use Propel\Generator\Model\Relation;
 
 /**
- * Adds all many-to-one referrer add methods.
+ * Adds all many-to-one referrer remove methods.
  *
  * @author Marc J. Schmidt <marc@marcjschmidt.de>
  */
-class ReferrerRelationAddMethods extends BuildComponent
+class ReferrerRelationRemoveMethods extends BuildComponent
 {
     use RelationTrait;
     use NamingTrait;
@@ -27,7 +27,7 @@ class ReferrerRelationAddMethods extends BuildComponent
                 continue;
             }
 
-            $this->addRefAddMethod($refRelation);
+            $this->addRefRemoveMethod($refRelation);
         }
     }
 
@@ -36,19 +36,18 @@ class ReferrerRelationAddMethods extends BuildComponent
      *
      * @param Relation $refRelation
      */
-    protected function addRefAddMethod(Relation $refRelation)
+    protected function addRefRemoveMethod(Relation $refRelation)
     {
         $varName = lcfirst($this->getRefRelationPhpName($refRelation));
         $className = $this->getObjectClassName();
-        $methodName = 'add' . ucfirst($varName);
+        $methodName = 'remove' . ucfirst($varName);
         $colVarName = $this->getRefRelationCollVarName($refRelation);
         $relationClassName = $this->useClass($refRelation->getEntity()->getFullClassName());
 
         $body = "
-if (!\$this->{$colVarName}->contains(\${$varName})) {
-    \$this->{$colVarName}[] = \${$varName};
-
-    \${$varName}->set" . $this->getRelationPhpName($refRelation) . "(\$this);
+if (\$this->{$colVarName} instanceof ObjectCollection) {
+    \$this->{$colVarName}->removeObject(\${$varName});
+    \${$varName}->set" . $this->getRelationPhpName($refRelation) . "(null);
 }
 
 return \$this;
@@ -58,7 +57,7 @@ return \$this;
         $this->addMethod($methodName)
             ->addSimpleParameter($varName, $relationClassName)
             ->setType($className . '|$this')
-            ->setDescription("Associate a $relationClassName to this object")
+            ->setDescription("Deassociate a $relationClassName to this object")
             ->setBody($body);
     }
 }

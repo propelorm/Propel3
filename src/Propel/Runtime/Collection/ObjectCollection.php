@@ -290,4 +290,12 @@ class ObjectCollection extends Collection
     {
         return false !== $this->search($element);
     }
+
+    public function __debugInfo()
+    {
+        return [
+            'fullyQualifiedModel' => $this->getFullyQualifiedModel(),
+            'data' => $this->data,
+        ];
+    }
 }

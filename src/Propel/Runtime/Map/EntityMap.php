@@ -605,6 +605,8 @@ abstract class EntityMap
 
         unset($object->__duringInitializing__);
 
+        $this->getConfiguration()->getSession()->addToFirstLevelCache($object);
+
         return $object;
     }
 
@@ -613,7 +615,9 @@ abstract class EntityMap
         $reflection = new \ReflectionClass(static::PROXY_CLASS);
         $object = $reflection->newInstanceWithoutConstructor();
         $object->__duringInitializing__ = true;
-        $object->_repository = $this->getRepository();
+
+        $writer = $this->getClassPropWriter(static::PROXY_CLASS);
+        $writer($object, '_repository', $this->getRepository());
 
         $unsetter = $this->getEntityMap()->getPropUnsetter();
 
@@ -662,7 +666,24 @@ abstract class EntityMap
                     );
                 }
 
-                $writer($entity, $fieldName, $query->find());
+                $items = $query->find();
+                $writer($entity, $fieldName, $items);
+                $this->getConfiguration()->getSession()->setLastKnownValue($entity, $fieldName, $items->getData());
+                return;
+            }
+
+            if ($relation->isOneToMany()) {
+                $query = $relation->getRightEntity()->createQuery();
+                $filterBy = 'filterBy' . ucfirst($relation->getRefName());
+                $query->$filterBy($entity);
+
+                $items = $query->find();
+                $foreignWriter = $this->getClassPropWriter($relation->getRightEntity()->getFullClassName());
+                foreach ($items as $item) {
+                    $foreignWriter($item, $relation->getRefName(), $entity);
+                }
+                $writer($entity, $fieldName, $items);
+                $this->getConfiguration()->getSession()->setLastKnownValue($entity, $fieldName, $items->getData());
                 return;
             }
 
@@ -691,6 +712,7 @@ abstract class EntityMap
         $value = $dataFetcher->fetchField();
         $value = $fieldType->databaseToProperty($value, $field);
         $writer($entity, $fieldName, $value);
+        $this->getConfiguration()->getSession()->setLastKnownValue($entity, $fieldName, $value);
     }
 
     /**
@@ -762,6 +784,7 @@ abstract class EntityMap
      * entity has only one primary key.
      *
      * @todo, what if a primary key is a relation?
+     * @deprecated This is too tightly coupled with SQL (field names are implementation details)
      *
      * @param array $entity
      *
@@ -790,6 +813,10 @@ abstract class EntityMap
     /**
      * @todo, to improve performance pre-compile this stuff
      *
+     * @deprecated This is too tightly coupled with SQL (field names are implementation details)
+     *
+     * Returns the last known primary key of the database.
+     *
      * @param object $entity
      *
      * @return array
@@ -812,7 +839,7 @@ abstract class EntityMap
         } else {
             $pk = [];
             foreach ($primaryKeyFields as $primaryKeyField) {
-                $pks[] = $entityMap->snapshotToProperty(
+                $pk[] = $entityMap->snapshotToProperty(
                     $lastKnownValues[$primaryKeyField->getName()],
                     $primaryKeyField->getName()
                 );
@@ -825,6 +852,7 @@ abstract class EntityMap
     /**
      * @todo, to improve performance pre-compile this stuff
      *
+     * @deprecated This is too tightly coupled with SQL (field names are implementation details)
      * @param array $entities
      *
      * @return array
@@ -1518,7 +1546,7 @@ abstract class EntityMap
      * @param  array $fieldMapping An associative array mapping field names (local => foreign)
      * @param  string $onDelete SQL behavior upon deletion ('SET NULL', 'CASCADE', ...)
      * @param  string $onUpdate SQL behavior upon update ('SET NULL', 'CASCADE', ...)
-     * @param  string $pluralName Optional plural name for *_TO_MANY relationships
+     * @param  string $refName Optional ref name for *_TO_MANY relationships
      *
      * @return \Propel\Runtime\Map\RelationMap the built RelationMap object
      */
@@ -1529,14 +1557,14 @@ abstract class EntityMap
         $fieldMapping = array(),
         $onDelete = null,
         $onUpdate = null,
-        $pluralName = null,
+        $refName = null,
         $polymorphic = false
     ) {
         $relation = new RelationMap($name);
         $relation->setType($type);
         $relation->setOnUpdate($onUpdate);
         $relation->setOnDelete($onDelete);
-        $relation->setPluralName($pluralName);
+        $relation->setRefName($refName);
 
         // set entities
         if (RelationMap::MANY_TO_ONE === $type) {

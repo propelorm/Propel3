@@ -80,6 +80,7 @@ if (\$foreignEntity = \$reader(\$entity, '$fieldName')) {
     \$foreignEntityReader = \$this->getConfiguration()->getEntityMap('$foreignEntityClass')->getPropReader();
 ";
             $emptyBody = '';
+
             foreach ($relation->getFieldObjectsMapping() as $reference) {
                 $relationFieldName = $reference['local']->getName();
                 $foreignFieldName = $reference['foreign']->getName();
@@ -137,6 +138,36 @@ if (false === \$lazyLastLoaded && false === \$lazyNowLoaded) {
 }
 ";
             }
+        }
+
+        foreach ($this->getEntity()->getReferrers() as $relation) {
+            $varName = $this->getRefRelationCollVarName($relation);
+
+            $body .= "
+// ref relation to {$relation->getForeignEntity()->getFullClassName()}
+\$lazyLastLoaded = isset(\$originValues['$varName']);
+\$lazyNowLoaded = \$isset(\$entity, '$varName');
+if (false === \$lazyLastLoaded && false === \$lazyNowLoaded) {
+    //both, initial population and lifetime value have not been set,
+    //so there can't be any difference.
+} else {
+    \$foreignEntities = \$reader(\$entity, '$varName') ?: [];
+    if (\$foreignEntities instanceof \\Propel\\Runtime\\Collection\\Collection) {
+        \$foreignEntities = \$foreignEntities->getData();
+    }
+    
+    if (!isset(\$originValues['$varName'])) {
+        \$lastValue = null;
+    } else {
+        \$lastValue = \$originValues['$varName'];
+    }
+    
+    if (\$foreignEntities !== \$lastValue) {
+        \$changed = true;
+        \$changes['$varName'] = \$foreignEntities;
+    }
+}
+";
         }
 
 

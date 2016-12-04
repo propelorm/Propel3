@@ -455,7 +455,7 @@ class FieldMap
      *
      * @return boolean True if field is a foreign key.
      */
-    public function isForeignKey()
+    public function isRelation()
     {
         return !empty($this->relatedEntityName);
     }

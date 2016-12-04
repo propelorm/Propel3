@@ -1004,6 +1004,9 @@ class Field extends MappingModel
     }
 
     /**
+     * This field is a implementation detail when it is used only to maintain a relationship
+     * but is not visible at the object itself.
+     *
      * @return boolean
      */
     public function isImplementationDetail()

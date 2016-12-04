@@ -86,7 +86,7 @@ class SqlPersister implements PersisterInterface
         $whereClauses = [];
         $params = [];
         foreach ($entities as $entity) {
-            $whereClauses[] = '(' . $entityMap->buildSqlPrimaryCondition($entity, $params) . ')';
+            $whereClauses[] = $this->getEntityPrimaryClause($entityMap, $entity, $params);
         }
 
         $query = sprintf('DELETE FROM %s WHERE %s', $entityMap->getFQTableName(), implode(' OR ', $whereClauses));
@@ -100,6 +100,7 @@ class SqlPersister implements PersisterInterface
             $stmt->execute($params);
 
             $this->getSession()->getConfiguration()->getEventDispatcher()->dispatch(Events::DELETE, $event);
+            $this->getSession()->setRemoved($entity);
             return $stmt->rowCount();
         } catch (\Exception $e) {
             throw new RuntimeException(sprintf('Could not execute query %s', $query), 0, $e);
@@ -234,7 +235,6 @@ class SqlPersister implements PersisterInterface
                 $sql .= ', ';
             }
 
-            $this->getSession()->setPersisted(spl_object_hash($entity));
             $sql .= $entityMap->buildSqlBulkInsertPart($entity, $params);
         }
 
@@ -276,11 +276,13 @@ class SqlPersister implements PersisterInterface
             ), 0, $e);
         }
 
-        if ($entityMap->hasAutoIncrement()) {
-            foreach ($inserts as $entity) {
+        foreach ($inserts as $entity) {
+            if ($entityMap->hasAutoIncrement()) {
                 $this->getConfiguration()->debug(sprintf('set auto-increment value %s for %s', json_encode($this->autoIncrementValues), get_class($entity)));
                 $entityMap->populateAutoIncrementFields($entity, $this->autoIncrementValues);
             }
+
+            $this->getSession()->setPersisted($entity);
         }
 
         $this->getSession()->getConfiguration()->getEventDispatcher()->dispatch(Events::INSERT, $event);
@@ -322,13 +324,13 @@ class SqlPersister implements PersisterInterface
             $id = substr(md5(spl_object_hash($entity)), 0, 9);
             $debugName = "{$entityMap->getFullClassName()} #$id {$relation->getName()}";
 
-            if (!$isset($entity, $relation->getPluralName())) {
+            if (!$isset($entity, $relation->getRefName())) {
                 //we don't update relations when they haven't been loaded.
                 $this->getConfiguration()->debug("many-to-many $debugName: no update, since not loaded.");
                 continue;
             }
 
-            $foreignItems = $reader($entity, $relation->getPluralName());
+            $foreignItems = $reader($entity, $relation->getRefName());
 
             //delete first
             $query = $relation->getMiddleEntity()->createQuery();
@@ -411,12 +413,6 @@ class SqlPersister implements PersisterInterface
 
         //todo, use CASE WHEN THEN to improve performance
         $sqlStart = 'UPDATE ' . $entityMap->getFQTableName();
-        $where = [];
-        foreach ($entityMap->getPrimaryKeys() as $pk) {
-            $where[] = $pk->getColumnName() . ' = ?';
-        }
-
-        $where = ' WHERE ' . implode(' AND ', $where);
         $connection = $this->getSession()->getConfiguration()->getConnectionManager($entityMap->getDatabaseName());
         $connection = $connection->getWriteConnection();
 
@@ -428,31 +424,48 @@ class SqlPersister implements PersisterInterface
             if ($changeSet) {
                 $params = [];
                 $sets = [];
+                $updateSnapshot = false;
                 foreach ($changeSet as $fieldName => $value) {
                     if ($entityMap->hasRelation($fieldName)) {
-                        if ($entityMap->getRelation($fieldName)->isManyToMany()) {
+                        $relation = $entityMap->getRelation($fieldName);
+
+                        if ($relation->isManyToMany()) {
                             $updateCrossRelations[$fieldName][] = $entity;
                         }
+
+                        if ($relation->isManyToOne()) {
+                            if (null === $value) {
+                                if ($relation->isOrphanRemoval()) {
+                                    $this->remove($entityMap, [$entity]);
+                                }
+                                continue 2;
+                            }
+                        }
+
+                        //relation has changed, but since we are not the owner side
+                        //we might not build a UPDATE query, so we need to make sure
+                        //our last known values update this relation
+                        $updateSnapshot = true;
                         continue;
                     }
 
-                    $columnName = $entityMap->getField($fieldName)->getColumnName();
+                    $fieldMap = $entityMap->getField($fieldName);
+                    $columnName = $fieldMap->getColumnName();
                     $sets[] = $columnName . ' = ?';
                     $params[] = $value;
+                }
+
+                if ($updateSnapshot) {
+                    $this->getSession()->snapshot($entity);
                 }
 
                 if (!$sets) {
                     continue;
                 }
 
-                $originValues = $entityMap->getLastKnownValues($entity);
+                $whereClause = $this->getEntityPrimaryClause($entityMap, $entity, $params);
 
-                foreach ($entityMap->getPrimaryKeys() as $pk) {
-                    $fieldName = $pk->getName();
-                    $params[] = $entityMap->snapshotToProperty($originValues[$fieldName], $fieldName);
-                }
-
-                $query = $sqlStart . ' SET ' . implode(', ', $sets).$where;
+                $query = $sqlStart . ' SET ' . implode(', ', $sets) . ' WHERE '. $whereClause;
 
                 $paramsReplace = $params;
                 $readable = preg_replace_callback('/\?/', function() use (&$paramsReplace) {
@@ -467,10 +480,16 @@ class SqlPersister implements PersisterInterface
                 $stmt = $connection->prepare($query);
                 try {
                     $stmt->execute($params);
+
+                    if ($entityMap->isReloadOnInsert()) {
+                        $entityMap->load($entity);
+                    }
+
+                    $this->getSession()->setPersisted($entity);
                 } catch (\Exception $e) {
                     throw new RuntimeException(
                         sprintf(
-                            'Could not execute query %s',
+                            'Could not update entity (%s)',
                             $readable
                         ), 0, $e
                     );
@@ -480,13 +499,6 @@ class SqlPersister implements PersisterInterface
 
         $this->getSession()->getConfiguration()->getEventDispatcher()->dispatch(Events::UPDATE, $event);
 
-
-        if ($entityMap->isReloadOnInsert()) {
-            foreach ($updates as $entity) {
-                $entityMap->load($entity);
-            }
-        }
-
         if ($updateCrossRelations) {
             $this->getConfiguration()->debug(sprintf('many-to-many update %d entities', count($updateCrossRelations)));
         }
@@ -494,5 +506,31 @@ class SqlPersister implements PersisterInterface
         foreach ($updateCrossRelations as $relationName => $entities) {
             $this->addCrossRelations($entityMap, $entities, $entityMap->getRelation($relationName));
         }
+    }
+
+    /**
+     * Returns the SQL for a primary key clause, e.g. 'id = ?'.
+     *
+     * @param EntityMap $entityMap
+     * @param object $entity
+     * @param array $params
+     * @return string
+     */
+    protected function getEntityPrimaryClause(EntityMap $entityMap, $entity, array &$params)
+    {
+        $originValues = $entityMap->getLastKnownValues($entity);
+
+        foreach ($entityMap->getPrimaryKeys() as $pk) {
+            $fieldName = $pk->getName();
+            $fieldType = $entityMap->getFieldType($fieldName);
+            $params[] = $fieldType->propertyToDatabase($fieldType->snapshotToProperty($originValues[$fieldName], $pk), $pk);
+        }
+
+        $where = [];
+        foreach ($entityMap->getPrimaryKeys() as $pk) {
+            $where[] = $pk->getColumnName() . ' = ?';
+        }
+
+        return implode(' AND ', $where);
     }
 }

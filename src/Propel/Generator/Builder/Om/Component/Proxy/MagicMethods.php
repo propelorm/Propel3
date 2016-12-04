@@ -22,7 +22,6 @@ class MagicMethods extends BuildComponent
 ';
 
         $loadableProperties = [];
-        $codePerField = [];
 
         foreach ($this->getEntity()->getFields() as $field) {
             $loadableProperties[] = $field->getName();
@@ -34,10 +33,55 @@ class MagicMethods extends BuildComponent
                 $loadableProperties[] = $this->getCrossRelationRelationVarName($relation);
             }
         }
+
         foreach ($this->getEntity()->getRelations() as $relation) {
-            $loadableProperties[] = $relation->getField();
+            $relationName = $this->getRelationVarName($relation);
+            $loadableProperties[] = $relationName;
         }
 
+        foreach ($this->getEntity()->getReferrers() as $relation) {
+            $relationName = $this->getRefRelationCollVarName($relation);
+            $loadableProperties[] = $relationName;
+        }
+
+
+        $getBody = $this->getCodeForFields($loadableProperties) . "
+return \$this->\$name;
+";
+        $this->addMethod('__get')
+            ->addSimpleParameter('name')
+            ->setBody($getBody);
+
+        $setBody = "
+\$this->\$name = \$value;
+";
+        $this->addMethod('__set')
+            ->addSimpleParameter('name')
+            ->addSimpleParameter('value')
+            ->setBody($setBody);
+
+
+        $debugInfo = '
+$fn = \\Closure::bind(function(){
+    return get_object_vars($this);
+}, $this, get_parent_class($this)); 
+return $fn();
+        ';
+
+        $this->addProperty('__duringInitializing__', false, 'public');
+        $this->addProperty('_repository', false, 'private');
+
+        $this->addMethod('__debugInfo')->setBody($debugInfo);
+    }
+
+    /**
+     * @param array $loadableProperties
+     * @return string
+     */
+    protected function getCodeForFields($loadableProperties)
+    {
+        $body = '';
+        $codePerField = [];
         foreach ($loadableProperties as $fieldName) {
             $fieldLazyLoading = "\$this->_repository->getEntityMap()->loadField(\$this, '$fieldName');";
             $codePerField[$fieldName] = $fieldLazyLoading;
@@ -56,19 +100,6 @@ if (!isset(\$this->__duringInitializing__) && '{$fieldName}' === \$name && !isse
 ";
         }
 
-        $getBody = $body . "
-return \$this->\$name;
-";
-        $this->addMethod('__get')
-            ->addSimpleParameter('name')
-            ->setBody($getBody);
-
-        $setBody = $body . "
-\$this->\$name = \$value;
-";
-        $this->addMethod('__set')
-            ->addSimpleParameter('name')
-            ->addSimpleParameter('value')
-            ->setBody($setBody);
+        return $body;
     }
 }

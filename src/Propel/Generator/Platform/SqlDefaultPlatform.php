@@ -195,11 +195,11 @@ class SqlDefaultPlatform implements PlatformInterface
     protected function setupRelationReferences(Entity $entity)
     {
         foreach ($entity->getRelations() as $relation) {
-//            if ($relation->getField()) {
+            if ($relation->getField()) {
                 $relationName = $relation->getField();
-//            } else {
-//                $relationName = $this->getName();
-//            }
+            } else {
+                $relationName = $relation->getForeignEntity()->getName();
+            }
 
             if (!$relation->getLocalFieldObjects()) {
                 //no references defined: set it
@@ -219,6 +219,12 @@ class SqlDefaultPlatform implements PlatformInterface
                     $field->setType($pk->getType());
                     $field->setDomain($pk->getDomain());
                     $field->setImplementationDetail(true);
+
+                    if ($entity->hasField($localFieldName, true)) {
+                        throw new BuildException(sprintf(
+                            'Unable to setup automatic relation from %s to %s due to no unique field name. Please specify <relation field="here"> a name'
+                        ), $entity->getName(), $relation->getForeignEntity()->getName());
+                    }
                     $entity->addField($field);
 
                     $relation->addReference($localFieldName, $pk->getName());

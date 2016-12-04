@@ -63,6 +63,7 @@ if (\$isset(\$entity, '$fieldName') && \$foreignEntity = \$reader(\$entity, '$fi
                 $foreignFieldName = $foreignField->getName();
 
                 if (isset($foreignField->foreignRelation)) {
+                    //@todo, what kind of workaround is this?
                     /** @var Relation $foreignRelation */
                     $foreignRelation = $foreignField->foreignRelation;
                     $relationFieldName = $foreignRelation->getField();
@@ -106,6 +107,22 @@ if (\$isset(\$entity, '$varName')) {
 }
 ";
             }
+        }
+
+        foreach ($this->getEntity()->getReferrers() as $relation) {
+            $varName = $this->getRefRelationCollVarName($relation);
+
+            $body .= "
+// ref relation to {$relation->getForeignEntity()->getFullClassName()}
+if (\$isset(\$entity, '$varName')) {
+    \$foreignEntities = \$reader(\$entity, '$varName') ?: [];
+    if (\$foreignEntities instanceof \\Propel\\Runtime\\Collection\\Collection) {
+        \$foreignEntities = \$foreignEntities->getData();
+    }
+    
+    \$snapshot['$varName'] = \$foreignEntities;
+}
+";
         }
 
         $body .= "

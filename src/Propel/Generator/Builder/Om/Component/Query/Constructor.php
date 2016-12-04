@@ -28,5 +28,9 @@ EOF;
             ->setDescription("Initializes internal state of $queryClass object.")
             ->setBody($body);
 
+
+        $this->addMethod('findOne')
+            ->setBody('return parent::findOne();')
+            ->setType('\\' . $modelClass);
     }
 }

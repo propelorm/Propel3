@@ -215,7 +215,7 @@ class StatementWrapper extends \PDOStatement implements \IteratorAggregate
             $size = count($matches[1]);
             for ($i = $size-1; $i >= 0; $i--) {
                 $pos = $matches[1][$i];
-                $sql = str_replace($pos, var_export($parameters[$pos], true), $sql);
+                $sql = str_replace($pos, json_encode($parameters[$pos]), $sql);
             }
         }
 

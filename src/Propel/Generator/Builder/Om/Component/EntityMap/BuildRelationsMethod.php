@@ -36,27 +36,27 @@ class BuildRelationsMethod extends BuildComponent
         }
 
         foreach ($this->getEntity()->getReferrers() as $relation) {
-            $relationName = var_export($this->getRefRelationVarName($relation), true);
+            $relationName = var_export($this->getRefRelationCollVarName($relation), true);
             $target = var_export($relation->getEntity()->getFullClassName(), true);
-            $columnMapping = var_export(array_flip($relation->getForeignLocalMapping()), true);
+            $columnMapping = var_export($relation->getLocalForeignMapping(), true);
 
             $onDelete = $relation->hasOnDelete() ? "'" . $relation->getOnDelete() . "'" : 'null';
             $onUpdate = $relation->hasOnUpdate() ? "'" . $relation->getOnUpdate() . "'" : 'null';
 
             $type = "RelationMap::ONE_TO_" . ($relation->isLocalPrimaryKey() ? "ONE" : "MANY");
 
-            $pluralName = $relation->isLocalPrimaryKey() ? 'null' : var_export($this->getRefRelationVarName($relation, true), true);
+            $refName = var_export($this->getRelationVarName($relation), true);
 
             $body .= "
 //ref relation
-\$this->addRelation($relationName, $target, $type, $columnMapping, $onDelete, $onUpdate, $pluralName);";
+\$this->addRelation($relationName, $target, $type, $columnMapping, $onDelete, $onUpdate, $refName);";
         }
 
         foreach ($this->getEntity()->getCrossRelations() as $crossRelation) {
 
             $relation = $crossRelation->getOutgoingRelation();
             $relationName = var_export($this->getRelationVarName($relation, true), true);
-            $pluralName = $relationName;
+            $refName = $relationName;
 
             $target = var_export($crossRelation->getForeignEntity()->getFullClassName(), true);
             
@@ -82,7 +82,7 @@ class BuildRelationsMethod extends BuildComponent
             $polymorphic = var_export($crossRelation->isPolymorphic(), true);
             $body .= "
 //cross relation
-\$this->addRelation($relationName, $target, RelationMap::MANY_TO_MANY, $mapping, $onDelete, $onUpdate, $pluralName, $polymorphic);";
+\$this->addRelation($relationName, $target, RelationMap::MANY_TO_MANY, $mapping, $onDelete, $onUpdate, $refName, $polymorphic);";
         }
 
         $this->addMethod('buildRelations')

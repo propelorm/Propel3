@@ -301,12 +301,6 @@ class SessionRound
 
             try {
                 $persister->commit($entityMap, $entities);
-
-                foreach ($entityIds as $entityId) {
-                    $entity = $this->persistQueue[$entityId];
-                    $this->getSession()->addToFirstLevelCache($entity);
-                    $this->getSession()->snapshot($entity);
-                }
             } catch (\Exception $e) {
                 foreach ($entityIds as $entityId) {
                     $this->getSession()->removePersisted($entityId);

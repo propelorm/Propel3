@@ -12,6 +12,7 @@ namespace Propel\Tests\Generator\Builder\Om;
 
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Generator\Util\QuickBuilder;
+use Propel\Runtime\Configuration;
 use Propel\Tests\TestCase;
 
 /**
@@ -131,17 +132,20 @@ EOF;
         $pageComment = \MoreRelationTest\CommentQuery::create()->filterByPage($page)->findOne();
         $currentCount = count($page->getComments());
 
-        \MoreRelationTest\Map\PageTableMap::clearInstancePool();
+        $this->assertSame(spl_object_hash($page->getComments()[0]), spl_object_hash($pageComment),
+            'lazy loading of one-to-many adds the reference/proxy to first level cache, so a query returns that object');
+
         /** @var $newPageObject \MoreRelationTest\Page */
         $newPageObject = \MoreRelationTest\PageQuery::create()->findOne(); //resets the cached comments through getComments()
-        $newPageObject->addComment($pageComment);
-
         $this->assertCount($currentCount, $newPageObject->getComments(), 'same count as before');
+        $newPageObject->addComment($pageComment);
+        $this->assertCount($currentCount, $newPageObject->getComments(), 'same count as before, because already in the list');
     }
 
     /**
      * Composite PK deletion of a 1-to-n relation through set<RelationName>() and remove<RelationName>()
      * where the PK is at the same time a FK.
+     * @group test
      */
     public function testCommentsDeletion()
     {
@@ -170,14 +174,15 @@ EOF;
         $this->assertEquals(0, $count, 'There should be no unassigned comment.');
 
         $page->removeComment($comment);
+        $this->assertNull($comment->getPage(), 'comment is not linked to page anymore.');
 
         $page->save();
 
         $count = \MoreRelationTest\CommentQuery::create()->filterByPageId($id)->count();
-        $this->assertEquals(0, $count);
+        $this->assertEquals(0, $count, 'no comments are linked with the page');
 
         $count = \MoreRelationTest\CommentQuery::create()->filterByPageId(NULL)->count();
-        $this->assertEquals(0, $count);
+        $this->assertEquals(0, $count, 'we have now no unassigned comments');
     }
 
     /**

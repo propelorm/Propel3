@@ -178,12 +178,26 @@ class Session
     }
 
     /**
-     * @param string $id
+     * Marks this $entity as persisted, places it into the first level cache and creates a snapshot aka 'lastKnownValue'.
+     *
+     * @param object $entity
      */
-    public function setPersisted($id)
+    public function setPersisted($entity)
     {
-        $this->getConfiguration()->debug("Set as persisted #" . NamingTool::shortEntityId($id), Configuration::LOG_PURPLE);
+        $id = spl_object_hash($entity);
+        $this->getConfiguration()->debug('Set as persisted ' . get_class($entity) . '#' . NamingTool::shortEntityId($id), Configuration::LOG_PURPLE);
         $this->persisted[$id] = true;
+
+        $this->addToFirstLevelCache($entity);
+        $this->snapshot($entity);
+    }
+
+    public function setRemoved($entity)
+    {
+        $id = spl_object_hash($entity);
+        $this->getConfiguration()->debug('Set as removed ' . get_class($entity) . '/#' . NamingTool::shortEntityId($id), Configuration::LOG_PURPLE);
+        $this->removed[$id] = true;
+        $this->snapshot($entity);
     }
 
     /**
@@ -445,6 +459,24 @@ class Session
     }
 
     /**
+     * Sets a value of the known values.
+     *
+     * @see \Propel\Runtime\Session\Session::setLastKnownValues
+     *
+     * @param string|object $id
+     * @param string $key
+     * @param mixed $value
+     */
+    public function setLastKnownValue($id, $key, $value)
+    {
+        if (is_object($id)) {
+            $id = spl_object_hash($id);
+        }
+
+        $this->lastKnownValues[$id][$key] = $value;
+    }
+
+    /**
      * @param string $hashCode
      *
      * @return object
@@ -469,7 +501,13 @@ class Session
         $prefix = $entityMap->getFullClassName();
 
         $originPk = json_encode($entityMap->getOriginPK($entity));
-        $currentPk = json_encode($entityMap->getPK($entity));
+
+        $currentPk = $entityMap->getPK($entity);
+        if (null === $currentPk) {
+            var_dump($entity);
+            throw new \RuntimeException('Can not cache entity. Primary key can not be null for ' . $entityMap->getFullClassName());
+        }
+        $currentPk = json_encode($currentPk);
 
         if (!isset($this->firstLevelCache[$prefix])) {
             $this->firstLevelCache[$prefix] = [];

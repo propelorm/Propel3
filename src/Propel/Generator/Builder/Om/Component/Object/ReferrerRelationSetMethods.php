@@ -22,10 +22,11 @@ class ReferrerRelationSetMethods extends BuildComponent
         $entity = $this->getEntity();
 
         foreach ($entity->getReferrers() as $refRelation) {
-           
             if ($refRelation->isLocalPrimaryKey()) {
                 //one-to-one
                 $this->addRefGetMethod($refRelation);
+            } else {
+                $this->addRefGetCollectionMethod($refRelation);
             }
         }
     }
@@ -51,5 +52,39 @@ class ReferrerRelationSetMethods extends BuildComponent
             ->addSimpleParameter($varName, $foreignClassName)
             ->setBody($body)
             ->setDescription("Sets the associated $foreignClassName object.$internal");
+    }
+
+    /**
+     * Adds the accessor (getter) method for getting an related object.
+     *
+     * @param Relation $relation
+     */
+    protected function addRefGetCollectionMethod(Relation $relation)
+    {
+        $varName = $this->getRefRelationCollVarName($relation);
+        $foreignClassName = $this->useClass($relation->getEntity()->getFullClassName());
+        $setter = 'set' . $this->getRelationPhpName($relation);
+
+        $body = "
+//break relationship with old objects
+foreach (\$this->$varName as \$item) {
+    \$item->{$setter}(null);
+}
+
+//establish bi-directional relationship with new objects
+foreach (\$$varName as \$item) {
+    \$item->{$setter}(\$this);
+}
+
+\$this->$varName = \$$varName;
+";
+
+        $internal = "\nMapped by fields " . implode(', ', $relation->getForeignFields());
+
+        $methodName = 'set' . $this->getRefRelationPhpName($relation, true);
+        $this->addMethod($methodName)
+            ->addSimpleParameter($varName)
+            ->setBody($body)
+            ->setDescription("Sets a collection of $foreignClassName objects.$internal");
     }
 } 

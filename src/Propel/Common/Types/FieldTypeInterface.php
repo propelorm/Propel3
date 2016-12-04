@@ -21,7 +21,7 @@ interface FieldTypeInterface
      *
      * This should return always a compareable object. Returning always new objects is not compareable.
      * Propel uses this results for its change set building, means its result will be cached and when a user
-     * wants to sync its object with the database, this method is called and the results is compared
+     * wants to sync its object with the database, this result is fetched and compared
      * (using: $changed = $old !== $new) to check whether the value has changed. If so, propel syncs it to the
      * database.
      *

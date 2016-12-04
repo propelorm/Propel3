@@ -165,7 +165,7 @@ class Relation extends MappingModel
             }
         }
 
-        return $field ?: lcfirst($this->foreignEntityName);
+        return $field;
     }
 
     /**
@@ -181,7 +181,13 @@ class Relation extends MappingModel
      */
     public function getRefField()
     {
-        return $this->refField;
+        $field = $this->refField;
+
+        if (!$field) {
+            $field = lcfirst($this->getEntity()->getName());
+        }
+
+        return $field;
     }
 
     /**

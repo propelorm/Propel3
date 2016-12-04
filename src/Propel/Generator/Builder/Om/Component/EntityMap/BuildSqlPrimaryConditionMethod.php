@@ -25,7 +25,8 @@ class BuildSqlPrimaryConditionMethod extends BuildComponent
     {
         $body = '
 $entityReader = $this->getPropReader();
-        ';
+$lastKnownValues = $entityMap->getLastKnownValues($entity);
+';
         $placeholder = [];
 
         foreach ($this->getEntity()->getPrimaryKey() as $field) {
@@ -67,33 +68,6 @@ if (null === \$foreignEntity) {
 ";
             }
 
-            switch (strtoupper($field->getType())) {
-                case PropelTypes::DATE:
-                case PropelTypes::TIME:
-                    $dateTimeClass = $this->getBuilder()->getBuildProperty('dateTimeClass');
-                    if (!$dateTimeClass) {
-                        $dateTimeClass = '\DateTime';
-                    }
-
-                    $body .= "
-if (!(\$value instanceof $dateTimeClass)) {
-    \$value = \\Propel\\Runtime\\Util\\PropelDateTime::newInstance(\$value, null, '$dateTimeClass');
-}
-\$value = \$value->format('Y-m-d H:i:s');";
-                    break;
-                default:
-            }
-
-            $body .= $this->getTypeCasting($field);
-
-            if ($field->isLobType()) {
-                $body .= "
-if (is_resource(\$value)) {
-    \$value = stream_get_contents(\$value);
-}
-";
-            }
-
             $body .= "
 \$params[] = \$value;
 ";
@@ -113,20 +87,5 @@ return $placeholder;
             ->addSimpleParameter('entity')
             ->addParameter($paramsParam)
             ->setBody($body);
-    }
-
-    protected function getTypeCasting(Field $field)
-    {
-        if ($field->isNumericType()) {
-            return "
-\$value += 0; //cast to numeric";
-        }
-
-        if ($field->isBooleanType()) {
-            return "
-\$value = \$value ? 1 : 0; //cast to bool";
-        }
-
-        return "";
     }
 }

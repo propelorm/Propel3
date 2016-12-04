@@ -115,7 +115,7 @@ class FieldMapTest extends TestCaseFixtures
 
     public function testGetForeignKey()
     {
-        $this->assertFalse($this->cmap->isForeignKey(), 'foreignKey is false by default');
+        $this->assertFalse($this->cmap->isRelation(), 'foreignKey is false by default');
         try {
             $this->cmap->getRelatedEntity();
             $this->fail('getRelatedEntity throws an exception when called on a column with no foreign key');
@@ -132,7 +132,7 @@ class FieldMapTest extends TestCaseFixtures
         // required to let the database map use the foreign EntityMap
         $relatedCmap = $relatedTmap->addField('BAR2', 'Bar2', 'INTEGER');
         $this->cmap->setForeignKey('foo2', 'BAR2');
-        $this->assertTrue($this->cmap->isForeignKey(), 'foreignKey is true after setting the foreign key via setForeignKey()');
+        $this->assertTrue($this->cmap->isRelation(), 'foreignKey is true after setting the foreign key via setForeignKey()');
         $this->assertEquals($relatedTmap, $this->cmap->getRelatedEntity(), 'getRelatedEntity returns the related EntityMap object');
         $this->assertEquals($relatedCmap, $this->cmap->getRelatedField(), 'getRelatedField returns the related FieldMap object');
     }

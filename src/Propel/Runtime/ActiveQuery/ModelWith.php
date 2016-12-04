@@ -33,10 +33,6 @@ class ModelWith
 
     protected $relationName;
 
-    protected $initMethod;
-
-    protected $resetPartialMethod = '';
-
     protected $leftName;
 
     protected $rightName;
@@ -61,16 +57,14 @@ class ModelWith
         $this->getEntityMap = $entityMap;
         $this->isSingleEntityInheritance = $entityMap->isSingleEntityInheritance();
         $relation = $join->getRelationMap();
-        $relationName = $relation->getName();
-        if ($relation->getType() == RelationMap::ONE_TO_MANY) {
+        $this->relationName = $relation->getName();
+
+        if ($relation->isOneToMany()) {
             $this->isAdd = $this->isWithOneToMany = true;
-            $this->relationName = $relation->getPluralName();
-            $this->initMethod = 'init' . $this->relationName;
-            $this->resetPartialMethod = 'resetPartial' . $this->relationName;
-        } else {
-            $this->relationName = $relationName;
         }
-        $this->rightName = $join->hasRelationAlias() ? $join->getRelationAlias() : $relationName;
+
+        $this->rightName = $join->hasRelationAlias() ? $join->getRelationAlias() :  $relation->getName();
+
         if (!$join->isPrimary()) {
             $this->leftName = $join->hasLeftTableAlias() ? $join->getLeftTableAlias() : $join->getPreviousJoin()->getRelationMap()->getName();
         }
@@ -115,6 +109,11 @@ class ModelWith
         $this->isAdd = $isAdd;
     }
 
+    /**
+     * @deprecated
+     *
+     * @return bool
+     */
     public function isAdd()
     {
         return $this->isAdd;
@@ -138,26 +137,6 @@ class ModelWith
     public function getRelationName()
     {
         return $this->relationName;
-    }
-
-    public function setInitMethod($initMethod)
-    {
-        $this->initMethod = $initMethod;
-    }
-
-    public function getInitMethod()
-    {
-        return $this->initMethod;
-    }
-
-    public function setResetPartialMethod($resetPartialMethod)
-    {
-        $this->resetPartialMethod = $resetPartialMethod;
-    }
-
-    public function getResetPartialMethod()
-    {
-        return $this->resetPartialMethod;
     }
 
     public function setLeftName($leftPhpName)

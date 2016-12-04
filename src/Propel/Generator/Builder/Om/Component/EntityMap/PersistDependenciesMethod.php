@@ -22,6 +22,7 @@ class PersistDependenciesMethod extends BuildComponent
         $body = '
 $reader = $this->getPropReader();
 $isset = $this->getPropIsset();
+$lastValues = $this->hasKnownValues($entity) ? $this->getLastKnownValues($entity) : [];
 ';
 
         foreach ($this->getEntity()->getRelations() as $relation) {
@@ -60,6 +61,13 @@ if (\$isset(\$entity, '$relationName') && \$relationEntity = \$reader(\$entity, 
 //ref one-to-many {$relation->getEntity()->getFullClassName()}
 if (\$isset(\$entity, '$relationName') && \$relationEntities = \$reader(\$entity, '$relationName')) {
     foreach (\$relationEntities as \$relationEntity) {
+        \$session->persist(\$relationEntity, \$deep);
+    }
+}
+
+//to track broken relationships, we need to persist also objects from last known values
+if (isset(\$lastValues['$relationName'])) {
+    foreach (\$lastValues['$relationName'] as \$relationEntity) {
         \$session->persist(\$relationEntity, \$deep);
     }
 }

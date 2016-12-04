@@ -40,7 +40,7 @@ class RelationMap
 
     protected $name;
 
-    protected $pluralName;
+    protected $refName;
 
     protected $type;
 
@@ -109,9 +109,9 @@ class RelationMap
         return $this->name;
     }
 
-    public function setPluralName($pluralName)
+    public function setRefName($refName)
     {
-        $this->pluralName = $pluralName;
+        $this->refName = $refName;
     }
 
     /**
@@ -247,9 +247,9 @@ class RelationMap
      *
      * @return string The plural name of the relation.
      */
-    public function getPluralName()
+    public function getRefName()
     {
-        return null !== $this->pluralName ? $this->pluralName : ($this->name . 's');
+        return $this->refName;
     }
 
     /**
@@ -409,11 +409,92 @@ class RelationMap
     }
 
     /**
+     * When one local field is required we assume that the object
+     * should be removed from the database when its incoming reference is null.
+     *
+     * @return boolean
+     */
+    public function isOrphanRemoval()
+    {
+        foreach ($this->getLocalFields() as $field){
+            if ($field->isNotNull()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOnDeleteCascade()
+    {
+        return $this->getOnDelete() === 'cascade';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOnDeleteRestrict()
+    {
+        return $this->getOnDelete() === 'restrict';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOnDeleteSetNull()
+    {
+        return $this->getOnDelete() === 'setnull';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOnUpdateCascade()
+    {
+        return $this->getOnUpdate() === 'cascade';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOnUpdateRestrict()
+    {
+        return $this->getOnUpdate() === 'restrict';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOnUpdateSetNull()
+    {
+        return $this->getOnUpdate() === 'setnull';
+    }
+
+    /**
      * @return bool
      */
     public function isManyToMany()
     {
         return RelationMap::MANY_TO_MANY === $this->getType();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isManyToOne()
+    {
+        return RelationMap::MANY_TO_ONE === $this->getType();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOneToMany()
+    {
+        return RelationMap::ONE_TO_MANY === $this->getType();
     }
 
     /**
@@ -483,7 +564,7 @@ class RelationMap
      */
     public function setOnUpdate($onUpdate)
     {
-        $this->onUpdate = $onUpdate;
+        $this->onUpdate = strtolower($onUpdate);
     }
 
     /**
@@ -503,7 +584,7 @@ class RelationMap
      */
     public function setOnDelete($onDelete)
     {
-        $this->onDelete = $onDelete;
+        $this->onDelete = strtolower($onDelete);
     }
 
     /**
