@@ -85,9 +85,22 @@ class RelationMap
      */
     protected $foreignFields = array();
 
+    /**
+     * @var string
+     */
     protected $onUpdate;
 
+    /**
+     * @var string
+     */
     protected $onDelete;
+
+    /**
+     * Whether this relation is a referrer.
+     *
+     * @var bool
+     */
+    protected $referrer = false;
 
     /**
      * Constructor.
@@ -240,6 +253,34 @@ class RelationMap
     public function setPolymorphic($polymorphic)
     {
         $this->polymorphic = $polymorphic;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isReferrer()
+    {
+        return $this->referrer;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOwnerSide()
+    {
+        if ($this->isManyToMany()) {
+            throw new \LogicException('In MANY_TO_MANY relations there is no such thing as owner side.');
+        }
+
+        return !$this->referrer;
+    }
+
+    /**
+     * @param boolean $referrer
+     */
+    public function setReferrer($referrer)
+    {
+        $this->referrer = $referrer;
     }
 
     /**
@@ -498,6 +539,14 @@ class RelationMap
     }
 
     /**
+     * @return bool
+     */
+    public function isOneToOne()
+    {
+        return RelationMap::ONE_TO_ONE === $this->getType();
+    }
+
+    /**
      * Returns true if the relation has more than one field mapping
      *
      * @return boolean
@@ -570,7 +619,7 @@ class RelationMap
     /**
      * Get the onUpdate behavior
      *
-     * @return integer the relation type
+     * @return string
      */
     public function getOnUpdate()
     {
@@ -590,7 +639,7 @@ class RelationMap
     /**
      * Get the onDelete behavior
      *
-     * @return int the relation type
+     * @return string
      */
     public function getOnDelete()
     {

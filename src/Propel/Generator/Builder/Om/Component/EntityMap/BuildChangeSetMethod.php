@@ -72,12 +72,18 @@ if (\$different) {
         }
 
         foreach ($this->getEntity()->getRelations() as $relation) {
-            $fieldName = $this->getRelationVarName($relation);
+            $varName = $this->getRelationVarName($relation);
             $foreignEntityClass = $relation->getForeignEntity()->getFullClassName();
             $body .= "
 // relation {$relation->getField()}
-if (\$foreignEntity = \$reader(\$entity, '$fieldName')) {
-    \$foreignEntityReader = \$this->getConfiguration()->getEntityMap('$foreignEntityClass')->getPropReader();
+\$lazyLastLoaded = isset(\$originValues['$varName']);
+\$lazyNowLoaded = \$isset(\$entity, '$varName');
+if (false === \$lazyLastLoaded && false === \$lazyNowLoaded) {
+    //both, initial population and lifetime value have not been set,
+    //so there can't be any difference.
+} else {
+    if (\$foreignEntity = \$reader(\$entity, '$varName')) {
+        \$foreignEntityReader = \$this->getConfiguration()->getEntityMap('$foreignEntityClass')->getPropReader();
 ";
             $emptyBody = '';
 
@@ -86,24 +92,34 @@ if (\$foreignEntity = \$reader(\$entity, '$fieldName')) {
                 $foreignFieldName = $reference['foreign']->getName();
 
                 $body .= "
-    if (\$originValues['$relationFieldName'] !== (\$v = \$foreignEntityReader(\$foreignEntity, '$foreignFieldName'))) {
-        \$changed = true;
-        \$changes['$relationFieldName'] = \$v;
-    }
+        if (\$originValues['$relationFieldName'] !== (\$v = \$foreignEntityReader(\$foreignEntity, '$foreignFieldName'))) {
+            \$changed = true;
+            \$changes['$relationFieldName'] = \$v;
+        }
 ";
 
                 $emptyBody .= "
-    if (null !== \$originValues['$relationFieldName']) {
-        \$changed = true;
-        \$changes['$relationFieldName'] = null;
-    }
+        if (null !== \$originValues['$relationFieldName']) {
+            \$changed = true;
+            \$changes['$relationFieldName'] = null;
+        }
 ";
 
             }
 
             $body .= "
-} else {
-    $emptyBody
+            
+        if (\$originValues['$varName'] !== \$foreignEntity) {
+            \$changed = true;
+            \$changes['$varName'] = \$foreignEntity;
+        }
+    } else {
+        if (null !== \$originValues['$varName']) {
+            \$changed = true;
+            \$changes['$varName'] = null;
+        }
+        $emptyBody
+    }
 }
 ";
         }

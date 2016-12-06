@@ -1,14 +1,16 @@
-$this->{{varName}} = ${{varName}};
+if ($this->{{varName}} !== ${{varName}}) {
+    $this->{{varName}} = ${{varName}};
 
-{{#isOnetoOne}}
-// Add binding for other direction of this 1:1 relationship.
-if (null !== ${{varName}}) {
-    ${{varName}}->{{setter}}($this);
+    {{#isOneToOne}}
+    // Add binding for other direction of this 1:1 relationship.
+    if (null !== ${{varName}}) {
+        ${{varName}}->{{setter}}($this);
+    }
+    {{/isOneToOne}}
+    {{#isManyToOne}}
+    // Setup bidirectional relationship.
+    if (null !== ${{varName}}) {
+        ${{varName}}->{{adder}}($this);
+    }
+    {{/isManyToOne}}
 }
-{{/isOnetoOne}}
-{{#isManyToOne}}
-// Setup bidirectional relationship.
-if (null !== ${{varName}}) {
-    ${{varName}}->{{adder}}($this);
-}
-{{/isManyToOne}}

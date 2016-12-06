@@ -31,8 +31,14 @@ class BuildRelationsMethod extends BuildComponent
 
             $onDelete = $relation->hasOnDelete() ? "'" . $relation->getOnDelete() . "'" : 'null';
             $onUpdate = $relation->hasOnUpdate() ? "'" . $relation->getOnUpdate() . "'" : 'null';
+
+            $type = 'RelationMap::MANY_TO_ONE';
+            if ($relation->isLocalPrimaryKey()) {
+                $type = 'RelationMap::ONE_TO_ONE';
+            }
+
             $body .= "
-\$this->addRelation($relationName, $target, RelationMap::MANY_TO_ONE, $columnMapping, $onDelete, $onUpdate);";
+\$this->addRelation($relationName, $target, $type, $columnMapping, $onDelete, $onUpdate);";
         }
 
         foreach ($this->getEntity()->getReferrers() as $relation) {
@@ -49,7 +55,7 @@ class BuildRelationsMethod extends BuildComponent
 
             $body .= "
 //ref relation
-\$this->addRelation($relationName, $target, $type, $columnMapping, $onDelete, $onUpdate, $refName);";
+\$this->addRefRelation($relationName, $target, $type, $columnMapping, $onDelete, $onUpdate, $refName);";
         }
 
         foreach ($this->getEntity()->getCrossRelations() as $crossRelation) {

@@ -204,20 +204,20 @@ class SqlPersister implements PersisterInterface
         $event = new InsertEvent($this->getSession(), $entityMap, $inserts);
         $this->getSession()->getConfiguration()->getEventDispatcher()->dispatch(Events::PRE_INSERT, $event);
 
-        $fieldObjects = $entityMap->getFields();
         $fields = [];
-        foreach ($fieldObjects as $field) {
+        foreach ($entityMap->getFields() as $field) {
             if (!$entityMap->isAllowPkInsert() && $field->isAutoIncrement()) {
                 continue;
             }
             if ($field->isImplementationDetail()) {
+                //fields with implementionDetail=true as set through related objects
                 continue;
             }
             $fields[$field->getColumnName()] = $field->getColumnName();
         }
 
         foreach ($entityMap->getRelations() as $relation) {
-            if ($relation->isOutgoingRelation()) {
+            if ($relation->isManyToOne() || ($relation->isOneToOne() && $relation->isOwnerSide())) {
                 foreach ($relation->getLocalFields() as $field) {
                     $fields[$field->getColumnName()] = $field->getColumnName();
                 }
@@ -437,8 +437,8 @@ class SqlPersister implements PersisterInterface
                             if (null === $value) {
                                 if ($relation->isOrphanRemoval()) {
                                     $this->remove($entityMap, [$entity]);
+                                    continue 2;
                                 }
-                                continue 2;
                             }
                         }
 

@@ -79,13 +79,16 @@ if (\$isset(\$entity, '$fieldName') && \$foreignEntity = \$reader(\$entity, '$fi
                 }
 
                 $emptyBody .="
-    \$snapshot['$relationFieldName'] = null;";
+    \$snapshot['$relationFieldName'] = null;
+";
                 $body .= "
     \$snapshot['$relationFieldName'] = \$value;";
             }
 
             $body .= "
+    \$snapshot['$fieldName'] = \$foreignEntity;
 } else {
+    \$snapshot['$fieldName'] = null;
     $emptyBody
 }
 ";

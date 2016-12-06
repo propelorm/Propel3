@@ -32,74 +32,74 @@ class DelegateBehaviorTest extends TestCase
             $schema = <<<EOF
 <database name="delegate_behavior_test_1" activeRecord="true">
 
-    <table name="delegate_main">
-        <column name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
-        <column name="title" type="VARCHAR" size="100" primaryString="true" />
-        <column name="delegate_id" type="INTEGER" />
-        <foreign-key foreignTable="second_delegate_delegate">
-            <reference local="delegate_id" foreign="id" />
-        </foreign-key>
+    <entity name="DelegateMain">
+        <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
+        <field name="title" type="VARCHAR" size="100" primaryString="true" />
+        <field name="delegateId" type="INTEGER" />
+        <relation target="SecondDelegateDelegate">
+            <reference local="delegateId" foreign="id" />
+        </relation>
         <behavior name="delegate">
             <parameter name="to" value="DelegateDelegate, SecondDelegateDelegate" />
         </behavior>
-    </table>
+    </entity>
 
-    <table name="delegate_delegate">
-        <column name="subtitle" type="VARCHAR" size="100" primaryString="true" />
-    </table>
+    <entity name="DelegateDelegate">
+        <field name="subtitle" type="VARCHAR" size="100" primaryString="true" />
+    </entity>
 
-    <table name="second_delegate_delegate">
-        <column name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
-        <column name="summary" type="VARCHAR" size="100" primaryString="true" />
+    <entity name="SecondDelegateDelegate">
+        <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
+        <field name="summary" type="VARCHAR" size="100" primaryString="true" />
         <behavior name="delegate">
             <parameter name="to" value="ThirdDelegateDelegate" />
         </behavior>
-    </table>
+    </entity>
 
-    <table name="third_delegate_delegate">
-        <column name="body" type="VARCHAR" size="100" primaryString="true" />
-    </table>
+    <entity name="ThirdDelegateDelegate">
+        <field name="body" type="VARCHAR" size="100" primaryString="true" />
+    </entity>
 
-    <table name="delegate_player">
-        <column name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
-        <column name="first_name" type="VARCHAR" size="100" primaryString="true" />
-        <column name="last_name" type="VARCHAR" size="100" primaryString="true" />
-    </table>
+    <entity name="DelegatePlayer">
+        <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
+        <field name="firstName" type="VARCHAR" size="100" primaryString="true" />
+        <field name="lastName" type="VARCHAR" size="100" primaryString="true" />
+    </entity>
 
-    <table name="delegate_basketballer">
-        <column name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
-        <column name="points" type="INTEGER" />
-        <column name="field_goals" type="INTEGER" />
-        <column name="player_id" type="INTEGER" />
-        <foreign-key foreignTable="delegate_player">
-            <reference local="player_id" foreign="id" />
-        </foreign-key>
+    <entity name="DelegateBasketballer">
+        <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
+        <field name="points" type="INTEGER" />
+        <field name="fieldGoals" type="INTEGER" />
+        <field name="playerId" type="INTEGER" />
+        <relation target="DelegatePlayer">
+            <reference local="playerId" foreign="id" />
+        </relation>
         <behavior name="delegate">
             <parameter name="to" value="DelegatePlayer" />
         </behavior>
-    </table>
+    </entity>
 
-    <table name="delegate_team">
-        <column name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
-        <column name="name" type="VARCHAR" size="100" primaryString="true" />
-    </table>
+    <entity name="DelegateTeam">
+        <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
+        <field name="name" type="VARCHAR" size="100" primaryString="true" />
+    </entity>
 
-    <table name="delegate_footballer">
-        <column name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
-        <column name="goals_scored" type="INTEGER" />
-        <column name="fouls_committed" type="INTEGER" />
-        <column name="player_id" type="INTEGER" />
-        <foreign-key foreignTable="delegate_player">
-            <reference local="player_id" foreign="id" />
-        </foreign-key>
-        <column name="team_id" type="INTEGER" />
-        <foreign-key foreignTable="delegate_team">
-            <reference local="team_id" foreign="id" />
-        </foreign-key>
+    <entity name="DelegateFootballer">
+        <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
+        <field name="goalsScored" type="INTEGER" />
+        <field name="foulsCommitted" type="INTEGER" />
+        <field name="playerId" type="INTEGER" />
+        <relation target="DelegatePlayer">
+            <reference local="playerId" foreign="id" />
+        </relation>
+        <field name="teamId" type="INTEGER" />
+        <relation target="DelegateTeam">
+            <reference local="teamId" foreign="id" />
+        </relation>
         <behavior name="delegate">
             <parameter name="to" value="DelegatePlayer, DelegateTeam" />
         </behavior>
-    </table>
+    </entity>
 
 </database>
 EOF;
@@ -183,6 +183,9 @@ EOF;
         $main->setBody('baz');
     }
 
+    /**
+     * @group test
+     */
     public function testOneToOneDelegatesCanBePersisted()
     {
         $main = new \DelegateMain();
@@ -246,20 +249,20 @@ EOF;
 //<database name="testTablePrefixSameDatabase_database" tablePrefix="foo">
 //
 //    <table name="testTablePrefixSameDatabase_main">
-//        <column name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
-//        <column name="title" type="VARCHAR" size="100" primaryString="true" />
-//        <column name="delegate_id" type="INTEGER" />
-//        <foreign-key foreignTable="testTablePrefixSameDatabase_delegate">
-//            <reference local="delegate_id" foreign="id" />
-//        </foreign-key>
+//        <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
+//        <field name="title" type="VARCHAR" size="100" primaryString="true" />
+//        <field name="delegateId" type="INTEGER" />
+//        <relation target="testTablePrefixSameDatabase_delegate">
+//            <reference local="delegateId" foreign="id" />
+//        </relation>
 //        <behavior name="delegate">
 //            <parameter name="to" value="testTablePrefixSameDatabase_delegate" />
 //        </behavior>
 //    </table>
 //
 //    <table name="testTablePrefixSameDatabase_delegate">
-//        <column name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
-//        <column name="subtitle" type="VARCHAR" size="100" primaryString="true" />
+//        <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
+//        <field name="subtitle" type="VARCHAR" size="100" primaryString="true" />
 //    </table>
 //
 //</database>

@@ -39,10 +39,14 @@ class ReferrerRelationSetMethods extends BuildComponent
     protected function addRefGetMethod(Relation $relation)
     {
         $varName = $this->getRefRelationVarName($relation);
+        $setter =  'set' . $this->getRelationPhpName($relation);
         $foreignClassName = $this->useClass($relation->getEntity()->getFullClassName());
 
         $body = "
-\$this->$varName = \$$varName;
+if (\$this->$varName !== \$$varName) {
+    \$this->$varName = \$$varName;
+    \$$varName->$setter(\$this);
+}
 ";
 
         $internal = "\nMapped by fields " . implode(', ', $relation->getForeignFields());
@@ -71,12 +75,12 @@ foreach (\$this->$varName as \$item) {
     \$item->{$setter}(null);
 }
 
+\$this->$varName = \$$varName;
+
 //establish bi-directional relationship with new objects
-foreach (\$$varName as \$item) {
+foreach (\$this->$varName as \$item) {
     \$item->{$setter}(\$this);
 }
-
-\$this->$varName = \$$varName;
 ";
 
         $internal = "\nMapped by fields " . implode(', ', $relation->getForeignFields());

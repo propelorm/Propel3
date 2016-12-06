@@ -145,7 +145,6 @@ EOF;
     /**
      * Composite PK deletion of a 1-to-n relation through set<RelationName>() and remove<RelationName>()
      * where the PK is at the same time a FK.
-     * @group test
      */
     public function testCommentsDeletion()
     {
@@ -188,6 +187,7 @@ EOF;
     /**
      * Deletion of a 1-to-n relation through set<RelationName>()
      * with onDelete=setnull
+     * @group test
      */
     public function testContentCommentDeletion()
     {
@@ -203,6 +203,7 @@ EOF;
         $commentCollection[] = $comment2;
 
         $content = \MoreRelationTest\ContentQuery::create()->findOne();
+        $oldContentComments = $content->getContentComments();
         $id = $content->getId();
 
         $count = \MoreRelationTest\ContentCommentQuery::create()->filterByContentId($id)->count();
@@ -218,7 +219,6 @@ EOF;
 
         $count = \MoreRelationTest\ContentCommentQuery::create()->filterByContentId(NULL)->count();
         $this->assertEquals(1, $count, 'There should be one unassigned contentComment.');
-
     }
 
     /**
@@ -269,6 +269,8 @@ EOF;
         $page->removeContent($content);
         $page->save();
 
-        $this->assertEquals(0, \MoreRelationTest\ContentQuery::create()->count());
+        //since the relation has required="false" (one of its local fields)
+        //we do not remove orphans.
+        $this->assertEquals(1, \MoreRelationTest\ContentQuery::create()->count());
     }
 }

@@ -58,8 +58,21 @@ class CrossRelationSetterMethods extends BuildComponent
 
         $collName = $this->getCrossRelationRelationVarName($relation);
 
+        $remover = 'remove' . $this->getRelationPhpName($relation);
+        $adder = 'add' . $this->getRelationPhpName($relation);
+
     $body = "
+//break relationship with old objects
+foreach (\$this->$collName as \$item) {
+    \$item->{$remover}(\$this);
+}
+
 \$this->$collName = \$$collName;
+
+//establish bi-directional relationship with new objects
+foreach (\$this->$collName as \$item) {
+    \$item->{$adder}(\$this);
+}
 
 return \$this;";
 
@@ -75,4 +88,4 @@ EOF;
             ->setDescription($description)
             ->setBody($body);
     }
-} 
+}

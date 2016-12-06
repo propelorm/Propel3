@@ -32,46 +32,22 @@ $entityReader = $this->getPropReader();
         ';
 
         foreach ($this->getEntity()->getFields() as $field) {
-            if ($field->isImplementationDetail()) {
-                continue;
-            }
+
             if (!$this->getEntity()->isAllowPkInsert() && $field->isAutoIncrement()) {
                 continue;
             }
+
             $fieldName = $field->getName();
             $propertyName = $field->getName();
+
+            if ($field->isImplementationDetail()) {
+                continue;
+            }
+
 
             $body .= "
 //field:$fieldName
 \$value = \$entityReader(\$entity, '$propertyName');";
-
-            switch (strtoupper($field->getType())) {
-                case PropelTypes::DATE:
-                case PropelTypes::TIME:
-                case PropelTypes::TIMESTAMP:
-                    $dateTimeClass = $this->getBuilder()->getBuildProperty('dateTimeClass');
-                    if (!$dateTimeClass) {
-                        $dateTimeClass = '\DateTime';
-                    }
-
-                    $body .= "
-if (!(\$value instanceof $dateTimeClass)) {
-    \$value = \\Propel\\Runtime\\Util\\PropelDateTime::newInstance(\$value, null, '$dateTimeClass');
-}
-if (null !== \$value) {
-    \$value = \$value->format('Y-m-d H:i:s');
-}";
-                    break;
-                default:
-            }
-
-            if ($field->isLobType()) {
-                $body .= "
-if (is_resource(\$value)) {
-    \$value = stream_get_contents(\$value);
-}
-";
-            }
 
             $default = 'NULL';
             if ($field->getDefaultValue() && $field->getDefaultValue()->isExpression()) {
@@ -121,28 +97,8 @@ if (!isset(\$params['{$localField->getName()}'])) {
 }
 ";
 
-//                if (isset($foreignField->foreignRelation)) {
-//                    /** @var Relation $foreignRelation */
-//                    $foreignRelation = $foreignField->foreignRelation;
-//                    $relationFieldName = $foreignRelation->getField();
-//                    $relationEntityName = $foreignRelation->getForeignEntity()->getFullClassName();
-//                    $body .= "
-//    \$foreignForeignEntity = \$foreignEntityReader(\$foreignEntity, '{$foreignFieldName}');
-//    \$value = \$foreignForeignEntityReader(\$foreignForeignEntity, '{$foreignField->foreignRelationFieldName}');
-//                    ";
-//                } else {
-//                    $body .= "
-//    \$value = \$foreignEntityReader(\$foreignEntity, '$foreignFieldName');";
-//                }
             }
 
-//            $body .= "
-//    $typeCasting
-//} else {
-//    \$value = null;
-//}
-//
-//";
             $body .= "
 //end relation:$propertyName";
         }

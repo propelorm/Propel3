@@ -1611,6 +1611,25 @@ abstract class EntityMap
     }
 
     /**
+     * @see addRelation same but sets the relation as referrer.
+     */
+    public function addRefRelation(
+        $name,
+        $foreignEntityName,
+        $type,
+        $fieldMapping = array(),
+        $onDelete = null,
+        $onUpdate = null,
+        $refName = null,
+        $polymorphic = false
+    )
+    {
+        $relation = $this->addRelation($name, $foreignEntityName, $type, $fieldMapping, $onDelete, $onUpdate, $refName, $polymorphic);
+        $relation->setReferrer(true);
+        return $relation;
+    }
+
+    /**
      * Gets a RelationMap of the entity by relation name
      * This method will build the relations if they are not built yet
      *
