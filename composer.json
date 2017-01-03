@@ -1,11 +1,12 @@
 {
     "name": "propel/propel",
     "type": "library",
-    "description": "Propel2 is an open-source Object-Relational Mapping (ORM) for PHP 5.4",
+    "description": "High performance data-mapper ORM with optional active-record traits for RAD and modern PHP 7.1+",
     "keywords": [
         "ORM",
         "persistence",
-        "Active Record"
+        "Active Record",
+        "data mapper"
     ],
     "homepage": "http://www.propelorm.org/",
     "license": "MIT",
@@ -16,14 +17,14 @@
         }
     ],
     "require": {
-        "php": ">=5.4",
-        "symfony/yaml": "~2.3",
-        "symfony/console": "~2.3",
-        "symfony/finder": "~2.3",
-        "symfony/validator": "~2.3",
-        "symfony/filesystem": "~2.3",
-        "symfony/event-dispatcher": "~2.3",
-        "symfony/config": "~2.3",
+        "php": ">=7.1",
+        "symfony/yaml": "^2.8|^3.0",
+        "symfony/console": "^2.8|^3.0",
+        "symfony/finder": "^2.8|^3.0",
+        "symfony/validator": "^2.8|^3.0",
+        "symfony/filesystem": "^2.8|^3.0",
+        "symfony/event-dispatcher": "^2.8|^3.0",
+        "symfony/config": "^2.8|^3.0",
         "psr/log": "~1.0",
         "gossi/php-code-generator": "dev-master",
         "mustache/mustache": "~2.6",
@@ -48,7 +49,7 @@
     ],
     "extra": {
         "branch-alias": {
-            "dev-master": "2.0-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

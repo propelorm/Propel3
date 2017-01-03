@@ -1,40 +1,115 @@
-# Propel2 #
+# Propel3 #
 
-Propel2 is an open-source Object-Relational Mapping (ORM) for PHP 5.4.
+Propel2 is an open-source Object-Relational Mapping (ORM) for modern PHP 7.1+.
+
 
 [![Build Status](https://circleci.com/gh/propelorm/Propel2/tree/master.png?style=shield)](https://circleci.com/gh/propelorm/Propel2/tree/master)
 [![Code Climate](https://codeclimate.com/github/propelorm/Propel2/badges/gpa.svg)](https://codeclimate.com/github/propelorm/Propel2)
 <a href="https://codeclimate.com/github/propelorm/Propel2"><img src="https://codeclimate.com/github/propelorm/Propel2/badges/coverage.svg" /></a>
+[![PPM Compatible](https://raw.githubusercontent.com/php-pm/ppm-badge/master/ppm-badge.png)](https://github.com/php-pm/php-pm)
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/propelorm/Propel)
 
-## Requirements ##
+Version 3 of Propel ORM replaces [Propel2](https://github.com/propelorm/Propel2), which is not maintained anymore.
+Propel3 introduces a data-mapper implementation which separates your entities from the actual persisting logic.
 
-Propel2 uses the following Symfony2 Components:
+## Status
 
-* [Console](https://github.com/symfony/Console)
-* [Yaml](https://github.com/symfony/Yaml)
-* [Finder](https://github.com/symfony/Finder)
-* [Validator](https://github.com/symfony/Validator)
-* [Filesystem](https://github.com/symfony/Filesystem)
+This is in current development and is not yet ready to use.
 
-Propel2 also relies on [**Composer**](https://github.com/composer/composer) to manage dependencies but you
-also can use [ClassLoader](https://github.com/symfony/ClassLoader) (see the `autoload.php.dist` file for instance).
+## Features
 
-Propel2 is only supported on PHP 5.4 and up.
+ - Propel is blazing fast
+ - Data mapper with runtime UnitOfWork for high performance with massive object counts (bulks inserts/updates)
+ - Query-Builder
+ - Very IDE friendly thanks to code-generation
+ - Generation of methods for all columns and relations
+ - Database schema migration
+ - Schema reverse engineering
+ - Customizable
+ - Propel comes with common ‘behaviors’
+ - Completely unit tested for MySQL, PostgreSQL, SQLite. Oracle and MSSQL are experimental.
 
+## Example
 
-## Installation ##
+### Define the enntity
 
-Read the [Propel documentation](http://www.propelorm.org/).
+##### XML
 
+```xml
+<database name="default">
+  <entity name="Vendor\Car">
+      <field name="id" primaryKey="true" autoIncrement="true" type="INTEGER" />
+      <field name="name" type="VARCHAR" required="true"  />
+      <relation target="Publisher" onDelete="setnull"/>
+      <relation target="Author" onDelete="setnull" onUpdate="cascade"/>
+  </entity>
+</database>
+```
 
-## Contribute ##
+##### or annotations
 
-Everybody can contribute to Propel2. Just fork it, and send Pull Requests.
-You have to follow [Propel2 Coding Standards](https://github.com/propelorm/Propel2/wiki/Coding-Standards) and provides unit tests as much as possible.
+```php
+
+namespace Vendor
+
+use Propel\Annotations\Entity;
+use Propel\Annotations\Field;
+use Propel\Annotations\PrimaryKey;
+
+/**
+ * @Entity()
+ */ 
+class Car
+{
+    /**
+     * @PrimaryKey(auto_increment=true)
+     */
+    private $id;
+    
+    /**
+     * @Field(type="VARCAR")
+     */
+    private $name;
+    
+    // getters/setters
+}
+```
+
+### Data mapper
+
+```yml
+$propel = new Propel\Runtime\Configuration('path/to/propel.yml');
+
+// require a session for each request/workload
+$session = $propel->getSession();
+
+$car = new Vendor\Car();
+$car->setName('Ford');
+
+$session->persist($car);
+$session->commit();
+```
+
+### RAD/Active-record
+
+```php
+// use <entity name="Vendor\Car" activeRecord="true">
+$car = new Vendor\Car();
+$car->setName('Ford');
+$car->save();
+```
+
+## Installation
+
+Read the [Propel documentation](http://www.propelorm.org/). This documentation is for Propel2 still. 
+
+## Contribute
+
+Everybody can contribute to Propel. Just fork it, and send Pull Requests.
+You have to follow [PSR2 conding standards](http://www.php-fig.org/psr/psr-2/) and provides unit tests as much as possible.
 
 Please see our [contribution guideline](http://propelorm.org/contribute.html). Thank you!
 
-## License ##
+## License
 
 See the `LICENSE` file.
