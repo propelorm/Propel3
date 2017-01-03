@@ -1,6 +1,6 @@
 # Propel3 #
 
-Propel2 is an open-source Object-Relational Mapping (ORM) for modern PHP 7.1+.
+Propel3 is an open-source Object-Relational Mapping (ORM) for modern PHP 7.1+.
 
 
 [![Build Status](https://circleci.com/gh/propelorm/Propel2/tree/master.png?style=shield)](https://circleci.com/gh/propelorm/Propel2/tree/master)
