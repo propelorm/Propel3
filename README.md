@@ -31,7 +31,7 @@ This is in current development and is not yet ready to use.
 
 ## Example
 
-### Define the enntity
+### Define the entity
 
 ##### XML
 
@@ -47,6 +47,8 @@ This is in current development and is not yet ready to use.
 ```
 
 ##### or annotations
+
+In work.
 
 ```php
 
