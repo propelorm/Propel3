@@ -10,10 +10,8 @@
 
 namespace Propel\Runtime\Collection;
 
-use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\DataFetcher\DataFetcherInterface;
 use Propel\Runtime\Formatter\ObjectFormatter;
-use Propel\Runtime\Propel;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Formatter\AbstractFormatter;
 
@@ -75,7 +73,7 @@ class OnDemandIterator implements \Iterator
      *
      * @see ObjectFormatter::getAllObjectsFromRow()
      *
-     * @return ActiveRecordInterface
+     * @return object
      */
     public function current()
     {

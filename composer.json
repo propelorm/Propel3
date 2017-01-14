@@ -21,7 +21,6 @@
         "symfony/yaml": "^2.8|^3.0",
         "symfony/console": "^2.8|^3.0",
         "symfony/finder": "^2.8|^3.0",
-        "symfony/validator": "^2.8|^3.0",
         "symfony/filesystem": "^2.8|^3.0",
         "symfony/event-dispatcher": "^2.8|^3.0",
         "symfony/config": "^2.8|^3.0",

@@ -10,16 +10,7 @@
 
 namespace Propel\Runtime\Collection;
 
-use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\Propel;
-use Propel\Runtime\Collection\Exception\ReadOnlyModelException;
-use Propel\Runtime\Collection\Exception\UnsupportedRelationException;
-use Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Runtime\Exception\RuntimeException;
-use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\EntityMap;
-use Propel\Runtime\ActiveQuery\PropelQuery;
-use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 
 /**
  * Class for iterating over a list of Propel objects
@@ -65,7 +56,7 @@ class ObjectCollection extends Collection
     {
         $ret = array();
 
-        /** @var $obj ActiveRecordInterface */
+        /** @var $obj */
         foreach ($this as $key => $obj) {
             $key = $usePrefix ? ($this->getModel() . '_' . $key) : $key;
             $ret[$key]= $obj->getPrimaryKey();
@@ -87,7 +78,7 @@ class ObjectCollection extends Collection
     {
         $class = $this->getFullyQualifiedModel();
         foreach ($arr as $element) {
-            /** @var $obj ActiveRecordInterface */
+            /** @var $obj */
             $obj = new $class();
             $obj->fromArray($element);
             $this->append($obj);
@@ -135,7 +126,7 @@ class ObjectCollection extends Collection
         $ret = array();
         $keyGetterMethod = 'get' . $keyField;
 
-        /** @var $obj ActiveRecordInterface */
+        /** @var $obj */
         foreach ($this->data as $key => $obj) {
             $key = null === $keyField ? $key : $obj->$keyGetterMethod();
             $key = $usePrefix ? ($this->getModel() . '_' . $key) : $key;

@@ -11,15 +11,12 @@
 namespace Propel\Runtime\ActiveQuery;
 
 use Propel\Generator\Model\NamingTool;
-use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Configuration;
 use Propel\Runtime\Event\DeleteEvent;
 use Propel\Runtime\Event\SaveEvent;
 use Propel\Runtime\Events;
 use Propel\Runtime\Exception\RuntimeException;
-use Propel\Runtime\Propel;
 use Propel\Runtime\Collection\ObjectCollection;
-use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\ClassNotFoundException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Exception\UnexpectedValueException;
@@ -1001,7 +998,7 @@ class ModelCriteria extends BaseModelCriteria
      * and format the list of results with the current formatter
      * By default, returns an array of model objects
      *
-     * @return ObjectCollection|ActiveRecordInterface[]|array|mixed the list of results, formatted by the current formatter
+     * @return ObjectCollection|array|mixed the list of results, formatted by the current formatter
      */
     public function find()
     {

@@ -10,8 +10,6 @@
 
 namespace Propel\Runtime\Formatter;
 
-use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
-use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\OnDemandCollection;
 use Propel\Runtime\Exception\LogicException;
 use Propel\Runtime\ActiveQuery\BaseModelCriteria;
@@ -82,7 +80,7 @@ class OnDemandFormatter extends ObjectFormatter
      *
      *  @param    array  $row associative array with data
      *
-     * @return ActiveRecordInterface
+     * @return object
      */
     public function getAllObjectsFromRow(array $row)
     {

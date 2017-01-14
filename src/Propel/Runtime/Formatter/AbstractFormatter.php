@@ -169,7 +169,7 @@ abstract class AbstractFormatter
     }
 
     /**
-     * Formats an ActiveRecord object
+     * Formats an object
      *
      * @param object $object the object to format
      *

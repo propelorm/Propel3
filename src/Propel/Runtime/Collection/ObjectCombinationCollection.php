@@ -10,8 +10,6 @@
 
 namespace Propel\Runtime\Collection;
 
-use Propel\Runtime\Propel;
-use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 
 /**
  * Class for iterating over a list of Propel objects
@@ -31,7 +29,6 @@ class ObjectCombinationCollection extends ObjectCollection
     {
         $ret = array();
 
-        /** @var $obj ActiveRecordInterface */
         foreach ($this as $combination) {
             $pkCombo = [];
             foreach ($combination as $key => $obj) {

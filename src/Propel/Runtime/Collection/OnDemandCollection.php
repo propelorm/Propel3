@@ -10,7 +10,6 @@
 
 namespace Propel\Runtime\Collection;
 
-use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Exception\ReadOnlyModelException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Formatter\AbstractFormatter;
@@ -73,7 +72,6 @@ class OnDemandCollection extends Collection
         $ret = array();
         $keyGetterMethod = 'get' . $keyField;
 
-        /** @var $obj ActiveRecordInterface */
         foreach ($this as $key => $obj) {
             $key = null === $keyField ? $key : $obj->$keyGetterMethod();
             $key = $usePrefix ? ($this->getModel() . '_' . $key) : $key;
