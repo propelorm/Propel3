@@ -10,7 +10,6 @@
 
 namespace Propel\Runtime\Formatter;
 
-use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Exception\LogicException;
 use Propel\Runtime\DataFetcher\DataFetcherInterface;
 
