@@ -174,7 +174,7 @@ class InitCommand extends AbstractCommand
     {
         $path = $dialog->ask($output, 'Where should the sqlite database be stored?', getcwd() . '/my.app.sq3');
 
-        return sprintf('sqlite:%', $path);
+        return sprintf('sqlite:%s', $path);
     }
 
     private function initPgsql(OutputInterface $output, DialogHelper $dialog)
