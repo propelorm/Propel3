@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -114,7 +114,7 @@ EOF;
         $q = \I18nBehaviorTest11Query::create();
         $q->setIdentifierQuoting(true);
         $q->joinI18n('fr_FR')->find($con);
-        $expected = $this->getSql("SELECT `i18n_behavior_test11`.`id`, `i18n_behavior_test11`.`foo` FROM `i18n_behavior_test11` LEFT JOIN `i18n_behavior_test11_i18n` ON (`i18n_behavior_test11`.`id`=`i18n_behavior_test11_i18n`.`id` AND `i18n_behavior_test11_i18n`.`locale` = 'fr_FR')");
+        $expected = $this->getSql("SELECT `i18n_behavior_test11`.`id`, `i18n_behavior_test11`.`foo` FROM `i18n_behavior_test11` LEFT JOIN `i18n_behavior_test11_i18n` ON (`i18n_behavior_test11`.`id`=`i18n_behavior_test11_i18n`.`id` AND `i18n_behavior_test11_i18n`.`locale` = \"fr_FR\")");
         $this->assertEquals($expected, $con->getLastExecutedQuery());
         $con->useDebug(false);
     }
@@ -159,7 +159,7 @@ EOF;
                 ->filterByBar('bar')
             ->endUse()
         ->find($con);
-        $expected = $this->getSql("SELECT `i18n_behavior_test11`.`id`, `i18n_behavior_test11`.`foo` FROM `i18n_behavior_test11` LEFT JOIN `i18n_behavior_test11_i18n` ON (`i18n_behavior_test11`.`id`=`i18n_behavior_test11_i18n`.`id` AND `i18n_behavior_test11_i18n`.`locale` = 'fr_FR') WHERE `i18n_behavior_test11_i18n`.`bar`='bar'");
+        $expected = $this->getSql("SELECT `i18n_behavior_test11`.`id`, `i18n_behavior_test11`.`foo` FROM `i18n_behavior_test11` LEFT JOIN `i18n_behavior_test11_i18n` ON (`i18n_behavior_test11`.`id`=`i18n_behavior_test11_i18n`.`id` AND `i18n_behavior_test11_i18n`.`locale` = \"fr_FR\") WHERE `i18n_behavior_test11_i18n`.`bar`=\"bar\"");
         $this->assertEquals($expected, $con->getLastExecutedQuery());
         $con->useDebug(false);
     }

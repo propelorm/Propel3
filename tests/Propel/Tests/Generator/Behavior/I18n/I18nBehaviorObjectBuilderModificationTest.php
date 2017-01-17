@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -10,9 +10,6 @@
 
 namespace Propel\Tests\Generator\Behavior\I18n;
 
-use Propel\Tests\Bookstore\Behavior\Movie;
-use Propel\Tests\Bookstore\Behavior\MovieQuery;
-use Propel\Tests\Bookstore\Behavior\MovieI18nQuery;
 use Propel\Generator\Util\QuickBuilder;
 use Propel\Tests\TestCase;
 
@@ -83,7 +80,7 @@ EOF;
             QuickBuilder::buildSchema($schema);
         }
     }
-    
+
     public function testPostDeleteEmulatesOnDeleteCascade()
     {
         \I18nBehaviorTest1Query::create()->deleteAll();
@@ -306,7 +303,7 @@ EOF;
         $count = \I18nBehaviorTest1I18nQuery::create()
             ->filterById($o->getId())
             ->count();
-        $this->assertEquals(2, $count);
+        $this->assertEquals(1, $count);
     }
 
     public function testI18nWithRelations()

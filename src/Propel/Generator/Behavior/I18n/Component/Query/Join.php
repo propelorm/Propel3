@@ -21,7 +21,7 @@ class Join extends BuildComponent
 
     public function process()
     {
-        $i18nRelationName = $this->getRefRelationVarName($this->getBehavior()->getI18nRelation());
+        $i18nRelationName = $this->getRefRelationCollVarName($this->getBehavior()->getI18nRelation());
 
         $this->addJoinI18n($i18nRelationName);
         $this->addJoinWithI18n($i18nRelationName);
@@ -46,16 +46,16 @@ return \$this
         $this->addMethod('joinI18n')
             ->addParameter(PhpParameter::create('locale')
                 ->setType('string', "Locale to use for the join condition, e.g. 'fr_FR'")
-                ->setDefaultValue($this->getBehavior()->getDefaultLocale())
+                ->setValue($this->getBehavior()->getDefaultLocale())
             )
             ->addParameter(PhpParameter::create('relationAlias')
                 ->setType('string', 'optional alias for the relation')
-                ->setDefaultValue(null)
+                ->setValue(null)
             )
             ->addParameter(PhpParameter::create('joinType')
                 ->setType('string')
                 ->setDescription("Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.")
-                ->setDefaultValue('LEFT JOIN')
+                ->setValue('LEFT JOIN')
             )
             ->setType('$this|' . $this->getBuilder()->getClassName(), 'The current query, for fluid interface')
             ->setDescription('Adds a JOIN clause to the query using the i18n relation')
@@ -76,12 +76,12 @@ return \$this
         $this->addMethod('joinWithI18n')
             ->addParameter(PhpParameter::create('locale')
                 ->setType('string', "Locale to use for the join condition, e.g. 'fr_FR'")
-                ->setDefaultValue($this->getBehavior()->getDefaultLocale())
+                ->setValue($this->getBehavior()->getDefaultLocale())
             )
             ->addParameter(PhpParameter::create('joinType')
                 ->setType('string')
                 ->setDescription("Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.")
-                ->setDefaultValue('LEFT JOIN')
+                ->setValue('LEFT JOIN')
             )
             ->setType('$this|' . $this->getBuilder()->getClassName(), 'The current query, for fluid interface')
             ->setDescription("

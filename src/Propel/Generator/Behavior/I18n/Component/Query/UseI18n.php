@@ -25,7 +25,7 @@ class UseI18n extends BuildComponent
     public function process()
     {
         $behavior = $this->getBehavior();
-        $i18nRelationName = $this->getRefRelationVarName($behavior->getI18nRelation());
+        $i18nRelationName = $this->getRefRelationCollVarName($behavior->getI18nRelation());
 
         $body = "
 return \$this
