@@ -44,7 +44,7 @@ class ModelWithTest extends TestCaseFixtures
     public function testModelNameOneToMany()
     {
         $q = AuthorQuery::create()
-            ->joinBook();
+            ->joinBooks();
         $joins = $q->getJoins();
         $join = $joins['book'];
         $with = new ModelWith($join);
@@ -75,7 +75,7 @@ class ModelWithTest extends TestCaseFixtures
     public function testRelationOneToMany()
     {
         $q = AuthorQuery::create()
-            ->joinBook();
+            ->joinBooks();
         $joins = $q->getJoins();
         $join = $joins['book'];
         $with = new ModelWith($join);
@@ -86,7 +86,7 @@ class ModelWithTest extends TestCaseFixtures
     public function testRelationOneToOne()
     {
         $q = BookstoreEmployeeQuery::create()
-            ->joinBookstoreEmployeeAccount();
+            ->joinBookstoreEmployeeAccounts();
         $joins = $q->getJoins();
         $join = $joins['bookstoreEmployeeAccount'];
         $with = new ModelWith($join);
@@ -97,7 +97,7 @@ class ModelWithTest extends TestCaseFixtures
     public function testIsPrimary()
     {
         $q = AuthorQuery::create()
-            ->joinBook();
+            ->joinBooks();
         $joins = $q->getJoins();
         $join = $joins['book'];
         $with = new ModelWith($join);
@@ -105,7 +105,7 @@ class ModelWithTest extends TestCaseFixtures
 
         $q = BookQuery::create()
             ->joinAuthor()
-            ->joinReview();
+            ->joinReviews();
         $joins = $q->getJoins();
         $join = $joins['review'];
         $with = new ModelWith($join);
@@ -123,21 +123,21 @@ class ModelWithTest extends TestCaseFixtures
     public function testGetLeftPhpName()
     {
         $q = AuthorQuery::create()
-            ->joinBook();
+            ->joinBooks();
         $joins = $q->getJoins();
         $join = $joins['book'];
         $with = new ModelWith($join);
         $this->assertNull($with->getLeftName(), 'A ModelWith initialized from a primary join has a null left phpName');
 
         $q = AuthorQuery::create('a')
-            ->joinBook();
+            ->joinBooks();
         $joins = $q->getJoins();
         $join = $joins['book'];
         $with = new ModelWith($join);
         $this->assertNull($with->getLeftName(), 'A ModelWith initialized from a primary join with alias has a null left phpName');
 
         $q = AuthorQuery::create()
-            ->joinBook('b');
+            ->joinBooks('b');
         $joins = $q->getJoins();
         $join = $joins['b'];
         $with = new ModelWith($join);
@@ -196,21 +196,21 @@ class ModelWithTest extends TestCaseFixtures
     public function testGetRightPhpName()
     {
         $q = AuthorQuery::create()
-            ->joinBook();
+            ->joinBooks();
         $joins = $q->getJoins();
         $join = $joins['book'];
         $with = new ModelWith($join);
         $this->assertEquals('book', $with->getRightName(), 'A ModelWith initialized from a primary join has a right phpName');
 
         $q = AuthorQuery::create('a')
-            ->joinBook();
+            ->joinBooks();
         $joins = $q->getJoins();
         $join = $joins['book'];
         $with = new ModelWith($join);
         $this->assertEquals('book', $with->getRightName(), 'A ModelWith initialized from a primary join with alias has a right phpName');
 
         $q = AuthorQuery::create()
-            ->joinBook('b');
+            ->joinBooks('b');
         $joins = $q->getJoins();
         $join = $joins['b'];
         $with = new ModelWith($join);
