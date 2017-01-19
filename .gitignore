@@ -35,3 +35,5 @@ tests/Fixtures/fixtures_built
 tests/graphviztest/
 tests/migrationdiff/
 tests/reversecommand/
+
+tests/latest_quickbuilder_sqlite.db
