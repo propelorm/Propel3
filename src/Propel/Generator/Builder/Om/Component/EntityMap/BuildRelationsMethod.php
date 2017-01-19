@@ -35,6 +35,7 @@ class BuildRelationsMethod extends BuildComponent
             $type = 'RelationMap::MANY_TO_ONE';
             if ($relation->isLocalPrimaryKey()) {
                 $type = 'RelationMap::ONE_TO_ONE';
+                $columnMapping = var_export($relation->getForeignLocalMapping(), true);
             }
 
             $body .= "

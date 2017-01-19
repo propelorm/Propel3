@@ -177,17 +177,11 @@ class Relation extends MappingModel
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getRefField()
     {
-        $field = $this->refField;
-
-        if (!$field) {
-            $field = lcfirst($this->getEntity()->getName());
-        }
-
-        return $field;
+        return $this->refField;
     }
 
     /**
