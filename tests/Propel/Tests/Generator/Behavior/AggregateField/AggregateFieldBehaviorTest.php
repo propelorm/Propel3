@@ -10,13 +10,10 @@
 
 namespace Propel\Tests\Generator\Behavior\AggregateField;
 
-use Propel\Runtime\Propel;
-use Propel\Tests\Bookstore\Behavior\AggregateField;
 use Propel\Tests\Bookstore\Behavior\AggregateComment;
 use Propel\Tests\Bookstore\Behavior\AggregateCommentQuery;
 use Propel\Tests\Bookstore\Behavior\AggregatePost;
 use Propel\Tests\Bookstore\Behavior\AggregatePostQuery;
-use Propel\Tests\Bookstore\Behavior\Base\BaseAggregatePollRepository;
 use Propel\Tests\Bookstore\Behavior\Base\BaseAggregatePostRepository;
 use Propel\Tests\Bookstore\Behavior\Map\AggregatePostEntityMap;
 use Propel\Tests\Bookstore\Behavior\AggregateItem;

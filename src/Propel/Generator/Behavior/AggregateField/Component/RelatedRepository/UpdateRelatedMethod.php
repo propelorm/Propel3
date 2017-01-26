@@ -1,14 +1,19 @@
 <?php
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ *
+ */
 
 namespace Propel\Generator\Behavior\AggregateField\Component\RelatedRepository;
 
-use gossi\codegen\model\PhpProperty;
-use Propel\Generator\Behavior\AggregateField\AggregateFieldBehavior;
 use Propel\Generator\Behavior\AggregateField\AggregateFieldRelationBehavior;
 use Propel\Generator\Builder\Om\Component\BuildComponent;
 use Propel\Generator\Builder\Om\Component\NamingTrait;
 use Propel\Generator\Builder\Om\Component\RelationTrait;
-use Propel\Generator\Builder\Om\Component\SimpleTemplateTrait;
 
 /**
  *
