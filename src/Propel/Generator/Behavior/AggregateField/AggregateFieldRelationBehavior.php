@@ -10,10 +10,8 @@
 
 namespace Propel\Generator\Behavior\AggregateField;
 
-use gossi\codegen\model\PhpProperty;
 use Propel\Generator\Builder\Om\Component\ComponentTrait;
 use Propel\Generator\Builder\Om\Component\RelationTrait;
-use Propel\Generator\Builder\Om\ObjectBuilder;
 use Propel\Generator\Builder\Om\RepositoryBuilder;
 use Propel\Generator\Model\Behavior;
 use Propel\Generator\Model\Entity;
@@ -46,6 +44,11 @@ class AggregateFieldRelationBehavior extends Behavior
     public function allowMultiple()
     {
         return true;
+    }
+
+    public function preSave(RepositoryBuilder $builder)
+    {
+        return $this->applyComponent('Repository\PreSave', $builder);
     }
 
     public function postSave(RepositoryBuilder $builder)
