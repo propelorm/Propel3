@@ -99,8 +99,7 @@ Example usage:
         } elseif ($field->isTextType()) {
 
             $variableParameter->setType('string');
-            $variableParameter->setTypeDescription("The value to use as filter.
- Accepts wildcards (* and % trigger a LIKE)");
+            $variableParameter->setTypeDescription("The value to use as filter.");
 
 
             $description .= "
