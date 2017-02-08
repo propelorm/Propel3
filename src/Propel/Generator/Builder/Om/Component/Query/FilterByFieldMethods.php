@@ -107,7 +107,7 @@ Example usage:
 Example usage:
 <code>
 \$query->filterBy$fieldPhpName('fooValue');   // WHERE $fieldName = 'fooValue'
-\$query->filterBy$fieldPhpName('%fooValue%'); // WHERE $fieldName LIKE '%fooValue%'
+\$query->filterBy$fieldPhpName('%fooValue%', Criteria::LIKE); // WHERE $fieldName LIKE '%fooValue%'
 </code>";
 
         } elseif ($field->isBooleanType()) {
