@@ -90,9 +90,9 @@ EOF;
         $article = $this->getConfiguration()->getEntityMap(ConcreteArticleEntityMap::ENTITY_CLASS);
         $this->assertTrue($article->hasRelation('concreteContent'), 'modifyEntity() adds a relationship to the parent');
         $relation = $article->getRelation('concreteContent');
-        $this->assertEquals(RelationMap::MANY_TO_ONE, $relation->getType(), 'modifyEntity adds a one-to-one relationship');
+        $this->assertEquals(RelationMap::ONE_TO_ONE, $relation->getType(), 'modifyEntity adds a one-to-one relationship');
         $content = $this->getConfiguration()->getEntityMap(ConcreteContentEntityMap::ENTITY_CLASS);
-        $relation = $content->getRelation('concreteArticle');
+        $relation = $content->getRelation('concreteArticles');
         $this->assertEquals(RelationMap::ONE_TO_ONE, $relation->getType(), 'modifyEntity adds a one-to-one relationship');
     }
 
@@ -132,7 +132,7 @@ EOF;
     public function testmodifyEntityAddsForeignKeysWithoutDuplicates()
     {
         $article = $this->getConfiguration()->getEntityMap(ConcreteAuthorEntityMap::ENTITY_CLASS);
-        $this->assertTrue($article->hasRelation('concreteNews'), 'modifyEntity() copies relationships from parent table and removes hardcoded refPhpName');
+        $this->assertTrue($article->hasRelation('concreteNewss'), 'modifyEntity() copies relationships from parent table and removes hardcoded refPhpName');
     }
 
     // no way to test copying of indices and uniques, except by reverse engineering the db...

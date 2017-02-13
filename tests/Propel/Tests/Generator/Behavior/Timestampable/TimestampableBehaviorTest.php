@@ -254,7 +254,7 @@ EOF;
 
         $builder = new QuickBuilder();
         $builder->setSchema($schema);
-        $builder->build('sqlite:memory:');
+        $builder->build('sqlite::memory:');
 
         $this->assertTrue(method_exists('EntityWithoutUpdatedAt', 'getCreatedAt'));
         $this->assertTrue(method_exists('EntityWithoutUpdatedAt', 'setCreatedAt'));
@@ -285,7 +285,7 @@ EOF;
 
         $builder = new QuickBuilder();
         $builder->setSchema($schema);
-        $builder->build('sqlite:memory:');
+        $builder->build('sqlite::memory:');
 
         $this->assertFalse(method_exists('EntityWithoutCreatedAt', 'getCreatedAt'));
         $this->assertFalse(method_exists('EntityWithoutCreatedAt', 'setCreatedAt'));
