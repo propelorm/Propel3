@@ -37,11 +37,11 @@ class MssqlPlatform extends SqlDefaultPlatform
         $this->setSchemaDomainMapping(new Domain(PropelTypes::DOUBLE, "FLOAT"));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::LONGVARCHAR, "VARCHAR(MAX)"));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::CLOB, "VARCHAR(MAX)"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::DATE, "DATETIME"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::BU_DATE, "DATETIME"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::TIME, "DATETIME"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::TIMESTAMP, "DATETIME"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::BU_TIMESTAMP, "DATETIME"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::DATE, "DATETIME2"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::BU_DATE, "DATETIME2"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::TIME, "DATETIME2"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::TIMESTAMP, "DATETIME2"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::BU_TIMESTAMP, "DATETIME2"));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::BINARY, "BINARY(7132)"));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::VARBINARY, "VARBINARY(MAX)"));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::LONGVARBINARY, "VARBINARY(MAX)"));
