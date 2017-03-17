@@ -149,8 +149,7 @@ class PgsqlSchemaParser extends AbstractSchemaParser
 
             $sql .= ' AND c.relname = ?';
             $params[] = $filterTable->getCommonName();
-
-        } else if (!$database->getSchema()) {
+        } elseif (!$database->getSchema()) {
             $stmt = $this->dbh->query('SELECT current_schemas(false)');
             $searchPathString = substr($stmt->fetchColumn(), 1, -1);
 
@@ -164,7 +163,6 @@ class PgsqlSchemaParser extends AbstractSchemaParser
             $searchPath = implode(', ', $searchPath);
             $sql .= "
             AND n.nspname IN ($searchPath)";
-
         } elseif ($database->getSchema()) {
             $sql .= "
             AND n.nspname = ?";
@@ -198,7 +196,6 @@ class PgsqlSchemaParser extends AbstractSchemaParser
             $wrap->oid = $oid;
             $tableWraps[] = $wrap;
         }
-
     }
 
     /**
@@ -218,7 +215,7 @@ class PgsqlSchemaParser extends AbstractSchemaParser
         if ($schema = $table->getSchema()) {
             $searchPath = '?';
             $params = [$schema];
-        } else if (!$table->getDatabase()->getSchema()) {
+        } elseif (!$table->getDatabase()->getSchema()) {
             $stmt = $this->dbh->query('SHOW search_path');
             $searchPathString = $stmt->fetchColumn();
 
@@ -226,7 +223,7 @@ class PgsqlSchemaParser extends AbstractSchemaParser
             $searchPath = explode(',', $searchPathString);
 
             foreach ($searchPath as &$path) {
-                $params[] = $path;
+                $params[] = trim($path);
                 $path = '?';
             }
             $searchPath = implode(', ', $searchPath);
@@ -250,7 +247,6 @@ class PgsqlSchemaParser extends AbstractSchemaParser
         $stmt->execute($params);
 
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-
             $size = $row['character_maximum_length'];
             if (!$size) {
                 $size = $row['numeric_precision'];
@@ -285,7 +281,10 @@ class PgsqlSchemaParser extends AbstractSchemaParser
             $propelType = $this->getMappedPropelType($type);
             if (!$propelType) {
                 $propelType = Column::DEFAULT_TYPE;
-                $this->warn('Column [' . $table->getName() . '.' . $name. '] has a column type ('.$type.') that Propel does not support.');
+                $this->warn(
+                    'Column [' . $table->getName() . '.' . $name. '] has a column type (' .
+                    $type . ') that Propel does not support.'
+                );
             }
 
             if (isset(static::$defaultTypeSizes[$type]) && $size == static::$defaultTypeSizes[$type]) {
@@ -355,7 +354,6 @@ class PgsqlSchemaParser extends AbstractSchemaParser
 
         $foreignKeys = array();
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-
             $name = $row['conname'];
             $localTable = $row['fktab'];
             $localColumns = explode(',', trim($row['fkcols'], '{}'));
@@ -478,7 +476,6 @@ class PgsqlSchemaParser extends AbstractSchemaParser
                 $row2 = $stmt2->fetch(\PDO::FETCH_ASSOC);
 
                 $indexes[$name]->addColumn($table->getColumn($row2['attname']));
-
             }
         }
 
