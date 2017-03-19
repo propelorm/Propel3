@@ -31,6 +31,7 @@ class CrossRelationCountMethods extends BuildComponent
     {
         $refRelation = $crossRelation->getIncomingRelation();
         $selfRelationName = $this->getRelationPhpName($refRelation, $plural = false);
+        $crossRelVars = $this->getRefRelationCollVarName($crossRelation->getOutgoingRelation());
 
         $relatedName = $this->getCrossRelationPhpName($crossRelation, true);
         $crossRefEntityName = $crossRelation->getMiddleEntity()->getName();
@@ -56,18 +57,18 @@ to the current object by way of the $crossRefEntityName cross-reference entity.
 EOF;
 
         $body = <<<EOF
-if (func_num_args() === 0 || \$this->isNew()) {
-    return count(\$this->$collName);
-}
-        
-\$query = $relatedQueryClassName::create(null, \$criteria);
-if (\$distinct) {
-    \$query->distinct();
+if ((null !== \$criteria || count(\$this->$crossRelVars) > count(\$this->$collName)) && !\$this->isNew()) {
+    \$query = $relatedQueryClassName::create(null, \$criteria);
+    if (\$distinct) {
+        \$query->distinct();
+    }
+
+    return \$query
+        ->filterBy{$selfRelationName}(\$this)
+        ->count();
 }
 
-return \$query
-    ->filterBy{$selfRelationName}(\$this)
-    ->count();
+return count(\$this->$collName);
 EOF;
 
 

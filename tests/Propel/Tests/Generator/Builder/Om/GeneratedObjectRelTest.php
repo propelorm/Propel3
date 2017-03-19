@@ -10,16 +10,14 @@
 
 namespace Propel\Tests\Generator\Builder\Om;
 
-use Propel\Runtime\Propel;
+use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Tests\Bookstore\Author;
 use Propel\Tests\Bookstore\AuthorQuery;
-use Propel\Tests\Bookstore\Map\AuthorTableMap;
 use Propel\Tests\Bookstore\Book;
 use Propel\Tests\Bookstore\BookQuery;
 use Propel\Tests\Bookstore\BookSummary;
 use Propel\Tests\Bookstore\BookSummaryQuery;
-use Propel\Tests\Bookstore\Map\BookTableMap;
 use Propel\Tests\Bookstore\Bookstore;
 use Propel\Tests\Bookstore\BookClubList;
 use Propel\Tests\Bookstore\BookClubListQuery;
@@ -30,12 +28,9 @@ use Propel\Tests\Bookstore\BookstoreContest;
 use Propel\Tests\Bookstore\BookstoreContestEntry;
 use Propel\Tests\Bookstore\Contest;
 use Propel\Tests\Bookstore\Customer;
-use Propel\Tests\Bookstore\Map\PublisherTableMap;
-use Propel\Tests\Bookstore\Review;
+use Propel\Tests\Bookstore\Map\BookEntityMap;
 use Propel\Tests\Helpers\Bookstore\BookstoreEmptyTestBase;
 use Propel\Tests\Helpers\Bookstore\BookstoreDataPopulator;
-
-use \DateTime;
 
 /**
  * Tests relationships between generated Object classes.
@@ -245,6 +240,7 @@ class GeneratedObjectRelTest extends BookstoreEmptyTestBase
         $book->setISBN('TEST');
 
         $list->addBook($book);
+
         $this->assertEquals(1, $list->countBooks(), 'addCrossFk() sets the internal collection properly');
         $this->assertEquals(1, $list->countBookListRels(), 'addCrossFk() sets the internal cross reference collection properly');
 
@@ -254,8 +250,6 @@ class GeneratedObjectRelTest extends BookstoreEmptyTestBase
         $rel = $rels[0];
         $this->assertFalse($rel->isNew(), 'cross object is saved if added');
 
-        $list->clearBookListRels();
-        $list->clearBooks();
         $books = $list->getBooks();
         $this->assertEquals(array($book), iterator_to_array($books), 'addCrossFk() adds the object properly');
         $this->assertEquals(1, $list->countBookListRels());
@@ -292,50 +286,8 @@ class GeneratedObjectRelTest extends BookstoreEmptyTestBase
         $bce->setCustomer($c);
         $bce->save();
 
-        $bce->setBookstoreId(null);
-
         $this->assertNull($bce->getBookstoreContest());
         $this->assertNull($bce->getBookstore());
-    }
-
-    /**
-     * Test the clearing of related object collection.
-     * @link       http://www.propelorm.org/ticket/529
-     */
-    public function testClearRefFk()
-    {
-        BookstoreDataPopulator::populate();
-        $book = new Book();
-        $book->setISBN("Foo-bar-baz");
-        $book->setTitle("The book title");
-
-        // No save ...
-
-        $r = new Review();
-        $r->setReviewedBy('Me');
-        $r->setReviewDate(new DateTime("now"));
-
-        $book->addReview($r);
-
-        // No save (yet) ...
-
-        $this->assertEquals(1, count($book->getReviews()) );
-        $book->clearReviews();
-        $this->assertEquals(0, count($book->getReviews()));
-    }
-
-    /**
-     * Test the clearing of related object collection via a many-to-many association.
-     * @link       http://www.propelorm.org/ticket/1374
-     */
-    public function testClearCrossFk()
-    {
-        $book = new Book();
-        $bookClub = new BookClubList();
-        $book->addBookClubList($bookClub);
-        $this->assertEquals(1, count($book->getBookClubLists()));
-        $book->clear();
-        $this->assertEquals(0, count($book->getBookClubLists()));
     }
 
     /**
@@ -371,9 +323,8 @@ class GeneratedObjectRelTest extends BookstoreEmptyTestBase
     public function testFKGetterUseInstancePool()
     {
         BookstoreDataPopulator::populate();
-        BookTableMap::clearInstancePool();
-        AuthorTableMap::clearInstancePool();
-        $con = Propel::getServiceContainer()->getConnection(BookTableMap::DATABASE_NAME);
+        /** @var ConnectionWrapper $con */
+        $con = $this->getConfiguration()->getConnectionManager(BookEntityMap::DATABASE_NAME)->getWriteConnection();
         $author = AuthorQuery::create()->findOne($con);
         // populate book instance pool
         $books = $author->getBooks(null, $con);
@@ -385,16 +336,13 @@ class GeneratedObjectRelTest extends BookstoreEmptyTestBase
     public function testRefFKGetJoin()
     {
         BookstoreDataPopulator::populate();
-        BookTableMap::clearInstancePool();
-        AuthorTableMap::clearInstancePool();
-        PublisherTableMap::clearInstancePool();
-        $con = Propel::getServiceContainer()->getConnection(BookTableMap::DATABASE_NAME);
+        /** @var ConnectionWrapper $con */
+        $con = $this->getConfiguration()->getConnectionManager(BookEntityMap::DATABASE_NAME)->getWriteConnection();
         $author = AuthorQuery::create()->findOne($con);
         // populate book instance pool
-        $books = $author->getBooksJoinPublisher(null, $con);
         $sql = $con->getLastExecutedQuery();
-        $publisher = $books[0]->getPublisher($con);
-        $this->assertEquals($sql, $con->getLastExecutedQuery(), 'refFK getter uses instance pool if possible');
+        $publisher = $author->getBooks()[0]->getPublisher($con);
+        $this->assertEquals($sql, $con->getLastExecutedQuery(), 'refFK getter uses first level cache if possible if possible');
     }
 
     public function testRefFKAddReturnsCurrentObject()
@@ -440,13 +388,14 @@ class GeneratedObjectRelTest extends BookstoreEmptyTestBase
         }
 
         // Remove an element
+        $books = clone $books;
         $books->shift();
         $this->assertEquals(9, $books->count());
 
         $bookClubList1->setBooks($books);
         $bookClubList1->save();
 
-        $this->assertEquals(9, $bookClubList1->getBooks()->count());
+        $this->assertCount(9, $bookClubList1->getBooks());
         $this->assertEquals(1, BookClubListQuery::create()->count());
         $this->assertEquals(9, BookListRelQuery::create()->count());
         $this->assertEquals(10, BookQuery::create()->count());
@@ -548,7 +497,6 @@ class GeneratedObjectRelTest extends BookstoreEmptyTestBase
         $coll = new ObjectCollection();
         $coll[] = $book;
 
-        BookTableMap::clearInstancePool();
         $book = BookQuery::create()->findPk($book->getPrimaryKey());
 
         $bookClubList1 = new BookClubList();
@@ -613,7 +561,6 @@ class GeneratedObjectRelTest extends BookstoreEmptyTestBase
             $b->save();
         }
 
-        BookTableMap::clearInstancePool();
         $books = BookQuery::create()->find();
 
         $bookClubList = new BookClubList();
@@ -732,18 +679,12 @@ class GeneratedObjectRelTest extends BookstoreEmptyTestBase
         $bookClubList->setFavoriteBooks($books);
         $bookClubList->save();
 
-        $bookClubList->reload(true);
-
         $this->assertCount(3, $bookClubList->getFavoriteBooks());
-
-        $bookClubList->reload(true);
 
         $books->shift();
 
         $bookClubList->setFavoriteBooks($books);
         $bookClubList->save();
-
-        $bookClubList->reload(true);
 
         $this->assertCount(2, $bookClubList->getFavoriteBooks());
     }

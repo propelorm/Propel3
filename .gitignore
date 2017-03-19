@@ -6,7 +6,6 @@ php-cs-fixer.phar
 
 tests/Fixtures/namespaced/build/
 tests/Fixtures/schemas/build/
-tests/Fixtures/schemas/build/
 
 tests/Fixtures/bookstore/build/
 tests/Fixtures/bookstore/propel.yaml

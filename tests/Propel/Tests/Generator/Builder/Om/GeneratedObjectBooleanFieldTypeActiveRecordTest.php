@@ -9,7 +9,6 @@
  */
 
 use Propel\Generator\Util\QuickBuilder;
-
 use \Propel\Tests\TestCase;
 
 /**

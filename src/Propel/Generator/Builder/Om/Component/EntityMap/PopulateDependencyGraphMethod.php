@@ -61,7 +61,7 @@ if (\$isset(\$entity, '$relationName') && \$dep = \$reader(\$entity, '$relationN
 
         $body .= '
 $dependencyGraph->add($entity, $dependencies);
-        ';
+';
 
         $this->getDefinition()->declareUse('Propel\Runtime\Session\DependencyGraph');
         $this->addMethod('populateDependencyGraph')

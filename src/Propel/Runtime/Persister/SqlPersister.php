@@ -1,12 +1,18 @@
 <?php
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ *
+ */
 
 namespace Propel\Runtime\Persister;
-
 
 use Propel\Generator\Model\NamingTool;
 use Propel\Runtime\Configuration;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Runtime\EntityProxyInterface;
 use Propel\Runtime\Event\DeleteEvent;
 use Propel\Runtime\Event\InsertEvent;
 use Propel\Runtime\Event\SaveEvent;
@@ -16,7 +22,6 @@ use Propel\Runtime\Exception\RuntimeException;
 use Propel\Runtime\Map\EntityMap;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Persister\Exception\PersisterException;
-use Propel\Runtime\Persister\Exception\UniqueConstraintException;
 use Propel\Runtime\Session\Session;
 
 class SqlPersister implements PersisterInterface
@@ -217,8 +222,14 @@ class SqlPersister implements PersisterInterface
         }
 
         foreach ($entityMap->getRelations() as $relation) {
-            if ($relation->isManyToOne() || ($relation->isOneToOne() && $relation->isOwnerSide())) {
+            if ($relation->isManyToOne()) {
                 foreach ($relation->getLocalFields() as $field) {
+                    $fields[$field->getColumnName()] = $field->getColumnName();
+                }
+            }
+
+            if ($relation->isOneToOne() && $relation->isOwnerSide()) {
+                foreach ($relation->getForeignFields() as $field) {
                     $fields[$field->getColumnName()] = $field->getColumnName();
                 }
             }
@@ -306,15 +317,19 @@ class SqlPersister implements PersisterInterface
     }
 
     /**
-     * Ads cross relation entities to the database when necessary for many-to-many relations.
+     * Adds cross relation entities to the database when necessary for many-to-many relations.
      *
+     * @param EntityMap $entityMap
      * @param array $inserts
      * @param RelationMap $relation
      */
     protected function addCrossRelations(EntityMap $entityMap, $inserts, RelationMap $relation)
     {
-        //todo, make sure the symmetrical relation hasn't been saved yet.
+        //make sure the symmetrical relation hasn't been saved yet.
         //if so, we return immediately since we would save the cross entities twice.
+        if ($this->checkCrossRelationInsertions($entityMap, $inserts, $relation)) {
+            return;
+        }
 
         $reader = $entityMap->getPropReader();
         $isset = $entityMap->getPropIsset();
@@ -532,5 +547,40 @@ class SqlPersister implements PersisterInterface
         }
 
         return implode(' AND ', $where);
+    }
+
+    /**
+     * @param EntityMap $entityMap
+     * @param $inserts
+     * @param RelationMap $relation
+     *
+     * @return bool
+     */
+    protected function checkCrossRelationInsertions(EntityMap $entityMap, $inserts, RelationMap $relation)
+    {
+        $query = $relation->getMiddleEntity()->getRepository()->createQuery();
+        $entityReader = $entityMap->getPropReader();
+        foreach ($inserts as $entity) {
+            $foreignItems = $entityReader($entity, $relation->getRefName());
+            $foreignItem = $foreignItems->getFirst();
+            if (null !== $foreignItem) {
+                $foreignReader = $foreignItem->getRepository()->getEntityMap()->getPropReader();
+            }
+            foreach ($foreignItems as $foreign) {
+                foreach ($relation->getFieldMappingIncoming() as $middleTableField => $myId) {
+                    $query->filterBy($middleTableField, $entityReader($entity, $myId));
+                    foreach ($relation->getFieldMappingOutgoing() as $outId) {
+                        $key = key($outId);
+                        $query->filterBy($key, $foreignReader($foreign, $outId[$key]));
+                        if ($query->find()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+        }
+
+        return false;
     }
 }

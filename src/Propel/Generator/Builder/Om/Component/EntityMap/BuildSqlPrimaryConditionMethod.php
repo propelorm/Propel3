@@ -25,7 +25,6 @@ class BuildSqlPrimaryConditionMethod extends BuildComponent
     {
         $body = '
 $entityReader = $this->getPropReader();
-$lastKnownValues = $entityMap->getLastKnownValues($entity);
 ';
         $placeholder = [];
 

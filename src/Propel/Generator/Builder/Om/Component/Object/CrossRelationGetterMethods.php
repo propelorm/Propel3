@@ -2,7 +2,7 @@
 
 namespace Propel\Generator\Builder\Om\Component\Object;
 
-use gossi\codegen\model\PhpParameter;
+use Propel\Common\Pluralizer\StandardEnglishPluralizer;
 use Propel\Generator\Builder\Om\Component\BuildComponent;
 use Propel\Generator\Builder\Om\Component\CrossRelationTrait;
 use Propel\Generator\Model\CrossRelation;
@@ -223,6 +223,7 @@ EOF;
         $refFK = $crossRelation->getIncomingRelation();
         $selfRelationName = $this->getRelationPhpName($refFK, $plural = false);
         $crossRefEntityName = $crossRelation->getMiddleEntity()->getName();
+        $crossRelVars = $this->getRefRelationCollVarName($crossRelation->getOutgoingRelation());
 
         foreach ($crossRelation->getRelations() as $relation) {
             $relatedName = $this->getRelationPhpName($relation, true);
@@ -236,14 +237,11 @@ EOF;
             $collName = $this->getCrossRelationRelationVarName($relation);
 
             $body = <<<EOF
-if (func_num_args() === 0 || \$this->isNew()) {
-    return \$this->$collName;
+if ((null !== \$criteria || count(\$this->$crossRelVars) > count(\$this->$collName)) && !\$this->isNew()){
+    \$this->$collName = $relatedQueryClassName::create(null, \$criteria)->filterBy{$selfRelationName}(\$this)->find();
 }
 
-\$query = $relatedQueryClassName::create(null, \$criteria)
-    ->filterBy{$selfRelationName}(\$this);
-
-return \$query->find(\$con);
+return \$this->$collName;
 EOF;
 
             $objectClassName = $this->getObjectClassName();
@@ -258,7 +256,7 @@ If this $objectClassName is new, it will return
 an empty collection or the current collection; the criteria is ignored on a new object.
 EOF;
 
-
+            $this->getDefinition()->addUseStatement('Propel\Runtime\ActiveQuery\Criteria');
             $this->addMethod('get' . $relatedName)
                 ->addSimpleParameter('criteria', 'Criteria', null)
                 ->setType("ObjectCollection|{$relatedObjectClassName}[]")

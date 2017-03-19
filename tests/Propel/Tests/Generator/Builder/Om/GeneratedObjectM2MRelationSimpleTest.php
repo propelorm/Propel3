@@ -1,11 +1,16 @@
 <?php
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ *
+ */
 
 namespace Propel\Tests\Generator\Builder\Om;
 
-use Propel\Generator\Platform\MysqlPlatform;
-use Propel\Generator\Util\QuickBuilder;
 use Propel\Runtime\Collection\ObjectCollection;
-use Propel\Runtime\Collection\ObjectCombinationCollection;
 use Propel\Runtime\Configuration;
 use Propel\Tests\Helpers\PlatformDatabaseBuildTimeBase;
 
@@ -72,19 +77,27 @@ class GeneratedObjectM2MRelationSimpleTest extends PlatformDatabaseBuildTimeBase
 
         $friend1 = (new \Relation1User())->setName('Friend 1');
         $friend2 = (new \Relation1User())->setName('Friend 2');
-        $friend1->save();
-        $friend2->save();
+
         $hans->addFriend($friend1);
         $this->assertCount(1, $hans->getFriends(), 'one friend');
 
         $hans->addFriend($friend2);
         $this->assertCount(2, $hans->getFriends(), 'two friends');
 
+        $this->assertCount(1, $friend1->getWhos(), 'One who');
+        $this->assertCount(1, $friend2->getWhos(), 'One who');
+
+        $this->assertCount(2, $hans->getRelation1UserFriendsByWho(), 'Two cross-relation objects');
+        $this->assertCount(1, $friend1->getRelation1UserFriendsByFriend(), 'One cross relation object');
+        $this->assertCount(1, $friend2->getRelation1UserFriendsByFriend(), 'One cross relation object');
+
+        $this->assertSame($hans->getRelation1UserFriendsByWho()[0], $friend1->getRelation1UserFriendsByFriend()[0], 'Cross-relation objects are the same');
+        $this->assertSame($hans->getRelation1UserFriendsByWho()[1], $friend2->getRelation1UserFriendsByFriend()[0], 'Cross-relation objects are the same');
+
         $hans->save();
         $this->assertEquals(3, \Relation1UserQuery::create()->count(), 'We have three users.');
         $this->assertEquals(2, \Relation1UserFriendQuery::create()->count(), 'We have two connections.');
         $this->assertEquals(2, \Relation1UserQuery::create()->filterByWho($hans)->count(), 'Hans has two friends.');
-
     }
 
     /**
@@ -152,13 +165,14 @@ class GeneratedObjectM2MRelationSimpleTest extends PlatformDatabaseBuildTimeBase
         $friends[] = $friend1;
         $friends[] = $friend2 = (new \Relation1User())->setName('Friend 2');
         $hans->setFriends($friends);
+
         $this->assertCount(2, $hans->getFriends(), 'two friends');
+        $this->assertCount(2, $hans->getRelation1UserFriendsByWho(), 'two connections');
 
         $hans->save();
         $this->assertEquals(3, \Relation1UserQuery::create()->count(), 'We have three users.');
         $this->assertEquals(2, \Relation1UserFriendQuery::create()->count(), 'We have two connections.');
         $this->assertEquals(2, \Relation1UserQuery::create()->filterByWho($hans)->count(), 'Hans has two friends.');
-
     }
 
     /*

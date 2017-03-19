@@ -7,6 +7,7 @@
  *
  * @license MIT License
  */
+
 namespace Propel\Tests\Generator\Builder\Om;
 
 use \MyNameSpace\ComplexFieldTypeEntity2;

@@ -11,10 +11,8 @@
 namespace Propel\Tests\Generator\Builder\Om;
 
 use Propel\Generator\Util\QuickBuilder;
-
 use Propel\Runtime\Configuration;
 use Propel\Runtime\Connection\ConnectionWrapper;
-use Propel\Runtime\Propel;
 use Propel\Tests\TestCase;
 
 /**
