@@ -69,7 +69,7 @@ class Car
     private $id;
     
     /**
-     * @Field(type="VARCAR")
+     * @Field(type="VARCHAR")
      */
     private $name;
     
