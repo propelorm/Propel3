@@ -11,8 +11,6 @@
 namespace Propel\Tests\Generator\Builder\Om;
 
 use Propel\Generator\Util\QuickBuilder;
-
-use Propel\Runtime\Propel;
 use Propel\Tests\TestCase;
 
 /**

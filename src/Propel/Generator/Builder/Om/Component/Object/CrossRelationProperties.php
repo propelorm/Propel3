@@ -42,7 +42,8 @@ class CrossRelationProperties extends BuildComponent
             $this->addConstructorBody("\$this->$varName = new ObjectCombinationCollection();");
         } else {
             $this->getDefinition()->declareUse('Propel\Runtime\Collection\ObjectCollection');
-            $this->addConstructorBody("\$this->$varName = new ObjectCollection();");
+            $this->addConstructorBody("\$this->$varName = new ObjectCollection();
+\$this->{$varName}->setModel('$className');");
         }
     }
 } 

@@ -12,9 +12,7 @@ namespace Propel\Tests\Generator\Builder\Om;
 
 use Map\ComplexColumnTypeEntity1EntityMap;
 use Propel\Generator\Util\QuickBuilder;
-
 use Propel\Runtime\Configuration;
-use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Tests\TestCase;
 

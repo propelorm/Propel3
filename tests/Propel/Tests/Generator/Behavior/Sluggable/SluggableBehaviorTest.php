@@ -85,7 +85,7 @@ XML;
     </entity >
 </database>
 XML;
-        QuickBuilder::buildSchema($schema, 'sqlite:memory:');
+        QuickBuilder::buildSchema($schema, 'sqlite::memory:');
     }
 
     public function testParameters()

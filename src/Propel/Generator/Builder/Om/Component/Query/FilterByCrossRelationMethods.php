@@ -43,13 +43,13 @@ class FilterByCrossRelationMethods extends BuildComponent
      */
     protected function addFilterByCrossRelation(CrossRelation $crossRelation)
     {
-        $relationName = $this->getRefRelationPhpName($crossRelation->getIncomingRelation(), $plural = false);
+        $relationName = $this->getRefRelationPhpName($crossRelation->getIncomingRelation(), true);
 
         foreach ($crossRelation->getRelations() as $relation) {
             $queryClass = $this->getQueryClassName();
             $foreignEntity = $relation->getForeignEntity();
             $fkPhpName = $foreignEntity->getFullClassName();
-            $relName = $this->getRelationPhpName($relation, $plural = false);
+            $relName = $this->getRelationPhpName($relation, false);
             $objectName = '$' . $foreignEntity->getCamelCaseName();
 
             $description = "Filter the query by a related $fkPhpName object

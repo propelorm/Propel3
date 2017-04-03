@@ -13,7 +13,6 @@ use \MyNameSpace\ComplexFieldTypeEntity2;
 use \MyNameSpace\ComplexFieldTypeEntity2Query;
 use Propel\Generator\Util\QuickBuilder;
 use Propel\Runtime\Configuration;
-use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Tests\TestCase;
 
 /**
