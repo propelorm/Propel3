@@ -28,6 +28,13 @@ class RemoveMethod extends BuildComponent
 \$session->commit();
 EOF;
 
+        if ($this->getEntity()->isReadOnly()) {
+$body = <<<EOF
+throw new BadMethodCallException('Readonly entity cannot be deleted');
+EOF;
+            $this->useClass('Propel\Runtime\Exception\BadMethodCallException');
+        }
+
         $this->addMethod('remove')
             ->addSimpleParameter('entity', $entityClassName)
             ->setDescription("Removes a instance of $entityClassName.")

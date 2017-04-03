@@ -28,6 +28,13 @@ class SaveMethod extends BuildComponent
 \$session->commit();
 EOF;
 
+        if ($this->getEntity()->isReadOnly()) {
+$body = <<<EOF
+throw new BadMethodCallException('Readonly entity cannot be saved');
+EOF;
+            $this->useClass('Propel\Runtime\Exception\BadMethodCallException');
+        }
+
         $this->addMethod('save')
             ->addSimpleParameter('entity', $entityClassName)
             ->setDescription("Saves a instance of $entityClassName.")

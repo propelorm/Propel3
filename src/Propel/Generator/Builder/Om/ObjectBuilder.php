@@ -49,8 +49,9 @@ class ObjectBuilder extends AbstractBuilder
             $this->applyComponent('Object\\CrossRelationCountMethods');
             $this->applyComponent('Object\\ReferrerRelationCountMethods');
         }
-
-        $this->applyComponent('Object\\PropertySetterMethods');
+        if ($this->getEntity()->isReadOnly() === false) {
+            $this->applyComponent('Object\\PropertySetterMethods');
+        }
         $this->applyComponent('Object\\RelationSetterMethods');
         $this->applyComponent('Object\\ReferrerRelationAddMethods');
         $this->applyComponent('Object\\ReferrerRelationRemoveMethods');
