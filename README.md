@@ -79,7 +79,7 @@ class Car
 
 ### Data mapper
 
-```yml
+```php
 $propel = new Propel\Runtime\Configuration('path/to/propel.yml');
 
 // require a session for each request/workload
