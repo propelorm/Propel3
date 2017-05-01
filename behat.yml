@@ -1,0 +1,4 @@
+default:
+  suites:
+    propel:
+      paths:    [ %paths.base%/features ]
