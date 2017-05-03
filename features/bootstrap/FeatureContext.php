@@ -1,70 +1,43 @@
 <?php
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ *
+ */
 
-use Behat\Behat\Context\BehatContext;
 use Behat\Gherkin\Node\PyStringNode;
+use Behat\Behat\Tester\Exception\PendingException;
 
-class FeatureContext extends BehatContext
+/**
+ * Class FeatureContext
+ *
+ * @author William Durand
+ * @author Cristiano Cinotti
+ */
+class FeatureContext extends PropelContext
 {
     /**
-     * @var string
-     */
-    protected $workingDirectory;
-
-    /**
-     * @var string
-     */
-    protected $platform;
-
-    /**
-     * Initializes context.
-     * Every scenario gets it's own context object.
-     *
-     * @param array $parameters context parameters (set them up through behat.yml)
-     */
-    public function __construct(array $parameters)
-    {
-        // Initialize your context here
-        $this->workingDirectory = sys_get_temp_dir();
-    }
-
-    /**
-     * @Given /^a platform is "([^"]*)"$/
-     */
-    public function aPlatformIs($platform)
-    {
-        $this->platform = $platform;
-    }
-
-    /**
-     * @Given /^I have XML schema:$/
-     */
-    public function iHaveXmlSchema(PyStringNode $string)
-    {
-        file_put_contents($this->workingDirectory . '/schema.xml', $string->getRaw());
-    }
-
-    /**
-     * @When /^I generate SQL$/
-     */
-    public function iGenerateSql()
-    {
-        exec(sprintf('bin/propel sql:build --platform=%s --input-dir=%s --output-dir=%s',
-            $this->platform,
-            $this->workingDirectory,
-            $this->workingDirectory
-        ));
-    }
-
-    /**
-     * @Then /^it should contain:$/
+     * @Then /^It should contain:$/
      */
     public function itShouldContain(PyStringNode $string)
     {
-        $sql = file_get_contents($this->workingDirectory . '/behat_table.sql');
+        $sql = file_get_contents($this->workingDirectory . '/default.sql');
 
-        if (empty($sql) || !preg_match(sprintf('/%s/', preg_quote($string->getRaw())), $sql)) {
-            $this->printDebug($sql);
+        if (empty($sql)) {
             throw new Exception('Content not found');
         }
+
+        \PHPUnit_Framework_Assert::assertContains($this->getSql($string->getRaw()), $sql);
+    }
+
+    /**
+     * @Then I should see:
+     */
+    public function iShouldSee(PyStringNode $string)
+    {
+        throw new PendingException();
     }
 }
