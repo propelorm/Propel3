@@ -1,4 +1,4 @@
-# Propel3 #
+# Propel3
 
 Propel3 is an open-source Object-Relational Mapping (ORM) for modern PHP 7.1+.
 
@@ -7,7 +7,7 @@ Propel3 is an open-source Object-Relational Mapping (ORM) for modern PHP 7.1+.
 [![Code Climate](https://codeclimate.com/github/propelorm/Propel2/badges/gpa.svg)](https://codeclimate.com/github/propelorm/Propel2)
 <a href="https://codeclimate.com/github/propelorm/Propel2"><img src="https://codeclimate.com/github/propelorm/Propel2/badges/coverage.svg" /></a>
 [![PPM Compatible](https://raw.githubusercontent.com/php-pm/ppm-badge/master/ppm-badge.png)](https://github.com/php-pm/php-pm)
-[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/propelorm/Propel)
+[![Gitter](https://badges.gitter.im/propelorm/Propel.svg)](https://gitter.im/propelorm/Propel)
 
 Version 3 of Propel ORM replaces [Propel2](https://github.com/propelorm/Propel2), which is not maintained anymore.
 Propel3 introduces a data-mapper implementation which separates your entities from the actual persisting logic.
