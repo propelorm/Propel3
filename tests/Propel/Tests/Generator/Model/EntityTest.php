@@ -243,7 +243,7 @@ class EntityTest extends ModelTestCase
 
     public function testSetInvalidDefaultStringFormat()
     {
-        $this->setExpectedException('Propel\Generator\Exception\InvalidArgumentException');
+        $this->expectException('Propel\Generator\Exception\InvalidArgumentException');
 
         $entity = new Entity();
         $entity->setDefaultStringFormat('FOO');
@@ -291,7 +291,7 @@ class EntityTest extends ModelTestCase
         $entity = new Entity('books');
         $field = $this->getFieldMock('created_at', array('phpName' => 'CreatedAt'));
 
-        $this->setExpectedException('Propel\Generator\Exception\EngineException');
+        $this->expectException('Propel\Generator\Exception\EngineException');
 
         $entity->addField($field);
         $entity->addField($field);
@@ -396,7 +396,7 @@ class EntityTest extends ModelTestCase
 
     public function testCantRemoveFieldWhichIsNotInEntity()
     {
-        $this->setExpectedException('Propel\Generator\Exception\EngineException');
+        $this->expectException('Propel\Generator\Exception\EngineException');
 
         $field1 = $this->getFieldMock('title');
 

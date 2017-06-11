@@ -142,13 +142,10 @@ EOF;
 EOF;
         try {
             $appData = $schemaReader->parseString($schema);
+            $this->fail('No exception thrown');
         } catch (SchemaException $e) {
-            if ($e->getPrevious() instanceof BehaviorNotFoundException) {
-                return;
-            }
+            $this->assertInstanceOf(BehaviorNotFoundException::class, $e->getPrevious());
         }
-
-        $this->fail('No exception or wrong exception thrown');
     }
 
     public function testModifyEntity()

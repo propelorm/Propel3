@@ -180,12 +180,21 @@ EOF;
     <table name="archivable_test_01">
         <column name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
         <column name="title" type="VARCHAR" size="100" primaryString="true" />
-        <behavior name="archivable" />
     </table>
 </database>
 EOF;
         $builder = new QuickBuilder();
         $builder->setSchema($schema);
-        $builder->getSQL();
+        $expectedSql = "
+CREATE TABLE archivable_test01_archive
+(
+    id INTEGER NOT NULL,
+    title VARCHAR(100),
+    archived_at TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE (id)
+);
+";
+        $this->assertContains($expectedSql, $builder->getSQL(), "Archive entity correctly created");
     }
 }

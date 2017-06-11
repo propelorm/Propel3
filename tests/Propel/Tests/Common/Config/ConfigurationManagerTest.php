@@ -92,8 +92,12 @@ foo: bar
 bar: baz
 EOF;
         $this->getFilesystem()->dumpFile('doctrine.yaml', $yamlConf);
-
-        $manager = new TestableConfigurationManager();
+        try {
+            $manager = new TestableConfigurationManager();
+            $this->assertNotNull($manager,  'Manager loaded');
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
     }
 
     public function testBackupConfigFilesAreIgnored()

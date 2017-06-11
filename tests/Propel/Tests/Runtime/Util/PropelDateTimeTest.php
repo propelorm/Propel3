@@ -14,6 +14,7 @@ use Propel\Runtime\Util\PropelDateTime;
 
 use \DateTime;
 use \DateTimeZone;
+use Propel\Tests\TestCase;
 
 /**
  * Test for DateTime subclass to support serialization.
@@ -21,7 +22,7 @@ use \DateTimeZone;
  * @author Alan Pinstein
  * @author Soenke Ruempler
  */
-class PropelDateTimeTest extends \PHPUnit_Framework_TestCase
+class PropelDateTimeTest extends TestCase
 {
 
     /**

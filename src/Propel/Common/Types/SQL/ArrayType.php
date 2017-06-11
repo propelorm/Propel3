@@ -1,8 +1,15 @@
 <?php
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ *
+ */
 
 namespace Propel\Common\Types\SQL;
 
-use gossi\codegen\model\PhpConstant;
 use Propel\Common\Types\AbstractType;
 use Propel\Common\Types\BuildableFieldTypeInterface;
 use Propel\Generator\Builder\Om\AbstractBuilder;
@@ -14,6 +21,9 @@ class ArrayType extends AbstractType implements BuildableFieldTypeInterface
 {
     public function databaseToProperty($value, FieldMap $fieldMap)
     {
+        $value = ltrim($value, '| ');
+        $value = rtrim($value, ' |');
+
         return $value ? explode(' | ', $value) : [];
     }
 

@@ -781,7 +781,7 @@ class FieldTest extends ModelTestCase
 
     public function testGetAutoIncrementStringThrowsEngineException()
     {
-        $this->setExpectedException('Propel\Generator\Exception\EngineException');
+        $this->expectException('Propel\Generator\Exception\EngineException');
 
         $entity = $this->getEntityMock('books');
         $entity

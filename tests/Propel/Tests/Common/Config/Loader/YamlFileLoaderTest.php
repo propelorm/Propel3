@@ -16,6 +16,7 @@ use Propel\Tests\Common\Config\ConfigTestCase;
 
 class YamlFileLoaderTest extends ConfigTestCase
 {
+    /** @var  YamlFileLoader */
     protected $loader;
 
     protected function setUp()
@@ -58,7 +59,7 @@ EOF;
 
     /**
      * @expectedException        Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage Unable to parse
+     * @expectedExceptionMessage The content is not valid yaml
      */
     public function testYamlFileHasInvalidContent()
     {
@@ -69,7 +70,7 @@ text
 EOF;
         $this->dumpTempFile('nonvalid.yaml', $content);
 
-        @$this->loader->load('nonvalid.yaml');
+        $this->loader->load('nonvalid.yaml');
     }
 
     public function testYamlFileIsEmpty()

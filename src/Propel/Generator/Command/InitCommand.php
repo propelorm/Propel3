@@ -11,14 +11,14 @@
 namespace Propel\Generator\Command;
 
 use Propel\Generator\Builder\Util\PropelTemplate;
-use Propel\Generator\Command\Helper\DialogHelper;
 use Propel\Runtime\Adapter\AdapterFactory;
 use Propel\Runtime\Connection\ConnectionFactory;
 use Propel\Runtime\Connection\Exception\ConnectionException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\StyleInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -49,18 +49,8 @@ class InitCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->getHelperSet()->set(new DialogHelper());
-
-        /** @var $dialog DialogHelper */
-        $dialog = $this->getHelper('dialog');
-
+        $io = new SymfonyStyle($input, $output);
         $options = [];
-
-        $dialog->writeBlock($output, 'Propel 2 Initializer');
-
-        $dialog->writeSection($output, 'First we need to set up your database connection.');
-        $output->writeln('');
-
         $supportedRdbms = [
             'mysql' => 'MySQL',
             'sqlite' => 'SQLite',
@@ -70,80 +60,83 @@ class InitCommand extends AbstractCommand
             'mssql' => 'MSSQL (via pdo-mssql)'
         ];
 
-        $options['rdbms'] = $dialog->select($output, 'Please pick your favorite database management system', $supportedRdbms);
+        $io->title('Propel 3 Initializer');
 
-        $output->writeln('');
+        $io->section('First we need to set up your database connection.');
+        $options['rdbms'] = $io->choice('Please pick your favorite database management system', $supportedRdbms, 'MySQL');
 
         do {
             switch ($options['rdbms']) {
                 case 'mysql':
-                    $options['dsn'] = $this->initMysql($output, $dialog);
+                    $options['dsn'] = $this->initMysql($io);
                     break;
                 case 'sqlite':
-                    $options['dsn'] = $this->initSqlite($output, $dialog);
+                    $options['dsn'] = $this->initSqlite($io);
                     break;
                 case 'pgsql':
-                    $options['dsn'] = $this->initPgsql($output, $dialog);
+                    $options['dsn'] = $this->initPgsql($io);
                     break;
                 default:
-                    $options['dsn'] = $this->initDsn($output, $dialog, $options['rdbms']);
+                    $options['dsn'] = $this->initDsn($io, $options['rdbms']);
                     break;
             }
 
+            $options['user'] = $io->ask('Please enter your database user', 'root');
+            $options['password'] = $io->askHidden('Please enter your database password');
+            $options['charset'] = $io->ask('Which charset would you like to use?', 'utf8');
+        } while (!$this->testConnection($io, $options));
 
-            $options['user'] = $dialog->ask($output, 'Please enter your database user', 'root');
-            $options['password'] = $dialog->askHiddenResponse($output, 'Please enter your database password');
+        $io->section('Propel schema');
+        $io->text([
+            'The initial step in every Propel project is the "build".',
+            'During build time, a developer describes the structure of the datamodel in a XML file called the "schema".',
+            'From this schema, Propel generates PHP classes, called "model classes", made of object-oriented PHP code',
+            'optimized for a given RDMBS.',
+            'The model classes are the primary interface to find and manipulate data in the database in Propel.',
+            'The XML schema can also be used to generate SQL code to setup your database.',
+            'Alternatively, you can generate the schema from an existing database.'
+        ]);
 
-            $options['charset'] = $dialog->ask($output, 'Which charset would you like to use?', 'utf8');
-        } while (!$this->testConnection($output, $dialog, $options));
-
-        $dialog->writeSection($output, 'The initial step in every Propel project is the "build". During build time, a developer describes the structure of the datamodel in a XML file called the "schema".');
-        $dialog->writeSection($output, 'From this schema, Propel generates PHP classes, called "model classes", made of object-oriented PHP code optimized for a given RDMBS. The model classes are the primary interface to find and manipulate data in the database in Propel.');
-        $dialog->writeSection($output, 'The XML schema can also be used to generate SQL code to setup your database. Alternatively, you can generate the schema from an existing database.');
-        $output->writeln('');
-
-        if ($dialog->askConfirmation($output, 'Do you have an existing database you want to use with propel?', false)) {
+        if ($io->confirm('Do you have an existing database you want to use with propel?', false)) {
             $options['schema'] = $this->reverseEngineerSchema($output, $options);
+            $options['reverse'] = true;
         }
 
-        $options['schemaDir'] = $dialog->ask($output, 'Where do you want to store your schema.xml?', $this->defaultSchemaDir);
-        $options['phpDir'] = $dialog->ask($output, 'Where do you want propel to save the generated php models?', $this->defaultPhpDir);
-        $options['namespace'] = $dialog->ask($output, 'Which namespace should the generated php models use?');
+        $options['schemaDir'] = $io->ask('Where do you want to store your schema.xml?', $this->defaultSchemaDir);
+        $options['phpDir'] = $io->ask('Where do you want propel to save the generated php models?', $this->defaultPhpDir);
+        $options['namespace'] = $io->ask('Which namespace should the generated php models use?');
 
-        $dialog->writeSection($output, 'Propel asks you to define some data to work properly, for instance: connection parameters, working directories, flags to take decisions and so on. You can pass these data via a configuration file.');
-        $dialog->writeSection($output, 'The name of the configuration file is <comment>propel</comment>, with one of the supported extensions (yml, xml, json, ini, php). E.g. <comment>propel.yml</comment> or <comment>propel.json</comment>.');
-        $output->writeln('');
+        $io->section('Propel configuration file');
+        $io->text('Propel asks you to define some data to work properly, for instance: connection parameters, working directories, flags to take decisions and so on. You can pass these data via a configuration file.');
+        $io->text('The name of the configuration file is <comment>propel</comment>, with one of the supported extensions (yml, xml, json, ini, php). E.g. <comment>propel.yml</comment> or <comment>propel.json</comment>.');
 
-        $options['format'] = $dialog->askAndValidate($output, 'Please enter the format to use for the generated configuration file (yml, xml, json, ini, php)', [$this, 'validateFormat'], false, 'yml');
+        $options['format'] = $io->ask('Please enter the format to use for the generated configuration file (yml, xml, json, ini, php)', 'yml', [$this, 'validateFormat']);
 
-        $dialog->writeBlock($output, 'Propel 2 Initializer - Summary');
-        $dialog->writeSection($output, 'The Propel 2 Initializer will set up your project with the following settings:');
+        $io->block('Propel 3 Initializer - Summary', null, 'bg=blue;fg=white');
+        $io->text('The Propel 3 Initializer will set up your project with the following settings:');
 
-        $dialog->writeSummary($output, [
+        $io->listing($this->formatSummary([
             'Path to schema.xml' => $options['schemaDir'] . '/schema.xml',
             'Path to config file' => sprintf('%s/propel.%s', getcwd(), $options['format']),
             'Path to generated php models' => $options['phpDir'],
             'Namespace of generated php models' => $options['namespace'],
-        ]);
+        ]));
 
-        $dialog->writeSummary($output, [
+        $io->listing($this->formatSummary([
             'Database management system' => $options['rdbms'],
             'Charset' => $options['charset'],
             'User' => $options['user'],
-        ]);
+        ]));
 
-        $output->writeln('');
+        if (!$io->confirm('Is everything correct?')) {
+            $io->error('Process aborted.');
 
-        if (!$dialog->askConfirmation($output, 'Is everything correct?')) {
-            $output->writeln('<error>Process aborted.</error>');
             return 1;
         }
 
-        $output->writeln('');
+        $this->generateProject($io, $options);
 
-        $this->generateProject($output, $options);
-
-        $dialog->writeSection($output, sprintf('Propel 2 is ready to be used!'));
+        $io->text(sprintf('Propel 3 is ready to be used!'));
     }
 
     private function detectDefaultPhpDir()
@@ -162,31 +155,32 @@ class InitCommand extends AbstractCommand
         return getcwd();
     }
 
-    private function initMysql(OutputInterface $output, DialogHelper $dialog)
+    private function initMysql(StyleInterface $io)
     {
-        $host = $dialog->ask($output, 'Please enter your database host', 'localhost');
-        $database = $dialog->ask($output, 'Please enter your database name');
+        $host = $io->ask('Please enter your database host', 'localhost');
+        $port = $io->ask('Please enter your database port', '3306');
+        $database = $io->ask('Please enter your database name');
 
-        return sprintf('mysql:host=%s;dbname=%s', $host, $database);
+        return sprintf('mysql:host=%s;port=%s;dbname=%s', $host, $port, $database);
     }
 
-    private function initSqlite(OutputInterface $output, DialogHelper $dialog)
+    private function initSqlite(StyleInterface $io)
     {
-        $path = $dialog->ask($output, 'Where should the sqlite database be stored?', getcwd() . '/my.app.sq3');
+        $path = $io->ask('Where should the sqlite database be stored?', getcwd() . '/my.app.sq3');
 
         return sprintf('sqlite:%s', $path);
     }
 
-    private function initPgsql(OutputInterface $output, DialogHelper $dialog)
+    private function initPgsql(StyleInterface $io)
     {
-        $host = $dialog->ask($output, 'Please enter your database host (without port)', 'localhost');
-        $port = $dialog->ask($output, 'Please enter your database port', '3306');
-        $database = $dialog->ask($output, 'Please enter your database name');
+        $host = $io->ask('Please enter your database host (without port)', 'localhost');
+        $port = $io->ask('Please enter your database port', '5432');
+        $database = $io->ask('Please enter your database name');
 
         return sprintf('pgsql:host=%s;port=%s;dbname=%s', $host, $port, $database);
     }
 
-    private function initDsn(OutputInterface $output, DialogHelper $dialog, $rdbms)
+    private function initDsn(StyleInterface $io, $rdbms)
     {
         switch ($rdbms) {
             case 'oracle':
@@ -202,10 +196,10 @@ class InitCommand extends AbstractCommand
                 $help = 'https://php.net/manual/en/pdo.drivers.php';
         }
 
-        return $dialog->ask($output, sprintf('Please enter the dsn (see <comment>%s</comment>) for your database connection', $help));
+        return $io->ask(sprintf('Please enter the dsn (see <comment>%s</comment>) for your database connection', $help));
     }
 
-    private function generateProject(OutputInterface $output, array $options)
+    private function generateProject(StyleInterface $io, array $options)
     {
         $schema = new PropelTemplate();
         $schema->setTemplateFile(__DIR__ . '/templates/schema.xml.php');
@@ -220,16 +214,16 @@ class InitCommand extends AbstractCommand
             $options['schema'] = $schema->render($options);
         }
 
-        $this->writeFile($output, sprintf('%s/schema.xml', $options['schemaDir']), $options['schema']);
-        $this->writeFile($output, sprintf('%s/propel.%s', getcwd(), $options['format']), $config->render($options));
-        $this->writeFile($output, sprintf('%s/propel.%s.dist', getcwd(), $options['format']), $distConfig->render($options));
+        $this->writeFile($io, sprintf('%s/schema.xml', $options['schemaDir']), $options['schema']);
+        $this->writeFile($io, sprintf('%s/propel.%s', getcwd(), $options['format']), $config->render($options));
+        $this->writeFile($io, sprintf('%s/propel.%s.dist', getcwd(), $options['format']), $distConfig->render($options));
     }
 
-    private function writeFile(OutputInterface $output, $filename, $content)
+    private function writeFile(StyleInterface $io, $filename, $content)
     {
         $this->getFilesystem()->dumpFile($filename, $content);
 
-        $output->writeln(sprintf('<info> + %s</info>', $filename));
+        $io->text(sprintf('<info> + %s</info>', $filename));
     }
 
     public function validateFormat($format)
@@ -251,14 +245,14 @@ class InitCommand extends AbstractCommand
         return $format;
     }
 
-    private function testConnection(OutputInterface $output, DialogHelper $dialog, array $options)
+    private function testConnection(SymfonyStyle $io, array $options)
     {
         $adapter = AdapterFactory::create($options['rdbms']);
 
         try {
             ConnectionFactory::create($options, $adapter);
+            $io->block('Connected to sql server successful!', null, 'bg=blue;fg=white');
 
-            $dialog->writeBlock($output, 'Connected to sql server successful!');
             return true;
         } catch (ConnectionException $e) {
             // get the "real" wrapped exception message
@@ -266,12 +260,11 @@ class InitCommand extends AbstractCommand
                 $message = $e->getMessage();
             } while (($e = $e->getPrevious()) !== null);
 
-            $dialog->writeBlock($output, 'Unable to connect to the specific sql server: ' . $message, 'error');
-            $dialog->writeSection($output, 'Make sure the specified credentials are correct and try it again.');
-            $output->writeln('');
+            $io->error('Unable to connect to the specific sql server: ' . $message);
+            $io->text('Make sure the specified credentials are correct and try it again.');
 
-            if ($output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) {
-                $output->writeln($e);
+            if ($io->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) {
+                $io->text($e);
             }
 
             return false;
@@ -281,9 +274,11 @@ class InitCommand extends AbstractCommand
     private function reverseEngineerSchema(OutputInterface $output, array $options)
     {
         $outputDir = sys_get_temp_dir();
-
         $this->getApplication()->setAutoExit(false);
-        if (0 === $this->getApplication()->run(new StringInput(sprintf('reverse %s --output-dir %s', escapeshellarg($options['dsn']), $outputDir)), $output)) {
+        if (0 === $this->getApplication()->find('database:reverse')->run(new StringInput(sprintf(
+            'reverse %s --output-dir %s --database-name %s',
+            escapeshellarg($options['dsn'] . ';user=' . $options['user'] . ';password=' . $options['password']), $outputDir, 'default')),
+                $output)) {
             $schema = file_get_contents($outputDir . '/schema.xml');
         } else {
             exit(1);
@@ -292,5 +287,15 @@ class InitCommand extends AbstractCommand
         $this->getApplication()->setAutoExit(true);
 
         return $schema;
+    }
+
+    private function formatSummary($items)
+    {
+        $strings = [];
+        foreach ($items as $name => $value) {
+            $strings[] = sprintf('<info>%s</info>: <comment>%s</comment>', $name, $value);
+        }
+
+        return $strings;
     }
 }
