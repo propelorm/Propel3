@@ -57,5 +57,4 @@ class DatabaseReverseTest extends TestCaseFixturesDatabase
         $this->assertCount(2, $table->xpath('column'));
 
     }
-
 }

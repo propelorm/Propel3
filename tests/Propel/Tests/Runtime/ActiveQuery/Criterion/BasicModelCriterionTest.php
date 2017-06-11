@@ -44,6 +44,7 @@ class BasicModelCriterionTest extends BaseTestCase
         $params = array();
         $ps = '';
         $cton->appendPsTo($ps, $params);
+        $this->assertEquals('A.COL = B.COL', $ps);
     }
 
     public function testAppendPsToAddsClauseWithoutBindingForNullValues()

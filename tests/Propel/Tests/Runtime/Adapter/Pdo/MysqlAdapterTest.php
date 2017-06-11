@@ -41,15 +41,6 @@ class MysqlAdapterTest extends TestCaseFixtures
     /**
      * @dataProvider getConParams
      */
-    public function testPrepareParamsThrowsException($conparams)
-    {
-        $db = new TestableMysqlAdapter();
-        $db->prepareParams($conparams);
-    }
-
-    /**
-     * @dataProvider getConParams
-     */
     public function testPrepareParams($conparams)
     {
         $db = new TestableMysqlAdapter();

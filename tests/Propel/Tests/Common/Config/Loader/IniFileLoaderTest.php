@@ -16,6 +16,7 @@ use Propel\Tests\Common\Config\ConfigTestCase;
 
 class IniFileLoaderTest extends ConfigTestCase
 {
+    /** @var  IniFileLoader */
     protected $loader;
 
     protected function setUp()

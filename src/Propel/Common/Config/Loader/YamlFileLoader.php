@@ -11,6 +11,7 @@
 namespace Propel\Common\Config\Loader;
 
 use Propel\Common\Config\Exception\InputOutputException;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -43,6 +44,11 @@ class YamlFileLoader extends FileLoader
         //config file is empty
         if (null === $content) {
             $content = array();
+        }
+
+        //Invalid yaml content (e.g. text only) return a string
+        if (!is_array($content)) {
+            throw new ParseException('The content is not valid yaml.');
         }
 
         $content = $this->resolveParams($content); //Resolve parameter placeholders (%name%)

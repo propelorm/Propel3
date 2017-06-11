@@ -10,8 +10,9 @@ use Propel\Generator\Model\Relation;
 use Propel\Generator\Model\Index;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Platform\SqlDefaultPlatform;
+use Propel\Tests\TestCase;
 
-class EntityDiffTest extends \PHPUnit_Framework_TestCase
+class EntityDiffTest extends TestCase
 {
     public function testDefaultObjectState()
     {

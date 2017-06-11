@@ -26,7 +26,8 @@ class RepositoryTest extends TestCase
 {
     public function testBla()
     {
-        return;
+        $this->markTestSkipped();
+
         $configuration = new \Propel\Runtime\Configuration('/Users/marc/Propel2/propel.yml');
         $session = $configuration->getSession();
 

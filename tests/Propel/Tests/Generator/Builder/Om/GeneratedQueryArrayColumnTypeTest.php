@@ -14,24 +14,25 @@ use Propel\Generator\Util\QuickBuilder;
 
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Tests\TestCase;
 
 /**
  * Tests the generated queries for array column types filters
  *
  * @author Francois Zaninotto
  */
-class GeneratedQueryArrayColumnTypeTest extends \PHPUnit_Framework_TestCase
+class GeneratedQueryArrayColumnTypeTest extends TestCase
 {
     public function setUp()
     {
         if (!class_exists('\ComplexColumnTypeEntity11')) {
             $schema = <<<EOF
 <database name="generated_object_complex_type_test_11" activeRecord="true">
-    <table name="complex_column_type_entity_11">
-        <column name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
-        <column name="tags" type="ARRAY" />
-        <column name="value_set" type="ARRAY" />
-    </table>
+    <entity name="ComplexColumnTypeEntity11">
+        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
+        <field name="tags" type="ARRAY" />
+        <field name="value_set" type="ARRAY" />
+    </entity>
 </database>
 EOF;
             QuickBuilder::buildSchema($schema);

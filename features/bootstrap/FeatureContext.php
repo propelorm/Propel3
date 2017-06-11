@@ -10,6 +10,7 @@
 
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Behat\Tester\Exception\PendingException;
+use PHPUnit\Framework\Assert;
 
 /**
  * Class FeatureContext
@@ -30,14 +31,6 @@ class FeatureContext extends PropelContext
             throw new Exception('Content not found');
         }
 
-        \PHPUnit_Framework_Assert::assertContains($this->getSql($string->getRaw()), $sql);
-    }
-
-    /**
-     * @Then I should see:
-     */
-    public function iShouldSee(PyStringNode $string)
-    {
-        throw new PendingException();
+        Assert::assertContains($this->getSql($string->getRaw()), $sql);
     }
 }

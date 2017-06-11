@@ -3,8 +3,9 @@
 namespace Propel\Tests\Generator\Schema\Dumper;
 
 use Propel\Generator\Schema\Dumper\XmlDumper;
+use Propel\Tests\TestCase;
 
-class XmlDumperTest extends \PHPUnit_Framework_TestCase
+class XmlDumperTest extends TestCase
 {
     /**
      * The XmlDumper instance.

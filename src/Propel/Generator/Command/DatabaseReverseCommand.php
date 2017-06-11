@@ -65,10 +65,14 @@ class DatabaseReverseCommand extends AbstractCommand
             }
         } else {
             //probably a dsn
-            $configOptions += $this->connectionToProperties('reverseconnection=' . $connection, 'reverse');
+            $connectionName = $input->getOption('database-name');
+            if (null === $connectionName) {
+                $connectionName = 'reverseconnection';
+            }
+            $configOptions += $this->connectionToProperties("$connectionName=$connection", 'reverse');
             $configOptions['propel']['reverse']['parserClass'] = sprintf(
                 '\\Propel\\Generator\\Reverse\\%sSchemaParser',
-                ucfirst($configOptions['propel']['database']['connections']['reverseconnection']['adapter'])
+                ucfirst($configOptions['propel']['database']['connections'][$connectionName]['adapter'])
             );
 
             if (!$input->getOption('database-name')) {

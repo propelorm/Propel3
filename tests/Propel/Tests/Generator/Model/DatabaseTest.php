@@ -114,7 +114,7 @@ class DatabaseTest extends ModelTestCase
 
     public function testCantAddInvalidBehavior()
     {
-        $this->setExpectedException('Propel\Generator\Exception\BehaviorNotFoundException');
+        $this->expectException('Propel\Generator\Exception\BehaviorNotFoundException');
 
         $database = new Database();
         $behavior = $database->addBehavior(array('name' => 'foo'));
@@ -247,7 +247,7 @@ class DatabaseTest extends ModelTestCase
 
     public function testAddSameEntityTwice()
     {
-        $this->setExpectedException('Propel\Generator\Exception\EngineException');
+        $this->expectException('Propel\Generator\Exception\EngineException');
 
         $database = new Database();
         $database->addEntity(array('name' => 'authors'));
@@ -343,7 +343,7 @@ class DatabaseTest extends ModelTestCase
 
     public function testSetInvalidDefaultStringFormat()
     {
-        $this->setExpectedException('Propel\Generator\Exception\InvalidArgumentException');
+        $this->expectException('Propel\Generator\Exception\InvalidArgumentException');
 
         $database = new Database();
         $database->setDefaultStringFormat('FOO');

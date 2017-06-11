@@ -15,13 +15,14 @@ use Propel\Generator\Util\QuickBuilder;
 use Propel\Runtime\Configuration;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Tests\TestCase;
 
 /**
  * Tests the generated queries for object column types filters
  *
  * @author Francois Zaninotto
  */
-class GeneratedQueryObjectColumnTypeTest extends \PHPUnit_Framework_TestCase
+class GeneratedQueryObjectColumnTypeTest extends TestCase
 {
     protected $c1, $c2;
 

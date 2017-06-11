@@ -12,12 +12,13 @@ namespace Propel\Tests\Common\Pluralizer;
 
 use Propel\Common\Pluralizer\SimpleEnglishPluralizer;
 use Propel\Common\Pluralizer\StandardEnglishPluralizer;
+use Propel\Tests\TestCase;
 
 /**
  * Tests for the StandardEnglishPluralizer class
  *
  */
-class EnglishPluralizerTest extends \PHPUnit_Framework_TestCase
+class EnglishPluralizerTest extends TestCase
 {
     public function getPluralFormDataProvider()
     {
