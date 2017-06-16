@@ -529,8 +529,8 @@ class Relation extends MappingModel
     public function addReference($ref1, $ref2 = null)
     {
         if (is_array($ref1)) {
-            $this->localFields[] = $ref1['local'] ? $ref1['local'] : null;
-            $this->foreignFields[] = $ref1['foreign'] ? $ref1['foreign'] : null;
+            $this->localFields[] = $ref1['local'] ?? null;
+            $this->foreignFields[] = $ref1['foreign'] ?? null;
 
             return;
         }
