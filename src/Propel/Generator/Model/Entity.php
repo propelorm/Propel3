@@ -204,8 +204,6 @@ class Entity extends ScopedMappingModel implements IdMethod
         if ($this->getAttribute('activeRecord')) {
             $this->activeRecord = 'true' === $this->getAttribute('activeRecord');
         }
-
-        $this->idMethod = $this->getAttribute('idMethod', $this->database->getDefaultIdMethod());
         $this->allowPkInsert = $this->booleanValue($this->getAttribute('allowPkInsert'));
 
         $this->skipSql = $this->booleanValue($this->getAttribute('skipSql'));
@@ -222,14 +220,6 @@ class Entity extends ScopedMappingModel implements IdMethod
             $this->repository = false;
         }
 
-        $this->heavyIndexing = (
-            $this->booleanValue($this->getAttribute('heavyIndexing'))
-            || (
-                'false' !== $this->getAttribute('heavyIndexing')
-                && $this->database->isHeavyIndexing()
-            )
-        );
-
         if ($this->getAttribute('identifierQuoting')) {
             $this->identifierQuoting = $this->booleanValue($this->getAttribute('identifierQuoting'));
         }
@@ -240,14 +230,40 @@ class Entity extends ScopedMappingModel implements IdMethod
         $this->reloadOnUpdate = $this->booleanValue($this->getAttribute('reloadOnUpdate'));
         $this->isCrossRef = $this->booleanValue($this->getAttribute('isCrossRef', false));
         $this->defaultStringFormat = $this->getAttribute('defaultStringFormat');
-        $this->defaultAccessorVisibility = $this->getAttribute(
-            'defaultAccessorVisibility',
-            $this->database->getAttribute('defaultAccessorVisibility', static::VISIBILITY_PUBLIC)
-        );
-        $this->defaultMutatorVisibility = $this->getAttribute(
-            'defaultMutatorVisibility',
-            $this->database->getAttribute('defaultMutatorVisibility', static::VISIBILITY_PUBLIC)
-        );
+        
+        $this->lazySetupObject();
+    }
+    
+    protected function lazySetupObject() {
+        if ($this->database) {
+            if (null === $this->idMethod) {
+                $this->idMethod = $this->getAttribute('idMethod', $this->database->getDefaultIdMethod());
+            }
+            
+            if (null === $this->heavyIndexing) {
+                $this->heavyIndexing = (
+                    $this->booleanValue($this->getAttribute('heavyIndexing'))
+                    || (
+                        'false' !== $this->getAttribute('heavyIndexing')
+                        && $this->database->isHeavyIndexing()
+                    )
+                );
+            }
+            
+            if (null === $this->defaultAccessorVisibility) {
+                $this->defaultAccessorVisibility = $this->getAttribute(
+                    'defaultAccessorVisibility',
+                    $this->database->getAttribute('defaultAccessorVisibility', static::VISIBILITY_PUBLIC)
+                );
+            }
+            
+            if (null === $this->defaultMutatorVisibility) {
+                $this->defaultMutatorVisibility = $this->getAttribute(
+                    'defaultMutatorVisibility',
+                    $this->database->getAttribute('defaultMutatorVisibility', static::VISIBILITY_PUBLIC)
+                );
+            }
+        }
     }
 
     public function finalizeDefinition($throwErrors = false)
@@ -1636,6 +1652,7 @@ class Entity extends ScopedMappingModel implements IdMethod
     public function setDatabase(Database $database)
     {
         $this->database = $database;
+        $this->lazySetupObject();
     }
 
     /**
