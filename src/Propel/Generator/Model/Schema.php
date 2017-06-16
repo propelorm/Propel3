@@ -14,6 +14,7 @@ use Propel\Generator\Config\GeneratorConfigInterface;
 use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Platform\PlatformInterface;
 use Propel\Generator\Schema\Dumper\XmlDumper;
+use phootwork\collection\Set;
 
 /**
  * A class for holding application data structures.
@@ -33,6 +34,10 @@ class Schema
     private $name;
     private $isInitialized;
     protected $generatorConfig;
+    protected $schemas;
+    protected $filename;
+    protected $referenceOnly = true;
+    protected $parent = null;
 
     /**
      * @var PlatformInterface
@@ -50,6 +55,7 @@ class Schema
 
         $this->isInitialized = false;
         $this->databases     = [];
+        $this->schemas = new Set();
     }
 
     /**
@@ -60,6 +66,10 @@ class Schema
     public function setGeneratorConfig(GeneratorConfigInterface $generatorConfig)
     {
         $this->generatorConfig = $generatorConfig;
+        
+        if (!$this->platform) {
+            $this->platform = $generatorConfig->createPlatformForDatabase();
+        }
     }
 
     /**
@@ -69,7 +79,18 @@ class Schema
      */
     public function getGeneratorConfig()
     {
-        return $this->generatorConfig;
+        if ($this->generatorConfig) {
+            return $this->generatorConfig;
+        }
+        
+        // walk up parent chain
+        $parent = $this;
+        while ($parent->getParent()) {
+            $parent = $parent->getParent();
+            if ($parent->getGeneratorConfig()) {
+                return $parent->getGeneratorConfig();
+            }
+        }
     }
 
     /**
@@ -86,6 +107,26 @@ class Schema
     public function setPlatform($platform)
     {
         $this->platform = $platform;
+    }
+    
+    /**
+     * Sets the filename when reading this schema
+     * 
+     * @param string $filename
+     */
+    public function setFilename(string $filename) 
+    {
+        $this->filename = $filename;
+    }
+    
+    /**
+     * Returns the filename
+     * 
+     * @return string
+     */
+    public function getFilename(): string
+    {
+        return $this->filename;
     }
 
     /**
@@ -116,6 +157,94 @@ class Schema
     public function getShortName()
     {
         return str_replace('-schema', '', $this->name);
+    }
+    
+    /**
+     * Sets the parent schema (will make this an external schema)
+     * 
+     * @param Schema $schema
+     */
+    public function setParent(Schema $schema) 
+    {
+        $this->parent = $schema;
+        $this->parent->addExternalSchema($schema);
+    }
+    
+    /**
+     * Returns the parent schema
+     * 
+     * @return Schema
+     */
+    public function getParent(): ?Schema
+    {
+        return $this->parent;    
+    }
+    
+    /**
+     * Adds an external schema
+     * 
+     * @param Schema $schema
+     */
+    public function addExternalSchema(Schema $schema) 
+    {
+        $this->schemas->add($schema);
+        if (!$schema->isExternalSchema()) {
+            $schema->setParent($this);
+        }
+    }
+    
+    /**
+     * Removes an external schema (only relevant if this is an external schema)
+     * 
+     * @param Schema $schema
+     */
+    public function removeExternalSchema(Schema $schema) 
+    {
+        $schema->setParent(null);
+        $this->schemas->remove($schema);
+    }
+    
+    /**
+     * Returns whether this is an external schema
+     * 
+     * @return bool
+     */
+    public function isExternalSchema(): bool 
+    {
+        return null !== $this->parent;
+    }
+    
+    /**
+     * Retuns the root schema
+     * 
+     * @return Schema
+     */
+    public function getRootSchema(): Schema 
+    {
+        $parent = $this;
+        while ($parent->getParent()) {
+            $parent = $parent->getParent();
+        }
+        
+        return $parent;
+    }
+    
+    /**
+     * Set whether this schema is only for reference (only relevant if this is an external schema)
+     * 
+     * @param bool $referenceOnly
+     */
+    public function setReferenceOnly(bool $referenceOnly) {
+        $this->referenceOnly = $referenceOnly;
+    }
+    
+    /**
+     * Returns whether this schema is for reference only
+     * 
+     * @return bool
+     */
+    public function getReferenceOnly(): bool {
+        return $this->referenceOnly;
     }
 
     /**
