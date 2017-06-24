@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Common\Config\Loader;
 
 use Propel\Common\Config\Exception\InputOutputException;
@@ -26,12 +28,13 @@ class JsonFileLoader extends FileLoader
      *
      * @param mixed  $file The resource
      * @param string $type The resource type
+     * @return array
      *
-     * @throws \InvalidArgumentException                               if configuration file not found
-     * @throws Propel\Common\Config\Exception\InvalidArgumentException if invalid json file
-     * @throws Propel\Common\Config\Exception\InputOutputException     if configuration file is not readable
+     * @throws \InvalidArgumentException  if configuration file not found
+     * @throws \Propel\Common\Config\Exception\InvalidArgumentException   if invalid json file
+     * @throws \Propel\Common\Config\Exception\InputOutputException       if configuration file is not readable
      */
-    public function load($file, $type = null)
+    public function load($file, $type = null): array
     {
         $path = $this->locator->locate($file);
 
@@ -45,7 +48,7 @@ class JsonFileLoader extends FileLoader
             throw new InvalidArgumentException('Error while reading configuration file');
         }
 
-        $content = array();
+        $content = [];
 
         if ('' !== $json) {
             $content = json_decode($json, true);
@@ -69,7 +72,7 @@ class JsonFileLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, $type = null): bool
     {
         $info = pathinfo($resource);
         $extension = $info['extension'];

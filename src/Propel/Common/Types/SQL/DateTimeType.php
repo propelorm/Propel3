@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ */
+
+declare(strict_types=1);
+
 namespace Propel\Common\Types\SQL;
 
 use gossi\codegen\model\PhpMethod;
@@ -12,9 +22,20 @@ use Propel\Generator\Model\PropelTypes;
 use Propel\Runtime\Map\FieldMap;
 use Propel\Runtime\Util\PropelDateTime;
 
+/**
+ * Class DateTimeType
+ *
+ * @author Marc J. Schmidt <marc@marcjschmidt.de>
+ */
 class DateTimeType extends AbstractType implements BuildableFieldTypeInterface
 {
-    public function decorateGetterMethod(PhpMethod $method, Field $field)
+    /**
+     * {@inheritdoc}
+     *
+     * @param PhpMethod $method
+     * @param Field $field
+     */
+    public function decorateGetterMethod(PhpMethod $method, Field $field): void
     {
         $varName = $field->getName();
         $method->addSimpleParameter('format', 'string', null);
@@ -31,8 +52,13 @@ EOF;
 
     /**
      * {@inheritdoc}
+     *
+     * @param mixed $value
+     * @param FieldMap $fieldMap
+     *
+     * @return string
      */
-    public function propertyToDatabase($value, FieldMap $fieldMap)
+    public function propertyToDatabase($value, FieldMap $fieldMap):? string
     {
         if ($value instanceof \DateTime) {
             $format = 'U';
@@ -55,8 +81,13 @@ EOF;
 
     /**
      * {@inheritdoc}
+     *
+     * @param $value
+     * @param FieldMap $fieldMap
+     *
+     * @return \DateTime|null
      */
-    public function databaseToProperty($value, FieldMap $fieldMap)
+    public function databaseToProperty($value, FieldMap $fieldMap):? \DateTime
     {
         if (!($value instanceof \DateTime)) {
             $value = PropelDateTime::newInstance($value);
@@ -65,7 +96,13 @@ EOF;
         return $value;
     }
 
-    public function build(AbstractBuilder $builder, Field $field)
+    /**
+     * {@inheritdoc}
+     *
+     * @param AbstractBuilder $builder
+     * @param Field $field
+     */
+    public function build(AbstractBuilder $builder, Field $field): void
     {
         if ($builder instanceof ObjectBuilder) {
             $property = $builder->getDefinition()->getProperty($field->getName());

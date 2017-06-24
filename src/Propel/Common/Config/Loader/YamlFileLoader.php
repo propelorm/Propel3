@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Common\Config\Loader;
 
 use Propel\Common\Config\Exception\InputOutputException;
@@ -26,10 +28,11 @@ class YamlFileLoader extends FileLoader
      *
      * @param mixed  $file The resource
      * @param string $type The resource type
+     * @return array
      *
      * @throws \InvalidArgumentException                           if configuration file not found
-     * @throws Symfony\Component\Yaml\Exception\ParseException     if something goes wrong in parsing file
-     * @throws Propel\Common\Config\Exception\InputOutputException if configuration file is not readable
+     * @throws \Symfony\Component\Yaml\Exception\ParseException     if something goes wrong in parsing file
+     * @throws \Propel\Common\Config\Exception\InputOutputException if configuration file is not readable
      */
     public function load($file, $type = null)
     {
@@ -43,7 +46,7 @@ class YamlFileLoader extends FileLoader
 
         //config file is empty
         if (null === $content) {
-            $content = array();
+            $content = [];
         }
 
         //Invalid yaml content (e.g. text only) return a string
@@ -65,7 +68,7 @@ class YamlFileLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, $type = null): bool
     {
         $info = pathinfo($resource);
         $extension = $info['extension'];

@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Common\Pluralizer;
 
 /**
@@ -24,7 +26,7 @@ class StandardEnglishPluralizer implements PluralizerInterface
     /**
      * @var array
      */
-    protected $plural = array(
+    protected $plural = [
         '(matr|vert|ind)(ix|ex)' => '\1ices',
         '(alumn|bacill|cact|foc|fung|nucle|radi|stimul|syllab|termin|vir)us' => '\1i',
         '(buffal|tomat)o' => '\1oes',
@@ -73,9 +75,9 @@ class StandardEnglishPluralizer implements PluralizerInterface
         'arf'  => 'arves',
         'nife' => 'nives',
         'life' => 'lives'
-    );
+    ];
 
-    protected $irregular = array(
+    protected $irregular = [
         'leaf'   => 'leaves',
         'loaf'   => 'loaves',
         'move'   => 'moves',
@@ -94,9 +96,9 @@ class StandardEnglishPluralizer implements PluralizerInterface
         'numen'  => 'numina',
         'quiz' => 'quizzes',
         'alias' => 'aliases',
-    );
+    ];
 
-    protected $uncountable = array(
+    protected $uncountable = [
         'sheep',
         'fish',
         'deer',
@@ -108,14 +110,15 @@ class StandardEnglishPluralizer implements PluralizerInterface
         'equipment',
         'news',
         'people',
-    );
+    ];
 
     /**
      * Generate a plural name based on the passed in root.
+     *
      * @param  string $root The root that needs to be pluralized (e.g. Author)
      * @return string The plural form of $root (e.g. Authors).
      */
-    public function getPluralForm($root)
+    public function getPluralForm(string $root): string
     {
         // save some time in the case that singular and plural are the same
         if (in_array(strtolower($root), $this->uncountable)) {

@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Common\Config\Loader;
 
 use Propel\Common\Config\Exception\InvalidArgumentException;
@@ -40,7 +42,7 @@ abstract class FileLoader extends BaseFileLoader
      *
      * @var array
      */
-    private $config = array();
+    private $config = [];
 
     /**
      * Constructor.
@@ -60,15 +62,16 @@ abstract class FileLoader extends BaseFileLoader
      * Replaces parameter placeholders (%name%) by their values for all parameters.
      *
      * @param array $configuration The configuration array to resolve
+     * @return array|null
      */
-    public function resolveParams(array $configuration)
+    public function resolveParams(array $configuration): ?array
     {
         if ($this->resolved) {
-            return;
+            return null;
         }
 
         $this->config = $configuration;
-        $parameters = array();
+        $parameters = [];
         foreach ($configuration as $key => $value) {
             $key = $this->resolveValue($key);
             $value = $this->resolveValue($value);
@@ -80,7 +83,12 @@ abstract class FileLoader extends BaseFileLoader
         return $parameters;
     }
 
-    private function isResolved()
+    /**
+     * If the configuration array with parameters is resolved.
+     *
+     * @return bool
+     */
+    private function isResolved(): bool
     {
         return ($this->resolved);
     }
@@ -94,10 +102,10 @@ abstract class FileLoader extends BaseFileLoader
      * @return mixed The resolved value
      *
      */
-    private function resolveValue($value, array $resolving = array())
+    private function resolveValue($value, array $resolving = [])
     {
         if (is_array($value)) {
-            $args = array();
+            $args = [];
             foreach ($value as $k => $v) {
                 $args[$this->resolveValue($k, $resolving)] = $this->resolveValue($v, $resolving);
             }
@@ -120,10 +128,10 @@ abstract class FileLoader extends BaseFileLoader
      *
      * @return string The resolved string
      *
-     * @throws Propel\Common\Config\Exception\RuntimeException         if a problem occurs
-     * @throws Propel\Common\Config\Exception\InvalidArgumentException if a parameter is non-existent
+     * @throws \Propel\Common\Config\Exception\RuntimeException         if a problem occurs
+     * @throws \Propel\Common\Config\Exception\InvalidArgumentException if a parameter is non-existent
      */
-    private function resolveString($value, array $resolving = array())
+    private function resolveString($value, array $resolving = [])
     {
         if (preg_match('/^%([^%\s]+)%$/', $value, $match)) {
             if (null !== $ret = $this->parseEnvironmentParams($match[1])) {
@@ -174,7 +182,7 @@ abstract class FileLoader extends BaseFileLoader
     /**
      * Return unescaped variable.
      *
-     * @param $value The variable to unescape
+     * @param $value mixed The variable to unescape
      * @return array|mixed
      */
     private function unescapeValue($value)
@@ -184,7 +192,7 @@ abstract class FileLoader extends BaseFileLoader
         }
 
         if (is_array($value)) {
-            $result = array();
+            $result = [];
             foreach ($value as $k => $v) {
                 $result[$k] = $this->unescapeValue($v);
             }
@@ -201,7 +209,7 @@ abstract class FileLoader extends BaseFileLoader
      * @param mixed $property_key The key, in the configuration values array, to return the respective value
      *
      * @return mixed
-     * @throws Propel\Common\Config\Exception\InvalidArgumentException when non-existent key in configuration array
+     * @throws \Propel\Common\Config\Exception\InvalidArgumentException when non-existent key in configuration array
      */
     private function get($property_key)
     {
@@ -244,6 +252,8 @@ abstract class FileLoader extends BaseFileLoader
                 }
             }
         }
+
+        return null;
     }
 
     /**
@@ -252,9 +262,9 @@ abstract class FileLoader extends BaseFileLoader
      * @param string $value The value to parse
      *
      * @return string|null
-     * @throws Propel\Common\Config\Exception\InvalidArgumentException if the environment variable is not set
+     * @throws \Propel\Common\Config\Exception\InvalidArgumentException if the environment variable is not set
      */
-    private function parseEnvironmentParams($value)
+    private function parseEnvironmentParams(string $value): ?string
     {
         // env.variable is an environment variable
         $env = explode('.', $value);

@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Common\Config\Loader;
 
 use Propel\Common\Config\Exception\InputOutputException;
@@ -25,13 +27,14 @@ class XmlFileLoader extends FileLoader
      *
      * @param mixed  $file The resource
      * @param string $type The resource type
+     * @return array
      *
-     * @throws \InvalidArgumentException                               if configuration file not found
-     * @throws Propel\Common\Config\Exception\InputOutputException     if configuration file is not readable
-     * @throws Propel\Common\Config\Exception\InvalidArgumentException if invalid xml file
-     * @throws Propel\Common\Config\Exception\XmlParseException        if something went wrong while parsing xml file
+     * @throws \InvalidArgumentException                                if configuration file not found
+     * @throws \Propel\Common\Config\Exception\InputOutputException     if configuration file is not readable
+     * @throws \Propel\Common\Config\Exception\InvalidArgumentException if invalid xml file
+     * @throws \Propel\Common\Config\Exception\XmlParseException        if something went wrong while parsing xml file
      */
-    public function load($file, $type = null)
+    public function load($file, $type = null): array
     {
         $path = $this->locator->locate($file);
 
@@ -53,7 +56,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, $type = null): bool
     {
         $info = pathinfo($resource);
         $extension = $info['extension'];

@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Common\Config;
 
 use Propel\Common\Config\Exception\InvalidArgumentException;
@@ -31,7 +33,7 @@ class ConfigurationManager
      *
      * @var array
      */
-    private $config = array();
+    private $config = [];
 
     /**
      * Load and validate configuration values from a file.
@@ -40,9 +42,9 @@ class ConfigurationManager
      * @param array  $extraConf Array of configuration properties, to be merged with those loaded from file.
      *                          It's useful when passing configuration parameters from command line.
      */
-    public function __construct($filename = './', $extraConf = array())
+    public function __construct(string $filename = './', array $extraConf = [])
     {
-        if (null !== $filename) {
+        if ('' !== $filename) {
             $this->load($filename, $extraConf);
         }
 
@@ -54,7 +56,7 @@ class ConfigurationManager
      *
      * @return array
      */
-    public function get()
+    public function get(): array
     {
         return $this->config;
     }
@@ -66,7 +68,7 @@ class ConfigurationManager
      * @param  string $section the section to be returned
      * @return array
      */
-    public function getSection($section)
+    public function getSection(string $section): array
     {
         if (!array_key_exists($section, $this->config)) {
             return null;
@@ -81,18 +83,14 @@ class ConfigurationManager
      * array, with each level separated by a dot. I.e.:
      * <code> $config['database']['adapter']['mysql']['tableType']</code>
      * is expressed by:
-     * <code>'database.adapter.mysql.tableType</code>
+     * <code>'database.adapter.mysql.tableType'</code>
      *
      * @param string $name The name of property, expressed as a dot separated level hierarchy
      * @throws \Propel\Common\Config\Exception\InvalidArgumentException
      * @return mixed The configuration property
      */
-    public function getConfigProperty($name)
+    public function getConfigProperty(string $name)
     {
-        if (!is_string($name)) {
-            throw new InvalidArgumentException("Invalid configuration property name '$name'.");
-        }
-
         $keys = explode('.', $name);
         $output = $this->get();
         foreach ($keys as $key) {
@@ -112,13 +110,13 @@ class ConfigurationManager
      * @param  string     $section `runtime` or `generator` section
      * @return array|null
      */
-    public function getConnectionParametersArray($section = 'runtime')
+    public function getConnectionParametersArray(string $section = 'runtime'):? array
     {
-        if (!in_array($section, array('runtime', 'generator'))) {
+        if (!in_array($section, ['runtime', 'generator'])) {
             return null;
         }
 
-        $output = array();
+        $output = [];
         foreach ($this->config[$section]['connections'] as $connection) {
             $output[$connection] = $this->config['database']['connections'][$connection];
         }
@@ -137,11 +135,11 @@ class ConfigurationManager
      * @param string $fileName  Configuration file name or directory in which resides the configuration file.
      * @param array  $extraConf Array of configuration properties, to be merged with those loaded from file.
      */
-    protected function load($fileName, $extraConf)
+    protected function load(string $fileName = '', array $extraConf): void
     {
         $currentDir = getcwd();
 
-        if (null === $fileName) {
+        if ('' == $fileName) {
             $fileName = self::CONFIG_FILE_NAME;
         }
 
@@ -151,7 +149,7 @@ class ConfigurationManager
         }
 
         if (null === $extraConf) {
-            $extraConf = array();
+            $extraConf = [];
         }
 
         if ('propel' === $fileName) {
@@ -200,7 +198,7 @@ class ConfigurationManager
 
         $conf = $delegatingLoader->load($fileName);
 
-        $distConf = array();
+        $distConf = [];
         if (file_exists($fileName . '.dist')) {
             $distDelegatingLoader = new DelegatingLoader();
             $distConf = $distDelegatingLoader->load($fileName . '.dist');
@@ -217,7 +215,7 @@ class ConfigurationManager
      *                         the constructor to pass a built-in array of configuration, without load it from file. I.e.
      *                         Propel\Generator\Config\QuickGeneratorConfig class.
      */
-    protected function process($extraConf = null)
+    protected function process(array $extraConf = null): void
     {
         $processor = new Processor();
         $configuration = new PropelConfiguration();
@@ -230,7 +228,7 @@ class ConfigurationManager
 
         //Workaround to remove empty `slaves` array from database.connections
         foreach ($this->config['database']['connections'] as $name => $connection) {
-            if (count($connection['slaves'] <= 0)) {
+            if (count($connection['slaves']) <= 0) {
                 unset($this->config['database']['connections'][$name]['slaves']);
             }
         }

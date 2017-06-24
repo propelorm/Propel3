@@ -10,6 +10,11 @@
 
 namespace Propel\Common\Config\Exception;
 
+/**
+ * Class RuntimeException
+ *
+ * Specialized configuration exception, for generic runtime errors.
+ */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {
 }

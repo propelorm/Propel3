@@ -20,7 +20,7 @@ class JsonFileLoaderTest extends ConfigTestCase
 
     protected function setUp()
     {
-        $this->loader = new JsonFileLoader(new FileLocator(sys_get_temp_dir()));
+        $this->loader = new JsonFileLoader(new FileLocator([sys_get_temp_dir()]));
     }
 
     public function testSupports()

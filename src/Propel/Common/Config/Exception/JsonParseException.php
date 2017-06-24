@@ -10,6 +10,11 @@
 
 namespace Propel\Common\Config\Exception;
 
+/**
+ * Class JsonParseException
+ *
+ * This exception is thrown at runtime, if the parser for json files encounters an error.
+ */
 class JsonParseException extends RuntimeException implements ExceptionInterface
 {
     /**

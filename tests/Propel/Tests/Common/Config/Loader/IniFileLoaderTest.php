@@ -21,7 +21,7 @@ class IniFileLoaderTest extends ConfigTestCase
 
     protected function setUp()
     {
-        $this->loader = new IniFileLoader(new FileLocator(sys_get_temp_dir()));
+        $this->loader = new IniFileLoader(new FileLocator([sys_get_temp_dir()]));
     }
 
     public function testSupports()

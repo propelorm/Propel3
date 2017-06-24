@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Common\Config\Loader;
 
 use Symfony\Component\Config\Loader\LoaderResolver as BaseLoaderResolver;
@@ -25,13 +27,13 @@ class LoaderResolver extends BaseLoaderResolver
     public function __construct(array $loaders = null)
     {
         if (null === $loaders) {
-            $loaders = array(
+            $loaders = [
                 new IniFileLoader(),
                 new PhpFileLoader(),
                 new XmlFileLoader(),
                 new YamlFileLoader(),
                 new JsonFileLoader()
-            );
+            ];
         }
 
         parent::__construct($loaders);

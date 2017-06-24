@@ -10,6 +10,11 @@
 
 namespace Propel\Common\Config\Exception;
 
+/**
+ * Class XmlParseException
+ *
+ * Exception thrown at runtime, if the parser for xml files encounters an error.
+ */
 class XmlParseException extends RuntimeException implements ExceptionInterface
 {
     /**

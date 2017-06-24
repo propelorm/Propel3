@@ -21,7 +21,7 @@ class YamlFileLoaderTest extends ConfigTestCase
 
     protected function setUp()
     {
-        $this->loader = new YamlFileLoader(new FileLocator(sys_get_temp_dir()));
+        $this->loader = new YamlFileLoader(new FileLocator([sys_get_temp_dir()]));
     }
 
     public function testSupports()

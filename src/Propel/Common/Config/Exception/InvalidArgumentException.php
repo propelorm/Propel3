@@ -10,6 +10,11 @@
 
 namespace Propel\Common\Config\Exception;
 
+/**
+ * Class InvalidArgumentException
+ *
+ * Specialized configuration exception, thrown when an invalid argument is passed to a method.
+ */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {
 }

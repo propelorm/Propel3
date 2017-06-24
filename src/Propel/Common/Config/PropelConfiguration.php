@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Common\Config;
 
 use Propel\Common\Types\SQL\ArrayType;
@@ -147,7 +149,7 @@ class PropelConfiguration implements ConfigurationInterface
                             ->isRequired()
                             ->validate()
                             ->always()
-                                ->then(function($connections) {
+                                ->then(function ($connections) {
                                     foreach ($connections as $name => $connection) {
                                         if (strpos($name, '.') !== false) {
                                             throw new \InvalidArgumentException('Dots are not allowed in connection names');

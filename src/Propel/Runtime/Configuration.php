@@ -1,4 +1,12 @@
 <?php
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ */
+declare(strict_types=1);
 
 namespace Propel\Runtime;
 
@@ -8,7 +16,6 @@ use Monolog\Logger;
 use Propel\Common\Config\Exception\InvalidArgumentException;
 use Propel\Common\Types\FieldTypeInterface;
 use Propel\Generator\Config\GeneratorConfig;
-use Propel\Generator\Model\NamingTool;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Adapter\AdapterFactory;
 use Propel\Runtime\Adapter\AdapterInterface;
@@ -200,7 +207,7 @@ class Configuration extends GeneratorConfig
     /**
      * @var array
      */
-    protected $profilerConfiguration = array();
+    protected $profilerConfiguration = [];
 
     /**
      * @var Repository[]
@@ -215,10 +222,15 @@ class Configuration extends GeneratorConfig
     protected $typeMaps = [];
 
     /**
+     * @var PersisterInterface[]
+     */
+    protected $persister = [];
+
+    /**
      * @param string $filename
      * @param array  $extraConf
      */
-    public function __construct($filename = null, $extraConf = array())
+    public function __construct(string $filename = '', array $extraConf = [])
     {
         parent::__construct($filename, $extraConf);
 
@@ -239,7 +251,7 @@ class Configuration extends GeneratorConfig
     /**
      * @return EventDispatcherInterface
      */
-    public function getEventDispatcher()
+    public function getEventDispatcher(): EventDispatcherInterface
     {
         if (null === $this->eventDispatcher) {
             $this->eventDispatcher = new EventDispatcher();
@@ -251,18 +263,18 @@ class Configuration extends GeneratorConfig
     /**
      * @param EventDispatcherInterface $eventDispatcher
      */
-    public function setEventDispatcher($eventDispatcher)
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
-     * check whether the given propel generator version has the same version as
+     * Check whether the given propel generator version has the same version as
      * the propel runtime.
      *
      * @param string $generatorVersion
      */
-    public function checkVersion($generatorVersion)
+    public function checkVersion(string $generatorVersion)
     {
         if ($generatorVersion != Propel::VERSION) {
             $warning = "Version mismatch: The generated configuration was build using propel '" . $generatorVersion;
@@ -283,7 +295,7 @@ class Configuration extends GeneratorConfig
      *
      * @return Configuration
      */
-    public static function getCurrentConfiguration()
+    public static function getCurrentConfiguration(): Configuration
     {
         if (!static::$globalConfiguration) {
             throw new RuntimeException(
@@ -297,7 +309,7 @@ class Configuration extends GeneratorConfig
     /**
      * @return Configuration
      */
-    public static function getCurrentConfigurationOrCreate()
+    public static function getCurrentConfigurationOrCreate(): Configuration
     {
         if (!static::$globalConfiguration) {
             static::$globalConfiguration = new static;
@@ -311,7 +323,7 @@ class Configuration extends GeneratorConfig
      *
      * @param Configuration $configuration
      */
-    public static function registerConfiguration(Configuration $configuration)
+    public static function registerConfiguration(Configuration $configuration): void
     {
         static::$globalConfiguration = $configuration;
     }
@@ -319,7 +331,7 @@ class Configuration extends GeneratorConfig
     /**
      * @return string
      */
-    public function getDefaultDatasource()
+    public function getDefaultDatasource(): string
     {
         return $this->defaultDatasource;
     }
@@ -327,7 +339,7 @@ class Configuration extends GeneratorConfig
     /**
      * @param string $defaultDatasource
      */
-    public function setDefaultDatasource($defaultDatasource)
+    public function setDefaultDatasource(string $defaultDatasource)
     {
         $this->defaultDatasource = $defaultDatasource;
     }
@@ -341,7 +353,7 @@ class Configuration extends GeneratorConfig
      * @param string          $databaseName
      * @param string|string[] $fullEntityClassName
      */
-    public function registerEntity($databaseName, $fullEntityClassName)
+    public function registerEntity(string $databaseName, $fullEntityClassName): void
     {
         foreach ((array)$fullEntityClassName as $fullEntityClassName) {
             $this->entityToDatabaseMap[$fullEntityClassName] = $databaseName;
@@ -359,7 +371,7 @@ class Configuration extends GeneratorConfig
      *
      * @return string[]
      */
-    public function getEntitiesForDatabase($databaseName)
+    public function getEntitiesForDatabase(string $databaseName): array
     {
         return $this->databaseToEntitiesMap[$databaseName];
     }
@@ -374,7 +386,7 @@ class Configuration extends GeneratorConfig
      *
      * @return EntityMap[]
      */
-    public function getEntityMapsForDatabase($databaseName)
+    public function getEntityMapsForDatabase(string $databaseName): array
     {
         $entities = [];
         if (!isset($this->databaseToEntitiesMap[$databaseName])) {
@@ -393,7 +405,7 @@ class Configuration extends GeneratorConfig
      *
      * @return DatabaseMap
      */
-    public function getDatabaseForEntityClass($fullEntityClassName)
+    public function getDatabaseForEntityClass(string $fullEntityClassName): DatabaseMap
     {
         $databaseName = $this->entityToDatabaseMap[$fullEntityClassName];
 
@@ -405,7 +417,7 @@ class Configuration extends GeneratorConfig
      *
      * @return DatabaseMap
      */
-    public function getDatabase($databaseName = 'default')
+    public function getDatabase(string $databaseName = 'default'): DatabaseMap
     {
         if (!isset($this->databaseMaps[$databaseName])) {
             $this->databaseMaps[$databaseName] = new DatabaseMap($databaseName);
@@ -421,7 +433,7 @@ class Configuration extends GeneratorConfig
     /**
      * @param DatabaseMap $database
      */
-    public function registerDatabase(DatabaseMap $database)
+    public function registerDatabase(DatabaseMap $database): void
     {
         $this->databaseMaps[$database->getName()] = $database;
     }
@@ -429,7 +441,7 @@ class Configuration extends GeneratorConfig
     /**
      * @return string[]
      */
-    public function getDatabaseNames()
+    public function getDatabaseNames(): array
     {
         return array_keys($this->databaseToEntitiesMap);
     }
@@ -449,7 +461,7 @@ class Configuration extends GeneratorConfig
      *
      * @return bool
      */
-    public function hasEntityMap($fullEntityClassName)
+    public function hasEntityMap(string $fullEntityClassName): bool
     {
         return isset($this->entityToDatabaseMap[$fullEntityClassName]) || isset($this->entityShortNameToDatabaseMap[$fullEntityClassName]);
     }
@@ -460,7 +472,7 @@ class Configuration extends GeneratorConfig
      *
      * @return null|EntityMap
      */
-    public function getEntityMap($fullEntityClassName, $returnNull = false)
+    public function getEntityMap(string $fullEntityClassName, bool $returnNull = false):? EntityMap
     {
         $fullEntityClassName = trim($fullEntityClassName, '\\');
 
@@ -516,7 +528,7 @@ class Configuration extends GeneratorConfig
         return $map;
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->databaseMaps = [];
         $this->entityMaps = [];
@@ -528,7 +540,7 @@ class Configuration extends GeneratorConfig
      *
      * @return PersisterInterface
      */
-    public function getEntityPersisterForEntity(Session $session, $entity)
+    public function getEntityPersisterForEntity(Session $session, $entity): PersisterInterface
     {
         if ($entity instanceof EntityProxyInterface) {
             $entityName = get_parent_class($entity);
@@ -539,15 +551,13 @@ class Configuration extends GeneratorConfig
         return $this->getEntityPersister($session, $entityName);
     }
 
-    protected $persister = [];
-
     /**
      * @param string  $entityName
      * @param Session $session
      *
      * @return PersisterInterface
      */
-    public function getEntityPersister(Session $session, $entityName)
+    public function getEntityPersister(Session $session, string $entityName): PersisterInterface
     {
         $database = $this->getDatabaseForEntityClass($entityName);
 
@@ -565,17 +575,17 @@ class Configuration extends GeneratorConfig
      *
      * @return ModelCriteria
      */
-    public function createQuery($entityName, $alias = '')
+    public function createQuery(string $entityName, string $alias = ''): ModelCriteria
     {
         return $this->getRepository($entityName)->createQuery($alias);
     }
 
     /**
-     * @param $type
+     * @param string $type
      *
      * @return FieldTypeInterface
      */
-    public function getFieldType($type)
+    public function getFieldType(string $type)
     {
         $type = strtolower($type);
 
@@ -887,7 +897,7 @@ class Configuration extends GeneratorConfig
         $ansi = new \Bramus\Ansi\Ansi(new \Bramus\Ansi\Writers\BufferWriter());
 
         if (!is_array($color)) {
-            $color = array($color, SGR::STYLE_INTENSITY_FAINT);
+            $color = [$color, SGR::STYLE_INTENSITY_FAINT];
         }
 
         $start = $ansi->sgr($color)->get();

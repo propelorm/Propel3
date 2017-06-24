@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,6 +8,8 @@
  * @license MIT License
  *
  */
+
+declare(strict_types=1);
 
 namespace Propel\Common\Types\SQL;
 
@@ -17,16 +20,39 @@ use Propel\Generator\Builder\Om\ObjectBuilder;
 use Propel\Generator\Model\Field;
 use Propel\Runtime\Map\FieldMap;
 
+/**
+ * Class ArrayType
+ *
+ * @author Marc J. Schmidt <marc@marcjschmidt.de>
+ */
 class ArrayType extends AbstractType implements BuildableFieldTypeInterface
 {
+    /**
+     * {@inheritdoc}
+     *
+     * @param mixed $value
+     * @param FieldMap $fieldMap
+     *
+     * @return array|string
+     */
     public function databaseToProperty($value, FieldMap $fieldMap)
     {
-        $value = ltrim($value, '| ');
-        $value = rtrim($value, ' |');
+        if (null !== $value) {
+            $value = ltrim($value, '| ');
+            $value = rtrim($value, ' |');
+        }
 
         return $value ? explode(' | ', $value) : [];
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @param mixed $value
+     * @param FieldMap $fieldMap
+     *
+     * @return mixed|null|string
+     */
     public function propertyToDatabase($value, FieldMap $fieldMap)
     {
         if (is_array($value)) {
@@ -36,7 +62,11 @@ class ArrayType extends AbstractType implements BuildableFieldTypeInterface
         return $value;
     }
 
-    public function build(AbstractBuilder $builder, Field $field)
+    /**
+     * @param AbstractBuilder $builder
+     * @param Field $field
+     */
+    public function build(AbstractBuilder $builder, Field $field): void
     {
         if ($builder instanceof ObjectBuilder) {
             $property = $builder->getDefinition()->getProperty($field->getName());

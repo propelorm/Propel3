@@ -170,8 +170,8 @@ XML
     }
 
     /**
-     * @expectedException Propel\Common\Config\Exception\InvalidArgumentException
-     * @expectedExceptionMessage XmlToArrayConverter::convert method expects an xml file to parse, or a string containing valid xml
+     * @expectedException \Propel\Common\Config\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Invalid xml content
      */
     public function testInvalidFileNameThrowsException()
     {
@@ -179,7 +179,7 @@ XML
     }
 
     /**
-     * @expectedException Propel\Common\Config\Exception\InvalidArgumentException
+     * @expectedException \Propel\Common\Config\Exception\InvalidArgumentException
      * @expectedExceptionMessage Invalid xml content
      */
     public function testInexistentFileThrowsException()
@@ -188,7 +188,7 @@ XML
     }
 
     /**
-     * @expectedException Propel\Common\Config\Exception\InvalidArgumentException
+     * @expectedException \Propel\Common\Config\Exception\InvalidArgumentException
      * @expectedExceptionMessage Invalid xml content
      */
     public function testInvalidXmlThrowsException()
@@ -202,7 +202,7 @@ XML;
     }
 
     /**
-     * @expectedException Propel\Common\Config\Exception\XmlParseException
+     * @expectedException \Propel\Common\Config\Exception\XmlParseException
      * @expectedExceptionMessage An error occurred while parsing XML configuration file:
      */
     public function testErrorInXmlThrowsException()
@@ -222,7 +222,7 @@ XML;
     }
 
     /**
-     * @expectedException Propel\Common\Config\Exception\XmlParseException
+     * @expectedException \Propel\Common\Config\Exception\XmlParseException
      * @expectedExceptionMessage Some errors occurred while parsing XML configuration file:
     - Fatal Error 76: Opening and ending tag mismatch: titles line 4 and title
     - Fatal Error 73: expected '>'

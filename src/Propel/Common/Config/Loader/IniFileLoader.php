@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Common\Config\Loader;
 
 use Propel\Common\Config\Exception\InputOutputException;
@@ -34,12 +36,12 @@ class IniFileLoader extends FileLoader
     /**
      * Returns true if this class supports the given resource.
      *
-     * @param mixed  $resource A resource
+     * @param string  $resource A resource
      * @param string $type     The resource type
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, $type = null): bool
     {
         $info = pathinfo($resource);
         $extension = $info['extension'];
@@ -58,11 +60,11 @@ class IniFileLoader extends FileLoader
      * @param  string $type The resource type
      * @return array  The configuration array
      *
-     * @throws \InvalidArgumentException                               if configuration file not found
-     * @throws Propel\Common\Config\Exception\InvalidArgumentException When ini file is not valid
-     * @throws Propel\Common\Config\Exception\InputOutputException     if configuration file is not readable
+     * @throws \InvalidArgumentException                                If configuration file not found
+     * @throws \Propel\Common\Config\Exception\InvalidArgumentException When ini file is not valid
+     * @throws \Propel\Common\Config\Exception\InputOutputException     If configuration file is not readable
      */
-    public function load($file, $type = null)
+    public function load($file, $type = null): array
     {
         $path = $this->locator->locate($file);
 
@@ -88,9 +90,9 @@ class IniFileLoader extends FileLoader
      * @param  array $data
      * @return array
      */
-    private function parse(array $data)
+    private function parse(array $data): array
     {
-        $config = array();
+        $config = [];
 
         foreach ($data as $section => $value) {
             if (is_array($value)) {
@@ -115,13 +117,13 @@ class IniFileLoader extends FileLoader
      * @param  mixed $value
      * @return array
      */
-    private function buildNestedSection($sections, $value)
+    private function buildNestedSection(array $sections, $value): array
     {
         if (count($sections) == 0) {
             return $this->parseSection($value);
         }
 
-        $nestedSection = array();
+        $nestedSection = [];
 
         $first = array_shift($sections);
         $nestedSection[$first] = $this->buildNestedSection($sections, $value);
@@ -135,12 +137,12 @@ class IniFileLoader extends FileLoader
      * @param  array $section
      * @return array
      */
-    private function parseSection(array $section)
+    private function parseSection(array $section): array
     {
-        $config = array();
+        $config = [];
 
         foreach ($section as $key => $value) {
-            $this->parseKey($key, $value, $config);
+            $this->parseKey((string)$key, $value, $config);
         }
 
         return $config;
@@ -149,13 +151,13 @@ class IniFileLoader extends FileLoader
     /**
      * Process a key.
      *
-     * @param  string                                           $key
-     * @param  string                                           $value
-     * @param  array                                            $config
+     * @param  string $key
+     * @param  string $value
+     * @param  array  $config
      *
-     * @throws Propel\Common\Config\Exception\IniParseException
+     * @throws \Propel\Common\Config\Exception\IniParseException
      */
-    private function parseKey($key, $value, array &$config)
+    private function parseKey(string $key, $value, array &$config)
     {
         if (strpos($key, $this->nestSeparator) !== false) {
             $pieces = explode($this->nestSeparator, $key, 2);
@@ -164,9 +166,9 @@ class IniFileLoader extends FileLoader
                 throw new IniParseException(sprintf('Invalid key "%s"', $key));
             } elseif (!isset($config[$pieces[0]])) {
                 if ($pieces[0] === '0' && !empty($config)) {
-                    $config = array($pieces[0] => $config);
+                    $config = [$pieces[0] => $config];
                 } else {
-                    $config[$pieces[0]] = array();
+                    $config[$pieces[0]] = [];
                 }
             } elseif (!is_array($config[$pieces[0]])) {
                 throw new IniParseException(sprintf(
