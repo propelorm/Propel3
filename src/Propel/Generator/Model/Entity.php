@@ -36,7 +36,7 @@ use Propel\Generator\Config\GeneratorConfigInterface;
  * @author Hugo Hamon <webmaster@apprendre-php.com> (Propel)
  * @author Thomas Gossmann
  */
-class Entity extends Model
+class Entity
 {
     use BehaviorPart;
     use NamespacePart;

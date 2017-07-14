@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Model;
 
 use Propel\Generator\Builder\Om\ActiveRecordTraitBuilder;
@@ -15,16 +17,17 @@ use Propel\Generator\Builder\Om\EntityMapBuilder;
 use Propel\Generator\Builder\Om\ObjectBuilder;
 use Propel\Generator\Builder\Om\QueryBuilder;
 use Propel\Generator\Builder\Om\RepositoryBuilder;
-use Propel\Generator\Builder\Util\PropelTemplate;
 use Propel\Generator\Exception\LogicException;
+use phootwork\collection\Map;
 
 /**
  * Information about behaviors of a entity.
  *
  * @author François Zaninotto
  * @author Hugo Hamon <webmaster@apprendre-php.com> (Propel)
+ * @author Thomas Gossmann
  */
-class Behavior extends MappingModel
+class Behavior
 {
     /**
      * The entity object on which the behavior is applied.
@@ -57,15 +60,15 @@ class Behavior extends MappingModel
     /**
      * A collection of parameters.
      *
-     * @var array
+     * @var Map
      */
-    protected $parameters = [ ];
+    protected $parameters;
 
     /**
      * Whether or not the entity has been
      * modified by the behavior.
      *
-     * @var boolean
+     * @var bool
      */
     protected $isEntityModified = false;
 
@@ -93,28 +96,58 @@ class Behavior extends MappingModel
      */
     protected $entityModificationOrder = 50;
 
+    public function __construct()
+    {
+        $this->parameters = new Map();
+    }
+
     /**
      * Sets the name of the Behavior
      *
      * @param string $name the name of the behavior
+     * @return $this
      */
-    public function setName($name)
+    public function setName(string $name): Behavior
     {
         $this->name = $name;
 
         if ($this->id === null) {
             $this->id = $name;
         }
+
+        return $this;
+    }
+
+    /**
+     * Returns the name of the Behavior
+     *
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     /**
      * Sets the id of the Behavior
      *
      * @param string $id The id of the behavior
+     * @return $this
      */
-    public function setId($id)
+    public function setId(string $id): Behavior
     {
         $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * Returns the id of the Behavior
+     *
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->id;
     }
 
     /**
@@ -123,39 +156,21 @@ class Behavior extends MappingModel
      *
      * @return bool
      */
-    public function allowMultiple()
+    public function allowMultiple(): bool
     {
         return false;
-    }
-
-    /**
-     * Returns the id of the Behavior
-     *
-     * @return string
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * Returns the name of the Behavior
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
     }
 
     /**
      * Sets the entity this behavior is applied to
      *
      * @param Entity $entity
+     * @return $this
      */
-    public function setEntity(Entity $entity)
+    public function setEntity(Entity $entity): Behavior
     {
         $this->entity = $entity;
+        return $this;
     }
 
     /**
@@ -163,7 +178,7 @@ class Behavior extends MappingModel
      *
      * @return Entity
      */
-    public function getEntity()
+    public function getEntity(): Entity
     {
         return $this->entity;
     }
@@ -172,10 +187,12 @@ class Behavior extends MappingModel
      * Sets the database this behavior is applied to
      *
      * @param Database $database
+     * @return $this
      */
-    public function setDatabase(Database $database)
+    public function setDatabase(Database $database): Behavior
     {
         $this->database = $database;
+        return $this;
     }
 
     /**
@@ -184,23 +201,38 @@ class Behavior extends MappingModel
      *
      * @return Database
      */
-    public function getDatabase()
+    public function getDatabase(): Database
     {
         return $this->database;
     }
 
     /**
+     * Sets a single parameter by its name.
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return $this
+     */
+    public function setParameter(string $name, $value): Behavior
+    {
+        $this->parameters->set(strtolower($name), $value);
+        return $this;
+    }
+
+    /**
      * Adds a single parameter.
      *
-     * Expects an associative array looking like
-     * [ 'name' => 'foo', 'value' => bar ]
+     * Expects an associative array:
+     * ['name' => 'foo', 'value' => 'bar']
      *
      * @param array $parameter
+     * @return $this
      */
-    public function addParameter(array $parameter)
+    public function addParameter(array $parameter): Behavior
     {
-        $parameter = array_change_key_case($parameter, CASE_LOWER);
-        $this->parameters[$parameter['name']] = $parameter['value'];
+        $this->parameters->set(strtolower($parameter['name']), $parameter['value']);
+
+        return $this;
     }
 
     /**
@@ -209,26 +241,29 @@ class Behavior extends MappingModel
      * Expects an associative array looking like [ 'foo' => 'bar' ].
      *
      * @param array $parameters
+     * @return $this
      */
-    public function setParameters(array $parameters)
+    public function setParameters(array $parameters): Behavior
     {
-        $this->parameters = $parameters;
+        $this->parameters->setAll($parameters);
+        return $this;
     }
 
     /**
-     * Returns the associative array of parameters.
+     * Checks whether a parameter is set
      *
-     * @return array
+     * @param string $name
+     * @return bool
      */
-    public function getParameters()
+    public function hasParameter(string $name): bool
     {
-        return $this->parameters;
+        return $this->parameters->has($name);
     }
 
     /**
      * Returns a single parameter by its name.
      *
-     * @param  string $name
+     * @param string $name
      * @return string
      */
     public function getParameter($name)
@@ -237,14 +272,13 @@ class Behavior extends MappingModel
     }
 
     /**
-     * Sets a single parameter by its name.
+     * Returns the associative array of parameters.
      *
-     * @param  string $name
-     * @param  string $value
+     * @return array
      */
-    public function setParameter($name, $value)
+    public function getParameters(): array
     {
-        $this->parameters[$name] = $value;
+        return $this->parameters->toArray();
     }
 
     /**
@@ -255,10 +289,12 @@ class Behavior extends MappingModel
      * Default is 50.
      *
      * @param integer $entityModificationOrder
+     * @return $this
      */
-    public function setEntityModificationOrder($entityModificationOrder)
+    public function setEntityModificationOrder(int $entityModificationOrder): Behavior
     {
-        $this->entityModificationOrder = (int) $entityModificationOrder;
+        $this->entityModificationOrder = $entityModificationOrder;
+        return $this;
     }
 
     /**
@@ -268,9 +304,9 @@ class Behavior extends MappingModel
      *
      * Default is 50.
      *
-     * @return integer
+     * @return int
      */
-    public function getEntityModificationOrder()
+    public function getEntityModificationOrder(): int
     {
         return $this->entityModificationOrder;
     }
@@ -299,7 +335,7 @@ class Behavior extends MappingModel
      *
      * @return Entity[] A collection of Entity instance
      */
-    protected function getEntities()
+    protected function getEntities(): array
     {
         return $this->database->getEntities();
     }
@@ -317,19 +353,21 @@ class Behavior extends MappingModel
     /**
      * Sets whether or not the entity has been modified.
      *
-     * @param boolean $modified
+     * @param bool $modified
+     * @return $this
      */
-    public function setEntityModified($modified)
+    public function setEntityModified(bool $modified): Behavior
     {
         $this->isEntityModified = $modified;
+        return $this;
     }
 
     /**
      * Returns whether or not the entity has been modified.
      *
-     * @return boolean
+     * @return bool
      */
-    public function isEntityModified()
+    public function isEntityModified(): bool
     {
         return $this->isEntityModified;
     }
@@ -384,14 +422,18 @@ class Behavior extends MappingModel
      * Returns a column object using a name stored in the behavior parameters.
      * Useful for entity behaviors.
      *
-     * @param  string $name
+     * @param string $name
      * @return Field
      */
-    public function getFieldForParameter($name)
+    public function getFieldForParameter(string $name): Field
     {
         return $this->entity->getField($this->getParameter($name));
     }
 
+    /**
+     * @TODO move to ModelFactory
+     * @throws LogicException
+     */
     protected function setupObject()
     {
         $this->setName($this->getAttribute('name'));
@@ -512,9 +554,9 @@ class Behavior extends MappingModel
     /**
      * Returns whether or not this behavior has additional builders.
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasAdditionalBuilders()
+    public function hasAdditionalBuilders(): bool
     {
         return !empty($this->additionalBuilders);
     }
@@ -524,7 +566,7 @@ class Behavior extends MappingModel
      *
      * @return array
      */
-    public function getAdditionalBuilders()
+    public function getAdditionalBuilders(): array
     {
         return $this->additionalBuilders;
     }
