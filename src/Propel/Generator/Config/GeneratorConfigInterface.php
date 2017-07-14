@@ -17,7 +17,7 @@ use Propel\Generator\Builder\Om\AbstractBuilder;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Platform\PlatformInterface;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Generator\Util\BehaviorLocator;
+use Propel\Generator\Manager\BehaviorManager;
 
 interface GeneratorConfigInterface
 {
@@ -60,9 +60,9 @@ interface GeneratorConfigInterface
     /**
      * Returns the behavior locator.
      *
-     * @return BehaviorLocator
+     * @return BehaviorManager
      */
-    public function getBehaviorLocator();
+    public function getBehaviorManager();
 
     /**
      * @param string $name

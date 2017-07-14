@@ -10,22 +10,19 @@
 
 namespace Propel\Generator\Config;
 
-use Propel\Common\Config\ConfigurationManager;
-use Propel\Common\Pluralizer\PluralizerInterface;
 use Propel\Common\Pluralizer\StandardEnglishPluralizer;
-use Propel\Generator\Builder\DataModelBuilder;
 use Propel\Generator\Exception\InvalidArgumentException;
 use Propel\Generator\Model\Entity;
-use Propel\Generator\Platform\SqlDefaultPlatform;
-use \Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Generator\Util\BehaviorLocator;
+use Propel\Generator\Manager\BehaviorManager;
+use Propel\Generator\Builder\DataModelBuilder;
+use Propel\Common\Pluralizer\PluralizerInterface;
 
 class QuickGeneratorConfig extends GeneratorConfig implements GeneratorConfigInterface
 {
     /**
-     * @var BehaviorLocator
+     * @var BehaviorManager
      */
-    protected $behaviorLocator = null;
+    protected $behaviorManager = null;
 
     public function __construct($extraConf = array())
     {
@@ -94,12 +91,12 @@ class QuickGeneratorConfig extends GeneratorConfig implements GeneratorConfigInt
         return new StandardEnglishPluralizer();
     }
 
-    public function getBehaviorLocator()
+    public function getBehaviorManager()
     {
-        if (!$this->behaviorLocator) {
-            $this->behaviorLocator = new BehaviorLocator($this);
+        if (!$this->behaviorManager) {
+            $this->behaviorManager = new BehaviorManager($this);
         }
 
-        return $this->behaviorLocator;
+        return $this->behaviorManager;
     }
 }

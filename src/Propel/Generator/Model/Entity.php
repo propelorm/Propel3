@@ -8,14 +8,20 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Model;
 
-use Propel\Generator\Config\GeneratorConfig;
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Exception\InvalidArgumentException;
+use Propel\Generator\Model\Parts\BehaviorPart;
+use Propel\Generator\Model\Parts\NamespacePart;
 use Propel\Generator\Platform\PlatformInterface;
 use Propel\Runtime\Exception\RuntimeException;
+use phootwork\collection\Set;
+use phootwork\collection\Map;
+use Propel\Generator\Config\GeneratorConfigInterface;
 
 /**
  * Data about a entity used in an application.
@@ -28,42 +34,88 @@ use Propel\Runtime\Exception\RuntimeException;
  * @author Daniel Rall <dlr@collab.net> (Torque)
  * @author Byron Foster <byron_foster@yahoo.com> (Torque)
  * @author Hugo Hamon <webmaster@apprendre-php.com> (Propel)
+ * @author Thomas Gossmann
  */
-class Entity extends ScopedMappingModel implements IdMethod
+class Entity extends Model
 {
-    use BehaviorableTrait;
+    use BehaviorPart;
+    use NamespacePart;
 
-    /**
-     * @var Field[]
-     */
-    private $fields;
 
-    /**
-     * @var Relation[]
-     */
-    private $relations;
-    private $foreignEntityNames;
 
-    /**
-     * @var Index[]
-     */
-    private $indices;
-
-    /**
-     * @var Unique[]
-     */
-    private $unices;
-    private $idMethodParameters;
+    //
+    // Model properties
+    // ------------------------------------------------------------
     private $name;
     private $tableName;
     private $description;
-//    private $phpName;
-    private $idMethod;
+
+    private $alias;
+
+
+
+    //
+    // References to other models
+    // ------------------------------------------------------------
+
+    /** @var Database */
+    private $database;
 
     /**
-     * @var bool
+     * RepositoryClass
+     *
+     * @var bool|string
      */
+    private $repository;
+
+    /** @var Field */
+    private $inheritanceField;
+
+
+
+    //
+    // Collections to other models
+    // ------------------------------------------------------------
+
+    /** @var Set */
+    private $fields;
+
+    /** @var Map */
+    private $fieldsByName;
+
+    /** @var Map */
+    private $fieldsByLowercaseName;
+
+    /** @var Set */
+    private $relations;
+
+    /** @var Set */
+    private $referrers;
+
+    /** @var Set */
+    private $foreignEntityNames;
+
+    /** @var Set */
+    private $indices;
+
+    /** @var Set */
+    private $unices;
+
+
+
+    //
+    // Database related options/properties
+    // ------------------------------------------------------------
+
+    private $idMethod;
+
+    /** @var Set */
+    private $idMethodParameters;
+
+    /** @var bool */
     private $allowPkInsert;
+
+    private $containsForeignPK;
 
     /**
      * Whether this entity is an implementation detail. Implementation details are entities that are only
@@ -72,54 +124,40 @@ class Entity extends ScopedMappingModel implements IdMethod
      */
     private $implementationDetail = false;
 
-    /**
-     * @var Database
-     */
-    private $database;
-
-    /**
-     * @var Relation[]
-     */
-    private $referrers;
-    private $containsForeignPK;
-
-    /**
-     * RepositoryClass
-     *
-     * @var boolean|string
-     */
-    private $repository;
-    /**
-     * @var Field
-     */
-    private $inheritanceField;
-    private $skipSql;
-    private $readOnly;
-    private $isAbstract;
-    private $alias;
-    private $fieldsByName;
-    private $fieldsByLowercaseName;
-//    private $fieldsByPhpName;
     private $needsTransactionInPostgres;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $heavyIndexing;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $identifierQuoting;
+
+
+    private $forReferenceOnly;
+    private $reloadOnInsert;
+    private $reloadOnUpdate;
+
+    private $defaultStringFormat;
+
+
+
+    //
+    // Generator options
+    // ------------------------------------------------------------
 
     /**
      * @var bool|null
      */
     private $activeRecord;
 
-    private $forReferenceOnly;
-    private $reloadOnInsert;
-    private $reloadOnUpdate;
+
+    private $readOnly;
+    private $isAbstract;
+    private $skipSql;
 
     /**
      * The default accessor visibility.
@@ -139,8 +177,16 @@ class Entity extends ScopedMappingModel implements IdMethod
      */
     private $defaultMutatorVisibility;
 
-    protected $isCrossRef;
-    protected $defaultStringFormat;
+    /**
+     * @TODO maybe move this to database related options/props section ;)
+     *
+     * @var bool
+     */
+    private $isCrossRef;
+
+
+
+
 
     /**
      * Constructs a entity object with a name
@@ -151,13 +197,21 @@ class Entity extends ScopedMappingModel implements IdMethod
     {
         parent::__construct();
 
-        if (null !== $name) {
-            $this->name = $name;
-        }
+        $this->name = $name;
+
+        $this->fields = new Set();
+        $this->fieldsByName = new Map();
+        $this->fieldsByLowercaseName = new Map();
+        $this->relations = new Set();
+        $this->foreignEntityNames = new Set();
+        $this->indices = new Set();
+        $this->referrers = new Set();
+        $this->unices = new Set();
+        $this->initBehaviors();
 
         $this->idMethod = IdMethod::NO_ID_METHOD;
-        $this->defaultAccessorVisibility = static::VISIBILITY_PUBLIC;
-        $this->defaultMutatorVisibility = static::VISIBILITY_PUBLIC;
+        $this->idMethodParameters = new Set();
+
         $this->allowPkInsert = false;
         $this->isAbstract = false;
         $this->isCrossRef = false;
@@ -165,35 +219,44 @@ class Entity extends ScopedMappingModel implements IdMethod
         $this->reloadOnInsert = false;
         $this->reloadOnUpdate = false;
         $this->skipSql = false;
-        $this->behaviors = [];
-        $this->fields = [];
-        $this->fieldsByName = [];
-//        $this->fieldsByPhpName = [];
-        $this->fieldsByLowercaseName = [];
-        $this->relations = [];
-        $this->foreignEntityNames = [];
-        $this->idMethodParameters = [];
-        $this->indices = [];
-        $this->referrers = [];
-        $this->unices = [];
+        $this->defaultAccessorVisibility = static::VISIBILITY_PUBLIC;
+        $this->defaultMutatorVisibility = static::VISIBILITY_PUBLIC;
+    }
+
+    public function __clone()
+    {
+        $fields = [];
+        if ($this->fields) {
+            foreach ($this->fields as $oldCol) {
+                $col = clone $oldCol;
+                $fields[] = $col;
+                $this->fieldsByName[$col->getName()] = $col;
+                $this->fieldsByLowercaseName[strtolower($col->getName())] = $col;
+                //            $this->fieldsByPhpName[$col->getName()] = $col;
+            }
+            $this->fields = $fields;
+        }
     }
 
     /**
-     * @return bool|string
+     * Retrieves the configuration object.
+     *
+     * @return GeneratorConfigInterface
      */
-    public function getRepository()
+    public function getGeneratorConfig(): ?GeneratorConfigInterface
     {
-        return $this->repository;
+        if ($this->database) {
+            return $this->database->getGeneratorConfig();
+        }
+
+        return null;
     }
+
+
 
     /**
-     * @param bool|string $repository
+     * @TODO
      */
-    public function setRepository($repository)
-    {
-        $this->repository = $repository;
-    }
-
     public function setupObject()
     {
         parent::setupObject();
@@ -204,12 +267,12 @@ class Entity extends ScopedMappingModel implements IdMethod
         if ($this->getAttribute('activeRecord')) {
             $this->activeRecord = 'true' === $this->getAttribute('activeRecord');
         }
-        $this->allowPkInsert = $this->booleanValue($this->getAttribute('allowPkInsert'));
+        $this->allowPkInsert = $this->boolValue($this->getAttribute('allowPkInsert'));
 
-        $this->skipSql = $this->booleanValue($this->getAttribute('skipSql'));
-        $this->readOnly = $this->booleanValue($this->getAttribute('readOnly'));
+        $this->skipSql = $this->boolValue($this->getAttribute('skipSql'));
+        $this->readOnly = $this->boolValue($this->getAttribute('readOnly'));
 
-        $this->isAbstract = $this->booleanValue($this->getAttribute('abstract'));
+        $this->isAbstract = $this->boolValue($this->getAttribute('abstract'));
         $this->baseClass = $this->getAttribute('baseClass');
         $this->alias = $this->getAttribute('alias');
         $this->repository = $this->getAttribute('repository');
@@ -221,42 +284,45 @@ class Entity extends ScopedMappingModel implements IdMethod
         }
 
         if ($this->getAttribute('identifierQuoting')) {
-            $this->identifierQuoting = $this->booleanValue($this->getAttribute('identifierQuoting'));
+            $this->identifierQuoting = $this->boolValue($this->getAttribute('identifierQuoting'));
         }
 
         $this->description = $this->getAttribute('description');
 
-        $this->reloadOnInsert = $this->booleanValue($this->getAttribute('reloadOnInsert'));
-        $this->reloadOnUpdate = $this->booleanValue($this->getAttribute('reloadOnUpdate'));
-        $this->isCrossRef = $this->booleanValue($this->getAttribute('isCrossRef', false));
+        $this->reloadOnInsert = $this->boolValue($this->getAttribute('reloadOnInsert'));
+        $this->reloadOnUpdate = $this->boolValue($this->getAttribute('reloadOnUpdate'));
+        $this->isCrossRef = $this->boolValue($this->getAttribute('isCrossRef', false));
         $this->defaultStringFormat = $this->getAttribute('defaultStringFormat');
-        
+
         $this->lazySetupObject();
     }
-    
+
+    /**
+     * @TODO
+     */
     protected function lazySetupObject() {
         if ($this->database) {
             if (null === $this->idMethod) {
                 $this->idMethod = $this->getAttribute('idMethod', $this->database->getDefaultIdMethod());
             }
-            
+
             if (null === $this->heavyIndexing) {
                 $this->heavyIndexing = (
-                    $this->booleanValue($this->getAttribute('heavyIndexing'))
+                    $this->boolValue($this->getAttribute('heavyIndexing'))
                     || (
                         'false' !== $this->getAttribute('heavyIndexing')
                         && $this->database->isHeavyIndexing()
                     )
                 );
             }
-            
+
             if (null === $this->defaultAccessorVisibility) {
                 $this->defaultAccessorVisibility = $this->getAttribute(
                     'defaultAccessorVisibility',
                     $this->database->getAttribute('defaultAccessorVisibility', static::VISIBILITY_PUBLIC)
                 );
             }
-            
+
             if (null === $this->defaultMutatorVisibility) {
                 $this->defaultMutatorVisibility = $this->getAttribute(
                     'defaultMutatorVisibility',
@@ -266,18 +332,23 @@ class Entity extends ScopedMappingModel implements IdMethod
         }
     }
 
+    /**
+     * @TODO externalize !
+     * @param bool $throwErrors
+     */
     public function finalizeDefinition($throwErrors = false)
     {
         $this->setupReferrers($throwErrors);
     }
 
     /**
+     * @TODO externalize ?
      * Browses the foreign keys and creates referrers for the foreign entity.
      * This method can be called several times on the same entity. It only
      * adds the missing referrers and is non-destructive.
      * Warning: only use when all the entitys were created.
      *
-     * @param  boolean $throwErrors
+     * @param  bool $throwErrors
      *
      * @throws BuildException
      */
@@ -289,6 +360,7 @@ class Entity extends ScopedMappingModel implements IdMethod
     }
 
     /**
+     * @TODO externalize ?
      * @param Relation $relation
      * @param bool     $throwErrors
      */
@@ -361,43 +433,235 @@ class Entity extends ScopedMappingModel implements IdMethod
         }
     }
 
+
+
+    //
+    // Model properties
+    // ------------------------------------------------------------
+
     /**
-     * @return boolean
+     * @param string $tableName
+     * @return $this
      */
-    public function isImplementationDetail()
+    public function setTableName(string $tableName): Entity
     {
-        return $this->implementationDetail;
+        $this->tableName = $tableName;
+        return $this;
     }
 
     /**
-     * @param boolean $implementationDetail
-     */
-    public function setImplementationDetail($implementationDetail)
-    {
-        $this->implementationDetail = $implementationDetail;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isHeavyIndexing()
-    {
-        return $this->heavyIndexing;
-    }
-
-    /**
-     * Returns a build property value for the database this entity belongs to.
-     *
-     * @param  string $key
+     * Returns the blank table name.
      *
      * @return string
      */
-    public function getBuildProperty($key)
+    public function getTableName(): string
     {
-        return $this->database ? $this->database->getBuildProperty($key) : '';
+        $tableName = !$this->tableName ? NamingTool::toUnderscore($this->name) : $this->tableName;
+
+        return $tableName;
     }
 
     /**
+     * The table name with database scope.
+     *
+     * @return string
+     */
+    public function getScopedTableName(): string
+    {
+        $tableName = !$this->tableName ? NamingTool::toUnderscore($this->name) : $this->tableName;
+
+        if ($this->getDatabase()) {
+            return $this->getDatabase()->getScope() . $this->tableName;
+        }
+
+        return $tableName;
+    }
+
+    /**
+     * Returns the scoped table name with possible schema.
+     *
+     * @return string
+     */
+    public function getFullTableName(): string
+    {
+        $fqTableName = $this->getScopedTableName();
+
+        if ($this->hasSchema()) {
+            $fqTableName = $this->guessSchemaName() . $this->getPlatform()->getSchemaDelimiter() . $fqTableName;
+        }
+
+        return $fqTableName;
+    }
+
+    /**
+     * Returns the class name with namespace.
+     *
+     * @return string
+     */
+    public function getFullName(): string
+    {
+        $name = $this->getName();
+        $namespace = $this->getNamespace();
+
+        if (!$namespace && $this->getDatabase()) {
+            $namespace = $this->getDatabase()->getNamespace();
+        }
+
+        if ($namespace) {
+            return $namespace . '\\' . $name;
+        } else {
+            return $name;
+        }
+    }
+
+    /**
+     * @TODO convenient method. remove?
+     *
+     * Returns the camelCase version of PHP name.
+     *
+     * The studly name is the PHP name with the first character lowercase.
+     *
+     * @return string
+     */
+    public function getCamelCaseName(): string
+    {
+        return lcfirst($this->getName());
+    }
+
+    /**
+     * Sets the entity description.
+     *
+     * @param string $description
+     * @return $this
+     */
+    public function setDescription(string $description): Entity
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    /**
+     * Returns the entity description.
+     *
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    /**
+     * Returns whether or not the entity has a description.
+     *
+     * @return bool
+     */
+    public function hasDescription(): bool
+    {
+        return !empty($this->description);
+    }
+
+
+
+    //
+    // References to other models
+    // ------------------------------------------------------------
+
+    /**
+     * @param bool|string $repository
+     */
+    public function setRepository($repository)
+    {
+        $this->repository = $repository;
+    }
+
+    /**
+     * @return bool|string
+     */
+    public function getRepository()
+    {
+        return $this->repository;
+    }
+
+    /**
+     * Set the database that contains this entity.
+     *
+     * @param Database $database
+     * @return $this
+     */
+    public function setDatabase(Database $database): Entity
+    {
+        if (!$this->database !== null && $this->database !== $database) {
+            $this->database->removeEntity($this);
+        }
+        $this->database = $database;
+        $this->database->addEntity($this);
+
+        return $this;
+    }
+
+    /**
+     * Get the database that contains this entity.
+     *
+     * @return Database
+     */
+    public function getDatabase(): ?Database
+    {
+        return $this->database;
+    }
+
+    /**
+     * Returns the Database platform.
+     *
+     * @return PlatformInterface
+     */
+    public function getPlatform(): ?PlatformInterface
+    {
+        return $this->database ? $this->database->getPlatform() : null;
+    }
+
+    /**
+     * Returns the field that subclasses the class representing this
+     * entity can be produced from.
+     *
+     * @return Field
+     */
+    public function getChildrenField(): Field
+    {
+        return $this->inheritanceField;
+    }
+
+    /**
+     * Returns the subclasses that can be created from this entity.
+     *
+     * @return array
+     */
+    public function getChildrenNames(): array
+    {
+        if (null === $this->inheritanceField || !$this->inheritanceField->isEnumeratedClasses()) {
+            return null;
+        }
+
+        $names = [];
+        foreach ($this->inheritanceField->getChildren() as $child) {
+            $names[] = get_class($child);
+        }
+
+        return $names;
+    }
+
+
+
+    //
+    // Collections to other models
+    // ------------------------------------------------------------
+
+
+    // behaviors
+    // -----------------------------------------
+
+    /**
+     * @TODO can it be externalized?
+     *
      * Executes behavior entity modifiers.
      * This is only for testing purposes. Model\Database calls already `modifyEntity` on each behavior.
      */
@@ -416,78 +680,196 @@ class Entity extends ScopedMappingModel implements IdMethod
         $behavior->setEntity($this);
     }
 
-    /**
-     * Creates a new index.
-     *
-     * @param  string $name    The index name
-     * @param  array  $fields The list of fields to index
-     *
-     * @return Index  $index   The created index
-     */
-    public function createIndex($name, array $fields)
+    protected function unregisterBehavior(Behavior $behavior)
     {
-        $index = new Index($name);
-        $index->setFields($fields);
-        $index->resetFieldsSize();
-
-        $this->addIndex($index);
-
-        return $index;
+        $behavior->setEntity(null);
     }
+
+
+    // fields
+    // -----------------------------------------
 
     /**
      * Adds a new field to the entity.
      *
-     * @param  Field|array $col
+     * @param Field $field
      *
      * @throws EngineException
-     * @return Field
+     * @return $this
      */
-    public function addField($col)
+    public function addField(Field $field): Entity
     {
-        if ($col instanceof Field) {
-
-            if (isset($this->fieldsByName[$col->getName()])) {
-                throw new EngineException(
-                    sprintf('Field "%s" declared twice in entity "%s"', $col->getName(), $this->getName())
-                );
-            }
-
-            $col->setEntity($this);
-
-            if ($col->isInheritance()) {
-                $this->inheritanceField = $col;
-            }
-
-            $this->fields[] = $col;
-            $this->fieldsByName[$col->getName()] = $col;
-            $this->fieldsByLowercaseName[strtolower($col->getName())] = $col;
-//            $this->fieldsByPhpName[$col->getName()] = $col;
-            $col->setPosition(count($this->fields));
-
-            if ($col->requiresTransactionInPostgres()) {
-                $this->needsTransactionInPostgres = true;
-            }
-
-            return $col;
+        if ($this->fieldsByName->has($field->getName())) {
+            throw new EngineException(sprintf('Field "%s" declared twice in entity "%s"', $col->getName(), $this->getName()));
         }
 
-        $field = new Field();
-        $field->setEntity($this);
-        $field->loadMapping($col);
+        $this->fields->add($field);
+        $this->fieldsByName->set($field->getName(), $field);
+        $this->fieldsByLowercaseName->set(strtolower($field->getName()), $field);
 
-        return $this->addField($field); // call self w/ different param
+        $field->setPosition($this->fields->size());
+        $field->setEntity($this);
+
+        if ($field->requiresTransactionInPostgres()) {
+            $this->needsTransactionInPostgres = true;
+        }
+
+        if ($field->isInheritance()) {
+            $this->inheritanceField = $field;
+        }
+
+        return $this;
     }
 
     /**
      * Adds several fields at once.
      *
      * @param Field[] $fields An array of Field instance
+     * @return $this
      */
-    public function addFields(array $fields)
+    public function addFields(array $fields): Entity
     {
         foreach ($fields as $field) {
             $this->addField($field);
+        }
+        return $this;
+    }
+
+    /**
+     * Returns whether or not the entity has a field.
+     *
+     * @param Field|string $field The Field object or its name
+     * @param bool $caseInsensitive Whether the check is case insensitive.
+     *
+     * @return bool
+     */
+    public function hasField($field, bool $caseInsensitive = false): bool
+    {
+        if ($field instanceof Field) {
+            return $this->fields->contains($field);
+        }
+
+        if ($caseInsensitive) {
+            return $this->fieldsByLowercaseName->has(strtolower($field));
+        }
+
+        return $this->fieldsByName->has($field);
+    }
+
+    /**
+     * Returns the Field object with the specified name.
+     *
+     * @param string $name The name of the field (e.g. 'my_field')
+     * @param bool $caseInsensitive Whether the check is case insensitive.
+     *
+     * @return Field
+     */
+    public function getField(string $name, bool $caseInsensitive = false): Field
+    {
+        if (!$this->hasField($name, $caseInsensitive)) {
+            throw new \InvalidArgumentException(sprintf('Field `%s` not found in Entity `%s` [%s]', $name, $this->getName(), implode(',', array_keys($this->fieldsByName))));
+        }
+
+        if ($caseInsensitive) {
+            return $this->fieldsByLowercaseName->get(strtolower($name));
+        }
+
+        return $this->fieldsByName->get($name);
+    }
+
+    /**
+     * Returns an array containing all Field objects in the entity.
+     *
+     * @return Field[]
+     */
+    public function getFields(): array
+    {
+        return $this->fields;
+    }
+
+    /**
+     * @TODO This method has no relevance to the model. Could just be static - what to do with it?
+     *
+     * Returns a delimiter-delimited string list of field names.
+     *
+     * @see SqlDefaultPlatform::getFieldList() if quoting is required
+     *
+     * @param array
+     * @param string $delimiter
+     * @return string
+     */
+    public function getFieldList(array $columns, string $delimiter = ','): string
+    {
+        $list = [];
+        foreach ($columns as $col) {
+            if ($col instanceof Field) {
+                $col = $col->getName();
+            }
+            $list[] = $col;
+        }
+        return implode($delimiter, $list);
+    }
+
+    /**
+     * @TODO check consistency with naming size/num/count methods
+     *
+     * Returns the number of fields in this entity.
+     *
+     * @return int
+     */
+    public function getNumFields(): int
+    {
+        return $this->fields->size();
+    }
+
+    /**
+     * @TODO check consistency with naming size/num/count methods
+     *
+     * Returns the number of lazy loaded fields in this entity.
+     *
+     * @return int
+     */
+    public function getNumLazyLoadFields(): int
+    {
+        $count = 0;
+        foreach ($this->fields as $col) {
+            if ($col->isLazyLoad()) {
+                $count++;
+            }
+        }
+
+        return $count;
+    }
+
+    /**
+     * Returns whether or not one of the fields is of type ENUM.
+     *
+     * @return bool
+     */
+    public function hasEnumFields(): bool
+    {
+        foreach ($this->fields as $col) {
+            if ($col->isEnumType()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function getFieldPosition(Field $field): int
+    {
+        return $this->fields->indexOf($field);
+    }
+
+    /**
+     * @TODO: This shouldn't be a method. period. Should automatically managed by add/remove Field
+     */
+    public function adjustFieldPositions()
+    {
+        $nbFields = $this->fields->size();
+        for ($i = 0; $i < $nbFields; $i++) {
+            $this->fields[$i]->setPosition($i + 1);
         }
     }
 
@@ -497,60 +879,48 @@ class Entity extends ScopedMappingModel implements IdMethod
      * @param  Field|string $field The Field or its name
      *
      * @throws EngineException
+     * @return $this
      */
-    public function removeField($field)
+    public function removeField($field): Entity
     {
         if (is_string($field)) {
             $field = $this->getField($field);
         }
 
-        $pos = $this->getFieldPosition($field);
-        if (false === $pos) {
-            throw new EngineException(
-                sprintf('No field named %s found in entity %s.', $field->getName(), $this->getName())
-            );
+        if (null === $field || !$this->fields->contains($field)) {
+            throw new EngineException(sprintf('No field named %s found in entity %s.', $field->getName(), $this->getName()));
         }
 
-        unset($this->fields[$pos]);
-        unset($this->fieldsByName[$field->getName()]);
-        unset($this->fieldsByLowercaseName[strtolower($field->getName())]);
-//        unset($this->fieldsByPhpName[$field->getName()]);
+        $this->fields->remove($field);
+        $this->fieldsByName->remove($field->getName());
+        $this->fieldsByLowercaseName->remove(strtolower($field->getName()));
 
         $this->adjustFieldPositions();
         // @FIXME: also remove indexes and validators on this field?
+
+        return $this;
     }
 
-    private function getFieldPosition(Field $field)
-    {
-        $position = false;
-        $nbFields = $this->getNumFields();
-        for ($pos = 0; $pos < $nbFields; $pos++) {
-            if ($this->fields[$pos]->getName() === $field->getName()) {
-                $position = $pos;
-            }
-        }
 
-        return $position;
-    }
-
-    public function adjustFieldPositions()
-    {
-        $this->fields = array_values($this->fields);
-        $nbFields = $this->getNumFields();
-        for ($i = 0; $i < $nbFields; $i++) {
-            $this->fields[$i]->setPosition($i + 1);
-        }
-    }
+    // relations
+    // -----------------------------------------
 
     /**
-     * Adds a new foreign key to this entity.
+     * Adds a new relation to this entity.
      *
-     * @param  Relation|array $data The foreign key mapping
+     * @param Relation $relation The relation
      *
-     * @return Relation
+     * @return $this
      */
-    public function addRelation($data)
+    public function addRelation(Relation $relation): Entity
     {
+        $relation->setEntity($this);
+
+        $this->relations->add($relation);
+        $this->foreignEntityNames->add($relation->getForeignEntityName());
+
+        return $this;
+
         if ($data instanceof Relation) {
             $relation = $data;
             $relation->setEntity($this);
@@ -583,55 +953,80 @@ class Entity extends ScopedMappingModel implements IdMethod
     }
 
     /**
-     * Returns the field that subclasses the class representing this
-     * entity can be produced from.
+     * Returns whether or not the entity has foreign keys.
      *
-     * @return Field
+     * @return bool
      */
-    public function getChildrenField()
+    public function hasRelations(): bool
     {
-        return $this->inheritanceField;
+        return $this->relations->size() > 0;
     }
 
     /**
-     * Returns the subclasses that can be created from this entity.
+     * Returns whether the entity has cross foreign keys or not.
      *
-     * @return array
+     * @return bool
      */
-    public function getChildrenNames()
+    public function hasCrossRelations(): bool
     {
-        if (null === $this->inheritanceField
-            || !$this->inheritanceField->isEnumeratedClasses()
-        ) {
-            return null;
+        return count($this->getCrossRelations()) > 0;
+    }
+
+    /**
+     * @param string $fieldName
+     *
+     * @return Relation
+     */
+    public function getRelation($fieldName): Relation
+    {
+        foreach ($this->relations as $relation) {
+            if ($relation->getField() == $fieldName) {
+                return $relation;
+            }
         }
-
-        $names = [];
-        foreach ($this->inheritanceField->getChildren() as $child) {
-            $names[] = get_class($child);
-        }
-
-        return $names;
     }
 
     /**
-     * Adds the foreign key from another entity that refers to this entity.
-     *
-     * @param Relation $relation
-     */
-    public function addReferrer(Relation $relation)
-    {
-        $this->referrers[] = $relation;
-    }
-
-    /**
-     * Returns the list of references to this entity.
+     * Returns the list of all foreign keys.
      *
      * @return Relation[]
      */
-    public function getReferrers()
+    public function getRelations(): array
     {
-        return $this->referrers;
+        return $this->relations->toArray();
+    }
+
+    /**
+     * Returns all foreign keys from this entity that reference the entity passed
+     * in argument.
+     *
+     * @param string $entityName
+     *
+     * @return Relation[]
+     */
+    public function getRelationsReferencingEntity(string $entityName): array
+    {
+        return $this->relations->filter(function (Relation $relation) use ($entityName) {
+            return $relation->getForeignEntityName() === $entityName;
+        })->toArray();
+    }
+
+    /**
+     * Returns the foreign keys that include $field in it's list of local
+     * fields.
+     *
+     * Eg. Foreign key (a, b, c) references tbl(x, y, z) will be returned of $field
+     * is either a, b or c.
+     *
+     * @param string $fieldName Name of the field
+     *
+     * @return Relation[]
+     */
+    public function getFieldRelations(string $fieldName): array
+    {
+        return $this->relations->filter(function (Relation $relation) use ($fieldName) {
+            return in_array($fieldName, $relation->getLocalFields());
+        })->toArray();
     }
 
     /**
@@ -660,52 +1055,6 @@ class Entity extends ScopedMappingModel implements IdMethod
     }
 
     /**
-     * Returns all required(notNull && no defaultValue) primary keys which are not in $primaryKeys.
-     *
-     * @param  Field[] $primaryKeys
-     *
-     * @return Field[]
-     */
-    public function getOtherRequiredPrimaryKeys(array $primaryKeys)
-    {
-        $pks = [];
-        foreach ($this->getPrimaryKey() as $primaryKey) {
-            if ($primaryKey->isNotNull() && !$primaryKey->hasDefaultValue() && !in_array(
-                    $primaryKey,
-                    $primaryKeys,
-                    true
-                )
-            ) {
-                $pks = $primaryKey;
-            }
-        }
-
-        return $pks;
-    }
-
-    /**
-     * Sets whether or not this entity contains a foreign primary key.
-     *
-     * @param $containsForeignPK
-     *
-     * @return boolean
-     */
-    public function setContainsForeignPK($containsForeignPK)
-    {
-        $this->containsForeignPK = (Boolean)$containsForeignPK;
-    }
-
-    /**
-     * Returns whether or not this entity contains a foreign primary key.
-     *
-     * @return boolean
-     */
-    public function getContainsForeignPK()
-    {
-        return $this->containsForeignPK;
-    }
-
-    /**
      * Returns the list of entitys referenced by foreign keys in this entity.
      *
      * @return array
@@ -715,54 +1064,87 @@ class Entity extends ScopedMappingModel implements IdMethod
         return $this->foreignEntityNames;
     }
 
+
+    // referrer
+    // -----------------------------------------
+
     /**
-     * Return true if the field requires a transaction in Postgres.
+     * Adds the foreign key from another entity that refers to this entity.
      *
-     * @return boolean
+     * @param Relation $relation
+     * @return $this
      */
-    public function requiresTransactionInPostgres()
+    public function addReferrer(Relation $relation): Entity
     {
-        return $this->needsTransactionInPostgres;
+        $this->referrers->add($relation);
+        return $this;
     }
 
     /**
-     * Adds a new parameter for the strategy that generates primary keys.
+     * Returns the list of references to this entity.
      *
-     * @param  IdMethodParameter|array $idMethodParameter
-     *
-     * @return IdMethodParameter
+     * @return Relation[]
      */
-    public function addIdMethodParameter($idMethodParameter)
+    public function getReferrers()
     {
-        if ($idMethodParameter instanceof IdMethodParameter) {
-            $idMethodParameter->setEntity($this);
-            $this->idMethodParameters[] = $idMethodParameter;
+        return $this->referrers->toArray();
+    }
 
-            return $idMethodParameter;
-        }
 
-        $imp = new IdMethodParameter();
-        $imp->setEntity($this);
-        $imp->loadMapping($idMethodParameter);
+    // indices
+    // -----------------------------------------
 
-        return $this->addIdMethodParameter($imp);
+    /**
+     * Creates a new index.
+     *
+     * @param string $name The index name
+     * @param array $fields The list of fields to index
+     *
+     * @return Index  $index   The created index
+     */
+    public function createIndex(string $name, array $fields): Index
+    {
+        $index = new Index($name);
+        $index->setFields($fields);
+        $index->resetFieldsSize();
+
+        $this->addIndex($index);
+
+        return $index;
     }
 
     /**
-     * Removes a index from the entity.
+     * Adds a new index to the indices list and set the
+     * parent entity of the field to the current entity.
      *
-     * @param string $name
+     * @param  Index $index
+     *
+     * @throw  InvalidArgumentException
+     *
+     * @return $this
      */
-    public function removeIndex($name)
+    public function addIndex(Index $index): Entity
     {
-        // check if we have a index with this name already, then delete it
-        foreach ($this->indices as $n => $idx) {
-            if ($idx->getName() == $name) {
-                unset($this->indices[$n]);
-
-                return;
-            }
+        if ($this->hasIndex($index->getName())) {
+            throw new \InvalidArgumentException(sprintf('Index "%s" already exist.', $index->getName()));
         }
+
+        if (!$index->getFields()) {
+            throw new \InvalidArgumentException(sprintf('Index "%s" has no fields.', $index->getName()));
+        }
+
+        $index->setEntity($this);
+        // @TODO $index->getName() ? we can do better here. Under investigation
+//         $index->getName();
+        $this->indices->add($index);
+
+        return $this;
+
+//         $idx = new Index();
+//         $idx->loadMapping($index);
+//         foreach ((array)@$index['fields'] as $field) {
+//             $idx->addField($field);
+//         }
     }
 
     /**
@@ -770,7 +1152,7 @@ class Entity extends ScopedMappingModel implements IdMethod
      *
      * @param  string $name
      *
-     * @return boolean
+     * @return bool
      */
     public function hasIndex($name)
     {
@@ -784,645 +1166,29 @@ class Entity extends ScopedMappingModel implements IdMethod
     }
 
     /**
-     * Adds a new index to the indices list and set the
-     * parent entity of the field to the current entity.
+     * Checks if a index exists with the given $keys.
      *
-     * @param  Index|array $index
-     *
-     * @return Index
-     *
-     * @throw  InvalidArgumentException
+     * @param array $keys
+     * @return bool
      */
-    public function addIndex($index)
+    public function isIndex(array $keys): bool
     {
-        if ($index instanceof Index) {
-            if ($this->hasIndex($index->getName())) {
-                throw new InvalidArgumentException(sprintf('Index "%s" already exist.', $index->getName()));
-            }
-            if (!$index->getFields()) {
-                throw new InvalidArgumentException(sprintf('Index "%s" has no fields.', $index->getName()));
-            }
-            $index->setEntity($this);
-            // force the name to be created if empty.
-            $this->indices[] = $index;
-
-            return $index;
-        }
-
-        $idx = new Index();
-        $idx->loadMapping($index);
-        foreach ((array)@$index['fields'] as $field) {
-            $idx->addField($field);
-        }
-
-        return $this->addIndex($idx);
-    }
-
-    /**
-     * Adds a new Unique index to the list of unique indices and set the
-     * parent entity of the field to the current entity.
-     *
-     * @param  Unique|array $unique
-     *
-     * @return Unique
-     */
-    public function addUnique($unique)
-    {
-        if ($unique instanceof Unique) {
-            $unique->setEntity($this);
-            $unique->getName(); // we call this method so that the name is created now if it doesn't already exist.
-            $this->unices[] = $unique;
-
-            return $unique;
-        }
-
-        $unik = new Unique();
-        $unik->loadMapping($unique);
-
-        return $this->addUnique($unik);
-    }
-
-    /**
-     * Retrieves the configuration object.
-     *
-     * @return GeneratorConfig
-     */
-    public function getGeneratorConfig()
-    {
-        return $this->database->getGeneratorConfig();
-    }
-
-    /**
-     * Returns whether or not the entity behaviors offer additional builders.
-     *
-     * @return boolean
-     */
-    public function hasAdditionalBuilders()
-    {
-        foreach ($this->behaviors as $behavior) {
-            if ($behavior->hasAdditionalBuilders()) {
-                return true;
+        foreach ($this->indices as $index) {
+            if (count($keys) === $index->fields->size()) {
+                $allAvailable = true;
+                foreach ($keys as $key) {
+                    if (!$index->hasField($key instanceof Field ? $key->getName() : $key)) {
+                        $allAvailable = false;
+                        break;
+                    }
+                }
+                if ($allAvailable) {
+                    return true;
+                }
             }
         }
 
         return false;
-    }
-
-    /**
-     * Get the early entity behaviors
-     *
-     * @return Array of Behavior objects
-     */
-    public function getEarlyBehaviors()
-    {
-        $behaviors = [];
-        foreach ($this->behaviors as $name => $behavior) {
-            if ($behavior->isEarly()) {
-                $behaviors[$name] = $behavior;
-            }
-        }
-
-        return $behaviors;
-    }
-
-    /**
-     * Returns the list of additional builders provided by the entity behaviors.
-     *
-     * @return array
-     */
-    public function getAdditionalBuilders()
-    {
-        $additionalBuilders = [];
-        foreach ($this->behaviors as $behavior) {
-            $additionalBuilders = array_merge($additionalBuilders, $behavior->getAdditionalBuilders());
-        }
-
-        return $additionalBuilders;
-    }
-
-    /**
-     * Returns the entity (class) name without namespace.
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * @param string $name
-     */
-    public function setName($name)
-    {
-        if (false !== strpos($name, '\\')) {
-            $namespace = explode('\\', trim($name, '\\'));
-            $this->name = array_pop($namespace);
-            $this->namespace = implode('\\', $namespace);
-        } else {
-            $this->name = $name;
-        }
-    }
-
-    /**
-     * @return string
-     */
-    public function getTableName()
-    {
-        if (!$this->tableName) {
-            $shortName = basename($this->name);
-            $this->tableName = NamingTool::toUnderscore($shortName);
-        }
-
-        if ($this->getDatabase()) {
-            return $this->getDatabase()->getTablePrefix() . $this->tableName;
-        }
-
-        return $this->tableName;
-    }
-
-    /**
-     * Table name without table prefix.
-     *
-     * @return string
-     */
-    public function getCommonTableName()
-    {
-        if (!$this->tableName) {
-            $shortName = basename($this->name);
-            $this->tableName = NamingTool::toUnderscore($shortName);
-        }
-
-        return $this->tableName;
-    }
-
-    /**
-     * Full table name with possible schema.
-     *
-     * @return string
-     */
-    public function getFQTableName()
-    {
-        $fqTableName = $this->getTableName();
-
-        if ($this->hasSchema()) {
-            $fqTableName = $this->guessSchemaName() . $this->getPlatform()->getSchemaDelimiter() . $fqTableName;
-        }
-
-        return $fqTableName;
-    }
-
-    /**
-     * @param mixed $tableName
-     */
-    public function setTableName($tableName)
-    {
-        $this->tableName = $tableName;
-    }
-
-    /**
-     * Returns the full entity class name with namespace.
-     *
-     * @return string
-     */
-    public function getFullClassName()
-    {
-        $name = $this->getName();
-        $namespace = $this->getNamespace();
-
-        if (!$namespace && $this->getDatabase()) {
-            $namespace = $this->getDatabase()->getNamespace();
-        }
-
-        if ($namespace) {
-            return trim($namespace, '\\') . '\\' . $name;
-        } else {
-            return $name;
-        }
-    }
-
-    /**
-     * Returns the schema name from this entity or from its database.
-     *
-     * @return string
-     */
-    public function guessSchemaName()
-    {
-        if (!$this->schema && $this->database) {
-            return $this->database->getSchema();
-        }
-
-        return $this->schema;
-    }
-
-    /**
-     * Returns whether or not this entity is linked to a schema.
-     *
-     * @return boolean
-     */
-    public function hasSchema()
-    {
-        return $this->database
-        && ($this->schema ?: $this->database->getSchema())
-        && ($platform = $this->getPlatform())
-        && $platform->supportsSchemas();
-    }
-
-    /**
-     * Returns the entity description.
-     *
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    /**
-     * Returns whether or not the entity has a description.
-     *
-     * @return boolean
-     */
-    public function hasDescription()
-    {
-        return !empty($this->description);
-    }
-
-    /**
-     * Sets the entity description.
-     *
-     * @param string $description
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
-    }
-
-    /**
-     * Returns the camelCase version of PHP name.
-     *
-     * The studly name is the PHP name with the first character lowercase.
-     *
-     * @return string
-     */
-    public function getCamelCaseName()
-    {
-        return lcfirst($this->getName());
-    }
-
-//    /**
-//     * Returns the common name (without schema name), but with entity prefix if defined.
-//     *
-//     * @return string
-//     */
-//    public function getCommonName()
-//    {
-//        return $this->commonName;
-//    }
-//
-//    /**
-//     * Sets the entity common name (without schema name).
-//     *
-//     * @param string $name
-//     */
-//    public function setCommonName($name)
-//    {
-//        $this->commonName = $this->originCommonName = $name;
-//    }
-
-    /**
-     * Returns the unmodified common name (not modified by entity prefix).
-     *
-     * @return string
-     */
-    public function getOriginCommonName()
-    {
-        return $this->originCommonName;
-    }
-
-    /**
-     * Sets the default string format for ActiveRecord objects in this entity.
-     *
-     * Any of 'XML', 'YAML', 'JSON', or 'CSV'.
-     *
-     * @param  string $format
-     *
-     * @throws InvalidArgumentException
-     */
-    public function setDefaultStringFormat($format)
-    {
-        $formats = Database::getSupportedStringFormats();
-
-        $format = strtoupper($format);
-        if (!in_array($format, $formats)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Given "%s" default string format is not supported. Only "%s" are valid string formats.',
-                    $format,
-                    implode(', ', $formats)
-                )
-            );
-        }
-
-        $this->defaultStringFormat = $format;
-    }
-
-    /**
-     * Returns the default string format for ActiveRecord objects in this entity,
-     * or the one for the whole database if not set.
-     *
-     * @return string
-     */
-    public function getDefaultStringFormat()
-    {
-        if (null !== $this->defaultStringFormat) {
-            return $this->defaultStringFormat;
-        }
-
-        return $this->database->getDefaultStringFormat();
-    }
-
-    /**
-     * Returns the method strategy for generating primary keys.
-     *
-     * [HL] changing behavior so that Database default method is returned
-     * if no method has been specified for the entity.
-     *
-     * @return string
-     */
-    public function getIdMethod()
-    {
-        return $this->idMethod;
-    }
-
-    /**
-     * Returns whether we allow to insert primary keys on entitys with
-     * native id method.
-     *
-     * @return boolean
-     */
-    public function isAllowPkInsert()
-    {
-        return $this->allowPkInsert;
-    }
-
-    /**
-     * Sets the method strategy for generating primary keys.
-     *
-     * @param string $idMethod
-     */
-    public function setIdMethod($idMethod)
-    {
-        $this->idMethod = $idMethod;
-    }
-
-    /**
-     * Returns whether or not Propel has to skip DDL SQL generation for this
-     * entity (in the event it should not be created from scratch).
-     *
-     * @return boolean
-     */
-    public function isSkipSql()
-    {
-        return ($this->skipSql || $this->isAlias() || $this->isForReferenceOnly());
-    }
-
-    /**
-     * Sets whether or not this entity should have its SQL DDL code generated.
-     *
-     * @param boolean $skip
-     */
-    public function setSkipSql($skip)
-    {
-        $this->skipSql = (Boolean)$skip;
-    }
-
-    /**
-     * Returns whether or not this entity is read-only. If yes, only only
-     * accessors and relationship accessors and mutators will be generated.
-     *
-     * @return boolean
-     */
-    public function isReadOnly()
-    {
-        return $this->readOnly;
-    }
-
-    /**
-     * Makes this database in read-only mode.
-     *
-     * @param boolean $flag True by default
-     */
-    public function setReadOnly($flag = true)
-    {
-        $this->readOnly = (boolean)$flag;
-    }
-
-    /**
-     * Whether to force object to reload on INSERT.
-     *
-     * @return boolean
-     */
-    public function isReloadOnInsert()
-    {
-        return $this->reloadOnInsert;
-    }
-
-    /**
-     * Makes this database reload on insert statement.
-     *
-     * @param boolean $flag True by default
-     */
-    public function setReloadOnInsert($flag = true)
-    {
-        $this->reloadOnInsert = (boolean)$flag;
-    }
-
-    /**
-     * Returns whether or not to force object to reload on UPDATE.
-     *
-     * @return boolean
-     */
-    public function isReloadOnUpdate()
-    {
-        return $this->reloadOnUpdate;
-    }
-
-    /**
-     * Makes this database reload on update statement.
-     *
-     * @param boolean $flag True by default
-     */
-    public function setReloadOnUpdate($flag = true)
-    {
-        $this->reloadOnUpdate = (boolean)$flag;
-    }
-
-    /**
-     * Returns the PHP name of an active record object this entry references.
-     *
-     * @return string
-     */
-    public function getAlias()
-    {
-        return $this->alias;
-    }
-
-    /**
-     * Returns whether or not this entity is specified in the schema or if there
-     * is just a foreign key reference to it.
-     *
-     * @return boolean
-     */
-    public function isAlias()
-    {
-        return null !== $this->alias;
-    }
-
-    /**
-     * Sets whether or not this entity is specified in the schema or if there is
-     * just a foreign key reference to it.
-     *
-     * @param string $alias
-     */
-    public function setAlias($alias)
-    {
-        $this->alias = $alias;
-    }
-
-    /**
-     * Returns whether or not a entity is abstract, it marks the business object
-     * class that is generated as being abstract. If you have a entity called
-     * "FOO", then the Foo business object class will be declared abstract. This
-     * helps support class hierarchies
-     *
-     * @return boolean
-     */
-    public function isAbstract()
-    {
-        return $this->isAbstract;
-    }
-
-    /**
-     * Sets whether or not a entity is abstract, it marks the business object
-     * class that is generated as being abstract. If you have a
-     * entity called "FOO", then the Foo business object class will be
-     * declared abstract. This helps support class hierarchies
-     *
-     * @param boolean $flag
-     */
-    public function setAbstract($flag = true)
-    {
-        $this->isAbstract = (boolean)$flag;
-    }
-
-    /**
-     * Returns an array containing all Field objects in the entity.
-     *
-     * @return Field[]
-     */
-    public function getFields()
-    {
-        return $this->fields;
-    }
-
-    /**
-     * Returns a delimiter-delimited string list of field names.
-     *
-     * @see SqlDefaultPlatform::getFieldList() if quoting is required
-     *
-     * @param array
-     * @param  string $delimiter
-     * @return string
-     */
-    public function getFieldList($columns, $delimiter = ',')
-    {
-        $list = [];
-        foreach ($columns as $col) {
-            if ($col instanceof Field) {
-                $col = $col->getName();
-            }
-            $list[] = $col;
-        }
-        return implode($delimiter, $list);
-    }
-
-    /**
-     * Returns the number of fields in this entity.
-     *
-     * @return integer
-     */
-    public function getNumFields()
-    {
-        return count($this->fields);
-    }
-
-    /**
-     * Returns the number of lazy loaded fields in this entity.
-     *
-     * @return integer
-     */
-    public function getNumLazyLoadFields()
-    {
-        $count = 0;
-        foreach ($this->fields as $col) {
-            if ($col->isLazyLoad()) {
-                $count++;
-            }
-        }
-
-        return $count;
-    }
-
-    /**
-     * Returns whether or not one of the fields is of type ENUM.
-     *
-     * @return boolean
-     */
-    public function hasEnumFields()
-    {
-        foreach ($this->fields as $col) {
-            if ($col->isEnumType()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns the list of all foreign keys.
-     *
-     * @return Relation[]
-     */
-    public function getRelations()
-    {
-        return $this->relations;
-    }
-
-    /**
-     * @param string $fieldName
-     *
-     * @return Relation
-     */
-    public function getRelation($fieldName)
-    {
-        foreach ($this->relations as $relation) {
-            if ($relation->getField() == $fieldName) {
-                return $relation;
-            }
-        }
-    }
-
-    /**
-     * Returns a Collection of parameters relevant for the chosen
-     * id generation method.
-     *
-     * @return IdMethodParameter[]
-     */
-    public function getIdMethodParameters()
-    {
-        return $this->idMethodParameters;
     }
 
     /**
@@ -1430,30 +1196,63 @@ class Entity extends ScopedMappingModel implements IdMethod
      *
      * @return Index[]
      */
-    public function getIndices()
+    public function getIndices(): array
     {
-        return $this->indices;
+        return $this->indices->toArray();
     }
 
     /**
-     * Returns the list of all unique indices of this entity.
+     * Removes an index off this entity
      *
-     * @return Unique[]
+     * @param Index|string $index
+     * @return $this
      */
-    public function getUnices()
+    public function removeIndex($index): Entity
     {
-        return $this->unices;
+        if (is_string($index)) {
+            $index = $this->indices->find($index, function(Index $index, $query) {
+                return $index->getName() == $query;
+            });
+        }
+
+        if ($index instanceof Index && $index->getEntity() == $this) {
+            $index->setEntity(null);
+            $this->indices->remove($index);
+        }
+
+        return $this;
+    }
+
+
+    // unices
+    // -----------------------------------------
+
+    /**
+     * Adds a new Unique index to the list of unique indices and set the
+     * parent entity of the field to the current entity.
+     *
+     * @param Unique $unique
+     *
+     * @return $this
+     */
+    public function addUnique(Unique $unique): Entity
+    {
+        $unique->setEntity($this);
+        $unique->getName(); // we call this method so that the name is created now if it doesn't already exist.
+
+        $this->unices->add($unique);
+
+        return $this;
     }
 
     /**
      * Checks if $keys are a unique constraint in the entity.
      * (through primaryKey, through a regular unices constraints or for single keys when it has isUnique=true)
      *
-     * @param  Field[]|string[] $keys
-     *
-     * @return boolean
+     * @param Field[]|string[] $keys
+     * @return bool
      */
-    public function isUnique(array $keys)
+    public function isUnique(array $keys): bool
     {
         if (1 === count($keys)) {
             $field = $keys[0] instanceof Field ? $keys[0] : $this->getField($keys[0]);
@@ -1492,22 +1291,20 @@ class Entity extends ScopedMappingModel implements IdMethod
         }
 
         // check if there is a unique constrains that contains exactly the $keys
-        if ($this->unices) {
-            foreach ($this->unices as $unique) {
-                if (count($unique->getFields()) === count($keys)) {
-                    $allAvailable = true;
-                    foreach ($keys as $key) {
-                        if (!$unique->hasField($key instanceof Field ? $key->getName() : $key)) {
-                            $allAvailable = false;
-                            break;
-                        }
+        foreach ($this->unices as $unique) {
+            if (count($unique->getFields()) === count($keys)) {
+                $allAvailable = true;
+                foreach ($keys as $key) {
+                    if (!$unique->hasField($key instanceof Field ? $key->getName() : $key)) {
+                        $allAvailable = false;
+                        break;
                     }
-                    if ($allAvailable) {
-                        return true;
-                    }
-                } else {
-                    continue;
                 }
+                if ($allAvailable) {
+                    return true;
+                }
+            } else {
+                continue;
             }
         }
 
@@ -1515,164 +1312,158 @@ class Entity extends ScopedMappingModel implements IdMethod
     }
 
     /**
-     * Checks if a index exists with the given $keys.
+     * Returns the list of all unique indices of this entity.
      *
-     * @param  array $keys
-     *
-     * @return boolean
+     * @return Unique[]
      */
-    public function isIndex(array $keys)
+    public function getUnices(): array
     {
-        if ($this->indices) {
-            foreach ($this->indices as $index) {
-                if (count($keys) === count($index->getFields())) {
-                    $allAvailable = true;
-                    foreach ($keys as $key) {
-                        if (!$index->hasField($key instanceof Field ? $key->getName() : $key)) {
-                            $allAvailable = false;
-                            break;
-                        }
-                    }
-                    if ($allAvailable) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
+        return $this->unices->toArray();
     }
 
     /**
-     * Returns whether or not the entity has a field.
+     * Removes an unique index off this entity
      *
-     * @param  Field|string $field          The Field object or its name
-     * @param  boolean      $caseInsensitive Whether the check is case insensitive.
-     *
-     * @return boolean
+     * @param Unique $unique
+     * @return $this
      */
-    public function hasField($field, $caseInsensitive = false)
+    public function removeUnique(Unique $unique): Entity
     {
-        if ($field instanceof Field) {
-            $field = $field->getName();
+        if ($unique->getEntity() == $this) {
+            $unique->setEntity(null);
+            $this->unices->remove($unique);
         }
 
-        if ($caseInsensitive) {
-            return isset($this->fieldsByLowercaseName[strtolower($field)]);
-        }
+        return $this;
+    }
 
-        return isset($this->fieldsByName[$field]);
+
+
+    //
+    // Database related options/properties
+    // ------------------------------------------------------------
+
+    /**
+     * Sets the method strategy for generating primary keys.
+     *
+     * @param string $idMethod
+     * @return $this
+     */
+    public function setIdMethod(string $idMethod): Entity
+    {
+        $this->idMethod = $idMethod;
+        return $this;
     }
 
     /**
-     * Returns the Field object with the specified name.
+     * Returns the method strategy for generating primary keys.
      *
-     * @param  string  $name            The name of the field (e.g. 'my_field')
-     * @param  boolean $caseInsensitive Whether the check is case insensitive.
+     * [HL] changing behavior so that Database default method is returned
+     * if no method has been specified for the entity.
      *
-     * @return Field
+     * @return string
      */
-    public function getField($name, $caseInsensitive = false)
+    public function getIdMethod(): string
     {
-        if (!$this->hasField($name, $caseInsensitive)) {
-            throw new \InvalidArgumentException(sprintf('Field `%s` not found in Entity `%s` [%s]', $name, $this->getName(), implode(',', array_keys($this->fieldsByName))));
-        }
-
-        if ($caseInsensitive) {
-            return $this->fieldsByLowercaseName[strtolower($name)];
-        }
-
-        return $this->fieldsByName[$name];
-    }
-
-//    /**
-//     * Returns a specified field by its php name.
-//     *
-//     * @param  string $phpName
-//     *
-//     * @return Field
-//     */
-//    public function getFieldByPhpName($phpName)
-//    {
-//        if (isset($this->fieldsByPhpName[$phpName])) {
-//            return $this->fieldsByPhpName[$phpName];
-//        }
-//
-//        return null;
-//    }
-
-    /**
-     * Returns all foreign keys from this entity that reference the entity passed
-     * in argument.
-     *
-     * @param  string $entityName
-     *
-     * @return array
-     */
-    public function getRelationsReferencingEntity($entityName)
-    {
-        $matches = [];
-        foreach ($this->relations as $relation) {
-            if ($relation->getForeignEntityName() === $entityName) {
-                $matches[] = $relation;
-            }
-        }
-
-        return $matches;
+        return $this->idMethod;
     }
 
     /**
-     * Returns the foreign keys that include $field in it's list of local
-     * fields.
+     * Adds a new parameter for the strategy that generates primary keys.
      *
-     * Eg. Foreign key (a, b, c) references tbl(x, y, z) will be returned of $field
-     * is either a, b or c.
-     *
-     * @param  string $field Name of the field
-     *
-     * @return array
+     * @param IdMethodParameter $idMethodParameter
+     * @return $this
      */
-    public function getFieldRelations($field)
+    public function addIdMethodParameter(IdMethodParameter $idMethodParameter): Entity
     {
-        $matches = [];
-        foreach ($this->relations as $relation) {
-            if (in_array($field, $relation->getLocalFields())) {
-                $matches[] = $relation;
-            }
-        }
+        $idMethodParameter->setEntity($this);
+        $this->idMethodParameters->add($idMethodParameter);
 
-        return $matches;
+        return $this;
     }
 
     /**
-     * Set the database that contains this entity.
+     * Returns a Collection of parameters relevant for the chosen
+     * id generation method.
      *
-     * @param Database $database
+     * @return IdMethodParameter[]
      */
-    public function setDatabase(Database $database)
+    public function getIdMethodParameters(): array
     {
-        $this->database = $database;
-        $this->lazySetupObject();
+        return $this->idMethodParameters->toArray();
     }
 
     /**
-     * Get the database that contains this entity.
+     * Removes a parameter for the strategy that generates primary keys.
      *
-     * @return Database
+     * @param IdMethodParameter $idMethodParameter
+     * @return $this
      */
-    public function getDatabase()
+    public function removeIdMethodParameter(IdMethodParameter $idMethodParameter): Entity
     {
-        return $this->database;
+        $idMethodParameter->setEntity(null);
+        $this->idMethodParameters->remove($idMethodParameter);
+
+        return $this;
     }
 
     /**
-     * Returns the Database platform.
-     *
-     * @return PlatformInterface
+     * @return bool
      */
-    public function getPlatform()
+    public function isImplementationDetail(): bool
     {
-        return $this->database ? $this->database->getPlatform() : null;
+        return $this->implementationDetail;
+    }
+
+    /**
+     * @param bool $implementationDetail
+     */
+    public function setImplementationDetail(bool $implementationDetail)
+    {
+        $this->implementationDetail = $implementationDetail;
+    }
+
+    /**
+     * Return true if the field requires a transaction in Postgres.
+     *
+     * @return bool
+     */
+    public function requiresTransactionInPostgres()
+    {
+        return $this->needsTransactionInPostgres;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHeavyIndexing(): bool
+    {
+        return $this->heavyIndexing;
+    }
+
+    /**
+     * @param bool $identifierQuoting
+     * @return $this
+     */
+    public function setIdentifierQuoting(bool $identifierQuoting): Entity
+    {
+        $this->identifierQuoting = $identifierQuoting;
+        return $this;
+    }
+
+    /**
+     * Checks if identifierQuoting is enabled. Looks up to its database->isIdentifierQuotingEnabled
+     * if identifierQuoting is null hence undefined.
+     *
+     * Use getIdentifierQuoting() if you need the raw value.
+     *
+     * @return bool
+     */
+    public function isIdentifierQuotingEnabled(): bool
+    {
+        return (null !== $this->identifierQuoting || !$this->database)
+            ? $this->identifierQuoting
+            : $this->database->isIdentifierQuotingEnabled();
     }
 
     /**
@@ -1684,12 +1475,12 @@ class Entity extends ScopedMappingModel implements IdMethod
      *
      * @return string
      */
-    public function quoteIdentifier($text)
+    public function quoteIdentifier(string $text): string
     {
         if (!$this->getPlatform()) {
             throw new RuntimeException(
                 'No platform specified. Can not quote without knowing which platform this entity\'s database is using.'
-            );
+               );
         }
 
         if ($this->isIdentifierQuotingEnabled()) {
@@ -1700,27 +1491,162 @@ class Entity extends ScopedMappingModel implements IdMethod
     }
 
     /**
-     * Returns whether or not code and SQL must be created for this entity.
-     *
-     * Entity will be skipped, if return true.
-     *
-     * @return boolean
+     * @return bool|null
      */
-    public function isForReferenceOnly()
+    public function getIdentifierQuoting()
     {
-        return $this->forReferenceOnly;
+        return $this->identifierQuoting;
+    }
+
+    /**
+     * Makes this database reload on insert statement.
+     *
+     * @param bool $flag True by default
+     * @return $this
+     */
+    public function setReloadOnInsert(bool $flag = true)
+    {
+        $this->reloadOnInsert = $flag;
+        return $this;
+    }
+
+    /**
+     * Whether to force object to reload on INSERT.
+     *
+     * @return bool
+     */
+    public function isReloadOnInsert(): bool
+    {
+        return $this->reloadOnInsert;
+    }
+
+    /**
+     * Makes this database reload on update statement.
+     *
+     * @param bool $flag True by default
+     * @return $this
+     */
+    public function setReloadOnUpdate(bool $flag = true): Entity
+    {
+        $this->reloadOnUpdate = $flag;
+    }
+
+    /**
+     * Returns whether or not to force object to reload on UPDATE.
+     *
+     * @return bool
+     */
+    public function isReloadOnUpdate(): bool
+    {
+        return $this->reloadOnUpdate;
     }
 
     /**
      * Returns whether or not to determine if code/sql gets created for this entity.
      * Entity will be skipped, if set to true.
      *
-     * @param boolean $flag
+     * @param bool $flag
+     * @return $this
      */
-    public function setForReferenceOnly($flag = true)
+    public function setForReferenceOnly(bool $flag = true): Entity
     {
-        $this->forReferenceOnly = (boolean)$flag;
+        $this->forReferenceOnly = $flag;
+        return $this;
     }
+
+    /**
+     * Returns whether or not code and SQL must be created for this entity.
+     *
+     * Entity will be skipped, if return true.
+     *
+     * @return bool
+     */
+    public function isForReferenceOnly(): bool
+    {
+        return $this->forReferenceOnly;
+    }
+
+    /**
+     * Returns whether we allow to insert primary keys on entitys with
+     * native id method.
+     *
+     * @return bool
+     */
+    public function isAllowPkInsert(): bool
+    {
+        return $this->allowPkInsert;
+    }
+
+    /**
+     * Returns whether or not Propel has to skip DDL SQL generation for this
+     * entity (in the event it should not be created from scratch).
+     *
+     * @return bool
+     */
+    public function isSkipSql(): bool
+    {
+        return ($this->skipSql || $this->isAlias() || $this->isForReferenceOnly());
+    }
+
+    /**
+     * Sets whether or not this entity should have its SQL DDL code generated.
+     *
+     * @param bool $skip
+     * @return $this
+     */
+    public function setSkipSql(bool $skip): Entity
+    {
+        $this->skipSql = $skip;
+        return $this;
+    }
+
+    /**
+     * Sets the default string format for ActiveRecord objects in this entity.
+     *
+     * Any of 'XML', 'YAML', 'JSON', or 'CSV'.
+     *
+     * @param  string $format
+     *
+     * @throws InvalidArgumentException
+     * @return $this
+     */
+    public function setDefaultStringFormat(string $format): Entity
+    {
+        $formats = Database::getSupportedStringFormats();
+        $format = strtoupper($format);
+
+        if (!in_array($format, $formats)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Given "%s" default string format is not supported. Only "%s" are valid string formats.',
+                    $format,
+                    implode(', ', $formats)
+                )
+            );
+        }
+
+        $this->defaultStringFormat = $format;
+        return $this;
+    }
+
+    /**
+     * Returns the default string format for ActiveRecord objects in this entity,
+     * or the one for the whole database if not set.
+     *
+     * @return string
+     */
+    public function getDefaultStringFormat(): string
+    {
+        if (null !== $this->defaultStringFormat) {
+            return $this->defaultStringFormat;
+        }
+
+        return $this->database->getDefaultStringFormat();
+    }
+
+
+    // relations / key handling
+    // -----------------------------------------
 
     /**
      * Returns the collection of Fields which make up the single primary
@@ -1728,24 +1654,19 @@ class Entity extends ScopedMappingModel implements IdMethod
      *
      * @return Field[]
      */
-    public function getPrimaryKey()
+    public function getPrimaryKey(): array
     {
-        $pk = [];
-        foreach ($this->fields as $col) {
-            if ($col->isPrimaryKey()) {
-                $pk[] = $col;
-            }
-        }
-
-        return $pk;
+        return $this->fields->filter(function (Field $field) {
+            return $field->isPrimaryKey();
+        })->toArray();
     }
 
     /**
      * Returns whether or not this entity has a primary key.
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasPrimaryKey()
+    public function hasPrimaryKey(): bool
     {
         return count($this->getPrimaryKey()) > 0;
     }
@@ -1753,9 +1674,9 @@ class Entity extends ScopedMappingModel implements IdMethod
     /**
      * Returns whether or not this entity has a composite primary key.
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasCompositePrimaryKey()
+    public function hasCompositePrimaryKey(): bool
     {
         return count($this->getPrimaryKey()) > 1;
     }
@@ -1767,36 +1688,62 @@ class Entity extends ScopedMappingModel implements IdMethod
      *
      * @return Field
      */
-    public function getFirstPrimaryKeyField()
+    public function getFirstPrimaryKeyField(): ?Field
     {
-        foreach ($this->fields as $col) {
-            if ($col->isPrimaryKey()) {
-                return $col;
+        foreach ($this->fields as $field) {
+            if ($field->isPrimaryKey()) {
+                return $field;
             }
         }
     }
 
-    public function __clone()
+    /**
+     * Sets whether or not this entity contains a foreign primary key.
+     *
+     * @param $containsForeignPK
+     *
+     * @return bool
+     */
+    public function setContainsForeignPK($containsForeignPK)
     {
-        $fields = [];
-        if ($this->fields) {
-            foreach ($this->fields as $oldCol) {
-                $col = clone $oldCol;
-                $fields[] = $col;
-                $this->fieldsByName[$col->getName()] = $col;
-                $this->fieldsByLowercaseName[strtolower($col->getName())] = $col;
-//            $this->fieldsByPhpName[$col->getName()] = $col;
-            }
-            $this->fields = $fields;
+        $this->containsForeignPK = (bool)$containsForeignPK;
+    }
+
+    /**
+     * Returns whether or not this entity contains a foreign primary key.
+     *
+     * @return bool
+     */
+    public function getContainsForeignPK()
+    {
+        return $this->containsForeignPK;
+    }
+
+    /**
+     * Returns all required(notNull && no defaultValue) primary keys which are not in $primaryKeys.
+     *
+     * @param Field[] $primaryKeys
+     * @return Field[]
+     */
+    public function getOtherRequiredPrimaryKeys(array $primaryKeys): array
+    {
+        $pks = [];
+        foreach ($this->getPrimaryKey() as $primaryKey) {
+            if ($primaryKey->isNotNull() && !$primaryKey->hasDefaultValue()
+                && !in_array($primaryKey, $primaryKeys, true)) {
+                    $pks = $primaryKey;
+                }
         }
+
+        return $pks;
     }
 
     /**
      * Returns whether or not this entity has any auto-increment primary keys.
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasAutoIncrementPrimaryKey()
+    public function hasAutoIncrementPrimaryKey(): bool
     {
         return null !== $this->getAutoIncrementPrimaryKey();
     }
@@ -1804,7 +1751,7 @@ class Entity extends ScopedMappingModel implements IdMethod
     /**
      * @return string[]
      */
-    public function getAutoIncrementFieldNames()
+    public function getAutoIncrementFieldNames(): array
     {
         $names = [];
         foreach ($this->getFields() as $field) {
@@ -1821,7 +1768,7 @@ class Entity extends ScopedMappingModel implements IdMethod
      *
      * @return Field
      */
-    public function getAutoIncrementPrimaryKey()
+    public function getAutoIncrementPrimaryKey(): ?Field
     {
         if (IdMethod::NO_ID_METHOD !== $this->getIdMethod()) {
             foreach ($this->getPrimaryKey() as $pk) {
@@ -1835,9 +1782,9 @@ class Entity extends ScopedMappingModel implements IdMethod
     /**
      * Returns whether or not this entity has at least one auto increment field.
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasAutoIncrement()
+    public function hasAutoIncrement(): bool
     {
         foreach ($this->getFields() as $field) {
             if ($field->isAutoIncrement()) {
@@ -1848,13 +1795,96 @@ class Entity extends ScopedMappingModel implements IdMethod
         return false;
     }
 
+
+
+    //
+    // Generator options
+    // ------------------------------------------------------------
+
+    /**
+     * Returns whether or not this entity is read-only. If yes, only only
+     * accessors and relationship accessors and mutators will be generated.
+     *
+     * @return bool
+     */
+    public function isReadOnly(): bool
+    {
+        return $this->readOnly;
+    }
+
+    /**
+     * Makes this database in read-only mode.
+     *
+     * @param bool $flag True by default
+     * @return $this
+     */
+    public function setReadOnly(bool $flag = true): Entity
+    {
+        $this->readOnly = $flag;
+        return $this;
+    }
+
+
+    /**
+     * Returns whether or not a entity is abstract, it marks the business object
+     * class that is generated as being abstract. If you have a entity called
+     * "FOO", then the Foo business object class will be declared abstract. This
+     * helps support class hierarchies
+     *
+     * @return bool
+     */
+    public function isAbstract(): bool
+    {
+        return $this->isAbstract;
+    }
+
+    /**
+     * Sets whether or not a entity is abstract, it marks the business object
+     * class that is generated as being abstract. If you have a
+     * entity called "FOO", then the Foo business object class will be
+     * declared abstract. This helps support class hierarchies
+     *
+     * @param bool $flag
+     * @return $this
+     */
+    public function setAbstract(bool $flag = true): Entity
+    {
+        $this->isAbstract = $flag;
+        return $this;
+    }
+
+    /**
+     * Sets a cross reference status for this foreign key.
+     *
+     * @param bool $flag
+     * @return $this
+     */
+    public function setCrossRef(bool $flag = true): Entity
+    {
+        $this->isCrossRef = $flag;
+        return $this;
+    }
+
+    /**
+     * Alias for Entity::setCrossRef.
+     *
+     * @see Entity::setCrossRef
+     *
+     * @param bool $flag
+     * @return $this;
+     */
+    public function setIsCrossRef(bool $flag = true): Entity
+    {
+        return $this->setCrossRef($flag);
+    }
+
     /**
      * Returns whether or not there is a cross reference status for this foreign
      * key.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsCrossRef()
+    public function isCrossRef(): bool
     {
         return $this->isCrossRef;
     }
@@ -1862,61 +1892,25 @@ class Entity extends ScopedMappingModel implements IdMethod
     /**
      * Alias for Entity::getIsCrossRef.
      *
-     * @return boolean
+     * @see Entity::isCrossRef
+     *
+     * @return bool
      */
-    public function isCrossRef()
+    public function getIsCrossRef(): bool
     {
         return $this->isCrossRef;
-    }
-
-    /**
-     * Sets a cross reference status for this foreign key.
-     *
-     * @param boolean $flag
-     */
-    public function setIsCrossRef($flag = true)
-    {
-        $this->setCrossRef($flag);
-    }
-
-    /**
-     * Sets a cross reference status for this foreign key.
-     *
-     * @param boolean $flag
-     */
-    public function setCrossRef($flag = true)
-    {
-        $this->isCrossRef = (boolean)$flag;
-    }
-
-    /**
-     * Returns whether or not the entity has foreign keys.
-     *
-     * @return boolean
-     */
-    public function hasRelations()
-    {
-        return 0 !== count($this->relations);
-    }
-
-    /**
-     * Returns whether the entity has cross foreign keys or not.
-     *
-     * @return boolean
-     */
-    public function hasCrossRelations()
-    {
-        return 0 !== count($this->getCrossFks());
     }
 
     /**
      * Sets the default accessor visibility.
      *
      * @param string $defaultAccessorVisibility
+     * @return $this
      */
-    public function setDefaultAccessorVisibility($defaultAccessorVisibility)
+    public function setDefaultAccessorVisibility(string $defaultAccessorVisibility): Entity
     {
         $this->defaultAccessorVisibility = $defaultAccessorVisibility;
+        return $this;
     }
 
     /**
@@ -1924,7 +1918,7 @@ class Entity extends ScopedMappingModel implements IdMethod
      *
      * @return string
      */
-    public function getDefaultAccessorVisibility()
+    public function getDefaultAccessorVisibility(): string
     {
         return $this->defaultAccessorVisibility;
     }
@@ -1933,10 +1927,12 @@ class Entity extends ScopedMappingModel implements IdMethod
      * Sets the default mutator visibility.
      *
      * @param string $defaultMutatorVisibility
+     * @return $this
      */
-    public function setDefaultMutatorVisibility($defaultMutatorVisibility)
+    public function setDefaultMutatorVisibility(string $defaultMutatorVisibility): Entity
     {
         $this->defaultMutatorVisibility = $defaultMutatorVisibility;
+        return $this;
     }
 
     /**
@@ -1944,15 +1940,25 @@ class Entity extends ScopedMappingModel implements IdMethod
      *
      * @return string
      */
-    public function getDefaultMutatorVisibility()
+    public function getDefaultMutatorVisibility(): string
     {
         return $this->defaultMutatorVisibility;
     }
 
     /**
-     * @return boolean
+     * @param bool $activeRecord
+     * @return $this
      */
-    public function isActiveRecord()
+    public function setActiveRecord(bool $activeRecord): Entity
+    {
+        $this->activeRecord = $activeRecord;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActiveRecord(): bool
     {
         if (null === $this->activeRecord) {
             return $this->getDatabase()->isActiveRecord();
@@ -1970,40 +1976,134 @@ class Entity extends ScopedMappingModel implements IdMethod
     }
 
     /**
-     * @param boolean $activeRecord
-     */
-    public function setActiveRecord($activeRecord)
-    {
-        $this->activeRecord = $activeRecord;
-    }
-
-    /**
-     * Checks if identifierQuoting is enabled. Looks up to its database->isIdentifierQuotingEnabled
-     * if identifierQuoting is null hence undefined.
+     * Returns whether or not the entity behaviors offer additional builders.
      *
-     * Use getIdentifierQuoting() if you need the raw value.
+     * @return bool
+     */
+    public function hasAdditionalBuilders()
+    {
+        foreach ($this->behaviors as $behavior) {
+            if ($behavior->hasAdditionalBuilders()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns the list of additional builders provided by the entity behaviors.
      *
-     * @return boolean
+     * @return array
      */
-    public function isIdentifierQuotingEnabled()
+    public function getAdditionalBuilders()
     {
-        return (null !== $this->identifierQuoting || !$this->database) ? $this->identifierQuoting : $this->database->isIdentifierQuotingEnabled(
-        );
+        $additionalBuilders = [];
+        foreach ($this->behaviors as $behavior) {
+            $additionalBuilders = array_merge($additionalBuilders, $behavior->getAdditionalBuilders());
+        }
+
+        return $additionalBuilders;
     }
 
     /**
-     * @return bool|null
+     * Get the early entity behaviors
+     *
+     * @return Array of Behavior objects
      */
-    public function getIdentifierQuoting()
+    public function getEarlyBehaviors()
     {
-        return $this->identifierQuoting;
+        $behaviors = [];
+        foreach ($this->behaviors as $name => $behavior) {
+            if ($behavior->isEarly()) {
+                $behaviors[$name] = $behavior;
+            }
+        }
+
+        return $behaviors;
+    }
+
+
+
+
+
+
+
+    //
+    // MISC
+    // --------------
+
+    /**
+     * Returns the schema name from this entity or from its database.
+     *
+     * @return string
+     */
+    public function guessSchemaName()
+    {
+        if (!$this->schema && $this->database) {
+            return $this->database->getSchema();
+        }
+
+        return $this->schema;
     }
 
     /**
-     * @param boolean $identifierQuoting
+     * Returns whether or not this entity is linked to a schema.
+     *
+     * @return bool
      */
-    public function setIdentifierQuoting($identifierQuoting)
+    public function hasSchema()
     {
-        $this->identifierQuoting = $identifierQuoting;
+        return $this->database
+        && ($this->schema ?: $this->database->getSchema())
+        && ($platform = $this->getPlatform())
+        && $platform->supportsSchemas();
+    }
+
+    /**
+     * Returns the PHP name of an active record object this entry references.
+     *
+     * @return string
+     */
+    public function getAlias(): string
+    {
+        return $this->alias;
+    }
+
+    /**
+     * Returns whether or not this entity is specified in the schema or if there
+     * is just a foreign key reference to it.
+     *
+     * @return bool
+     */
+    public function isAlias(): bool
+    {
+        return null !== $this->alias;
+    }
+
+    /**
+     * Sets whether or not this entity is specified in the schema or if there is
+     * just a foreign key reference to it.
+     *
+     * @param string $alias
+     * @return $this
+     */
+    public function setAlias(string $alias): Entity
+    {
+        $this->alias = $alias;
+        return $this;
+    }
+
+    /**
+     * @TODO not model related. remove? move to possible parent as helper?
+     *
+     * Returns a build property value for the database this entity belongs to.
+     *
+     * @param  string $key
+     * @return string
+     */
+    public function getBuildProperty(string $key): string
+    {
+        return $this->database ? $this->database->getBuildProperty($key) : '';
     }
 }

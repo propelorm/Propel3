@@ -11,23 +11,22 @@
 namespace Propel\Generator\Config;
 
 use Propel\Common\Config\ConfigurationManager;
-use Propel\Common\Pluralizer\PluralizerInterface;
-use Propel\Common\Types\BuildableFieldTypeInterface;
-use Propel\Common\Types\FieldTypeInterface;
-use Propel\Generator\Builder\DataModelBuilder;
-use Propel\Generator\Builder\Om\AbstractBuilder;
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Exception\ClassNotFoundException;
 use Propel\Generator\Exception\InvalidArgumentException;
+use Propel\Generator\Manager\BehaviorManager;
 use Propel\Generator\Model\Entity;
-use Propel\Generator\Platform\SqlDefaultPlatform;
-use Propel\Generator\Platform\PlatformInterface;
-use Propel\Generator\Reverse\SchemaParserInterface;
 use Propel\Generator\Reverse\SqlSchemaParserInterface;
 use Propel\Runtime\Adapter\AdapterFactory;
 use Propel\Runtime\Connection\ConnectionFactory;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Generator\Util\BehaviorLocator;
+use Propel\Generator\Platform\PlatformInterface;
+use Propel\Generator\Reverse\SchemaParserInterface;
+use Propel\Common\Types\FieldTypeInterface;
+use Propel\Common\Types\BuildableFieldTypeInterface;
+use Propel\Generator\Builder\DataModelBuilder;
+use Propel\Common\Pluralizer\PluralizerInterface;
+use Propel\Generator\Builder\Om\AbstractBuilder;
 
 /**
  * A class that holds build properties and provide a class loading mechanism for
@@ -39,9 +38,9 @@ use Propel\Generator\Util\BehaviorLocator;
 class GeneratorConfig extends ConfigurationManager implements GeneratorConfigInterface
 {
     /**
-     * @var BehaviorLocator
+     * @var BehaviorManager
      */
-    protected $behaviorLocator = null;
+    protected $behaviorManager = null;
 
     /**
      * Connections configured in the `generator` section of the configuration file
@@ -278,13 +277,13 @@ class GeneratorConfig extends ConfigurationManager implements GeneratorConfigInt
         return $con;
     }
 
-    public function getBehaviorLocator()
+    public function getBehaviorManager()
     {
-        if (!$this->behaviorLocator) {
-            $this->behaviorLocator = new BehaviorLocator($this);
+        if (!$this->behaviorManager) {
+            $this->behaviorManager = new BehaviorManager($this);
         }
 
-        return $this->behaviorLocator;
+        return $this->behaviorManager;
     }
 
     /**
