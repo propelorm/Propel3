@@ -10,12 +10,12 @@
 
 namespace Propel\Generator\Schema;
 
+use Propel\Generator\Config\GeneratorConfigInterface;
+use Propel\Generator\Config\QuickGeneratorConfig;
+use Propel\Generator\Exception\SchemaException;
+use Propel\Generator\Model\Schema;
 use phootwork\collection\Set;
 use phootwork\xml\XmlParser;
-use Propel\Generator\Config\GeneratorConfigInterface;
-use Propel\Generator\Model\Schema;
-use Propel\Generator\Exception\SchemaException;
-use Propel\Generator\Config\QuickGeneratorConfig;
 
 /**
  * A class that is used to parse an input xml schema file and creates a Schema

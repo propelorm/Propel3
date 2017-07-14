@@ -8,12 +8,18 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Model;
 
 use Propel\Generator\Config\GeneratorConfigInterface;
 use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Exception\InvalidArgumentException;
+use Propel\Generator\Model\Parts\BehaviorPart;
 use Propel\Generator\Platform\PlatformInterface;
+use phootwork\collection\ArrayList;
+use phootwork\collection\Map;
+use phootwork\collection\Set;
 
 /**
  * A class for holding application data structures.
@@ -25,11 +31,12 @@ use Propel\Generator\Platform\PlatformInterface;
  * @author Daniel Rall<dlr@collab.net> (Torque)
  * @author Byron Foster <byron_foster@yahoo.com> (Torque)
  * @author Hugo Hamon <webmaster@apprendre-php.com> (Propel)
+ * @author Thomas Gossmann
  */
 class Database extends ScopedMappingModel
 {
 
-    use BehaviorableTrait;
+    use BehaviorPart;
 
     /**
      * The database's platform.
@@ -43,10 +50,7 @@ class Database extends ScopedMappingModel
      */
     private $platformClass;
 
-    /**
-     * @var Entity[]
-     */
-    private $entities;
+
 
     /**
      * @var string
@@ -72,8 +76,10 @@ class Database extends ScopedMappingModel
      * @var string
      */
     private $defaultMutatorVisibility;
-    private $domainMap;
     private $heavyIndexing;
+
+    /** @var Map */
+    private $domains;
 
     /**
      * @var boolean
@@ -83,17 +89,15 @@ class Database extends ScopedMappingModel
     /** @var Schema */
     private $parentSchema;
 
-    /**
-     * @var Entity[]
-     */
+    /** @var Set */
+    private $entities;
+
+    /** @var Map */
     private $entitiesByName;
-    private $entitiesByFullClassName;
+    private $entitiesByLowercaseName;
+    private $entitiesByFullName;
     private $entitiesByTableName;
 
-    /**
-     * @var Entity[]
-     */
-    private $entitiesByLowercaseName;
 
 //    /**
 //     * @var Entity[]
@@ -101,12 +105,14 @@ class Database extends ScopedMappingModel
 //    private $entitiesByPhpName;
 
     /**
-     * @var string[]
+     * @var ArrayList
      */
     private $sequences;
 
     protected $defaultStringFormat;
-    protected $tablePrefix;
+
+    /** @var string */
+    protected $scope;
 
     /**
      * @var bool
@@ -116,10 +122,10 @@ class Database extends ScopedMappingModel
     /**
      * Constructs a new Database object.
      *
-     * @param string            $name     The database's name
+     * @param string $name The database's name
      * @param PlatformInterface $platform The database's platform
      */
-    public function __construct($name = null, PlatformInterface $platform = null)
+    public function __construct(?string $name = null, ?PlatformInterface $platform = null)
     {
         parent::__construct();
 
@@ -137,12 +143,15 @@ class Database extends ScopedMappingModel
         $this->defaultStringFormat       = static::DEFAULT_STRING_FORMAT;
         $this->defaultAccessorVisibility = static::VISIBILITY_PUBLIC;
         $this->defaultMutatorVisibility  = static::VISIBILITY_PUBLIC;
-        $this->behaviors                 = [];
-        $this->domainMap                 = [];
-        $this->entities                    = [];
-        $this->entitiesByName              = [];
+
+        $this->sequences = new ArrayList();
+        $this->behaviors = [];
+        $this->domains = new Map();
+        $this->entities = new Set();
+        $this->entitiesByName = new Map();
+        $this->entitiesByLowercaseName = new Map();
+        $this->entitiesByFullName = new Map();
 //        $this->entitiesByPhpName           = [];
-        $this->entitiesByLowercaseName     = [];
     }
 
     protected function setupObject()
@@ -155,7 +164,7 @@ class Database extends ScopedMappingModel
         $this->defaultIdMethod = $this->getAttribute('defaultIdMethod', IdMethod::NATIVE);
         $this->heavyIndexing = $this->booleanValue($this->getAttribute('heavyIndexing'));
         $this->identifierQuoting = $this->getAttribute('identifierQuoting') ? $this->booleanValue($this->getAttribute('identifierQuoting')) : false;
-        $this->tablePrefix = $this->getAttribute('tablePrefix', $this->getBuildProperty('generator.tablePrefix'));
+        $this->scope = $this->getAttribute('tablePrefix', $this->getBuildProperty('generator.tablePrefix'));
         $this->defaultStringFormat = $this->getAttribute('defaultStringFormat', static::DEFAULT_STRING_FORMAT);
 
         if ($this->getAttribute('activeRecord')) {
@@ -191,34 +200,38 @@ class Database extends ScopedMappingModel
      * Sets the PlatformInterface implementation for this database.
      *
      * @param PlatformInterface $platform A Platform implementation
+     * @return $this
      */
-    public function setPlatform(PlatformInterface $platform = null)
+    public function setPlatform(?PlatformInterface $platform = null): Database
     {
         $this->platform = $platform;
+        return $this;
     }
 
     /**
      * @return boolean
      */
-    public function isActiveRecord()
+    public function isActiveRecord(): bool
     {
         return $this->activeRecord;
     }
 
     /**
      * @param boolean $activeRecord
+     * @return $this
      */
-    public function setActiveRecord($activeRecord)
+    public function setActiveRecord(bool $activeRecord): Database
     {
         $this->activeRecord = $activeRecord;
+        return $this;
     }
 
     /**
      * Returns the max column name's length.
      *
-     * @return integer
+     * @return int
      */
-    public function getMaxFieldNameLength()
+    public function getMaxFieldNameLength(): int
     {
         return $this->getPlatform()->getMaxFieldNameLength();
     }
@@ -228,7 +241,7 @@ class Database extends ScopedMappingModel
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -237,10 +250,12 @@ class Database extends ScopedMappingModel
      * Sets the database name.
      *
      * @param string $name
+     * @return $this
      */
-    public function setName($name)
+    public function setName(string $name): Database
     {
         $this->name = $name;
+        return $this;
     }
 
     /**
@@ -249,7 +264,7 @@ class Database extends ScopedMappingModel
      *
      * @return string
      */
-    public function getDefaultIdMethod()
+    public function getDefaultIdMethod(): string
     {
         return $this->defaultIdMethod;
     }
@@ -259,10 +274,12 @@ class Database extends ScopedMappingModel
      * This parameter can be overridden at the entity level.
      *
      * @param string $strategy
+     * @return $this
      */
-    public function setDefaultIdMethod($strategy)
+    public function setDefaultIdMethod($strategy): Database
     {
         $this->defaultIdMethod = $strategy;
+        return $this;
     }
 
     /**
@@ -270,9 +287,9 @@ class Database extends ScopedMappingModel
      *
      * @return array
      */
-    public static function getSupportedStringFormats()
+    public static function getSupportedStringFormats(): array
     {
-        return [ 'XML', 'YAML', 'JSON', 'CSV' ];
+        return ['XML', 'YAML', 'JSON', 'CSV'];
     }
 
     /**
@@ -281,10 +298,11 @@ class Database extends ScopedMappingModel
      *
      * Any of 'XML', 'YAML', 'JSON', or 'CSV'.
      *
-     * @param  string                   $format
+     * @param string $format
      * @throws InvalidArgumentException
+     * @return $this
      */
-    public function setDefaultStringFormat($format)
+    public function setDefaultStringFormat(string $format): Database
     {
         $formats = static::getSupportedStringFormats();
 
@@ -294,6 +312,7 @@ class Database extends ScopedMappingModel
         }
 
         $this->defaultStringFormat = $format;
+        return $this;
     }
 
     /**
@@ -302,7 +321,7 @@ class Database extends ScopedMappingModel
      *
      * @return string
      */
-    public function getDefaultStringFormat()
+    public function getDefaultStringFormat(): string
     {
         return $this->defaultStringFormat;
     }
@@ -314,7 +333,7 @@ class Database extends ScopedMappingModel
      *
      * @return boolean
      */
-    public function isHeavyIndexing()
+    public function isHeavyIndexing(): bool
     {
         return $this->getHeavyIndexing();
     }
@@ -326,7 +345,7 @@ class Database extends ScopedMappingModel
      *
      * @return boolean
      */
-    public function getHeavyIndexing()
+    public function getHeavyIndexing(): bool
     {
         return $this->heavyIndexing;
     }
@@ -335,10 +354,12 @@ class Database extends ScopedMappingModel
      * Sets whether or not heavy indexing is enabled.
      *
      * @param boolean $flag
+     * @return $this
      */
-    public function setHeavyIndexing($flag = true)
+    public function setHeavyIndexing(bool $flag = true)
     {
-        $this->heavyIndexing = (Boolean) $flag;
+        $this->heavyIndexing = $flag;
+        return $this;
     }
 
     /**
@@ -346,9 +367,9 @@ class Database extends ScopedMappingModel
      *
      * @return Entity[]
      */
-    public function getEntities()
+    public function getEntities(): array
     {
-        return (array)$this->entities;
+        return $this->entities->toArray();
     }
 
     /**
@@ -358,7 +379,7 @@ class Database extends ScopedMappingModel
      *
      * @return integer
      */
-    public function countEntities()
+    public function countEntities(): int
     {
         $count = 0;
         foreach ($this->entities as $entity) {
@@ -375,36 +396,35 @@ class Database extends ScopedMappingModel
      *
      * @return Entity[]
      */
-    public function getEntitiesForSql()
+    public function getEntitiesForSql(): array
     {
-        $entities = [];
-        foreach ($this->entities as $entity) {
-            if (!$entity->isSkipSql()) {
-                $entities[] = $entity;
-            }
-        }
-
-        return $entities;
+        return $this->entities->filter(function(Entity $entity) {
+            return !$entity->isSkipSql();
+        })->toArray();
     }
 
     /**
      * Returns whether or not the database has a entity.
      *
-     * @param  string  $name
-     * @param  boolean $caseInsensitive
-     * @return boolean
+     * @param string|Entity $entity
+     * @param bool $caseInsensitive
+     * @return bool
      */
-    public function hasEntity($name, $caseInsensitive = false)
+    public function hasEntity($entity, bool $caseInsensitive = false): bool
     {
+        if ($entity instanceof Entity) {
+            return $this->entities->has($entity);
+        }
+
         if ($this->hasEntityByFullClassName($name)) {
             return true;
         }
 
         if ($caseInsensitive) {
-            return isset($this->entitiesByLowercaseName[ strtolower($name) ]);
+            return $this->entitiesByLowercaseName->has(strtolower($name));
         }
 
-        return isset($this->entitiesByName[$name]);
+        return $this->entitiesByName->has($name);
     }
 
     /**
@@ -412,9 +432,9 @@ class Database extends ScopedMappingModel
      *
      * @return bool
      */
-    public function hasEntityByFullClassName($fullClassName)
+    public function hasEntityByFullClassName($fullClassName): bool
     {
-        return isset($this->entitiesByFullClassName[$fullClassName]);
+        return $this->entitiesByFullName->has($fullClassName);
     }
 
     /**
@@ -422,9 +442,9 @@ class Database extends ScopedMappingModel
      *
      * @return Entity
      */
-    public function getEntityByFullClassName($fullClassName)
+    public function getEntityByFullClassName($fullClassName): ?Entity
     {
-        return $this->entitiesByFullClassName[$fullClassName];
+        return $this->entitiesByFullName->get($fullClassName);
     }
 
     /**
@@ -484,7 +504,8 @@ class Database extends ScopedMappingModel
      */
     public function getEntityNames()
     {
-        return implode(',', array_keys($this->entitiesByName));
+        return implode(',', $this->entitiesByName->keys()->toArray());
+//         return $this->entitiesByName->keys()->toArray()
     }
 
 //    /**
@@ -517,96 +538,89 @@ class Database extends ScopedMappingModel
     /**
      * Adds a new entity to this database.
      *
-     * @param  Entity|array $entity
-     * @return Entity
+     * @param Entity $entity
+     * @return $this
      */
-    public function addEntity($entity)
+    public function addEntity(Entity $entity): Database
     {
-        if (!$entity instanceof Entity) {
-            $tbl = new Entity();
-            $tbl->setDatabase($this);
-            $tbl->loadMapping($entity);
-
-            return $this->addEntity($tbl);
-        }
-
-        $entity->setDatabase($this);
-
-        if (isset($this->entitiesByFullClassName[$entity->getFullClassName()])) {
+        if ($this->entitiesByFullName->has($entity->getFullName())) {
             throw new EngineException(sprintf('Entity "%s" declared twice', $entity->getName()));
         }
 
-        $this->entities[] = $entity;
-        $this->entitiesByFullClassName[$entity->getFullClassName()] = $entity;
-        $this->entitiesByTableName[$entity->getFQTableName()] = $entity;
-        $this->entitiesByName[$entity->getName()] = $entity;
-        $this->entitiesByLowercaseName[strtolower($entity->getName())] = $entity;
+        $this->entities->add($entity);
+        $this->entitiesByFullName->set($entity->getFullName(), $entity);
+        $this->entitiesByTableName->set($entity->getFullTableName(), $entity);
+        $this->entitiesByName->set($entity->getName(), $entity);
+        $this->entitiesByLowercaseName->set(strtolower($entity->getName()), $entity);
 //        $this->entitiesByPhpName[$entity->getName()] = $entity;
 
 //        $this->computeEntityNamespace($entity);
 
-        if (null === $entity->getPackage()) {
-            $entity->setPackage($this->getPackage());
-        }
+        $entity->setDatabase($this);
 
-        return $entity;
+        return $this;
     }
 
     /**
      * Adds several entities at once.
      *
      * @param Entity[] $entities An array of Entity instances
+     * @return $this
      */
-    public function addEntities(array $entities)
+    public function addEntities(array $entities): Database
     {
         foreach ($entities as $entity) {
             $this->addEntity($entity);
         }
+        return $this;
     }
 
     /**
      * @param string[] $sequences
+     * @return $this
      */
-    public function setSequences($sequences)
+    public function setSequences(array $sequences): Database
     {
-        $this->sequences = $sequences;
+        $this->sequences->clear();
+        $this->sequences->addAll($sequences);
+        return $this;
     }
 
     /**
      * @return string[]
      */
-    public function getSequences()
+    public function getSequences(): array
     {
-        return $this->sequences;
+        return $this->sequences->toArray();
     }
 
     /**
      * @param string $sequence
+     * @return $this
      */
-    public function addSequence($sequence)
+    public function addSequence(string $sequence): Database
     {
-        $this->sequences[] = $sequence;
+        $this->sequences->add($sequence);
+        return $this;
     }
 
     /**
      * @param string $sequence
+     * @return $this
      */
-    public function removeSequence($sequence)
+    public function removeSequence(string $sequence): Database
     {
-        if ($this->sequences) {
-            if (false !== ($idx = array_search($sequence, $this->sequences))) {
-                unset($this->sequence[$idx]);
-            }
-        }
+        $this->sequences->remove($sequence);
+        return $this;
     }
 
     /**
      * @param  string $sequence
      * @return bool
      */
-    public function hasSequence($sequence)
+    public function hasSequence(string $sequence): bool
     {
-        return $this->sequences && in_array($sequence, $this->sequences);
+        return $this->sequences->contains($sequence);
     }
 
     /**
@@ -617,7 +631,7 @@ class Database extends ScopedMappingModel
      *
      * @return string
      */
-    public function getSchemaDelimiter()
+    public function getSchemaDelimiter(): string
     {
         return $this->getPlatform()->getSchemaDelimiter();
     }
@@ -686,10 +700,12 @@ class Database extends ScopedMappingModel
      * Sets the parent schema
      *
      * @param Schema $parent The parent schema
+     * @return $this
      */
-    public function setParentSchema(Schema $parent)
+    public function setParentSchema(Schema $parent): Database
     {
         $this->parentSchema = $parent;
+        return $this;
     }
 
     /**
@@ -705,39 +721,38 @@ class Database extends ScopedMappingModel
     /**
      * Adds a domain object to this database.
      *
-     * @param  Domain|array $data
-     * @return Domain
+     * @param Domain $domain
+     * @return $this
      */
-    public function addDomain($data)
+    public function addDomain(Domain $domain): Database
     {
-        if ($data instanceof Domain) {
-            $domain = $data; // alias
-            $domain->setDatabase($this);
-            $this->domainMap[$domain->getName()] = $domain;
-
-            return $domain;
-        }
-
-        $domain = new Domain();
         $domain->setDatabase($this);
-        $domain->loadMapping($data);
+        $this->domains->set($domain->getName(), $domain);
+        return $this;
+//         if ($data instanceof Domain) {
+//             $domain = $data; // alias
+//             $domain->setDatabase($this);
+//             $this->domainMap[$domain->getName()] = $domain;
 
-        return $this->addDomain($domain); // call self w/ different param
+//             return $domain;
+//         }
+
+//         $domain = new Domain();
+//         $domain->setDatabase($this);
+//         $domain->loadMapping($data);
+
+//         return $this->addDomain($domain); // call self w/ different param
     }
 
     /**
      * Returns the already configured domain object by its name.
      *
-     * @param  string $name
+     * @param string $name
      * @return Domain
      */
-    public function getDomain($name)
+    public function getDomain(string $name): ?Domain
     {
-        if (isset($this->domainMap[$name])) {
-            return $this->domainMap[$name];
-        }
-
-        return null;
+        return $this->domains->get($name);
     }
 
     /**
@@ -745,7 +760,7 @@ class Database extends ScopedMappingModel
      *
      * @return GeneratorConfigInterface
      */
-    public function getGeneratorConfig()
+    public function getGeneratorConfig(): ?GeneratorConfigInterface
     {
         if ($this->parentSchema) {
             return $this->parentSchema->getGeneratorConfig();
@@ -768,23 +783,25 @@ class Database extends ScopedMappingModel
     }
 
     /**
-     * Returns the entity prefix for this database.
+     * Returns the entity scope for this database.
      *
      * @return string
      */
-    public function getTablePrefix()
+    public function getScope(): string
     {
-        return $this->tablePrefix;
+        return $this->scope;
     }
 
     /**
-     * Sets the entities' prefix.
+     * Sets the entities' scope.
      *
-     * @param string $tablePrefix
+     * @param string $scope
+     * @return $this
      */
-    public function setTablePrefix($tablePrefix)
+    public function setScope(string $scope): Database
     {
-        $this->tablePrefix = $tablePrefix;
+        $this->scope = $scope;
+        return $this;
     }
 
     /**
@@ -843,10 +860,15 @@ class Database extends ScopedMappingModel
         $behavior->setDatabase($this);
     }
 
+    public function __toString(): string
+    {
+        return $this->toSql();
+    }
+
     /**
      * @return string
      */
-    public function __toString()
+    public function toSql(): string
     {
         $entities = [];
         foreach ($this->getEntities() as $entity) {
@@ -925,10 +947,12 @@ class Database extends ScopedMappingModel
      * Sets the default accessor visibility.
      *
      * @param string $defaultAccessorVisibility
+     * @return $this
      */
-    public function setDefaultAccessorVisibility($defaultAccessorVisibility)
+    public function setDefaultAccessorVisibility(string $defaultAccessorVisibility): Database
     {
         $this->defaultAccessorVisibility = $defaultAccessorVisibility;
+        return $this;
     }
 
     /**
@@ -936,7 +960,7 @@ class Database extends ScopedMappingModel
      *
      * @return string
      */
-    public function getDefaultAccessorVisibility()
+    public function getDefaultAccessorVisibility(): string
     {
         return $this->defaultAccessorVisibility;
     }
@@ -945,10 +969,12 @@ class Database extends ScopedMappingModel
      * Sets the default mutator visibility.
      *
      * @param string $defaultMutatorVisibility
+     * @return $this
      */
-    public function setDefaultMutatorVisibility($defaultMutatorVisibility)
+    public function setDefaultMutatorVisibility(string $defaultMutatorVisibility): Database
     {
         $this->defaultMutatorVisibility = $defaultMutatorVisibility;
+        return $this;
     }
 
     /**
@@ -956,7 +982,7 @@ class Database extends ScopedMappingModel
      *
      * @return string
      */
-    public function getDefaultMutatorVisibility()
+    public function getDefaultMutatorVisibility(): string
     {
         return $this->defaultMutatorVisibility;
     }
@@ -977,17 +1003,19 @@ class Database extends ScopedMappingModel
     /**
      * @return boolean
      */
-    public function isIdentifierQuotingEnabled()
+    public function isIdentifierQuotingEnabled(): bool
     {
         return $this->identifierQuoting;
     }
 
     /**
      * @param boolean $identifierQuoting
+     * @return $this
      */
-    public function setIdentifierQuoting($identifierQuoting)
+    public function setIdentifierQuoting(bool $identifierQuoting)
     {
         $this->identifierQuoting = $identifierQuoting;
+        return $this;
     }
 
 }

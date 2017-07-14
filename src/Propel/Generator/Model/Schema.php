@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Model;
 
 use Propel\Generator\Config\GeneratorConfigInterface;
@@ -24,12 +26,11 @@ use phootwork\collection\Set;
  * @author John McNally <jmcnally@collab.net> (Torque)
  * @author Daniel Rall <dlr@finemaltcoding.com> (Torque)
  * @author Hugo Hamon <webmaster@apprendre-php.com> (Propel)
+ * @author Thomas Gossmann
  */
 class Schema
 {
-    /**
-     * @var Database[]
-     */
+    /** @var Set */
     private $databases;
     private $name;
     private $isInitialized;
@@ -54,7 +55,7 @@ class Schema
         }
 
         $this->isInitialized = false;
-        $this->databases     = [];
+        $this->databases = new Set();
         $this->schemas = new Set();
     }
 
@@ -77,7 +78,7 @@ class Schema
      *
      * @return GeneratorConfigInterface
      */
-    public function getGeneratorConfig()
+    public function getGeneratorConfig(): ?GeneratorConfigInterface
     {
         if ($this->generatorConfig) {
             return $this->generatorConfig;
@@ -96,27 +97,31 @@ class Schema
     /**
      * @return PlatformInterface
      */
-    public function getPlatform()
+    public function getPlatform(): PlatformInterface
     {
         return $this->platform;
     }
 
     /**
      * @param PlatformInterface $platform
+     * @return $this
      */
-    public function setPlatform($platform)
+    public function setPlatform(PlatformInterface $platform): Schema
     {
         $this->platform = $platform;
+        return $this;
     }
     
     /**
      * Sets the filename when reading this schema
      * 
      * @param string $filename
+     * @return $this
      */
-    public function setFilename(string $filename) 
+    public function setFilename(string $filename): Schema 
     {
         $this->filename = $filename;
+        return $this;
     }
     
     /**
@@ -133,10 +138,12 @@ class Schema
      * Sets the schema name.
      *
      * @param string $name
+     * @return $this
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->name = $name;
+        return $this;
     }
 
     /**
@@ -144,7 +151,7 @@ class Schema
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -154,7 +161,7 @@ class Schema
      *
      * @return string
      */
-    public function getShortName()
+    public function getShortName(): string
     {
         return str_replace('-schema', '', $this->name);
     }
@@ -163,11 +170,13 @@ class Schema
      * Sets the parent schema (will make this an external schema)
      * 
      * @param Schema $schema
+     * @return $this
      */
-    public function setParent(Schema $schema) 
+    public function setParent(Schema $schema): Schema
     {
         $this->parent = $schema;
         $this->parent->addExternalSchema($schema);
+        return $this;
     }
     
     /**
@@ -184,24 +193,28 @@ class Schema
      * Adds an external schema
      * 
      * @param Schema $schema
+     * @return $this
      */
-    public function addExternalSchema(Schema $schema) 
+    public function addExternalSchema(Schema $schema): Schema
     {
         $this->schemas->add($schema);
         if (!$schema->isExternalSchema()) {
             $schema->setParent($this);
         }
+        return $this;
     }
     
     /**
      * Removes an external schema (only relevant if this is an external schema)
      * 
      * @param Schema $schema
+     * @return $this
      */
-    public function removeExternalSchema(Schema $schema) 
+    public function removeExternalSchema(Schema $schema): Schema
     {
         $schema->setParent(null);
         $this->schemas->remove($schema);
+        return $this;
     }
     
     /**
@@ -233,9 +246,12 @@ class Schema
      * Set whether this schema is only for reference (only relevant if this is an external schema)
      * 
      * @param bool $referenceOnly
+     * @return $this
      */
-    public function setReferenceOnly(bool $referenceOnly) {
+    public function setReferenceOnly(bool $referenceOnly): Schema 
+    {
         $this->referenceOnly = $referenceOnly;
+        return $this;
     }
     
     /**
@@ -243,7 +259,8 @@ class Schema
      * 
      * @return bool
      */
-    public function getReferenceOnly(): bool {
+    public function getReferenceOnly(): bool 
+    {
         return $this->referenceOnly;
     }
 
@@ -253,18 +270,17 @@ class Schema
      * The first boolean parameter tells whether or not to run the
      * final initialization process.
      *
-     * @param  boolean    $doFinalInitialization
      * @return Database[]
      */
-    public function getDatabases($doFinalInitialization = true)
+    public function getDatabases()
     {
         // this is temporary until we'll have a clean solution
         // for packaging datamodels/requiring schemas
-        if ($doFinalInitialization) {
-            $this->doFinalInitialization();
-        }
+//         if ($doFinalInitialization) {
+//             $this->doFinalInitialization();
+//         }
 
-        return $this->databases;
+        return $this->databases->toArray();
     }
 
     /**
@@ -272,7 +288,7 @@ class Schema
      *
      * @return boolean
      */
-    public function hasMultipleDatabases()
+    public function hasMultipleDatabases(): bool
     {
         return count($this->databases) > 1;
     }
@@ -296,15 +312,9 @@ class Schema
             return $this->databases[0];
         }
 
-        $db = null;
-        foreach ($this->databases as $database) {
-            if ($database->getName() === $name) {
-                $db = $database;
-                break;
-            }
-        }
-
-        return $db;
+        return $this->databases->find(function(Database $db) {
+            return $db->getName() === $name;
+        });
     }
 
     /**
@@ -314,15 +324,11 @@ class Schema
      * @param  string  $name
      * @return boolean
      */
-    public function hasDatabase($name)
+    public function hasDatabase($name): bool
     {
-        foreach ($this->databases as $database) {
-            if ($database->getName() === $name) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->databases->search(function(Database $db) {
+            return $db->getName() === $name;
+        });
     }
 
     /**
@@ -330,25 +336,27 @@ class Schema
      * Schema. The database can be specified as a Database object or a
      * DOMNode object.
      *
-     * @param  Database|array $database
-     * @return Database
+     * @param  Database $database
+     * @return $this
      */
-    public function addDatabase($database)
+    public function addDatabase(Database $database): Schema
     {
-        if ($database instanceof Database) {
-            $database->setParentSchema($this);
-            $this->databases[] = $database;
+//         if ($database instanceof Database) {
+//             $database->setParentSchema($this);
+//             $this->databases[] = $database;
 
-            return $database;
-        }
+//             return $database;
+//         }
+        $database->setParentSchema($this);
+        $this->databases->add($database);
 
         // XML attributes array / hash
-        $db = new Database();
-        $db->setParentSchema($this);
-        $db->setPlatform($this->getPlatform());
-        $db->loadMapping($database);
+//         $db = new Database();
+//         $db->setParentSchema($this);
+//         $db->setPlatform($this->getPlatform());
+//         $db->loadMapping($database);
 
-        return $this->addDatabase($db);
+        return $this;
     }
 
     /**
@@ -407,9 +415,9 @@ class Schema
     /**
      * Returns the number of tables in all the databases of this Schema object.
      *
-     * @return integer
+     * @return int
      */
-    public function countEntities()
+    public function countEntities(): int
     {
         $nb = 0;
         foreach ($this->getDatabases() as $database) {
@@ -425,7 +433,7 @@ class Schema
      *
      * @return string Representation in xml format
      */
-    public function toString()
+    public function toString(): string
     {
         $dumper = new XmlDumper();
 
@@ -437,7 +445,7 @@ class Schema
      *
      * @see toString()
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->toString();
     }
