@@ -14,40 +14,10 @@ trait BehaviorPart
     /** @var Map */
     protected $behaviors;
 
-//     /** @var BehaviorManager */
-//     private $behaviorManager;
-
-//     /**
-//      * @return GeneratorConfigInterface
-//      */
-//     abstract protected function getGeneratorConfig();
-
     protected function initBehaviors()
     {
         $this->behaviors = new Map();
     }
-
-//     /**
-//      * Returns the behavior locator.
-//      *
-//      * @return BehaviorLocator
-//      */
-//     private function getBehaviorManager()
-//     {
-//         if (null === $this->behaviorManager) {
-//             $config = $this->getGeneratorConfig();
-//             if (null !== $config) {
-//                 $this->behaviorManager = $config->getBehaviorManager();
-//                 if (null === $this->behaviorManager) {
-//                     $this->behaviorManager = new BehaviorManager();
-//                 }
-//             } else {
-//                 $this->behaviorManager = new BehaviorManager();
-//             }
-//         }
-
-//         return $this->behaviorManager;
-//     }
 
     /**
      * Adds a new Behavior
@@ -77,17 +47,6 @@ trait BehaviorPart
         $this->behaviors->set($behavior->getId(),  $behavior);
 
         return $this;
-
-//         $locator = $this->getBehaviorLocator();
-//         $class = $locator->getBehavior($bdata['name']);
-//         $behavior = new $class();
-//         if (!($behavior instanceof Behavior)) {
-//             throw new BuildException(sprintf('Behavior [%s: %s] not instance of %s',
-//                 $bdata['name'], $class, '\Propel\Generator\Model\Behavior'));
-//         }
-//         $behavior->loadMapping($bdata);
-
-//         return $this->addBehavior($behavior);
     }
 
     abstract protected function registerBehavior(Behavior $behavior);

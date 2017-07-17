@@ -21,7 +21,7 @@ use Propel\Generator\Model\Inheritance;
 use Propel\Generator\Model\Schema;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Unique;
-use Propel\Generator\Model\VendorInfo;
+use Propel\Generator\Model\Vendor;
 
 /**
  * A class for dumping a schema to an XML representation.
@@ -152,10 +152,10 @@ class XmlDumper implements DumperInterface
     /**
      * Appends the generated <vendor> XML node to its parent node.
      *
-     * @param VendorInfo $vendorInfo The VendorInfo model instance
+     * @param Vendor $vendorInfo The VendorInfo model instance
      * @param \DOMNode   $parentNode The parent DOMNode object
      */
-    private function appendVendorInformationNode(VendorInfo $vendorInfo, \DOMNode $parentNode)
+    private function appendVendorInformationNode(Vendor $vendorInfo, \DOMNode $parentNode)
     {
         $vendorNode = $parentNode->appendChild($this->document->createElement('vendor'));
         $vendorNode->setAttribute('type', $vendorInfo->getType());

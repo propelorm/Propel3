@@ -18,7 +18,7 @@ use Propel\Generator\Model\IdMethod;
 use Propel\Generator\Model\IdMethodParameter;
 use Propel\Generator\Model\Index;
 use Propel\Generator\Model\Entity;
-use Propel\Generator\Model\VendorInfo;
+use Propel\Generator\Model\Vendor;
 use Propel\Generator\Platform\MysqlPlatform;
 
 /**
@@ -436,7 +436,7 @@ DROP TABLE IF EXISTS `Woopah`.`foo`;
     {
         $column = new Field('foo');
         $column->getDomain()->copy($this->getPlatform()->getDomainForType('LONGVARCHAR'));
-        $vendor = new VendorInfo('mysql');
+        $vendor = new Vendor('mysql');
         $vendor->setParameter('Charset', 'greek');
         $column->addVendorInfo($vendor);
         $expected = '`foo` TEXT CHARACTER SET \'greek\'';
@@ -447,7 +447,7 @@ DROP TABLE IF EXISTS `Woopah`.`foo`;
     {
         $column = new Field('foo');
         $column->getDomain()->copy($this->getPlatform()->getDomainForType('LONGVARCHAR'));
-        $vendor = new VendorInfo('mysql');
+        $vendor = new Vendor('mysql');
         $vendor->setParameter('Collate', 'latin1_german2_ci');
         $column->addVendorInfo($vendor);
         $expected = '`foo` TEXT COLLATE \'latin1_german2_ci\'';
@@ -455,7 +455,7 @@ DROP TABLE IF EXISTS `Woopah`.`foo`;
 
         $column = new Field('foo');
         $column->getDomain()->copy($this->getPlatform()->getDomainForType('LONGVARCHAR'));
-        $vendor = new VendorInfo('mysql');
+        $vendor = new Vendor('mysql');
         $vendor->setParameter('Collation', 'latin1_german2_ci');
         $column->addVendorInfo($vendor);
         $expected = '`foo` TEXT COLLATE \'latin1_german2_ci\'';
@@ -476,7 +476,7 @@ DROP TABLE IF EXISTS `Woopah`.`foo`;
         $column = new Field('foo');
         $column->getDomain()->copy($this->getPlatform()->getDomainForType('LONGVARCHAR'));
         $column->setNotNull(true);
-        $vendor = new VendorInfo('mysql');
+        $vendor = new Vendor('mysql');
         $vendor->setParameter('Charset', 'greek');
         $column->addVendorInfo($vendor);
         $expected = '`foo` TEXT CHARACTER SET \'greek\' NOT NULL';
@@ -611,7 +611,7 @@ DROP INDEX `babar` ON `foo`;
         $entity->addField($column1);
         $index = new Index('bar_index');
         $index->addField($column1);
-        $vendor = new VendorInfo('mysql');
+        $vendor = new Vendor('mysql');
         $vendor->setParameter('Index_type', 'FULLTEXT');
         $index->addVendorInfo($vendor);
         $entity->addIndex($index);
