@@ -22,7 +22,7 @@ use Propel\Generator\Model\Index;
 use Propel\Generator\Model\Schema;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Unique;
-use Propel\Generator\Model\VendorInfo;
+use Propel\Generator\Model\Vendor;
 use Propel\Generator\Platform\PlatformInterface;
 
 /**

@@ -129,18 +129,18 @@ abstract class MappingModel implements MappingModelInterface
     /**
      * Adds a new VendorInfo instance to this current model object.
      *
-     * @param  VendorInfo|array $vendor
-     * @return VendorInfo
+     * @param  Vendor|array $vendor
+     * @return Vendor
      */
     public function addVendorInfo($vendor)
     {
-        if ($vendor instanceof VendorInfo) {
+        if ($vendor instanceof Vendor) {
             $this->vendorInfos[$vendor->getType()] = $vendor;
 
             return $vendor;
         }
 
-        $vi = new VendorInfo();
+        $vi = new Vendor();
         $vi->loadMapping($vendor);
 
         return $this->addVendorInfo($vi);
@@ -150,7 +150,7 @@ abstract class MappingModel implements MappingModelInterface
      * Returns a VendorInfo object by its type.
      *
      * @param  string     $type
-     * @return VendorInfo
+     * @return Vendor
      */
     public function getVendorInfoForType($type)
     {
@@ -158,7 +158,7 @@ abstract class MappingModel implements MappingModelInterface
             return $this->vendorInfos[$type];
         }
 
-        return new VendorInfo($type);
+        return new Vendor($type);
     }
 
     /**
