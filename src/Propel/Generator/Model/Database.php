@@ -15,11 +15,20 @@ namespace Propel\Generator\Model;
 use Propel\Generator\Config\GeneratorConfigInterface;
 use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Exception\InvalidArgumentException;
+use Propel\Generator\Model\Parts\ActiveRecordPart;
 use Propel\Generator\Model\Parts\BehaviorPart;
+use Propel\Generator\Model\Parts\GeneratorPart;
+use Propel\Generator\Model\Parts\NamespacePart;
+use Propel\Generator\Model\Parts\SchemaNamePart;
+use Propel\Generator\Model\Parts\ScopePart;
+use Propel\Generator\Model\Parts\SqlPart;
+use Propel\Generator\Model\Parts\VendorPart;
 use Propel\Generator\Platform\PlatformInterface;
 use phootwork\collection\ArrayList;
 use phootwork\collection\Map;
 use phootwork\collection\Set;
+use Propel\Generator\Model\Parts\SuperordinatePart;
+use Propel\Generator\Model\Parts\GeneratorConfigPart;
 
 /**
  * A class for holding application data structures.
@@ -33,10 +42,18 @@ use phootwork\collection\Set;
  * @author Hugo Hamon <webmaster@apprendre-php.com> (Propel)
  * @author Thomas Gossmann
  */
-class Database extends ScopedMappingModel
+class Database
 {
-
+    use SuperordinatePart;
+    use GeneratorConfigPart;
+    use SqlPart;
+    use ScopePart;
+    use ActiveRecordPart;
+    use NamespacePart;
+    use GeneratorPart;
     use BehaviorPart;
+    use SchemaNamePart;
+    use VendorPart;
 
     /**
      * The database's platform.
@@ -45,49 +62,13 @@ class Database extends ScopedMappingModel
      */
     private $platform;
 
-    /**
-     * @var string
-     */
-    private $platformClass;
-
-
-
-    /**
-     * @var string
-     */
-    private $name;
-
-    private $defaultIdMethod;
-
-    /**
-     * The default accessor visibility.
-     *
-     * It may be one of public, private and protected.
-     *
-     * @var string
-     */
-    private $defaultAccessorVisibility;
-
-    /**
-     * The default mutator visibility.
-     *
-     * It may be one of public, private and protected.
-     *
-     * @var string
-     */
-    private $defaultMutatorVisibility;
-    private $heavyIndexing;
 
     /** @var Map */
     private $domains;
 
-    /**
-     * @var boolean
-     */
-    private $identifierQuoting;
 
     /** @var Schema */
-    private $parentSchema;
+    private $schema;
 
     /** @var Set */
     private $entities;
@@ -98,26 +79,11 @@ class Database extends ScopedMappingModel
     private $entitiesByFullName;
     private $entitiesByTableName;
 
-
-//    /**
-//     * @var Entity[]
-//     */
-//    private $entitiesByPhpName;
-
     /**
      * @var ArrayList
      */
     private $sequences;
 
-    protected $defaultStringFormat;
-
-    /** @var string */
-    protected $scope;
-
-    /**
-     * @var bool
-     */
-    protected $activeRecord = false;
 
     /**
      * Constructs a new Database object.
@@ -137,21 +103,25 @@ class Database extends ScopedMappingModel
             $this->setPlatform($platform);
         }
 
-        $this->heavyIndexing             = false;
-        $this->identifierQuoting         = false;
-        $this->defaultIdMethod           = IdMethod::NATIVE;
-        $this->defaultStringFormat       = static::DEFAULT_STRING_FORMAT;
-        $this->defaultAccessorVisibility = static::VISIBILITY_PUBLIC;
-        $this->defaultMutatorVisibility  = static::VISIBILITY_PUBLIC;
-
+        // init
         $this->sequences = new ArrayList();
-        $this->behaviors = [];
         $this->domains = new Map();
         $this->entities = new Set();
         $this->entitiesByName = new Map();
         $this->entitiesByLowercaseName = new Map();
         $this->entitiesByFullName = new Map();
-//        $this->entitiesByPhpName           = [];
+        $this->initBehaviors();
+        $this->initSql();
+
+        // default values
+        $this->activeRecord = false;
+        $this->heavyIndexing = false;
+        $this->identifierQuoting = false;
+    }
+
+    protected function getSuperordinate()
+    {
+        return $this->schema;
     }
 
     protected function setupObject()
@@ -356,7 +326,7 @@ class Database extends ScopedMappingModel
      * @param boolean $flag
      * @return $this
      */
-    public function setHeavyIndexing(bool $flag = true)
+    public function setHeavyIndexing(bool $flag = true): Database
     {
         $this->heavyIndexing = $flag;
         return $this;
@@ -454,7 +424,7 @@ class Database extends ScopedMappingModel
      */
     public function getEntityByTableName($tableName)
     {
-        $schema = $this->getSchema() ?: $this->getName();
+        $schema = $this->getSchemaName() ?: $this->getName();
 
         if (!isset($this->entitiesByTableName[$tableName])) {
             if (isset($this->entitiesByTableName[$schema . $this->getSchemaDelimiter() . $tableName])) {
@@ -643,8 +613,8 @@ class Database extends ScopedMappingModel
 //     */
 //    public function setSchema($schema)
 //    {
-//        $oldSchema = $this->schema;
-//        if ($this->schema !== $schema && $this->getPlatform()) {
+//        $oldSchema = $this->schemaName;
+//        if ($this->schemaName !== $schema && $this->getPlatform()) {
 //            $schemaDelimiter = $this->getPlatform()->getSchemaDelimiter();
 //            $fixHash = function (&$array) use ($schema, $oldSchema, $schemaDelimiter) {
 //                foreach ($array as $k => $v) {
@@ -702,9 +672,9 @@ class Database extends ScopedMappingModel
      * @param Schema $parent The parent schema
      * @return $this
      */
-    public function setParentSchema(Schema $parent): Database
+    public function setSchema(Schema $parent): Database
     {
-        $this->parentSchema = $parent;
+        $this->schema = $parent;
         return $this;
     }
 
@@ -713,9 +683,9 @@ class Database extends ScopedMappingModel
      *
      * @return Schema
      */
-    public function getParentSchema()
+    public function getSchema(): ?Schema
     {
-        return $this->parentSchema;
+        return $this->schema;
     }
 
     /**
@@ -762,8 +732,8 @@ class Database extends ScopedMappingModel
      */
     public function getGeneratorConfig(): ?GeneratorConfigInterface
     {
-        if ($this->parentSchema) {
-            return $this->parentSchema->getGeneratorConfig();
+        if ($this->schema) {
+            return $this->schema->getGeneratorConfig();
         }
     }
 
@@ -858,6 +828,14 @@ class Database extends ScopedMappingModel
     protected function registerBehavior(Behavior $behavior)
     {
         $behavior->setDatabase($this);
+    }
+
+    /**
+     * @param Behavior $behavior
+     */
+    protected function unregisterBehavior(Behavior $behavior)
+    {
+        $behavior->setDatabase(null);
     }
 
     public function __toString(): string

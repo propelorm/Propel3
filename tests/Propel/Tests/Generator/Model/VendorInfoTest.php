@@ -10,7 +10,7 @@
 
 namespace Propel\Tests\Generator\Model;
 
-use Propel\Generator\Model\VendorInfo;
+use Propel\Generator\Model\Vendor;
 use Propel\Tests\TestCase;
 
 /**
@@ -22,7 +22,7 @@ class VendorInfoTest extends TestCase
 {
     public function testSetupObject()
     {
-        $info = new VendorInfo();
+        $info = new Vendor();
         $info->loadMapping(array('type' => 'foo'));
 
         $this->assertSame('foo', $info->getType());
@@ -30,7 +30,7 @@ class VendorInfoTest extends TestCase
 
     public function testGetSetType()
     {
-        $info = new VendorInfo('foo');
+        $info = new Vendor('foo');
 
         $this->assertSame('foo', $info->getType());
         $this->assertTrue($info->isEmpty());
@@ -38,7 +38,7 @@ class VendorInfoTest extends TestCase
 
     public function testSetParameter()
     {
-        $info = new VendorInfo();
+        $info = new Vendor();
         $info->setParameter('foo', 'bar');
 
         $this->assertFalse($info->isEmpty());
@@ -48,7 +48,7 @@ class VendorInfoTest extends TestCase
 
     public function testSetParameters()
     {
-        $info = new VendorInfo();
+        $info = new Vendor();
         $info->setParameters(array('foo' => 'bar', 'baz' => 'bat'));
 
         $this->assertFalse($info->isEmpty());
@@ -58,10 +58,10 @@ class VendorInfoTest extends TestCase
 
     public function testMergeVendorInfo()
     {
-        $current = new VendorInfo('mysql');
+        $current = new Vendor('mysql');
         $current->setParameters(array('foo' => 'bar', 'baz' => 'bat'));
 
-        $toMerge = new VendorInfo('mysql');
+        $toMerge = new Vendor('mysql');
         $toMerge->setParameters(array('foo' => 'wat', 'int' => 'mix'));
 
         $merged = $current->getMergedVendorInfo($toMerge);

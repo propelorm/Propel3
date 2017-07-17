@@ -14,14 +14,20 @@ namespace Propel\Generator\Model;
 
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Exception\EngineException;
-use Propel\Generator\Exception\InvalidArgumentException;
 use Propel\Generator\Model\Parts\BehaviorPart;
+use Propel\Generator\Model\Parts\GeneratorPart;
 use Propel\Generator\Model\Parts\NamespacePart;
+use Propel\Generator\Model\Parts\SchemaNamePart;
+use Propel\Generator\Model\Parts\SqlPart;
+use Propel\Generator\Model\Parts\SuperordinatePart;
+use Propel\Generator\Model\Parts\VendorPart;
 use Propel\Generator\Platform\PlatformInterface;
 use Propel\Runtime\Exception\RuntimeException;
-use phootwork\collection\Set;
 use phootwork\collection\Map;
-use Propel\Generator\Config\GeneratorConfigInterface;
+use phootwork\collection\Set;
+use Propel\Generator\Model\Parts\ActiveRecordPart;
+use Propel\Generator\Model\Parts\ScopePart;
+use Propel\Generator\Model\Parts\GeneratorConfigPart;
 
 /**
  * Data about a entity used in an application.
@@ -38,15 +44,21 @@ use Propel\Generator\Config\GeneratorConfigInterface;
  */
 class Entity
 {
+    use SuperordinatePart;
+    use GeneratorConfigPart;
+    use ActiveRecordPart;
+    use ScopePart;
     use BehaviorPart;
     use NamespacePart;
-
+    use SchemaNamePart;
+    use SqlPart;
+    use GeneratorPart;
+    use VendorPart;
 
 
     //
     // Model properties
     // ------------------------------------------------------------
-    private $name;
     private $tableName;
     private $description;
 
@@ -61,11 +73,7 @@ class Entity
     /** @var Database */
     private $database;
 
-    /**
-     * RepositoryClass
-     *
-     * @var bool|string
-     */
+    /** @var bool|string */
     private $repository;
 
     /** @var Field */
@@ -107,14 +115,10 @@ class Entity
     // Database related options/properties
     // ------------------------------------------------------------
 
-    private $idMethod;
-
-    /** @var Set */
-    private $idMethodParameters;
-
     /** @var bool */
     private $allowPkInsert;
 
+    /** @var bool */
     private $containsForeignPK;
 
     /**
@@ -124,58 +128,31 @@ class Entity
      */
     private $implementationDetail = false;
 
+    /** @var bool */
     private $needsTransactionInPostgres;
 
-    /**
-     * @var bool
-     */
-    private $heavyIndexing;
-
-    /**
-     * @var bool
-     */
-    private $identifierQuoting;
-
-
+    /** @var bool */
     private $forReferenceOnly;
+
+    /** @var bool */
     private $reloadOnInsert;
+
+    /** @var bool */
     private $reloadOnUpdate;
-
-    private $defaultStringFormat;
-
 
 
     //
     // Generator options
     // ------------------------------------------------------------
 
-    /**
-     * @var bool|null
-     */
-    private $activeRecord;
-
-
+    /** @var bool */
     private $readOnly;
+
+    /** @var bool */
     private $isAbstract;
+
+    /** @var bool */
     private $skipSql;
-
-    /**
-     * The default accessor visibility.
-     *
-     * It may be one of public, private and protected.
-     *
-     * @var string
-     */
-    private $defaultAccessorVisibility;
-
-    /**
-     * The default mutator visibility.
-     *
-     * It may be one of public, private and protected.
-     *
-     * @var string
-     */
-    private $defaultMutatorVisibility;
 
     /**
      * @TODO maybe move this to database related options/props section ;)
@@ -185,9 +162,6 @@ class Entity
     private $isCrossRef;
 
 
-
-
-
     /**
      * Constructs a entity object with a name
      *
@@ -195,10 +169,11 @@ class Entity
      */
     public function __construct($name = null)
     {
-        parent::__construct();
+        if ($name) {
+            $this->setName($name);
+        }
 
-        $this->name = $name;
-
+        // init
         $this->fields = new Set();
         $this->fieldsByName = new Map();
         $this->fieldsByLowercaseName = new Map();
@@ -208,10 +183,10 @@ class Entity
         $this->referrers = new Set();
         $this->unices = new Set();
         $this->initBehaviors();
+        $this->initSql();
+        $this->initVendor();
 
-        $this->idMethod = IdMethod::NO_ID_METHOD;
-        $this->idMethodParameters = new Set();
-
+        // default values
         $this->allowPkInsert = false;
         $this->isAbstract = false;
         $this->isCrossRef = false;
@@ -219,10 +194,10 @@ class Entity
         $this->reloadOnInsert = false;
         $this->reloadOnUpdate = false;
         $this->skipSql = false;
-        $this->defaultAccessorVisibility = static::VISIBILITY_PUBLIC;
-        $this->defaultMutatorVisibility = static::VISIBILITY_PUBLIC;
+        $this->forReferenceOnly = false;
     }
 
+    // @TODO it's todo
     public function __clone()
     {
         $fields = [];
@@ -238,21 +213,9 @@ class Entity
         }
     }
 
-    /**
-     * Retrieves the configuration object.
-     *
-     * @return GeneratorConfigInterface
-     */
-    public function getGeneratorConfig(): ?GeneratorConfigInterface
-    {
-        if ($this->database) {
-            return $this->database->getGeneratorConfig();
-        }
-
-        return null;
+    protected function getSuperordinate() {
+        return $this->database;
     }
-
-
 
     /**
      * @TODO
@@ -292,7 +255,7 @@ class Entity
         $this->reloadOnInsert = $this->boolValue($this->getAttribute('reloadOnInsert'));
         $this->reloadOnUpdate = $this->boolValue($this->getAttribute('reloadOnUpdate'));
         $this->isCrossRef = $this->boolValue($this->getAttribute('isCrossRef', false));
-        $this->defaultStringFormat = $this->getAttribute('defaultStringFormat');
+        $this->stringFormat = $this->getAttribute('defaultStringFormat');
 
         $this->lazySetupObject();
     }
@@ -456,7 +419,7 @@ class Entity
      */
     public function getTableName(): string
     {
-        $tableName = !$this->tableName ? NamingTool::toUnderscore($this->name) : $this->tableName;
+        $tableName = !$this->tableName ? NamingTool::toSnakeCase($this->name) : $this->tableName;
 
         return $tableName;
     }
@@ -468,10 +431,11 @@ class Entity
      */
     public function getScopedTableName(): string
     {
-        $tableName = !$this->tableName ? NamingTool::toUnderscore($this->name) : $this->tableName;
+        $tableName = !$this->tableName ? NamingTool::toSnakeCase($this->name) : $this->tableName;
+        $scope = $this->getScope();
 
-        if ($this->getDatabase()) {
-            return $this->getDatabase()->getScope() . $this->tableName;
+        if ($scope) {
+            $tableName = $scope . $tableName;
         }
 
         return $tableName;
@@ -491,27 +455,6 @@ class Entity
         }
 
         return $fqTableName;
-    }
-
-    /**
-     * Returns the class name with namespace.
-     *
-     * @return string
-     */
-    public function getFullName(): string
-    {
-        $name = $this->getName();
-        $namespace = $this->getNamespace();
-
-        if (!$namespace && $this->getDatabase()) {
-            $namespace = $this->getDatabase()->getNamespace();
-        }
-
-        if ($namespace) {
-            return $namespace . '\\' . $name;
-        } else {
-            return $name;
-        }
     }
 
     /**
@@ -638,7 +581,7 @@ class Entity
     public function getChildrenNames(): array
     {
         if (null === $this->inheritanceField || !$this->inheritanceField->isEnumeratedClasses()) {
-            return null;
+            return [];
         }
 
         $names = [];
@@ -1344,70 +1287,6 @@ class Entity
     // ------------------------------------------------------------
 
     /**
-     * Sets the method strategy for generating primary keys.
-     *
-     * @param string $idMethod
-     * @return $this
-     */
-    public function setIdMethod(string $idMethod): Entity
-    {
-        $this->idMethod = $idMethod;
-        return $this;
-    }
-
-    /**
-     * Returns the method strategy for generating primary keys.
-     *
-     * [HL] changing behavior so that Database default method is returned
-     * if no method has been specified for the entity.
-     *
-     * @return string
-     */
-    public function getIdMethod(): string
-    {
-        return $this->idMethod;
-    }
-
-    /**
-     * Adds a new parameter for the strategy that generates primary keys.
-     *
-     * @param IdMethodParameter $idMethodParameter
-     * @return $this
-     */
-    public function addIdMethodParameter(IdMethodParameter $idMethodParameter): Entity
-    {
-        $idMethodParameter->setEntity($this);
-        $this->idMethodParameters->add($idMethodParameter);
-
-        return $this;
-    }
-
-    /**
-     * Returns a Collection of parameters relevant for the chosen
-     * id generation method.
-     *
-     * @return IdMethodParameter[]
-     */
-    public function getIdMethodParameters(): array
-    {
-        return $this->idMethodParameters->toArray();
-    }
-
-    /**
-     * Removes a parameter for the strategy that generates primary keys.
-     *
-     * @param IdMethodParameter $idMethodParameter
-     * @return $this
-     */
-    public function removeIdMethodParameter(IdMethodParameter $idMethodParameter): Entity
-    {
-        $idMethodParameter->setEntity(null);
-        $this->idMethodParameters->remove($idMethodParameter);
-
-        return $this;
-    }
-
-    /**
      * @return bool
      */
     public function isImplementationDetail(): bool
@@ -1600,50 +1479,6 @@ class Entity
         return $this;
     }
 
-    /**
-     * Sets the default string format for ActiveRecord objects in this entity.
-     *
-     * Any of 'XML', 'YAML', 'JSON', or 'CSV'.
-     *
-     * @param  string $format
-     *
-     * @throws InvalidArgumentException
-     * @return $this
-     */
-    public function setDefaultStringFormat(string $format): Entity
-    {
-        $formats = Database::getSupportedStringFormats();
-        $format = strtoupper($format);
-
-        if (!in_array($format, $formats)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Given "%s" default string format is not supported. Only "%s" are valid string formats.',
-                    $format,
-                    implode(', ', $formats)
-                )
-            );
-        }
-
-        $this->defaultStringFormat = $format;
-        return $this;
-    }
-
-    /**
-     * Returns the default string format for ActiveRecord objects in this entity,
-     * or the one for the whole database if not set.
-     *
-     * @return string
-     */
-    public function getDefaultStringFormat(): string
-    {
-        if (null !== $this->defaultStringFormat) {
-            return $this->defaultStringFormat;
-        }
-
-        return $this->database->getDefaultStringFormat();
-    }
-
 
     // relations / key handling
     // -----------------------------------------
@@ -1704,9 +1539,9 @@ class Entity
      *
      * @return bool
      */
-    public function setContainsForeignPK($containsForeignPK)
+    public function setContainsForeignPK(bool $containsForeignPK)
     {
-        $this->containsForeignPK = (bool)$containsForeignPK;
+        $this->containsForeignPK = $containsForeignPK;
     }
 
     /**
@@ -1714,7 +1549,7 @@ class Entity
      *
      * @return bool
      */
-    public function getContainsForeignPK()
+    public function getContainsForeignPK(): bool
     {
         return $this->containsForeignPK;
     }
@@ -1899,80 +1734,6 @@ class Entity
     public function getIsCrossRef(): bool
     {
         return $this->isCrossRef;
-    }
-
-    /**
-     * Sets the default accessor visibility.
-     *
-     * @param string $defaultAccessorVisibility
-     * @return $this
-     */
-    public function setDefaultAccessorVisibility(string $defaultAccessorVisibility): Entity
-    {
-        $this->defaultAccessorVisibility = $defaultAccessorVisibility;
-        return $this;
-    }
-
-    /**
-     * Returns the default accessor visibility.
-     *
-     * @return string
-     */
-    public function getDefaultAccessorVisibility(): string
-    {
-        return $this->defaultAccessorVisibility;
-    }
-
-    /**
-     * Sets the default mutator visibility.
-     *
-     * @param string $defaultMutatorVisibility
-     * @return $this
-     */
-    public function setDefaultMutatorVisibility(string $defaultMutatorVisibility): Entity
-    {
-        $this->defaultMutatorVisibility = $defaultMutatorVisibility;
-        return $this;
-    }
-
-    /**
-     * Returns the default mutator visibility.
-     *
-     * @return string
-     */
-    public function getDefaultMutatorVisibility(): string
-    {
-        return $this->defaultMutatorVisibility;
-    }
-
-    /**
-     * @param bool $activeRecord
-     * @return $this
-     */
-    public function setActiveRecord(bool $activeRecord): Entity
-    {
-        $this->activeRecord = $activeRecord;
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isActiveRecord(): bool
-    {
-        if (null === $this->activeRecord) {
-            return $this->getDatabase()->isActiveRecord();
-        }
-
-        return $this->activeRecord;
-    }
-
-    /**
-     * @return bool|null
-     */
-    public function getActiveRecord()
-    {
-        return $this->activeRecord;
     }
 
     /**

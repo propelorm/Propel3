@@ -8,7 +8,7 @@ use Propel\Generator\Model\Relation;
 use Propel\Generator\Model\Index;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Unique;
-use Propel\Generator\Model\VendorInfo;
+use Propel\Generator\Model\Vendor;
 use Propel\Generator\Platform\MysqlPlatform;
 
 /* Fields */
@@ -64,7 +64,7 @@ $field61->setPrimaryKey();
 $field62 = new Field('title', 'varchar', 150);
 $field62->setNotNull();
 $field63 = new Field('content', 'clob');
-$field63->addVendorInfo(new VendorInfo('mysql', [
+$field63->addVendorInfo(new Vendor('mysql', [
     'Charset' => 'latin1',
     'Collate' => 'latin1_general_ci',
 ]));
@@ -106,7 +106,7 @@ $fkTagPost->setOnDelete('CASCADE');
 /* Regular Indexes */
 $pageContentFulltextIdx = new Index('page_content_fulltext_idx');
 $pageContentFulltextIdx->setFields([ [ 'name' => 'content' ] ]);
-$pageContentFulltextIdx->addVendorInfo(new VendorInfo('mysql', array('Index_type' => 'FULLTEXT')));
+$pageContentFulltextIdx->addVendorInfo(new Vendor('mysql', array('Index_type' => 'FULLTEXT')));
 
 /* Unique Indexes */
 $authorUsernameUnique = new Unique('author_password_unique_idx');
@@ -162,7 +162,7 @@ $entity6->setNamespace('Cms');
 $entity6->setPackage('Acme.Cms');
 $entity6->addFields([ $field61, $field62, $field63, $field64 ]);
 $entity6->addIndex($pageContentFulltextIdx);
-$entity6->addVendorInfo(new VendorInfo('mysql', array('Engine' => 'MyISAM')));
+$entity6->addVendorInfo(new Vendor('mysql', array('Engine' => 'MyISAM')));
 
 /* Database */
 $database = new Database('acme_blog', new MysqlPlatform());
@@ -171,7 +171,7 @@ $database->setTablePrefix('acme_');
 $database->setNamespace('Acme\\Model');
 $database->setPackage('Acme');
 $database->setHeavyIndexing();
-$database->addVendorInfo(new VendorInfo('mysql', [ 'Engine' => 'InnoDB', 'Charset' => 'utf8' ]));
+$database->addVendorInfo(new Vendor('mysql', [ 'Engine' => 'InnoDB', 'Charset' => 'utf8' ]));
 $database->addEntities([ $entity1, $entity2, $entity3, $entity4, $entity5, $entity6 ]);
 
 return $database;
