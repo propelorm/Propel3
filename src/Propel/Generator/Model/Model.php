@@ -10,6 +10,7 @@ class Model
     const ID_METHOD_NATIVE = 'native';
     const ID_METHOD_NONE = 'none';
 
+    const DEFAULT_TYPE = 'VARCHAR';
     const DEFAULT_ID_METHOD = Model::ID_METHOD_NATIVE;
     const DEFAULT_STRING_FORMAT = 'YAML';
     const DEFAULT_ACCESSOR_ACCESSIBILITY = Model::VISBILITY_PUBLIC;

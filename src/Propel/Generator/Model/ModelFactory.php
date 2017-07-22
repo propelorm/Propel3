@@ -160,7 +160,10 @@ class ModelFactory
         $database = $this->load(new Database(), $attributes, $this->database);
 
         if (isset($attributes['platform']) && $this->config) {
-            $database->setPlatform($this->config->createPlatform($attributes['platform']));
+            $platform = $this->config->createPlatform($attributes['platform']);
+            if ($platform) {
+                $database->setPlatform($platform);
+            }
         }
 
         return $database;
