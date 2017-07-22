@@ -14,10 +14,13 @@ namespace Propel\Generator\Model;
 
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Exception\EngineException;
+use Propel\Generator\Model\Parts\ActiveRecordPart;
 use Propel\Generator\Model\Parts\BehaviorPart;
 use Propel\Generator\Model\Parts\GeneratorPart;
 use Propel\Generator\Model\Parts\NamespacePart;
+use Propel\Generator\Model\Parts\PlatformAccessorPart;
 use Propel\Generator\Model\Parts\SchemaNamePart;
+use Propel\Generator\Model\Parts\ScopePart;
 use Propel\Generator\Model\Parts\SqlPart;
 use Propel\Generator\Model\Parts\SuperordinatePart;
 use Propel\Generator\Model\Parts\VendorPart;
@@ -25,9 +28,6 @@ use Propel\Generator\Platform\PlatformInterface;
 use Propel\Runtime\Exception\RuntimeException;
 use phootwork\collection\Map;
 use phootwork\collection\Set;
-use Propel\Generator\Model\Parts\ActiveRecordPart;
-use Propel\Generator\Model\Parts\ScopePart;
-use Propel\Generator\Model\Parts\GeneratorConfigPart;
 
 /**
  * Data about a entity used in an application.
@@ -45,7 +45,7 @@ use Propel\Generator\Model\Parts\GeneratorConfigPart;
 class Entity
 {
     use SuperordinatePart;
-    use GeneratorConfigPart;
+    use PlatformAccessorPart;
     use ActiveRecordPart;
     use ScopePart;
     use BehaviorPart;
@@ -215,84 +215,6 @@ class Entity
 
     protected function getSuperordinate() {
         return $this->database;
-    }
-
-    /**
-     * @TODO
-     */
-    public function setupObject()
-    {
-        parent::setupObject();
-
-        $this->setName($this->getAttribute('name'));
-        $this->tableName = $this->getAttribute('tableName');
-
-        if ($this->getAttribute('activeRecord')) {
-            $this->activeRecord = 'true' === $this->getAttribute('activeRecord');
-        }
-        $this->allowPkInsert = $this->boolValue($this->getAttribute('allowPkInsert'));
-
-        $this->skipSql = $this->boolValue($this->getAttribute('skipSql'));
-        $this->readOnly = $this->boolValue($this->getAttribute('readOnly'));
-
-        $this->isAbstract = $this->boolValue($this->getAttribute('abstract'));
-        $this->baseClass = $this->getAttribute('baseClass');
-        $this->alias = $this->getAttribute('alias');
-        $this->repository = $this->getAttribute('repository');
-
-        if ('true' === $this->repository) {
-            $this->repository = true;
-        } else if ('false' === $this->repository) {
-            $this->repository = false;
-        }
-
-        if ($this->getAttribute('identifierQuoting')) {
-            $this->identifierQuoting = $this->boolValue($this->getAttribute('identifierQuoting'));
-        }
-
-        $this->description = $this->getAttribute('description');
-
-        $this->reloadOnInsert = $this->boolValue($this->getAttribute('reloadOnInsert'));
-        $this->reloadOnUpdate = $this->boolValue($this->getAttribute('reloadOnUpdate'));
-        $this->isCrossRef = $this->boolValue($this->getAttribute('isCrossRef', false));
-        $this->stringFormat = $this->getAttribute('defaultStringFormat');
-
-        $this->lazySetupObject();
-    }
-
-    /**
-     * @TODO
-     */
-    protected function lazySetupObject() {
-        if ($this->database) {
-            if (null === $this->idMethod) {
-                $this->idMethod = $this->getAttribute('idMethod', $this->database->getDefaultIdMethod());
-            }
-
-            if (null === $this->heavyIndexing) {
-                $this->heavyIndexing = (
-                    $this->boolValue($this->getAttribute('heavyIndexing'))
-                    || (
-                        'false' !== $this->getAttribute('heavyIndexing')
-                        && $this->database->isHeavyIndexing()
-                    )
-                );
-            }
-
-            if (null === $this->defaultAccessorVisibility) {
-                $this->defaultAccessorVisibility = $this->getAttribute(
-                    'defaultAccessorVisibility',
-                    $this->database->getAttribute('defaultAccessorVisibility', static::VISIBILITY_PUBLIC)
-                );
-            }
-
-            if (null === $this->defaultMutatorVisibility) {
-                $this->defaultMutatorVisibility = $this->getAttribute(
-                    'defaultMutatorVisibility',
-                    $this->database->getAttribute('defaultMutatorVisibility', static::VISIBILITY_PUBLIC)
-                );
-            }
-        }
     }
 
     /**
@@ -533,7 +455,7 @@ class Entity
      */
     public function setDatabase(Database $database): Entity
     {
-        if (!$this->database !== null && $this->database !== $database) {
+        if ($this->database !== null && $this->database !== $database) {
             $this->database->removeEntity($this);
         }
         $this->database = $database;

@@ -13,22 +13,22 @@ declare(strict_types=1);
 namespace Propel\Generator\Model;
 
 use Propel\Generator\Config\GeneratorConfigInterface;
-use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Exception\InvalidArgumentException;
 use Propel\Generator\Model\Parts\ActiveRecordPart;
 use Propel\Generator\Model\Parts\BehaviorPart;
 use Propel\Generator\Model\Parts\GeneratorPart;
 use Propel\Generator\Model\Parts\NamespacePart;
+use Propel\Generator\Model\Parts\PlatformMutatorPart;
 use Propel\Generator\Model\Parts\SchemaNamePart;
 use Propel\Generator\Model\Parts\ScopePart;
 use Propel\Generator\Model\Parts\SqlPart;
+use Propel\Generator\Model\Parts\SuperordinatePart;
 use Propel\Generator\Model\Parts\VendorPart;
 use Propel\Generator\Platform\PlatformInterface;
 use phootwork\collection\ArrayList;
 use phootwork\collection\Map;
 use phootwork\collection\Set;
-use Propel\Generator\Model\Parts\SuperordinatePart;
-use Propel\Generator\Model\Parts\GeneratorConfigPart;
+use Propel\Generator\Model\Parts\SchemaPart;
 
 /**
  * A class for holding application data structures.
@@ -45,7 +45,7 @@ use Propel\Generator\Model\Parts\GeneratorConfigPart;
 class Database
 {
     use SuperordinatePart;
-    use GeneratorConfigPart;
+    use PlatformMutatorPart;
     use SqlPart;
     use ScopePart;
     use ActiveRecordPart;
@@ -53,22 +53,11 @@ class Database
     use GeneratorPart;
     use BehaviorPart;
     use SchemaNamePart;
+    use SchemaPart;
     use VendorPart;
-
-    /**
-     * The database's platform.
-     *
-     * @var PlatformInterface
-     */
-    private $platform;
-
 
     /** @var Map */
     private $domains;
-
-
-    /** @var Schema */
-    private $schema;
 
     /** @var Set */
     private $entities;
@@ -93,8 +82,6 @@ class Database
      */
     public function __construct(?string $name = null, ?PlatformInterface $platform = null)
     {
-        parent::__construct();
-
         if (null !== $name) {
             $this->setName($name);
         }
@@ -108,6 +95,7 @@ class Database
         $this->domains = new Map();
         $this->entities = new Set();
         $this->entitiesByName = new Map();
+        $this->entitiesByTableName = new Map();
         $this->entitiesByLowercaseName = new Map();
         $this->entitiesByFullName = new Map();
         $this->initBehaviors();
@@ -117,6 +105,19 @@ class Database
         $this->activeRecord = false;
         $this->heavyIndexing = false;
         $this->identifierQuoting = false;
+    }
+
+    public function __clone()
+    {
+        $entities = [];
+        foreach ($this->entities as $oldEntity) {
+            $entity = clone $oldEntity;
+            $entities[] = $entity;
+            $this->entitiesByName[$entity->getName()] = $entity;
+            $this->entitiesByLowercaseName[strtolower($entity->getName())] = $entity;
+            //            $this->entitiesByPhpName[$entity->getName()] = $entity;
+        }
+        $this->entities = $entities;
     }
 
     protected function getSuperordinate()
@@ -142,59 +143,59 @@ class Database
         }
     }
 
-    /**
-     * Returns the PlatformInterface implementation for this database.
-     *
-     * @return PlatformInterface
-     */
-    public function getPlatform()
-    {
-        if (null === $this->platform) {
-            if ($this->getParentSchema() && $this->getParentSchema()->getPlatform()) {
-                return $this->getParentSchema()->getPlatform();
-            }
+//     /**
+//      * Returns the PlatformInterface implementation for this database.
+//      *
+//      * @return PlatformInterface
+//      */
+//     public function getPlatform()
+//     {
+//         if (null === $this->platform) {
+//             if ($this->getParentSchema() && $this->getParentSchema()->getPlatform()) {
+//                 return $this->getParentSchema()->getPlatform();
+//             }
 
-            if ($this->getGeneratorConfig()) {
-                if ($this->platformClass) {
-                    $this->platform = $this->getGeneratorConfig()->createPlatform($this->platformClass);
-                } else {
-                    $this->platform = $this->getGeneratorConfig()->createPlatformForDatabase($this->getName());
-                }
-            }
-        }
+//             if ($this->getGeneratorConfig()) {
+//                 if ($this->platformClass) {
+//                     $this->platform = $this->getGeneratorConfig()->createPlatform($this->platformClass);
+//                 } else {
+//                     $this->platform = $this->getGeneratorConfig()->createPlatformForDatabase($this->getName());
+//                 }
+//             }
+//         }
 
-        return $this->platform;
-    }
+//         return $this->platform;
+//     }
 
-    /**
-     * Sets the PlatformInterface implementation for this database.
-     *
-     * @param PlatformInterface $platform A Platform implementation
-     * @return $this
-     */
-    public function setPlatform(?PlatformInterface $platform = null): Database
-    {
-        $this->platform = $platform;
-        return $this;
-    }
+//     /**
+//      * Sets the PlatformInterface implementation for this database.
+//      *
+//      * @param PlatformInterface $platform A Platform implementation
+//      * @return $this
+//      */
+//     public function setPlatform(?PlatformInterface $platform = null): Database
+//     {
+//         $this->platform = $platform;
+//         return $this;
+//     }
 
-    /**
-     * @return boolean
-     */
-    public function isActiveRecord(): bool
-    {
-        return $this->activeRecord;
-    }
+//     /**
+//      * @return boolean
+//      */
+//     public function isActiveRecord(): bool
+//     {
+//         return $this->activeRecord;
+//     }
 
-    /**
-     * @param boolean $activeRecord
-     * @return $this
-     */
-    public function setActiveRecord(bool $activeRecord): Database
-    {
-        $this->activeRecord = $activeRecord;
-        return $this;
-    }
+//     /**
+//      * @param boolean $activeRecord
+//      * @return $this
+//      */
+//     public function setActiveRecord(bool $activeRecord): Database
+//     {
+//         $this->activeRecord = $activeRecord;
+//         return $this;
+//     }
 
     /**
      * Returns the max column name's length.
@@ -206,131 +207,6 @@ class Database
         return $this->getPlatform()->getMaxFieldNameLength();
     }
 
-    /**
-     * Returns the database name.
-     *
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Sets the database name.
-     *
-     * @param string $name
-     * @return $this
-     */
-    public function setName(string $name): Database
-    {
-        $this->name = $name;
-        return $this;
-    }
-
-    /**
-     * Returns the name of the default ID method strategy.
-     * This parameter can be overridden at the entity level.
-     *
-     * @return string
-     */
-    public function getDefaultIdMethod(): string
-    {
-        return $this->defaultIdMethod;
-    }
-
-    /**
-     * Sets the name of the default ID method strategy.
-     * This parameter can be overridden at the entity level.
-     *
-     * @param string $strategy
-     * @return $this
-     */
-    public function setDefaultIdMethod($strategy): Database
-    {
-        $this->defaultIdMethod = $strategy;
-        return $this;
-    }
-
-    /**
-     * Returns the list of supported string formats
-     *
-     * @return array
-     */
-    public static function getSupportedStringFormats(): array
-    {
-        return ['XML', 'YAML', 'JSON', 'CSV'];
-    }
-
-    /**
-     * Sets the default string format for ActiveRecord objects in this entity.
-     * This parameter can be overridden at the entity level.
-     *
-     * Any of 'XML', 'YAML', 'JSON', or 'CSV'.
-     *
-     * @param string $format
-     * @throws InvalidArgumentException
-     * @return $this
-     */
-    public function setDefaultStringFormat(string $format): Database
-    {
-        $formats = static::getSupportedStringFormats();
-
-        $format = strtoupper($format);
-        if (!in_array($format, $formats)) {
-            throw new InvalidArgumentException(sprintf('Given "%s" default string format is not supported. Only "%s" are valid string formats.', $format, implode(', ', $formats)));
-        }
-
-        $this->defaultStringFormat = $format;
-        return $this;
-    }
-
-    /**
-     * Returns the default string format for ActiveRecord objects in this entity.
-     * This parameter can be overridden at the entity level.
-     *
-     * @return string
-     */
-    public function getDefaultStringFormat(): string
-    {
-        return $this->defaultStringFormat;
-    }
-
-    /**
-     * Returns whether or not heavy indexing is enabled.
-     *
-     * This is an alias for getHeavyIndexing().
-     *
-     * @return boolean
-     */
-    public function isHeavyIndexing(): bool
-    {
-        return $this->getHeavyIndexing();
-    }
-
-    /**
-     * Returns whether or not heavy indexing is enabled.
-     *
-     * This is an alias for isHeavyIndexing().
-     *
-     * @return boolean
-     */
-    public function getHeavyIndexing(): bool
-    {
-        return $this->heavyIndexing;
-    }
-
-    /**
-     * Sets whether or not heavy indexing is enabled.
-     *
-     * @param boolean $flag
-     * @return $this
-     */
-    public function setHeavyIndexing(bool $flag = true): Database
-    {
-        $this->heavyIndexing = $flag;
-        return $this;
-    }
 
     /**
      * Return the list of all entities.
@@ -376,45 +252,60 @@ class Database
     /**
      * Returns whether or not the database has a entity.
      *
-     * @param string|Entity $entity
-     * @param bool $caseInsensitive
+     * @param Entity $entity
      * @return bool
      */
-    public function hasEntity($entity, bool $caseInsensitive = false): bool
+    public function hasEntity(Entity $entity): bool
     {
-        if ($entity instanceof Entity) {
-            return $this->entities->has($entity);
-        }
-
-        if ($this->hasEntityByFullClassName($name)) {
-            return true;
-        }
-
-        if ($caseInsensitive) {
-            return $this->entitiesByLowercaseName->has(strtolower($name));
-        }
-
-        return $this->entitiesByName->has($name);
+        return $this->entities->has($entity);
     }
 
     /**
-     * @param string $fullClassName
+     * @param string $name
      *
      * @return bool
      */
-    public function hasEntityByFullClassName($fullClassName): bool
+    public function hasEntityByName($name): bool
     {
-        return $this->entitiesByFullName->has($fullClassName);
+        return $this->entities->search($name, function(Entity $entity, $query) {
+            return $entity->getName() === $query;
+        });
     }
 
     /**
-     * @param string $fullClassName
+     * @param string $name
      *
      * @return Entity
      */
-    public function getEntityByFullClassName($fullClassName): ?Entity
+    public function getEntityByName($name): ?Entity
     {
-        return $this->entitiesByFullName->get($fullClassName);
+        return $this->entities->find($name, function(Entity $entity, $query) {
+            return $entity->getName() === $query;
+        });
+    }
+
+    /**
+     * @param string $fullName
+     *
+     * @return bool
+     */
+    public function hasEntityByFullName($fullName): bool
+    {
+        return $this->entities->search($fullName, function(Entity $entity, $query) {
+           return $entity->getFullName() === $query;
+        });
+    }
+
+    /**
+     * @param string $fullName
+     *
+     * @return Entity
+     */
+    public function getEntityByFullName($fullName): ?Entity
+    {
+        return $this->entities->find($fullName, function(Entity $entity, $query) {
+            return $entity->getFullName() === $query;
+        });
     }
 
     /**
@@ -422,19 +313,47 @@ class Database
      *
      * @return Entity
      */
-    public function getEntityByTableName($tableName)
+    public function hasEntityByTableName($tableName): bool
     {
-        $schema = $this->getSchemaName() ?: $this->getName();
+        return $this->entities->find($tableName, function(Entity $entity, $query) {
+            return $entity->getTableName() === $query;
+        });
+    }
 
-        if (!isset($this->entitiesByTableName[$tableName])) {
-            if (isset($this->entitiesByTableName[$schema . $this->getSchemaDelimiter() . $tableName])) {
-                return $this->entitiesByTableName[$schema . $this->getSchemaDelimiter() . $tableName];
-            }
+    /**
+     * @param string $tableName full qualified table name (with schema)
+     *
+     * @return Entity
+     */
+    public function getEntityByTableName($tableName): ?Entity
+    {
+        return $this->entities->find($tableName, function(Entity $entity, $query) {
+            return $entity->getTableName() === $query;
+        });
+    }
 
-            throw new \InvalidArgumentException("Entity by table name $tableName not found in {$this->getName()}.");
-        }
+    /**
+     * @param string $tableName full qualified table name (with schema)
+     *
+     * @return Entity
+     */
+    public function hasEntityByFullTableName($tableName): bool
+    {
+        return $this->entities->find($tableName, function(Entity $entity, $query) {
+            return $entity->getFullTableName() === $query;
+        });
+    }
 
-        return $this->entitiesByTableName[$tableName];
+    /**
+     * @param string $tableName full qualified table name (with schema)
+     *
+     * @return Entity
+     */
+    public function getEntityByFullTableName($tableName): ?Entity
+    {
+        return $this->entities->find($tableName, function(Entity $entity, $query) {
+            return $entity->getFullTableName() === $query;
+        });
     }
 
     /**
@@ -470,40 +389,14 @@ class Database
     }
 
     /**
-     * @return string
+     * @return string[]
      */
-    public function getEntityNames()
+    public function getEntityNames(): array
     {
-        return implode(',', $this->entitiesByName->keys()->toArray());
-//         return $this->entitiesByName->keys()->toArray()
+        return $this->entities->map(function (Entity $entity) {
+            return $entity->getName();
+        })->toArray();
     }
-
-//    /**
-//     * Returns whether or not the database has a entity identified by its
-//     * PHP name.
-//     *
-//     * @param  string  $phpName
-//     * @return boolean
-//     */
-//    public function hasEntityByPhpName($phpName)
-//    {
-//        return isset($this->entitiesByPhpName[$phpName]);
-//    }
-//
-//    /**
-//     * Returns the entity object with the specified PHP name.
-//     *
-//     * @param  string $phpName
-//     * @return Entity
-//     */
-//    public function getEntityByPhpName($phpName)
-//    {
-//        if (isset($this->entitiesByPhpName[$phpName])) {
-//            return $this->entitiesByPhpName[$phpName];
-//        }
-//
-//        return null; // just to be explicit
-//    }
 
     /**
      * Adds a new entity to this database.
@@ -513,20 +406,10 @@ class Database
      */
     public function addEntity(Entity $entity): Database
     {
-        if ($this->entitiesByFullName->has($entity->getFullName())) {
-            throw new EngineException(sprintf('Entity "%s" declared twice', $entity->getName()));
+        if (!$this->entities->contains($entity)) {
+            $this->entities->add($entity);
+            $entity->setDatabase($this);
         }
-
-        $this->entities->add($entity);
-        $this->entitiesByFullName->set($entity->getFullName(), $entity);
-        $this->entitiesByTableName->set($entity->getFullTableName(), $entity);
-        $this->entitiesByName->set($entity->getName(), $entity);
-        $this->entitiesByLowercaseName->set(strtolower($entity->getName()), $entity);
-//        $this->entitiesByPhpName[$entity->getName()] = $entity;
-
-//        $this->computeEntityNamespace($entity);
-
-        $entity->setDatabase($this);
 
         return $this;
     }
@@ -672,20 +555,14 @@ class Database
      * @param Schema $parent The parent schema
      * @return $this
      */
-    public function setSchema(Schema $parent): Database
+    protected function registerSchema(Schema $schema)
     {
-        $this->schema = $parent;
-        return $this;
+        $schema->addDatabase($this);
     }
 
-    /**
-     * Returns the parent schema
-     *
-     * @return Schema
-     */
-    public function getSchema(): ?Schema
+    protected function unregisterSchema(Schema $schema)
     {
-        return $this->schema;
+        $schema->removeDatabase($this);
     }
 
     /**
@@ -696,22 +573,11 @@ class Database
      */
     public function addDomain(Domain $domain): Database
     {
-        $domain->setDatabase($this);
-        $this->domains->set($domain->getName(), $domain);
+        if (!$this->domains->contains($domain)) {
+            $domain->setDatabase($this);
+            $this->domains->set($domain->getName(), $domain);
+        }
         return $this;
-//         if ($data instanceof Domain) {
-//             $domain = $data; // alias
-//             $domain->setDatabase($this);
-//             $this->domainMap[$domain->getName()] = $domain;
-
-//             return $domain;
-//         }
-
-//         $domain = new Domain();
-//         $domain->setDatabase($this);
-//         $domain->loadMapping($data);
-
-//         return $this->addDomain($domain); // call self w/ different param
     }
 
     /**
@@ -723,18 +589,6 @@ class Database
     public function getDomain(string $name): ?Domain
     {
         return $this->domains->get($name);
-    }
-
-    /**
-     * Returns the GeneratorConfigInterface object.
-     *
-     * @return GeneratorConfigInterface
-     */
-    public function getGeneratorConfig(): ?GeneratorConfigInterface
-    {
-        if ($this->schema) {
-            return $this->schema->getGeneratorConfig();
-        }
     }
 
     /**
@@ -750,28 +604,6 @@ class Database
         if ($config = $this->getGeneratorConfig()) {
             return $config->getConfigProperty($name);
         }
-    }
-
-    /**
-     * Returns the entity scope for this database.
-     *
-     * @return string
-     */
-    public function getScope(): string
-    {
-        return $this->scope;
-    }
-
-    /**
-     * Sets the entities' scope.
-     *
-     * @param string $scope
-     * @return $this
-     */
-    public function setScope(string $scope): Database
-    {
-        $this->scope = $scope;
-        return $this;
     }
 
     /**
@@ -921,79 +753,7 @@ class Database
         );
     }
 
-    /**
-     * Sets the default accessor visibility.
-     *
-     * @param string $defaultAccessorVisibility
-     * @return $this
-     */
-    public function setDefaultAccessorVisibility(string $defaultAccessorVisibility): Database
-    {
-        $this->defaultAccessorVisibility = $defaultAccessorVisibility;
-        return $this;
-    }
 
-    /**
-     * Returns the default accessor visibility.
-     *
-     * @return string
-     */
-    public function getDefaultAccessorVisibility(): string
-    {
-        return $this->defaultAccessorVisibility;
-    }
 
-    /**
-     * Sets the default mutator visibility.
-     *
-     * @param string $defaultMutatorVisibility
-     * @return $this
-     */
-    public function setDefaultMutatorVisibility(string $defaultMutatorVisibility): Database
-    {
-        $this->defaultMutatorVisibility = $defaultMutatorVisibility;
-        return $this;
-    }
-
-    /**
-     * Returns the default mutator visibility.
-     *
-     * @return string
-     */
-    public function getDefaultMutatorVisibility(): string
-    {
-        return $this->defaultMutatorVisibility;
-    }
-
-    public function __clone()
-    {
-        $entities = [];
-        foreach ($this->entities as $oldEntity) {
-            $entity = clone $oldEntity;
-            $entities[] = $entity;
-            $this->entitiesByName[$entity->getName()] = $entity;
-            $this->entitiesByLowercaseName[strtolower($entity->getName())] = $entity;
-//            $this->entitiesByPhpName[$entity->getName()] = $entity;
-        }
-        $this->entities = $entities;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isIdentifierQuotingEnabled(): bool
-    {
-        return $this->identifierQuoting;
-    }
-
-    /**
-     * @param boolean $identifierQuoting
-     * @return $this
-     */
-    public function setIdentifierQuoting(bool $identifierQuoting)
-    {
-        $this->identifierQuoting = $identifierQuoting;
-        return $this;
-    }
 
 }
