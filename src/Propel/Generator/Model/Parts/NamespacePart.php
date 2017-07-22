@@ -28,7 +28,8 @@ trait NamespacePart
      */
     public function setNamespace(string $namespace)
     {
-        $this->namespace = trim($namespace, '\\');
+        $this->namespace = rtrim($namespace, '\\');
+
         return $this;
     }
 
@@ -39,7 +40,17 @@ trait NamespacePart
      */
     public function getNamespace(): string
     {
-        return $this->namespace;
+        $namespace = $this->namespace;
+
+        if (null === $namespace && $this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getNamespace')) {
+            $namespace = $this->getSuperordinate()->getNamespace();
+        }
+
+        if (null === $namespace) {
+            $namespace = '';
+        }
+
+        return $namespace;
     }
 
     /**
@@ -51,10 +62,6 @@ trait NamespacePart
     {
         $name = $this->getName();
         $namespace = $this->getNamespace();
-
-        if (!$namespace && $this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getNamespace')) {
-            $namespace = $this->getSuperordinate()->getNamespace();
-        }
 
         if ($namespace) {
             return $namespace . '\\' . $name;

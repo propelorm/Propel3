@@ -63,6 +63,44 @@ class EntityTest extends ModelTestCase
         );
     }
 
+    public function testNames()
+    {
+        $entity = new Entity('Wurst\\Und\\Kaese');
+        $this->assertEquals('Kaese', $entity->getName());
+        $this->assertEquals('Wurst\\Und', $entity->getNamespace());
+
+
+        $entity = new Entity();
+        $this->assertEmpty($entity->getName());
+
+        $entity->setName('Book');
+        $this->assertEquals('Book', $entity->getName());
+        $this->assertEquals('book', $entity->getTableName());
+
+        $entity->setName('BookAuthor');
+        $this->assertEquals('BookAuthor', $entity->getName());
+        $this->assertEquals('book_author', $entity->getTableName());
+
+        $entity->setTableName('book_has_author');
+        $this->assertEquals('BookAuthor', $entity->getName());
+        $this->assertEquals('book_has_author', $entity->getTableName());
+
+        $entity->setScope('bookstore_');
+        $this->assertEquals('bookstore_book_has_author', $entity->getScopedTableName());
+
+        $entity->setNamespace('Bookstore');
+        $this->assertEquals('Bookstore\\BookAuthor', $entity->getFullName());
+
+        $entity = new Entity();
+        $database = new Database();
+        $database->setScope('bookings_');
+        $database->setNamespace('Bookstore');
+        $entity->setDatabase($database);
+
+        $this->assertEquals('Bookstore', $entity->getNamespace());
+        $this->assertEquals('bookings_', $entity->getScope());
+    }
+
 //     public function testGetGeneratorConfig()
 //     {
 //         $config = $this->getMockBuilder('Propel\Generator\Config\GeneratorConfig')

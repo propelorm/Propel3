@@ -12,11 +12,13 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Model;
 
-use Propel\Generator\Config\GeneratorConfigInterface;
 use Propel\Generator\Exception\EngineException;
+use Propel\Generator\Model\Parts\PlatformMutatorPart;
 use Propel\Generator\Platform\PlatformInterface;
 use Propel\Generator\Schema\Dumper\XmlDumper;
 use phootwork\collection\Set;
+use Propel\Generator\Model\Parts\NamePart;
+use Propel\Generator\Model\Parts\SchemaPart;
 
 /**
  * A class for holding application data structures.
@@ -30,103 +32,57 @@ use phootwork\collection\Set;
  */
 class Schema
 {
+    use PlatformMutatorPart;
+    use NamePart;
+    use SchemaPart;
+
+//     private $isInitialized;
+
     /** @var Set */
     private $databases;
-    private $name;
-    private $isInitialized;
-    protected $generatorConfig;
+
     protected $schemas;
     protected $filename;
     protected $referenceOnly = true;
-    protected $parent = null;
-
-    /**
-     * @var PlatformInterface
-     */
-    protected $platform;
 
     /**
      * Creates a new instance for the specified database type.
      */
-    public function __construct(PlatformInterface $platform = null)
+    public function __construct(?PlatformInterface $platform = null)
     {
         if (null !== $platform) {
             $this->setPlatform($platform);
         }
 
-        $this->isInitialized = false;
+        // init
         $this->databases = new Set();
         $this->schemas = new Set();
+
+        // default values
+//         $this->isInitialized = false;
     }
 
-    /**
-     * Sets the generator configuration
-     *
-     * @param GeneratorConfigInterface $generatorConfig
-     */
-    public function setGeneratorConfig(GeneratorConfigInterface $generatorConfig)
+    protected function getSuperordinate()
     {
-        $this->generatorConfig = $generatorConfig;
-        
-        if (!$this->platform) {
-            $this->platform = $generatorConfig->createPlatformForDatabase();
-        }
+        return $this->schema;
     }
 
-    /**
-     * Returns the generator configuration
-     *
-     * @return GeneratorConfigInterface
-     */
-    public function getGeneratorConfig(): ?GeneratorConfigInterface
-    {
-        if ($this->generatorConfig) {
-            return $this->generatorConfig;
-        }
-        
-        // walk up parent chain
-        $parent = $this;
-        while ($parent->getParent()) {
-            $parent = $parent->getParent();
-            if ($parent->getGeneratorConfig()) {
-                return $parent->getGeneratorConfig();
-            }
-        }
-    }
 
-    /**
-     * @return PlatformInterface
-     */
-    public function getPlatform(): PlatformInterface
-    {
-        return $this->platform;
-    }
-
-    /**
-     * @param PlatformInterface $platform
-     * @return $this
-     */
-    public function setPlatform(PlatformInterface $platform): Schema
-    {
-        $this->platform = $platform;
-        return $this;
-    }
-    
     /**
      * Sets the filename when reading this schema
-     * 
+     *
      * @param string $filename
      * @return $this
      */
-    public function setFilename(string $filename): Schema 
+    public function setFilename(string $filename): Schema
     {
         $this->filename = $filename;
         return $this;
     }
-    
+
     /**
      * Returns the filename
-     * 
+     *
      * @return string
      */
     public function getFilename(): string
@@ -135,28 +91,7 @@ class Schema
     }
 
     /**
-     * Sets the schema name.
-     *
-     * @param string $name
-     * @return $this
-     */
-    public function setName(string $name)
-    {
-        $this->name = $name;
-        return $this;
-    }
-
-    /**
-     * Returns the schema name.
-     *
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
+     * @TODO what's this?
      * Returns the schema short name (without the '-schema' postfix).
      *
      * @return string
@@ -165,103 +100,156 @@ class Schema
     {
         return str_replace('-schema', '', $this->name);
     }
-    
-    /**
-     * Sets the parent schema (will make this an external schema)
-     * 
-     * @param Schema $schema
-     * @return $this
-     */
-    public function setParent(Schema $schema): Schema
+
+    protected function registerSchema(Schema $schema)
     {
-        $this->parent = $schema;
-        $this->parent->addExternalSchema($schema);
-        return $this;
+        $schema->addExternalSchema($this);
     }
-    
-    /**
-     * Returns the parent schema
-     * 
-     * @return Schema
-     */
-    public function getParent(): ?Schema
-    {
-        return $this->parent;    
-    }
-    
+
     /**
      * Adds an external schema
-     * 
+     *
      * @param Schema $schema
      * @return $this
      */
     public function addExternalSchema(Schema $schema): Schema
     {
-        $this->schemas->add($schema);
-        if (!$schema->isExternalSchema()) {
-            $schema->setParent($this);
+        if (!$this->schemas->contains($schema)) {
+            $this->schemas->add($schema);
+            $schema->setSchema($this);
         }
         return $this;
     }
-    
+
+    protected function unregisterSchema(Schema $schema)
+    {
+        $this->removeExternalSchema($schema);
+    }
+
     /**
      * Removes an external schema (only relevant if this is an external schema)
-     * 
+     *
      * @param Schema $schema
      * @return $this
      */
     public function removeExternalSchema(Schema $schema): Schema
     {
-        $schema->setParent(null);
-        $this->schemas->remove($schema);
+        if ($this->schemas->contains($schema)) {
+            $schema->setSchema(null);
+            $this->schemas->remove($schema);
+        }
         return $this;
     }
-    
+
     /**
      * Returns whether this is an external schema
-     * 
+     *
      * @return bool
      */
-    public function isExternalSchema(): bool 
+    public function isExternalSchema(): bool
     {
-        return null !== $this->parent;
+        return null !== $this->schema;
     }
-    
+
     /**
      * Retuns the root schema
-     * 
+     *
      * @return Schema
      */
-    public function getRootSchema(): Schema 
+    public function getRootSchema(): Schema
     {
         $parent = $this;
-        while ($parent->getParent()) {
-            $parent = $parent->getParent();
+        while ($parent->getSchema()) {
+            $parent = $parent->getSchema();
         }
-        
+
         return $parent;
     }
-    
+
     /**
      * Set whether this schema is only for reference (only relevant if this is an external schema)
-     * 
+     *
      * @param bool $referenceOnly
      * @return $this
      */
-    public function setReferenceOnly(bool $referenceOnly): Schema 
+    public function setReferenceOnly(bool $referenceOnly): Schema
     {
         $this->referenceOnly = $referenceOnly;
         return $this;
     }
-    
+
     /**
      * Returns whether this schema is for reference only
-     * 
+     *
      * @return bool
      */
-    public function getReferenceOnly(): bool 
+    public function getReferenceOnly(): bool
     {
         return $this->referenceOnly;
+    }
+
+    /**
+     * Adds a database to the list and sets the Schema property to this
+     * Schema.
+     *
+     * @param Database $database
+     * @return $this
+     */
+    public function addDatabase(Database $database): Schema
+    {
+        if (!$this->databases->contains($database)) {
+            $database->setSchema($this);
+            $this->databases->add($database);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns whether or not a database with the specified name exists in this
+     * schema.
+     *
+     * @param  string  $name
+     * @return boolean
+     */
+    public function hasDatabase($name): bool
+    {
+        return $this->databases->search($name, function(Database $db, $query) {
+            return $db->getName() === $query;
+        });
+    }
+
+    /**
+     * Returns whether or not this schema has multiple databases.
+     *
+     * @return bool
+     */
+    public function hasMultipleDatabases(): bool
+    {
+        return $this->databases->size() > 1;
+    }
+
+    /**
+     * Returns the database according to the specified name or the first one.
+     *
+     * @param string $name
+     * @return Database
+     */
+    public function getDatabase(?string $name = null): ?Database
+    {
+        // this is temporary until we'll have a clean solution
+        // for packaging datamodels/requiring schemas
+//         if ($doFinalInitialization) {
+//             $this->doFinalInitialization();
+//         }
+
+        if (null === $name) {
+            return $this->databases[0];
+        }
+
+        return $this->databases->find($name, function(Database $db, $query) {
+            return $db->getName() === $query;
+        });
     }
 
     /**
@@ -284,82 +272,22 @@ class Schema
     }
 
     /**
-     * Returns whether or not this schema has multiple databases.
+     * Removes the database from this schema
      *
-     * @return boolean
-     */
-    public function hasMultipleDatabases(): bool
-    {
-        return count($this->databases) > 1;
-    }
-
-    /**
-     * Returns the database according to the specified name.
-     *
-     * @param  string   $name
-     * @param  boolean  $doFinalInitialization
-     * @return Database
-     */
-    public function getDatabase($name = null, $doFinalInitialization = true)
-    {
-        // this is temporary until we'll have a clean solution
-        // for packaging datamodels/requiring schemas
-        if ($doFinalInitialization) {
-            $this->doFinalInitialization();
-        }
-
-        if (null === $name) {
-            return $this->databases[0];
-        }
-
-        return $this->databases->find(function(Database $db) {
-            return $db->getName() === $name;
-        });
-    }
-
-    /**
-     * Returns whether or not a database with the specified name exists in this
-     * schema.
-     *
-     * @param  string  $name
-     * @return boolean
-     */
-    public function hasDatabase($name): bool
-    {
-        return $this->databases->search(function(Database $db) {
-            return $db->getName() === $name;
-        });
-    }
-
-    /**
-     * Adds a database to the list and sets the Schema property to this
-     * Schema. The database can be specified as a Database object or a
-     * DOMNode object.
-     *
-     * @param  Database $database
+     * @param Database $database
      * @return $this
      */
-    public function addDatabase(Database $database): Schema
+    public function removeDatabase(Database $database): Schema
     {
-//         if ($database instanceof Database) {
-//             $database->setParentSchema($this);
-//             $this->databases[] = $database;
-
-//             return $database;
-//         }
-        $database->setParentSchema($this);
-        $this->databases->add($database);
-
-        // XML attributes array / hash
-//         $db = new Database();
-//         $db->setParentSchema($this);
-//         $db->setPlatform($this->getPlatform());
-//         $db->loadMapping($database);
-
+        if ($this->databases->contains($database)) {
+            $database->setSchema(null);
+            $this->databases->remove($database);
+        }
         return $this;
     }
 
     /**
+     * @TODO externalize
      * Finalizes the databases initialization.
      *
      */
@@ -450,3 +378,4 @@ class Schema
         return $this->toString();
     }
 }
+
