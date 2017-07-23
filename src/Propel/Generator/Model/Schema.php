@@ -19,6 +19,7 @@ use Propel\Generator\Schema\Dumper\XmlDumper;
 use phootwork\collection\Set;
 use Propel\Generator\Model\Parts\NamePart;
 use Propel\Generator\Model\Parts\SchemaPart;
+use phootwork\collection\ArrayList;
 
 /**
  * A class for holding application data structures.
@@ -38,7 +39,7 @@ class Schema
 
 //     private $isInitialized;
 
-    /** @var Set */
+    /** @var ArrayList */
     private $databases;
 
     protected $schemas;
@@ -55,7 +56,7 @@ class Schema
         }
 
         // init
-        $this->databases = new Set();
+        $this->databases = new ArrayList();
         $this->schemas = new Set();
 
         // default values
@@ -121,6 +122,36 @@ class Schema
         return $this;
     }
 
+    /**
+     * Returns whether this is an external schema
+     *
+     * @return bool
+     */
+    public function isExternalSchema(): bool
+    {
+        return null !== $this->schema;
+    }
+
+    /**
+     * Returns all external schema
+     *
+     * @return Schema[]
+     */
+    public function getExternalSchemas(): array
+    {
+        return $this->schemas->toArray();
+    }
+
+    /**
+     * Returns the amount of external schemas
+     *
+     * @return int
+     */
+    public function getExternalSchemaSize(): int
+    {
+        return $this->schemas->size();
+    }
+
     protected function unregisterSchema(Schema $schema)
     {
         $this->removeExternalSchema($schema);
@@ -139,16 +170,6 @@ class Schema
             $this->schemas->remove($schema);
         }
         return $this;
-    }
-
-    /**
-     * Returns whether this is an external schema
-     *
-     * @return bool
-     */
-    public function isExternalSchema(): bool
-    {
-        return null !== $this->schema;
     }
 
     /**
@@ -198,8 +219,8 @@ class Schema
     public function addDatabase(Database $database): Schema
     {
         if (!$this->databases->contains($database)) {
-            $database->setSchema($this);
             $this->databases->add($database);
+            $database->setSchema($this);
         }
 
         return $this;
@@ -243,8 +264,12 @@ class Schema
 //             $this->doFinalInitialization();
 //         }
 
+        if ($this->databases->size() === 0) {
+            return null;
+        }
+
         if (null === $name) {
-            return $this->databases[0];
+            return $this->databases->get(0);
         }
 
         return $this->databases->find($name, function(Database $db, $query) {
@@ -269,6 +294,16 @@ class Schema
 //         }
 
         return $this->databases->toArray();
+    }
+
+    /**
+     * Returns the amount of databases
+     *
+     * @return int
+     */
+    public function getDatabaseSize(): int
+    {
+        return $this->databases->size();
     }
 
     /**
@@ -302,6 +337,7 @@ class Schema
     }
 
     /**
+     * @TODO
      * Merge other Schema objects together into this Schema object.
      *
      * @param Schema[] $schemas

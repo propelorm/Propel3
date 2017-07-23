@@ -254,11 +254,11 @@ abstract class ModelTestCase extends TestCase
      * @param  string            $schemaDelimiter
      * @return PlatformInterface
      */
-    protected function getPlatformMock($supportsSchemas = true, array $options = array(), $schemaDelimiter = '.')
+    protected function getPlatformMock($supportsSchemas = true, array $options = [], $schemaDelimiter = '.')
     {
-        $defaults = array(
+        $defaults = [
             'max_field_name_length' => null,
-        );
+        ];
 
         $options = array_merge($defaults, $options);
 
@@ -326,16 +326,16 @@ abstract class ModelTestCase extends TestCase
      */
     protected function getEntityMock($name, array $options = array())
     {
-        $defaults = array(
-            'name'    => $name,
+        $defaults = [
+            'name' => $name,
             'tableName' => $name,
-            'namespace'   => null,
-            'database'    => null,
-            'platform'    => null,
-            'behaviors'   => array(),
-            'indices'     => array(),
-            'unices'      => array(),
-        );
+            'namespace' => null,
+            'database' => null,
+            'platform' => null,
+            'behaviors' => [],
+            'indices' => [],
+            'unices' => [],
+        ];
 
         $options = array_merge($defaults, $options);
 
@@ -353,7 +353,7 @@ abstract class ModelTestCase extends TestCase
 
         $entity
             ->expects($this->any())
-            ->method('getFullClassName')
+            ->method('getFullName')
             ->will($this->returnValue($name))
         ;
 

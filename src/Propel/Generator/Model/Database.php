@@ -12,8 +12,6 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Model;
 
-use Propel\Generator\Config\GeneratorConfigInterface;
-use Propel\Generator\Exception\InvalidArgumentException;
 use Propel\Generator\Model\Parts\ActiveRecordPart;
 use Propel\Generator\Model\Parts\BehaviorPart;
 use Propel\Generator\Model\Parts\GeneratorPart;
@@ -62,11 +60,11 @@ class Database
     /** @var Set */
     private $entities;
 
-    /** @var Map */
-    private $entitiesByName;
-    private $entitiesByLowercaseName;
-    private $entitiesByFullName;
-    private $entitiesByTableName;
+//     /** @var Map */
+//     private $entitiesByName;
+//     private $entitiesByLowercaseName;
+//     private $entitiesByFullName;
+//     private $entitiesByTableName;
 
     /**
      * @var ArrayList
@@ -94,10 +92,10 @@ class Database
         $this->sequences = new ArrayList();
         $this->domains = new Map();
         $this->entities = new Set();
-        $this->entitiesByName = new Map();
-        $this->entitiesByTableName = new Map();
-        $this->entitiesByLowercaseName = new Map();
-        $this->entitiesByFullName = new Map();
+//         $this->entitiesByName = new Map();
+//         $this->entitiesByTableName = new Map();
+//         $this->entitiesByLowercaseName = new Map();
+//         $this->entitiesByFullName = new Map();
         $this->initBehaviors();
         $this->initSql();
 
@@ -107,17 +105,20 @@ class Database
         $this->identifierQuoting = false;
     }
 
+    /**
+     * @TODO
+     */
     public function __clone()
     {
-        $entities = [];
-        foreach ($this->entities as $oldEntity) {
-            $entity = clone $oldEntity;
-            $entities[] = $entity;
-            $this->entitiesByName[$entity->getName()] = $entity;
-            $this->entitiesByLowercaseName[strtolower($entity->getName())] = $entity;
-            //            $this->entitiesByPhpName[$entity->getName()] = $entity;
-        }
-        $this->entities = $entities;
+//         $entities = [];
+//         foreach ($this->entities as $oldEntity) {
+//             $entity = clone $oldEntity;
+//             $entities[] = $entity;
+//             $this->entitiesByName[$entity->getName()] = $entity;
+//             $this->entitiesByLowercaseName[strtolower($entity->getName())] = $entity;
+//             //            $this->entitiesByPhpName[$entity->getName()] = $entity;
+//         }
+//         $this->entities = $entities;
     }
 
     protected function getSuperordinate()
@@ -125,23 +126,23 @@ class Database
         return $this->schema;
     }
 
-    protected function setupObject()
-    {
-        parent::setupObject();
+//     protected function setupObject()
+//     {
+//         parent::setupObject();
 
-        $this->name = $this->getAttribute('name');
-        $this->platformClass = $this->getAttribute('platform');
-        $this->baseClass = $this->getAttribute('baseClass');
-        $this->defaultIdMethod = $this->getAttribute('defaultIdMethod', IdMethod::NATIVE);
-        $this->heavyIndexing = $this->booleanValue($this->getAttribute('heavyIndexing'));
-        $this->identifierQuoting = $this->getAttribute('identifierQuoting') ? $this->booleanValue($this->getAttribute('identifierQuoting')) : false;
-        $this->scope = $this->getAttribute('tablePrefix', $this->getBuildProperty('generator.tablePrefix'));
-        $this->defaultStringFormat = $this->getAttribute('defaultStringFormat', static::DEFAULT_STRING_FORMAT);
+//         $this->name = $this->getAttribute('name');
+//         $this->platformClass = $this->getAttribute('platform');
+//         $this->baseClass = $this->getAttribute('baseClass');
+//         $this->defaultIdMethod = $this->getAttribute('defaultIdMethod', IdMethod::NATIVE);
+//         $this->heavyIndexing = $this->booleanValue($this->getAttribute('heavyIndexing'));
+//         $this->identifierQuoting = $this->getAttribute('identifierQuoting') ? $this->booleanValue($this->getAttribute('identifierQuoting')) : false;
+//         $this->scope = $this->getAttribute('tablePrefix', $this->getBuildProperty('generator.tablePrefix'));
+//         $this->defaultStringFormat = $this->getAttribute('defaultStringFormat', static::DEFAULT_STRING_FORMAT);
 
-        if ($this->getAttribute('activeRecord')) {
-            $this->activeRecord = 'true' === $this->getAttribute('activeRecord');
-        }
-    }
+//         if ($this->getAttribute('activeRecord')) {
+//             $this->activeRecord = 'true' === $this->getAttribute('activeRecord');
+//         }
+//     }
 
 //     /**
 //      * Returns the PlatformInterface implementation for this database.
@@ -198,6 +199,8 @@ class Database
 //     }
 
     /**
+     * @TODO unsave convenient method. Consider removing
+     *
      * Returns the max column name's length.
      *
      * @return int
@@ -216,6 +219,11 @@ class Database
     public function getEntities(): array
     {
         return $this->entities->toArray();
+    }
+
+    public function getEntitySize()
+    {
+        return $this->entities->size();
     }
 
     /**
@@ -356,39 +364,40 @@ class Database
         });
     }
 
+//     /**
+//      * Returns the entity with the specified name.
+//      *
+//      * @param  string  $name
+//      * @param  boolean $caseInsensitive
+//      * @return Entity
+//      */
+//     public function getEntity($name, $caseInsensitive = false)
+//     {
+//         if ($this->hasEntityByFullClassName($name)) {
+//             return $this->getEntityByFullClassName($name);
+//         }
+
+
+//         if (!$this->hasEntity($name, $caseInsensitive)) {
+//             throw new InvalidArgumentException(
+//                 sprintf(
+//                     'Entity %s in database %s not found [%s]',
+//                     $name,
+//                     $this->getName(),
+//                     $this->getEntityNames()
+//                 )
+//             );
+//         }
+
+//         if ($caseInsensitive) {
+//             return $this->entitiesByLowercaseName[strtolower($name)];
+//         }
+
+//         return $this->entitiesByName[$name];
+//     }
+
     /**
-     * Returns the entity with the specified name.
-     *
-     * @param  string  $name
-     * @param  boolean $caseInsensitive
-     * @return Entity
-     */
-    public function getEntity($name, $caseInsensitive = false)
-    {
-        if ($this->hasEntityByFullClassName($name)) {
-            return $this->getEntityByFullClassName($name);
-        }
-
-
-        if (!$this->hasEntity($name, $caseInsensitive)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Entity %s in database %s not found [%s]',
-                    $name,
-                    $this->getName(),
-                    $this->getEntityNames()
-                )
-            );
-        }
-
-        if ($caseInsensitive) {
-            return $this->entitiesByLowercaseName[strtolower($name)];
-        }
-
-        return $this->entitiesByName[$name];
-    }
-
-    /**
+     * @TODO is this needed? -> array_map($db->getEntities(), fn {....});
      * @return string[]
      */
     public function getEntityNames(): array
@@ -458,6 +467,15 @@ class Database
     }
 
     /**
+     * @param  string $sequence
+     * @return bool
+     */
+    public function hasSequence(string $sequence): bool
+    {
+        return $this->sequences->contains($sequence);
+    }
+
+    /**
      * @param string $sequence
      * @return $this
      */
@@ -468,15 +486,8 @@ class Database
     }
 
     /**
-     * @param  string $sequence
-     * @return bool
-     */
-    public function hasSequence(string $sequence): bool
-    {
-        return $this->sequences->contains($sequence);
-    }
-
-    /**
+     * @TODO unsave convenient method. Consider removing
+     *
      * Returns the schema delimiter character.
      *
      * For example, the dot character with mysql when
@@ -592,6 +603,8 @@ class Database
     }
 
     /**
+     * @TODO This is wrong here, about to kill it off here
+     *
      * Returns the configuration property identified by its name.
      *
      * @see \Propel\Common\Config\ConfigurationManager::getConfigProperty() method
@@ -633,6 +646,7 @@ class Database
     }
 
     /**
+     * @TODO Externalize
      * Finalizes the setup process.
      *
      */
