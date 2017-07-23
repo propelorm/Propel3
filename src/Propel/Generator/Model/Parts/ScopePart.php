@@ -25,13 +25,13 @@ trait ScopePart {
      */
     public function getScope(): string
     {
-        if (null !== $this->scope) {
-            return $this->scope;
+        $scope = $this->scope;
+
+        if (null === $scope && $this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getScope')) {
+            $scope = $this->getSuperordinate()->getScope();
         }
 
-        if ($this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getScope')) {
-            return $this->getSuperordinate()->getScope();
-        }
+        return null === $scope ? '' : $scope;
     }
 }
 
