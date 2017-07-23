@@ -11,7 +11,7 @@
 namespace Propel\Generator\Reverse;
 
 use Propel\Generator\Config\GeneratorConfigInterface;
-use Propel\Generator\Model\VendorInfo;
+use Propel\Generator\Model\Vendor;
 use Propel\Runtime\Connection\ConnectionInterface;
 
 /**
@@ -212,7 +212,7 @@ abstract class AbstractSchemaParser implements SchemaParserInterface, SqlSchemaP
     {
         $type = $this->getPlatform()->getDatabaseType();
 
-        $vi = new VendorInfo($type);
+        $vi = new Vendor($type);
         $vi->setParameters($params);
 
         return $vi;

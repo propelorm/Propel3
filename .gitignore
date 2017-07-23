@@ -36,3 +36,8 @@ tests/migrationdiff/
 tests/reversecommand/
 
 tests/latest_quickbuilder_sqlite.db
+
+# eclipse
+.buildpath
+.project
+.settings/

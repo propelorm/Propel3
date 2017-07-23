@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Model;
 
 /**
@@ -83,11 +85,13 @@ class CrossRelation
 
     /**
      * @param Relation $relation
+     * @return $this
      */
-    public function setIncomingRelation($relation)
+    public function setIncomingRelation(Relation $relation): CrossRelation
     {
         $this->setMiddleEntity($relation ? $relation->getEntity() : null);
         $this->incomingRelation = $relation;
+        return $this;
     }
 
     /**
@@ -95,7 +99,7 @@ class CrossRelation
      *
      * @return Relation
      */
-    public function getIncomingRelation()
+    public function getIncomingRelation(): Relation
     {
         return $this->incomingRelation;
     }
@@ -105,7 +109,7 @@ class CrossRelation
      *
      * @return Entity
      */
-    public function getForeignEntity()
+    public function getForeignEntity(): Entity
     {
         return $this->getOutgoingRelation()->getForeignEntity();
     }
@@ -139,7 +143,7 @@ class CrossRelation
      * @param  Relation $fk
      * @return bool
      */
-    public function isAtLeastOneLocalPrimaryKeyNotCovered(Relation $fk)
+    public function isAtLeastOneLocalPrimaryKeyNotCovered(Relation $fk): bool
     {
         $primaryKeys = $fk->getLocalPrimaryKeys();
         foreach ($primaryKeys as $primaryKey) {
@@ -166,7 +170,7 @@ class CrossRelation
      *
      * @return bool
      */
-    public function isPolymorphic()
+    public function isPolymorphic(): bool
     {
         return 1 < count($this->getRelations()) || $this->getUnclassifiedPrimaryKeys();
     }
@@ -176,7 +180,7 @@ class CrossRelation
      *
      * @return Field[]
      */
-    public function getUnclassifiedPrimaryKeys()
+    public function getUnclassifiedPrimaryKeys(): array
     {
         $pks = [];
         foreach ($this->getMiddleEntity()->getPrimaryKey() as $pk) {

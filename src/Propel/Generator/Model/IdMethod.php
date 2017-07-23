@@ -11,6 +11,8 @@
 namespace Propel\Generator\Model;
 
 /**
+ * @TODO Move this to Model::ID_METHOD_* ?
+ *
  * Interface for various ID retrieval method types
  * (i.e. auto-increment, sequence, ID broker, etc.).
  *
