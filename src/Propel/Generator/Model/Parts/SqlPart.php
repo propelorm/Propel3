@@ -32,7 +32,7 @@ trait SqlPart
         $this->idMethodParameters = new Set();
     }
 
-    abstract public function getPlatform(): PlatformInterface;
+    abstract public function getPlatform(): ?PlatformInterface;
 
     /**
      * Sets the method strategy for generating primary keys.
@@ -202,7 +202,7 @@ trait SqlPart
      */
     public function setStringFormat(string $format)
     {
-        $formats = Database::getSupportedStringFormats();
+        $formats = Model::SUPPORTED_STRING_FORMATS;
         $format = strtoupper($format);
 
         if (!in_array($format, $formats)) {
