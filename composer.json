@@ -1,5 +1,5 @@
 {
-    "name": "propel/propel",
+    "name": "propel/propel3",
     "type": "library",
     "description": "High performance data-mapper ORM with optional active-record traits for RAD and modern PHP 7.1+",
     "keywords": [
