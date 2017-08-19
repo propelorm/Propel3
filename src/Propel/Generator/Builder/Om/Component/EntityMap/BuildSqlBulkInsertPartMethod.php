@@ -24,7 +24,6 @@ class BuildSqlBulkInsertPartMethod extends BuildComponent
 
     public function process()
     {
-
         $body = '
 $params = [];
 $placeholder = [];
@@ -68,6 +67,11 @@ if (null !== \$value) {
 //end field:$fieldName
 ";
         }
+        if ($this->getEntity()->hasRelations()) {
+            $body .= "
+\$relParams = [];
+";
+        }
 
         foreach ($this->getEntity()->getRelations() as $relation) {
             $className = $relation->getForeignEntity()->getFullClassName();
@@ -84,23 +88,41 @@ if (null !== \$value) {
                 list ($localField, $foreignField) = $map;
                 $foreignFieldName = $foreignField->getName();
 
-                $body .= "
+                if ($foreignField->isImplementationDetail()) {
+                    $foreignEntity = $relation->getForeignEntity();
+                    foreach ($foreignEntity->getRelations() as $foreignRelation) {
+                        if ($foreignRelation->getLocalField()->getName() === $foreignFieldName ) {
+                            $body .= "
+\$reader = \$this->getClassPropReader('{$foreignRelation->getForeignEntity()->getFullClassName()}');
+\$forEnt = \$foreignEntityReader(\$foreignEntity, '{$this->getRelationVarName($foreignRelation)}');
+\$value = \$reader(\$forEnt, '{$foreignRelation->getForeignField()->getName()}');";
+                        }
+                    }
+                } else {
+                    $body .= "
 \$value = null;
 if (\$foreignEntity) {
     \$value = \$foreignEntityReader(\$foreignEntity, '{$foreignFieldName}');
-}
-
-if (!isset(\$params['{$localField->getName()}'])) {
-    \$params['{$localField->getName()}'] = \$value; //{$localField->getName()}
-    \$outgoingParams[] = \$value;
-    \$placeholder[] = '?';
-}
-";
-
+}";
+                }
+                $body .= "
+if (!isset(\$relParams['{$localField->getName()}']) || null === \$relParams['{$localField->getName()}']) {
+    \$relParams['{$localField->getName()}'] = \$value;
+}";
             }
 
             $body .= "
-//end relation:$propertyName";
+//end relation:$propertyName
+";
+        }
+
+        if ($this->getEntity()->hasRelations()) {
+            $body .= "
+foreach (\$relParams as \$relParam) {
+    \$outgoingParams[] = \$relParam;
+    \$placeholder[] = '?';
+}
+";
         }
 
         $body .= "

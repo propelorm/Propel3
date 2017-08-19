@@ -61,26 +61,29 @@ if (\$isset(\$entity, '$fieldName') && \$foreignEntity = \$reader(\$entity, '$fi
                 list ($localField, $foreignField) = $map;
                 $relationFieldName = $localField->getName();
                 $foreignFieldName = $foreignField->getName();
+                $foreignEntity = $relation->getForeignEntity();
 
-                if (isset($foreignField->foreignRelation)) {
-                    //@todo, what kind of workaround is this?
-                    /** @var Relation $foreignRelation */
-                    $foreignRelation = $foreignField->foreignRelation;
-                    $relationFieldName = $foreignRelation->getField();
-                    $relationEntityName = $foreignRelation->getForeignEntity()->getFullClassName();
-                    $body .= "
+                if ($foreignEntity->getField($foreignFieldName)->isImplementationDetail()) {
+                    //The field is both the primary and a foreign key of the foreign entity, so it's marked as
+                    //implementation detail and it's not accessible by the property reader, so I should
+                    //read the value from the related entity primary key
+
+                    foreach ($foreignEntity->getRelations() as $rel) {
+                        if ($rel->getLocalFieldName() == $foreignFieldName) {
+                            $relationEntityName = $rel->getForeignEntity()->getFullClassName();
+                            $body .= "
     \$foreignForeignEntityReader = \$this->getClassPropReader('$relationEntityName');
-    \$foreignForeignEntity = \$foreignEntityReader(\$foreignEntity, '{$relationFieldName}');
-    \$value = \$foreignForeignEntityReader(\$foreignForeignEntity, '{$foreignField->foreignRelationFieldName}');
-                    ";
+    \$foreignForeignEntity = \$foreignEntityReader(\$foreignEntity, '{$this->getRelationVarName($rel)}');
+    \$value = \$foreignForeignEntityReader(\$foreignForeignEntity, '{$rel->getForeignEntity()->getFirstPrimaryKeyField()->getName()}');";
+                        }
+                    }
                 } else {
                     $body .= "
     \$value = \$foreignEntityReader(\$foreignEntity, '$foreignFieldName');";
                 }
 
                 $emptyBody .="
-    \$snapshot['$relationFieldName'] = null;
-";
+    \$snapshot['$relationFieldName'] = null;";
                 $body .= "
     \$snapshot['$relationFieldName'] = \$value;";
             }
