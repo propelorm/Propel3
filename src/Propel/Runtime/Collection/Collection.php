@@ -95,7 +95,7 @@ class Collection implements \ArrayAccess, \IteratorAggregate, \Countable, \Seria
      * @param  mixed $offset
      * @return mixed
      */
-    public function &offsetGet($offset)
+    public function offsetGet($offset)
     {
         if (isset($this->data[$offset])) {
             return $this->data[$offset];
