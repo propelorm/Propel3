@@ -108,7 +108,7 @@ Read the [Propel documentation](http://www.propelorm.org/). This documentation i
 ## Contribute
 
 Everybody can contribute to Propel. Just fork it, and send Pull Requests.
-You have to follow [PSR2 conding standards](http://www.php-fig.org/psr/psr-2/) and provides unit tests as much as possible.
+You have to follow [PSR2 coding standards](http://www.php-fig.org/psr/psr-2/) and provides unit tests as much as possible.
 
 Please see our [contribution guideline](http://propelorm.org/contribute.html). Thank you!
 
