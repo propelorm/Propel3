@@ -20,7 +20,7 @@
 -->
 <database name="default" defaultIdMethod="native"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/propelorm/Propel3/8fe8ee0e2d00c4f0a264067af35a9fc0295d4f3f/resources/xsd/database.xsd"
+          xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/propelorm/Propel3/master/resources/xsd/database.xsd"
           namespace="<?php echo $namespace?>"
         >
     <!-- Within the <database> tag, Propel expects one <table> tag for each table -->
