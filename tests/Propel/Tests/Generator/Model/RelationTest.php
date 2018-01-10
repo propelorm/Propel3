@@ -36,10 +36,10 @@ class RelationTest extends ModelTestCase
         $platform     = $this->getPlatformMock();
         $foreignEntity = $this->getEntityMock('authors');
 
-        $localEntity   = $this->getEntityMock('books', array(
+        $localEntity   = $this->getEntityMock('books', [
             'platform' => $platform,
             'database' => $database
-        ));
+        ]);
 
         $idField     = $this->getFieldMock('id');
         $authorIdField = $this->getFieldMock('author_id');
@@ -54,7 +54,7 @@ class RelationTest extends ModelTestCase
         $foreignEntity
             ->expects($this->once())
             ->method('getPrimaryKey')
-            ->will($this->returnValue(array($idField)))
+            ->will($this->returnValue([$idField]))
         ;
 
         $foreignEntity
@@ -139,10 +139,10 @@ class RelationTest extends ModelTestCase
         $platform = $this->getPlatformMock(false);
         $foreignEntity = $this->getEntityMock('authors');
 
-        $localEntity = $this->getEntityMock('books', array(
+        $localEntity = $this->getEntityMock('books', [
             'platform' => $platform,
             'database' => $database
-        ));
+        ]);
 
         $database
             ->expects($this->any())
@@ -158,7 +158,7 @@ class RelationTest extends ModelTestCase
         $foreignEntity
             ->expects($this->any())
             ->method('getRelations')
-            ->will($this->returnValue(array()))
+            ->will($this->returnValue([]))
         ;
 
         $fk = new Relation();
@@ -177,10 +177,10 @@ class RelationTest extends ModelTestCase
         $platform = $this->getPlatformMock(true);
         $foreignEntity = $this->getEntityMock('authors');
 
-        $localEntity = $this->getEntityMock('books', array(
+        $localEntity = $this->getEntityMock('books', [
             'platform' => $platform,
             'database' => $database
-        ));
+        ]);
 
         $database
             ->expects($this->any())
@@ -196,7 +196,7 @@ class RelationTest extends ModelTestCase
         $foreignEntity
             ->expects($this->any())
             ->method('getRelations')
-            ->will($this->returnValue(array($inversedFk)))
+            ->will($this->returnValue([$inversedFk]))
         ;
 
         $fk = new Relation();
@@ -232,7 +232,7 @@ class RelationTest extends ModelTestCase
 
     public function testRelationIsNotLocalPrimaryKey()
     {
-        $pks = array($this->getFieldMock('id'));
+        $pks = [$this->getFieldMock('id')];
 
         $table = $this->getEntityMock('books');
         $table
@@ -250,10 +250,10 @@ class RelationTest extends ModelTestCase
 
     public function testRelationIsLocalPrimaryKey()
     {
-        $pks = array(
+        $pks = [
             $this->getFieldMock('book_id'),
             $this->getFieldMock('author_id'),
-        );
+        ];
 
         $table = $this->getEntityMock('books');
         $table
@@ -334,7 +334,7 @@ class RelationTest extends ModelTestCase
 
     public function testAddSingleArrayReference()
     {
-        $reference = array('local' => 'author_id', 'foreign' => 'id');
+        $reference = ['local' => 'author_id', 'foreign' => 'id'];
 
         $fk = new Relation();
         $fk->addReference($reference);
@@ -432,14 +432,14 @@ class RelationTest extends ModelTestCase
 
     public function provideOnActionBehaviors()
     {
-        return array(
-            array(null, ''),
-            array('none', ''),
-            array('NONE', ''),
-            array('setnull', 'SET NULL'),
-            array('SETNULL', 'SET NULL'),
-            array('cascade', 'CASCADE'),
-            array('CASCADE', 'CASCADE'),
-        );
+        return [
+            [null, ''],
+            ['none', ''],
+            ['NONE', ''],
+            ['setnull', 'SET NULL'],
+            ['SETNULL', 'SET NULL'],
+            ['cascade', 'CASCADE'],
+            ['CASCADE', 'CASCADE'],
+        ];
     }
 }

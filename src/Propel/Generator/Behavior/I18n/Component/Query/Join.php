@@ -44,15 +44,18 @@ return \$this
 ";
 
         $this->addMethod('joinI18n')
-            ->addParameter(PhpParameter::create('locale')
+            ->addParameter(
+                PhpParameter::create('locale')
                 ->setType('string', "Locale to use for the join condition, e.g. 'fr_FR'")
                 ->setValue($this->getBehavior()->getDefaultLocale())
             )
-            ->addParameter(PhpParameter::create('relationAlias')
+            ->addParameter(
+                PhpParameter::create('relationAlias')
                 ->setType('string', 'optional alias for the relation')
                 ->setValue(null)
             )
-            ->addParameter(PhpParameter::create('joinType')
+            ->addParameter(
+                PhpParameter::create('joinType')
                 ->setType('string')
                 ->setDescription("Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.")
                 ->setValue('LEFT JOIN')
@@ -74,11 +77,13 @@ return \$this
 ";
 
         $this->addMethod('joinWithI18n')
-            ->addParameter(PhpParameter::create('locale')
+            ->addParameter(
+                PhpParameter::create('locale')
                 ->setType('string', "Locale to use for the join condition, e.g. 'fr_FR'")
                 ->setValue($this->getBehavior()->getDefaultLocale())
             )
-            ->addParameter(PhpParameter::create('joinType')
+            ->addParameter(
+                PhpParameter::create('joinType')
                 ->setType('string')
                 ->setDescription("Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.")
                 ->setValue('LEFT JOIN')

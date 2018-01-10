@@ -67,9 +67,9 @@ class OnDemandCollection extends Collection
      *
      * @return array
      */
-    public function toArray($keyField = null, $usePrefix = false, $keyType = EntityMap::TYPE_PHPNAME, $includeLazyLoadFields = true, $alreadyDumpedObjects = array())
+    public function toArray($keyField = null, $usePrefix = false, $keyType = EntityMap::TYPE_PHPNAME, $includeLazyLoadFields = true, $alreadyDumpedObjects = [])
     {
-        $ret = array();
+        $ret = [];
         $keyGetterMethod = 'get' . $keyField;
 
         foreach ($this as $key => $obj) {

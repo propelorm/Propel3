@@ -3,7 +3,6 @@
 
 namespace Propel\Generator\Behavior\Delegate\Component;
 
-
 use Propel\Generator\Behavior\Delegate\DelegateBehavior;
 use Propel\Generator\Builder\Om\Component\BuildComponent;
 use Propel\Generator\Builder\Om\Component\RelationTrait;

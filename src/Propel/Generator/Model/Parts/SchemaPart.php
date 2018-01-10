@@ -3,7 +3,8 @@ namespace Propel\Generator\Model\Parts;
 
 use Propel\Generator\Model\Schema;
 
-trait SchemaPart {
+trait SchemaPart
+{
 
     /** @var Schema */
     protected $schema;
@@ -37,6 +38,4 @@ trait SchemaPart {
     {
         return $this->schema;
     }
-
 }
-

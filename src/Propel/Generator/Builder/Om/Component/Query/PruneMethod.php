@@ -32,7 +32,7 @@ if ($objectName) {";
         $pks = $entity->getPrimaryKey();
         if (count($pks) > 1) {
             $i = 0;
-            $conditions = array();
+            $conditions = [];
             foreach ($pks as $col) {
                 $condName = "'pruneCond" . $i . "'";
                 $conditions[]= $condName;

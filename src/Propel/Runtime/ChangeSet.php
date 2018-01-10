@@ -3,9 +3,8 @@
 
 namespace Propel\Runtime;
 
-
-class ChangeSet {
-
+class ChangeSet
+{
     protected $inserts = [];
 
     protected $updates = [];
@@ -83,5 +82,4 @@ class ChangeSet {
     {
         return $this->deletions;
     }
-
 }

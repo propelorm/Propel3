@@ -67,17 +67,17 @@ EOF;
     public function testAdderAddsNewValueToExistingData()
     {
         $e = new ComplexFieldTypeEntity2();
-        $this->assertEquals(array('FOO'), $e->getDefaults());
+        $this->assertEquals(['FOO'], $e->getDefaults());
         $e->addDefault('bar');
-        $this->assertEquals(array('FOO', 'bar'), $e->getDefaults());
+        $this->assertEquals(['FOO', 'bar'], $e->getDefaults());
     }
 
     public function testAdderAddsNewValueToMultipleExistingData()
     {
         $e = new ComplexFieldTypeEntity2();
-        $this->assertEquals(array('FOO', 'BAR', 'BAZ'), $e->getMultipleDefaults());
+        $this->assertEquals(['FOO', 'BAR', 'BAZ'], $e->getMultipleDefaults());
         $e->addMultipleDefault('bar');
-        $this->assertEquals(array('FOO', 'BAR', 'BAZ', 'bar'), $e->getMultipleDefaults());
+        $this->assertEquals(['FOO', 'BAR', 'BAZ', 'bar'], $e->getMultipleDefaults());
     }
 
     public function testTester()
@@ -85,7 +85,7 @@ EOF;
         $e = new ComplexFieldTypeEntity2();
         $this->assertFalse($e->hasTag('foo'));
         $this->assertFalse($e->hasTag(1234));
-        $value = array('foo', 1234);
+        $value = ['foo', 1234];
         $e->setTags($value);
         $this->assertTrue($e->hasTag('foo'));
         $this->assertTrue($e->hasTag(1234));
@@ -97,37 +97,37 @@ EOF;
     {
         $e = new ComplexFieldTypeEntity2();
         $e->addTag('foo');
-        $this->assertEquals(array('foo'), $e->getTags());
+        $this->assertEquals(['foo'], $e->getTags());
         $e->addTag(1234);
-        $this->assertEquals(array('foo', 1234), $e->getTags());
+        $this->assertEquals(['foo', 1234], $e->getTags());
         $e->addTag('foo');
-        $this->assertEquals(array('foo', 1234, 'foo'), $e->getTags());
-        $e->setTags(array(12, 34));
+        $this->assertEquals(['foo', 1234, 'foo'], $e->getTags());
+        $e->setTags([12, 34]);
         $e->addTag('foo');
-        $this->assertEquals(array(12, 34, 'foo'), $e->getTags());
+        $this->assertEquals([12, 34, 'foo'], $e->getTags());
     }
 
     public function testRemover()
     {
         $e = new ComplexFieldTypeEntity2();
         $e->removeTag('foo');
-        $this->assertEquals(array(), $e->getTags());
-        $e->setTags(array('foo', 1234));
+        $this->assertEquals([], $e->getTags());
+        $e->setTags(['foo', 1234]);
         $e->removeTag('foo');
-        $this->assertEquals(array(1234), $e->getTags());
+        $this->assertEquals([1234], $e->getTags());
         $e->removeTag(1234);
-        $this->assertEquals(array(), $e->getTags());
-        $e->setTags(array(12, 34, 1234));
+        $this->assertEquals([], $e->getTags());
+        $e->setTags([12, 34, 1234]);
         $e->removeTag('foo');
-        $this->assertEquals(array(12, 34, 1234), $e->getTags());
+        $this->assertEquals([12, 34, 1234], $e->getTags());
         $e->removeTag('1234');
-        $this->assertEquals(array(12, 34), $e->getTags());
+        $this->assertEquals([12, 34], $e->getTags());
     }
 
     public function testValueIsPersisted()
     {
         $e = new ComplexFieldTypeEntity2();
-        $value = array('foo', 1234);
+        $value = ['foo', 1234];
         $e->setTags($value);
         $e->save();
 

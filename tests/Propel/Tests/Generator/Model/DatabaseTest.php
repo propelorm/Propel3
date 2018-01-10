@@ -235,7 +235,6 @@ class DatabaseTest extends ModelTestCase
         $this->assertTrue($database->hasEntityByName('books'));
         $this->assertFalse($database->hasEntityByName('BOOKS'));
         $this->assertSame($entity, $database->getEntityByName('books'));
-
     }
 
 //     public function testAddArrayEntity()
@@ -272,9 +271,9 @@ class DatabaseTest extends ModelTestCase
         $config = $this->getMockBuilder('Propel\Generator\Config\GeneratorConfig')
             ->disableOriginalConstructor()->getMock();
 
-        $schema = $this->getSchemaMock('bookstore', array(
+        $schema = $this->getSchemaMock('bookstore', [
             'generator_config' => $config
-        ));
+        ]);
 
         $database = new Database();
         $database->setSchema($schema);

@@ -44,7 +44,7 @@ class ShiftLevelMethod extends BuildComponent
         $method = $this->addMethod('shiftLevel')
             ->setDescription("Adds \$delta to level for nodes having left value >= \$first and right value <= \$last.
 '\$delta' can also be negative.")
-            ->addSimpleDescParameter('delta',  'int', 'Value to be shifted by, can be negative')
+            ->addSimpleDescParameter('delta', 'int', 'Value to be shifted by, can be negative')
             ->addSimpleDescParameter('first', 'int', 'First node to be shifted')
             ->addSimpleDescParameter('last', 'int', 'Last node to be shifted')
             ->setBody($body);

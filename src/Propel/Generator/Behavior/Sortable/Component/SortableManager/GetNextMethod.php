@@ -35,7 +35,6 @@ $buildScopeVars
 \$query->filterByRank(\$entity->getRank() + 1, $params);
 ";
         } else {
-
             $body .= "
 \$query->filterByRank(\$entity->getRank() + 1);
 ";

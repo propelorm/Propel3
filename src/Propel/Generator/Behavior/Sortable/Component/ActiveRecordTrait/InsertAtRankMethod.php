@@ -14,7 +14,7 @@ use Propel\Generator\Builder\Om\Component\NamingTrait;
 
 /**
  *
- * @author Cristiano Cinotti <cristianocinotti@gmail.com> 
+ * @author Cristiano Cinotti <cristianocinotti@gmail.com>
  */
 class InsertAtRankMethod extends BuildComponent
 {

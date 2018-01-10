@@ -46,7 +46,7 @@ class GeneratedObjectLobTest extends BookstoreEmptyTestBase
      *
      * @var array string[]
      */
-    protected $sampleLobFiles = array();
+    protected $sampleLobFiles = [];
 
     protected function setUp()
     {
@@ -82,7 +82,6 @@ class GeneratedObjectLobTest extends BookstoreEmptyTestBase
      */
     public function testLobResults()
     {
-
         $blob_path = $this->getLobFile('tin_drum.gif');
         $clob_path = $this->getLobFile('tin_drum.txt');
 
@@ -252,7 +251,6 @@ class GeneratedObjectLobTest extends BookstoreEmptyTestBase
         $this->assertEquals(md5(file_get_contents($blob_path)), md5(stream_get_contents($m1->getCoverImage())), "Expected the updated BLOB value after setting with a stream.");
 
         // 7) Assert that 'w' mode works
-
     }
 
     public function testLobSetting_WriteMode()
@@ -295,7 +293,5 @@ class GeneratedObjectLobTest extends BookstoreEmptyTestBase
         $m2->reload();
 
         $this->assertEquals(md5(file_get_contents($blob_path)), md5(stream_get_contents($m2->getCoverImage())), "Expected contents to match when setting stream w/ 'w+' mode");
-
     }
-
 }

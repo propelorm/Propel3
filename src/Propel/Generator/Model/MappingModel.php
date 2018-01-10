@@ -111,7 +111,7 @@ abstract class MappingModel implements MappingModelInterface
             return (Boolean) $value;
         }
 
-        return in_array(strtolower($value),  [ 'true', 't', 'y', 'yes' ], true);
+        return in_array(strtolower($value), [ 'true', 't', 'y', 'yes' ], true);
     }
 
     protected function getDefaultValueForArray($stringValue)
@@ -170,5 +170,4 @@ abstract class MappingModel implements MappingModelInterface
     {
         return $this->vendorInfos;
     }
-
 }

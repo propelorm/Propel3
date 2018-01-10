@@ -80,7 +80,7 @@ EOF;
 
         $actual = $this->loader->load('empty.ini');
 
-        $this->assertEquals(array(), $actual);
+        $this->assertEquals([], $actual);
     }
 
     public function testWithSections()
@@ -155,6 +155,5 @@ EOF;
         $actual = $this->loader->load('notreadable.ini');
         $this->assertEquals('bar', $actual['foo']);
         $this->assertEquals('baz', $actual['bar']);
-
     }
 }

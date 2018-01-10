@@ -22,7 +22,7 @@ class PropertyGetterMethods extends BuildComponent
                 // it's a implementation detail, we don't need to expose it to the domain model.
                 continue;
             }
-            if ($field->isSkipCodeGeneration()){
+            if ($field->isSkipCodeGeneration()) {
                 continue;
             }
 
@@ -46,12 +46,12 @@ class PropertyGetterMethods extends BuildComponent
         $body = '';
 
         if ($field->isTemporalType()) {
-                $body .= "
+            $body .= "
 if (\$format && \$this->{$varName} instanceof \\DateTime) {
     return \$this->{$varName}->format(\$format);
 }";
             $method->addSimpleParameter('format', 'string', null);
-        } else if ($field->isBooleanType()) {
+        } elseif ($field->isBooleanType()) {
             $body .= "
 //Sometimes the default value is not a boolean
 if (!is_bool(\$this->$varName)) {

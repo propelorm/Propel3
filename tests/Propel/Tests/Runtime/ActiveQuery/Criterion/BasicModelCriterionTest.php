@@ -26,14 +26,14 @@ class BasicModelCriterionTest extends BaseTestCase
     {
         $cton = new BasicModelCriterion(new Criteria(), 'A.COL = ?', 'A.COL', 'foo');
 
-        $params = array();
+        $params = [];
         $ps = '';
         $cton->appendPsTo($ps, $params);
 
         $this->assertEquals('A.COL = :p1', $ps);
-        $expected = array(
-            array('entity' => 'A', 'field' => 'COL', 'value' => 'foo')
-        );
+        $expected = [
+            ['entity' => 'A', 'field' => 'COL', 'value' => 'foo']
+        ];
         $this->assertEquals($expected, $params);
     }
 
@@ -41,7 +41,7 @@ class BasicModelCriterionTest extends BaseTestCase
     {
         $cton = new BasicModelCriterion(new Criteria(), 'A.COL = B.COL', 'A.COL', 'foo');
 
-        $params = array();
+        $params = [];
         $ps = '';
         $cton->appendPsTo($ps, $params);
         $this->assertEquals('A.COL = B.COL', $ps);
@@ -51,12 +51,11 @@ class BasicModelCriterionTest extends BaseTestCase
     {
         $cton = new BasicModelCriterion(new Criteria(), 'A.COL IS NULL', 'A.COL', null);
 
-        $params = array();
+        $params = [];
         $ps = '';
         $cton->appendPsTo($ps, $params);
 
         $this->assertEquals('A.COL IS NULL', $ps);
-        $this->assertEquals(array(), $params);
+        $this->assertEquals([], $params);
     }
-
 }

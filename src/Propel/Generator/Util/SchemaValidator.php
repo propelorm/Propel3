@@ -31,7 +31,7 @@ use Propel\Generator\Model\Entity;
 class SchemaValidator
 {
     protected $schema;
-    protected $errors = array();
+    protected $errors = [];
 
     public function __construct(Schema $schema)
     {
@@ -52,13 +52,13 @@ class SchemaValidator
 
     protected function validateDatabaseTables(Database $database)
     {
-        $phpNames = array();
-        $namespaces = array();
+        $phpNames = [];
+        $namespaces = [];
         foreach ($database->getEntities() as $entity) {
             $list = &$phpNames;
             if ($entity->getNamespace()) {
                 if (!isset($namespaces[$entity->getNamespace()])) {
-                    $namespaces[$entity->getNamespace()] = array();
+                    $namespaces[$entity->getNamespace()] = [];
                 }
 
                 $list = &$namespaces[$entity->getNamespace()];
@@ -74,7 +74,7 @@ class SchemaValidator
 
     protected function validateTableAttributes(Entity $entity)
     {
-        $reservedTableNames = array('table_name');
+        $reservedTableNames = ['table_name'];
         $entityName = strtolower($entity->getTableName());
         if (in_array($entityName, $reservedTableNames)) {
             $this->errors[] = sprintf('Entity "%s" uses a reserved keyword as tableName', $entity->getName());
@@ -86,7 +86,7 @@ class SchemaValidator
         if (!$entity->hasPrimaryKey() && !$entity->isSkipSql()) {
             $this->errors[] = sprintf('Entity "%s" does not have a primary key defined. Propel requires all entities to have a primary key.', $entity->getName());
         }
-        $phpNames = array();
+        $phpNames = [];
         foreach ($entity->getFields() as $field) {
             if (in_array($field->getName(), $phpNames)) {
                 $this->errors[] = sprintf('Field "%s" declares a name already used in entity "%s"', $field->getName(), $entity->getName());

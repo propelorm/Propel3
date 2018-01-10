@@ -221,5 +221,4 @@ class PropelModelPagerTest extends BookstoreEmptyTestBase
             }
         }
     }
-
 }

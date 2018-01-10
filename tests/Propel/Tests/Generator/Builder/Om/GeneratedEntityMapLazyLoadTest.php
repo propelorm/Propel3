@@ -39,7 +39,7 @@ EOF;
 
     public function testPopulateObjectNotInPool()
     {
-        $values = array(123, 'fooValue', 'bazValue');
+        $values = [123, 'fooValue', 'bazValue'];
         $col = 0;
         $obj = Configuration::getCurrentConfiguration()->getEntityMap(\LazyLoadActiveRecord2::class)->populateObject($values, $col);
         $this->assertEquals(3, $col);
@@ -55,7 +55,7 @@ EOF;
         $ar->setId(123);
         $ar->setFoo('fooValue');
         $ar->setBaz('bazValue');
-        $values = array(123, 'fooValue', 'bazValue');
+        $values = [123, 'fooValue', 'bazValue'];
         $col = 0;
         $obj = Configuration::getCurrentConfiguration()->getEntityMap(\LazyLoadActiveRecord2::class)->populateObject($values, $col);
         $this->assertEquals(3, $col);
@@ -67,7 +67,7 @@ EOF;
 
     public function testPopulateObjectNotInPoolStartColGreaterThanOne()
     {
-        $values = array('dummy', 'dummy', 123, 'fooValue', 'bazValue', 'dummy');
+        $values = ['dummy', 'dummy', 123, 'fooValue', 'bazValue', 'dummy'];
         $col = 2;
         $obj = Configuration::getCurrentConfiguration()->getEntityMap(\LazyLoadActiveRecord2::class)->populateObject($values, $col);
         $this->assertEquals(5, $col);
@@ -83,7 +83,7 @@ EOF;
         $ar->setId(123);
         $ar->setFoo('fooValue');
         $ar->setBaz('bazValue');
-        $values = array('dummy', 'dummy', 123, 'fooValue', 'bazValue', 'dummy');
+        $values = ['dummy', 'dummy', 123, 'fooValue', 'bazValue', 'dummy'];
         $col = 2;
         $obj = Configuration::getCurrentConfiguration()->getEntityMap(\LazyLoadActiveRecord2::class)->populateObject($values, $col);
         $this->assertEquals(5, $col);
@@ -92,5 +92,4 @@ EOF;
         $this->assertNull($obj->getBar());
         $this->assertEquals('bazValue', $obj->getBaz());
     }
-
 }

@@ -190,8 +190,8 @@ class EntityComparator
         foreach ($toEntityPk as $column) {
             if (!$this->getFromEntity()->hasField($column->getName(), $caseInsensitive) ||
                 !$this->getFromEntity()->getField($column->getName(), $caseInsensitive)->isPrimaryKey()) {
-                    $this->tableDiff->addAddedPkField($column->getName(), $column);
-                    $pkDifferences++;
+                $this->tableDiff->addAddedPkField($column->getName(), $column);
+                $pkDifferences++;
             }
         }
 
@@ -199,8 +199,8 @@ class EntityComparator
         foreach ($fromEntityPk as $column) {
             if (!$this->getToEntity()->hasField($column->getName(), $caseInsensitive) ||
                 !$this->getToEntity()->getField($column->getName(), $caseInsensitive)->isPrimaryKey()) {
-                    $this->tableDiff->addRemovedPkField($column->getName(), $column);
-                    $pkDifferences++;
+                $this->tableDiff->addRemovedPkField($column->getName(), $column);
+                $pkDifferences++;
             }
         }
 

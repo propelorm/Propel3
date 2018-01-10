@@ -68,7 +68,7 @@ class QuickBuilder
     /**
      * @var array
      */
-    protected $classTargets = array(
+    protected $classTargets = [
         'activerecordtrait',
         'object',
         'entitymap',
@@ -77,7 +77,7 @@ class QuickBuilder
         'repository',
         'repositorystub',
         'querystub'
-    );
+    ];
 
     /**
      * Identifier quoting for reversed database.
@@ -341,7 +341,9 @@ class QuickBuilder
                         $this->database,
                         $database,
                         $diff
-                    ), null, $e
+                    ),
+                    null,
+                    $e
                 );
             }
         }
@@ -501,7 +503,7 @@ class QuickBuilder
                         $class = $builder->build();
                         $script .= $this->fixNamespaceDeclarations($class);
 
-                        foreach (array('objectmultiextend', 'queryinheritancestub') as $target) {
+                        foreach (['objectmultiextend', 'queryinheritancestub'] as $target) {
                             $builder = $this->getConfig()->getConfiguredBuilder($entity, $target);
                             $builder->setChild($child);
                             $class = $builder->build();
@@ -547,7 +549,7 @@ class QuickBuilder
             $token = $tokens[$i];
             if (is_string($token)) {
                 $output .= $token;
-            } elseif (in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
+            } elseif (in_array($token[0], [T_COMMENT, T_DOC_COMMENT])) {
                 // strip comments
                 $output .= $token[1];
             } elseif (T_NAMESPACE === $token[0]) {
@@ -559,7 +561,7 @@ class QuickBuilder
                 // namespace name and whitespaces
                 while (($t = $tokens[++$i]) && is_array($t) && in_array(
                         $t[0],
-                        array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING)
+                        [T_WHITESPACE, T_NS_SEPARATOR, T_STRING]
                     )) {
                     $output .= $t[1];
                 }

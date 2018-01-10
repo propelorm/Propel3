@@ -78,12 +78,12 @@ class RelationMap
     /**
      * @var FieldMap[]
      */
-    protected $localFields = array();
+    protected $localFields = [];
 
     /**
      * @var FieldMap[]
      */
-    protected $foreignFields = array();
+    protected $foreignFields = [];
 
     /**
      * @var string
@@ -404,7 +404,7 @@ class RelationMap
      */
     public function getFieldMappings($direction = RelationMap::LOCAL_TO_FOREIGN)
     {
-        $h = array();
+        $h = [];
         if (RelationMap::LEFT_TO_RIGHT === $direction
             && RelationMap::MANY_TO_ONE === $this->getType()) {
             $direction = RelationMap::LOCAL_TO_FOREIGN;
@@ -432,7 +432,7 @@ class RelationMap
      */
     public function getFieldNameObjectMappings($direction = RelationMap::LOCAL_TO_FOREIGN)
     {
-        $h = array();
+        $h = [];
         if (RelationMap::LEFT_TO_RIGHT === $direction
             && RelationMap::MANY_TO_ONE === $this->getType()) {
             $direction = RelationMap::LOCAL_TO_FOREIGN;
@@ -457,7 +457,7 @@ class RelationMap
      */
     public function isOrphanRemoval()
     {
-        foreach ($this->getLocalFields() as $field){
+        foreach ($this->getLocalFields() as $field) {
             if ($field->isNotNull()) {
                 return true;
             }
@@ -653,9 +653,9 @@ class RelationMap
      */
     public function getSymmetricalRelation()
     {
-        $localMapping = array($this->getLeftFields(), $this->getRightFields());
+        $localMapping = [$this->getLeftFields(), $this->getRightFields()];
         foreach ($this->getRightEntity()->getRelations() as $relation) {
-            $relationMapping = array($relation->getRightFields(), $relation->getLeftFields());
+            $relationMapping = [$relation->getRightFields(), $relation->getLeftFields()];
             if ($localMapping == $relationMapping) {
                 return $relation;
             }

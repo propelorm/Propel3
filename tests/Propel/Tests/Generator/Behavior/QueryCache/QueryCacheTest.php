@@ -50,7 +50,7 @@ XML;
             ->filterByTitle('foo')
             ->find();
 
-       $this->assertTrue(\QuerycacheEntity1Query::create()->cacheContains('test'), ' cache contains "test" key');
+        $this->assertTrue(\QuerycacheEntity1Query::create()->cacheContains('test'), ' cache contains "test" key');
     }
 
     public function testPublicApiExists()

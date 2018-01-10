@@ -74,14 +74,14 @@ class PgsqlPlatform extends SqlDefaultPlatform
 
     public function getDefaultTypeSizes()
     {
-        return array(
+        return [
             'char'      => 1,
             'character' => 1,
             'integer'   => 32,
             'bigint'    => 64,
             'smallint'  => 16,
             'double precision' => 54
-        );
+        ];
     }
 
     public function getMaxFieldNameLength()
@@ -142,7 +142,8 @@ class PgsqlPlatform extends SqlDefaultPlatform
 CREATE SEQUENCE %s;
 ";
 
-            return sprintf($pattern,
+            return sprintf(
+                $pattern,
                 $this->quoteIdentifier(strtolower($this->getSequenceName($entity)))
             );
         }
@@ -156,7 +157,8 @@ CREATE SEQUENCE %s;
 DROP SEQUENCE %s;
 ";
 
-            return sprintf($pattern,
+            return sprintf(
+                $pattern,
                 $this->quoteIdentifier(strtolower($this->getSequenceName($entity)))
             );
         }
@@ -165,7 +167,7 @@ DROP SEQUENCE %s;
     public function getAddSchemasDDL(Database $database)
     {
         $ret = '';
-        $schemas = array();
+        $schemas = [];
         foreach ($database->getEntities() as $entity) {
             $vi = $entity->getVendorInfoForType('pgsql');
             if ($vi->hasParameter('schema') && !isset($schemas[$vi->getParameter('schema')])) {
@@ -253,7 +255,7 @@ SET search_path TO public;
         $ret .= $this->getUseSchemaDDL($entity);
         $ret .= $this->getAddSequenceDDL($entity);
 
-        $lines = array();
+        $lines = [];
 
         foreach ($entity->getFields() as $field) {
             $lines[] = $this->getFieldDDL($field);
@@ -275,7 +277,8 @@ CREATE TABLE %s
     %s
 );
 ";
-        $ret .= sprintf($pattern,
+        $ret .= sprintf(
+            $pattern,
             $this->quoteIdentifier($entity->getFQTableName()),
             implode($sep, $lines)
         );
@@ -284,7 +287,8 @@ CREATE TABLE %s
             $pattern = "
 COMMENT ON TABLE %s IS %s;
 ";
-            $ret .= sprintf($pattern,
+            $ret .= sprintf(
+                $pattern,
                 $this->quoteIdentifier($entity->getFQTableName()),
                 $this->quote($entity->getDescription())
             );
@@ -312,7 +316,8 @@ COMMENT ON TABLE %s IS %s;
 COMMENT ON COLUMN %s.%s IS %s;
 ";
         if ($description = $field->getDescription()) {
-            return sprintf($pattern,
+            return sprintf(
+                $pattern,
                 $this->quoteIdentifier($field->getEntity()->getFQTableName()),
                 $this->quoteIdentifier($field->getColumnName()),
                 $this->quote($description)
@@ -345,7 +350,7 @@ DROP TABLE IF EXISTS %s CASCADE;
     {
         $domain = $col->getDomain();
 
-        $ddl = array($this->quoteIdentifier($col->getColumnName()));
+        $ddl = [$this->quoteIdentifier($col->getColumnName())];
         $sqlType = $domain->getSqlType();
         $entity = $col->getEntity();
         if ($col->isAutoIncrement() && $entity && $entity->getIdMethodParameters() == null) {
@@ -384,7 +389,8 @@ DROP TABLE IF EXISTS %s CASCADE;
 
     public function getUniqueDDL(Unique $unique)
     {
-        return sprintf('CONSTRAINT %s UNIQUE (%s)',
+        return sprintf(
+            'CONSTRAINT %s UNIQUE (%s)',
             $this->quoteIdentifier($unique->getName()),
             $this->getFieldListDDL($unique->getFieldObjects())
         );
@@ -400,7 +406,8 @@ DROP TABLE IF EXISTS %s CASCADE;
 ALTER TABLE %s RENAME TO %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($fromEntityName),
             $this->quoteIdentifier($toEntityName)
         );
@@ -416,7 +423,7 @@ ALTER TABLE %s RENAME TO %s;
 
     public function hasSize($sqlType)
     {
-        return !in_array($sqlType, array('BYTEA', 'TEXT', 'DOUBLE PRECISION'));
+        return !in_array($sqlType, ['BYTEA', 'TEXT', 'DOUBLE PRECISION']);
     }
 
     public function hasStreamBlobImpl()
@@ -472,14 +479,14 @@ ALTER TABLE %s ALTER COLUMN %s;
             $seqName = "{$entityName}_{$colPlainName}_seq";
 
             if ($toField->isAutoIncrement() && $entity && $entity->getIdMethodParameters() == null) {
-
                 $defaultValue = "nextval('$seqName'::regclass)";
                 $toField->setDefaultValue($defaultValue);
                 $changedProperties['defaultValueValue'] = [null, $defaultValue];
 
                 //add sequence
                 if (!$fromEntity->getDatabase()->hasSequence($seqName)) {
-                    $this->createOrDropSequences .= sprintf("
+                    $this->createOrDropSequences .= sprintf(
+                        "
 CREATE SEQUENCE %s;
 ",
                         $seqName
@@ -494,7 +501,8 @@ CREATE SEQUENCE %s;
 
                 //remove sequence
                 if ($fromEntity->getDatabase()->hasSequence($seqName)) {
-                    $this->createOrDropSequences .= sprintf("
+                    $this->createOrDropSequences .= sprintf(
+                        "
 DROP SEQUENCE %s CASCADE;
 ",
                         $seqName
@@ -505,7 +513,6 @@ DROP SEQUENCE %s CASCADE;
         }
 
         if (isset($changedProperties['size']) || isset($changedProperties['type']) || isset($changedProperties['scale'])) {
-
             $sqlType = $toField->getDomain()->getSqlType();
 
             if ($this->hasSize($sqlType) && $toField->isDefaultSqlType($this)) {
@@ -521,7 +528,8 @@ DROP SEQUENCE %s CASCADE;
             if ($using = $this->getUsingCast($fromField, $toField)) {
                 $sqlType .= $using;
             }
-            $ret .= sprintf($pattern,
+            $ret .= sprintf(
+                $pattern,
                 $this->quoteIdentifier($entity->getFQTableName()),
                 $colName . ' TYPE ' . $sqlType
             );
@@ -647,7 +655,8 @@ DROP SEQUENCE %s CASCADE;
     ALTER TABLE %s DROP CONSTRAINT %s;
     ";
 
-            return sprintf($pattern,
+            return sprintf(
+                $pattern,
                 $this->quoteIdentifier($index->getEntity()->getFQTableName()),
                 $this->quoteIdentifier($index->getName())
             );
@@ -669,7 +678,8 @@ DROP SEQUENCE %s CASCADE;
         $snippet = "
 \$dataFetcher = %s->query(\"SELECT nextval('%s')\");
 %s = \$dataFetcher->fetchField();";
-        $script = sprintf($snippet,
+        $script = sprintf(
+            $snippet,
             $connectionVariableName,
             $sequenceName,
             $fieldValueMutator
@@ -677,5 +687,4 @@ DROP SEQUENCE %s CASCADE;
 
         return preg_replace('/^/m', $tab, $script);
     }
-
 }

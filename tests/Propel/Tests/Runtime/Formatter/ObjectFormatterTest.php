@@ -49,7 +49,7 @@ class ObjectFormatterTest extends BookstoreEmptyTestBase
             $books = $formatter->format($stmt);
             $this->fail('ObjectFormatter::format() trows an exception when called with no valid criteria');
         } catch (PropelException $e) {
-            $this->assertTrue(true,'ObjectFormatter::format() trows an exception when called with no valid criteria');
+            $this->assertTrue(true, 'ObjectFormatter::format() trows an exception when called with no valid criteria');
         }
     }
 
@@ -127,7 +127,7 @@ class ObjectFormatterTest extends BookstoreEmptyTestBase
             $book = $formatter->formatOne($stmt);
             $this->fail('ObjectFormatter::formatOne() throws an exception when called with no valid criteria');
         } catch (PropelException $e) {
-            $this->assertTrue(true,'ObjectFormatter::formatOne() throws an exception when called with no valid criteria');
+            $this->assertTrue(true, 'ObjectFormatter::formatOne() throws an exception when called with no valid criteria');
         }
     }
 
@@ -154,5 +154,4 @@ class ObjectFormatterTest extends BookstoreEmptyTestBase
 
         $this->assertNull($book, 'ObjectFormatter::formatOne() returns null when no result');
     }
-
 }

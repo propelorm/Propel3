@@ -3,7 +3,6 @@
 
 namespace Propel\Generator\Builder\Om\Component\Query;
 
-
 use gossi\codegen\model\PhpConstant;
 use gossi\codegen\model\PhpParameter;
 use Propel\Generator\Builder\Om\Component\BuildComponent;

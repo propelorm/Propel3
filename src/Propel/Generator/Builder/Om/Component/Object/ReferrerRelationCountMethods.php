@@ -71,4 +71,4 @@ EOF;
             ->setTypeDescription("Count of related $className objects")
         ;
     }
-} 
+}

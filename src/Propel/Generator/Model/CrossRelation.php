@@ -300,5 +300,4 @@ class CrossRelation
     {
         return $this->entity;
     }
-
 }

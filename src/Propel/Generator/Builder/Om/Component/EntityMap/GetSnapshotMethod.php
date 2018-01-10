@@ -58,7 +58,7 @@ if (\$isset(\$entity, '$fieldName') && \$foreignEntity = \$reader(\$entity, '$fi
             foreach ($relation->getFieldObjectsMapArray() as $map) {
                 /** @var Field $localField */
                 /** @var Field $foreignField */
-                list ($localField, $foreignField) = $map;
+                list($localField, $foreignField) = $map;
                 $relationFieldName = $localField->getName();
                 $foreignFieldName = $foreignField->getName();
                 $foreignEntity = $relation->getForeignEntity();

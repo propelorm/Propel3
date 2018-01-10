@@ -44,8 +44,8 @@ class ModelJoinTest extends TestCaseFixtures
         $join = new ModelJoin();
         $join->setEntityMap($bookTable);
         $join->setRelationMap($bookTable->getRelation('author'));
-        $this->assertEquals(array(BookEntityMap::FIELD_AUTHOR_ID), $join->getLeftFields(), 'setRelationMap() automatically sets the left fields');
-        $this->assertEquals(array(AuthorEntityMap::FIELD_ID), $join->getRightFields(), 'setRelationMap() automatically sets the right fields');
+        $this->assertEquals([BookEntityMap::FIELD_AUTHOR_ID], $join->getLeftFields(), 'setRelationMap() automatically sets the left fields');
+        $this->assertEquals([AuthorEntityMap::FIELD_ID], $join->getRightFields(), 'setRelationMap() automatically sets the right fields');
     }
 
     public function testSetRelationMapLeftAlias()
@@ -54,8 +54,8 @@ class ModelJoinTest extends TestCaseFixtures
         $join = new ModelJoin();
         $join->setEntityMap($bookTable);
         $join->setRelationMap($bookTable->getRelation('author'), 'b');
-        $this->assertEquals(array('b.authorId'), $join->getLeftFields(), 'setRelationMap() automatically sets the left fields using the left table alias');
-        $this->assertEquals(array(AuthorEntityMap::FIELD_ID), $join->getRightFields(), 'setRelationMap() automatically sets the right fields');
+        $this->assertEquals(['b.authorId'], $join->getLeftFields(), 'setRelationMap() automatically sets the left fields using the left table alias');
+        $this->assertEquals([AuthorEntityMap::FIELD_ID], $join->getRightFields(), 'setRelationMap() automatically sets the right fields');
     }
 
     public function testSetRelationMapRightAlias()
@@ -64,8 +64,8 @@ class ModelJoinTest extends TestCaseFixtures
         $join = new ModelJoin();
         $join->setEntityMap($bookTable);
         $join->setRelationMap($bookTable->getRelation('author'), null, 'a');
-        $this->assertEquals(array(BookEntityMap::FIELD_AUTHOR_ID), $join->getLeftFields(), 'setRelationMap() automatically sets the left fields');
-        $this->assertEquals(array('a.id'), $join->getRightFields(), 'setRelationMap() automatically sets the right fields  using the right table alias');
+        $this->assertEquals([BookEntityMap::FIELD_AUTHOR_ID], $join->getLeftFields(), 'setRelationMap() automatically sets the left fields');
+        $this->assertEquals(['a.id'], $join->getRightFields(), 'setRelationMap() automatically sets the right fields  using the right table alias');
     }
 
     public function testSetRelationMapComposite()
@@ -74,8 +74,7 @@ class ModelJoinTest extends TestCaseFixtures
         $join = new ModelJoin();
         $join->setEntityMap($table);
         $join->setRelationMap($table->getRelation('bookOpinion'));
-        $this->assertEquals(array(ReaderFavoriteEntityMap::FIELD_BOOK_ID, ReaderFavoriteEntityMap::FIELD_READER_ID), $join->getLeftFields(), 'setRelationMap() automatically sets the left fields for composite relationships');
-        $this->assertEquals(array(BookOpinionEntityMap::FIELD_BOOK_ID, BookOpinionEntityMap::FIELD_READER_ID), $join->getRightFields(), 'setRelationMap() automatically sets the right fields for composite relationships');
+        $this->assertEquals([ReaderFavoriteEntityMap::FIELD_BOOK_ID, ReaderFavoriteEntityMap::FIELD_READER_ID], $join->getLeftFields(), 'setRelationMap() automatically sets the left fields for composite relationships');
+        $this->assertEquals([BookOpinionEntityMap::FIELD_BOOK_ID, BookOpinionEntityMap::FIELD_READER_ID], $join->getRightFields(), 'setRelationMap() automatically sets the right fields for composite relationships');
     }
-
 }

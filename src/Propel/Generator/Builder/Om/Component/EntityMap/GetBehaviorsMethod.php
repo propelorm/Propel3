@@ -21,22 +21,22 @@ class GetBehaviorsMethod extends BuildComponent
         $body = "
 return array(";
 
-            foreach ($this->getEntity()->getBehaviors() as $behavior) {
-                $body .= "
+        foreach ($this->getEntity()->getBehaviors() as $behavior) {
+            $body .= "
             '{$behavior->getId()}' => array(";
-                foreach ($behavior->getParameters() as $key => $value) {
-                    $body .= "'$key' => ";
-                    if (is_array($value)) {
-                        $string = var_export($value, true);
-                        $string = str_replace("\n", '', $string);
-                        $string = str_replace('  ', '', $string);
-                        $body .= $string . ", ";
-                    } else {
-                        $body .= "'$value', ";
-                    }
+            foreach ($behavior->getParameters() as $key => $value) {
+                $body .= "'$key' => ";
+                if (is_array($value)) {
+                    $string = var_export($value, true);
+                    $string = str_replace("\n", '', $string);
+                    $string = str_replace('  ', '', $string);
+                    $body .= $string . ", ";
+                } else {
+                    $body .= "'$value', ";
                 }
-                $body .= "),";
             }
+            $body .= "),";
+        }
         $body .= "
 );";
 

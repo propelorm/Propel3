@@ -7,7 +7,6 @@ namespace Propel\Tests\Generator\Migration;
  */
 class ForeignKeyTest extends MigrationTestCase
 {
-
     public function testAdd()
     {
         $originXml = '
@@ -148,5 +147,4 @@ class ForeignKeyTest extends MigrationTestCase
 ';
         $this->migrateAndTest($originXml, $targetXml);
     }
-
 }

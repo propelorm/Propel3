@@ -91,4 +91,4 @@ foreach (\$this->$varName as \$item) {
             ->setBody($body)
             ->setDescription("Sets a collection of $foreignClassName objects.$internal");
     }
-} 
+}

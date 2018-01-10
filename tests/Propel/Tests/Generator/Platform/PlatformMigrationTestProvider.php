@@ -21,7 +21,6 @@ use Propel\Generator\Model\Diff\EntityComparator;
  */
 abstract class PlatformMigrationTestProvider extends PlatformTestBase
 {
-
     public function providerForTestGetModifyDatabaseDDL()
     {
         $schema1 = <<<EOF
@@ -63,12 +62,12 @@ EOF;
         $d1 = $this->getDatabaseFromSchema($schema1);
         $d2 = $this->getDatabaseFromSchema($schema2);
 
-        return array(array(DatabaseComparator::computeDiff($d1, $d2, $caseInsensitive = false, $withRenaming = true)));
+        return [[DatabaseComparator::computeDiff($d1, $d2, $caseInsensitive = false, $withRenaming = true)]];
     }
 
     public function providerForTestGetRenameEntityDDL()
     {
-        return array(array('foo1', 'foo2'));
+        return [['foo1', 'foo2']];
     }
 
     public function providerForTestGetModifyEntityDDL()
@@ -127,7 +126,7 @@ EOF;
         $t1 = $this->getDatabaseFromSchema($schema1)->getEntity('foo');
         $t2 = $this->getDatabaseFromSchema($schema2)->getEntity('foo');
 
-        return array(array(EntityComparator::computeDiff($t1,$t2)));
+        return [[EntityComparator::computeDiff($t1, $t2)]];
     }
 
     public function providerForTestGetModifyEntityFieldsDDL()
@@ -158,7 +157,7 @@ EOF;
         $tc->setToEntity($t2);
         $tc->compareFields();
 
-        return array(array($tc->getEntityDiff()));
+        return [[$tc->getEntityDiff()]];
     }
 
     public function providerForTestGetModifyEntityPrimaryKeysDDL()
@@ -188,7 +187,7 @@ EOF;
         $tc->setToEntity($t2);
         $tc->comparePrimaryKeys();
 
-        return array(array($tc->getEntityDiff()));
+        return [[$tc->getEntityDiff()]];
     }
 
     public function providerForTestGetModifyEntityIndicesDDL()
@@ -233,7 +232,7 @@ EOF;
         $tc->setToEntity($t2);
         $tc->compareIndices();
 
-        return array(array($tc->getEntityDiff()));
+        return [[$tc->getEntityDiff()]];
     }
 
     public function providerForTestGetModifyEntityRelationsDDL()
@@ -287,7 +286,7 @@ EOF;
         $tc->setToEntity($t2);
         $tc->compareRelations();
 
-        return array(array($tc->getEntityDiff()));
+        return [[$tc->getEntityDiff()]];
     }
 
     public function providerForTestGetModifyEntityRelationsSkipSqlDDL()
@@ -329,7 +328,7 @@ EOF;
         $tc->setToEntity($t2);
         $tc->compareRelations();
 
-        return array(array($tc->getEntityDiff()));
+        return [[$tc->getEntityDiff()]];
     }
 
     public function providerForTestGetModifyEntityRelationsSkipSql2DDL()
@@ -368,7 +367,7 @@ EOF;
         $tc->setToEntity($t2);
         $tc->compareRelations();
 
-        return array(array($tc->getEntityDiff()));
+        return [[$tc->getEntityDiff()]];
     }
 
     public function providerForTestGetRemoveFieldDDL()
@@ -378,7 +377,7 @@ EOF;
         $column = new Field('bar');
         $table->addField($column);
 
-        return array(array($column));
+        return [[$column]];
     }
 
     public function providerForTestGetRenameFieldDDL()
@@ -399,7 +398,7 @@ EOF;
         $c2->getDomain()->replaceSize(2);
         $t2->addField($c2);
 
-        return array(array($c1, $c2));
+        return [[$c1, $c2]];
     }
 
     public function providerForTestGetModifyFieldDDL()
@@ -417,7 +416,7 @@ EOF;
         $c2->getDomain()->replaceSize(3);
         $t2->addField($c2);
 
-        return array(array(FieldComparator::computeDiff($c1, $c2)));
+        return [[FieldComparator::computeDiff($c1, $c2)]];
     }
 
     public function providerForTestGetModifyFieldsDDL()
@@ -446,10 +445,10 @@ EOF;
         $c4->setNotNull(true);
         $t2->addField($c4);
 
-        return array(array(array(
+        return [[[
             FieldComparator::computeDiff($c1, $c3),
             FieldComparator::computeDiff($c2, $c4)
-        )));
+        ]]];
     }
 
     public function providerForTestGetAddFieldDDL()
@@ -464,7 +463,7 @@ EOF;
 EOF;
         $column = $this->getDatabaseFromSchema($schema)->getEntity('foo')->getField('bar');
 
-        return array(array($column));
+        return [[$column]];
     }
 
     public function providerForTestGetAddFieldsDDL()
@@ -480,7 +479,7 @@ EOF;
 EOF;
         $table = $this->getDatabaseFromSchema($schema)->getEntity('foo');
 
-        return array(array(array($table->getField('bar1'), $table->getField('bar2'))));
+        return [[[$table->getField('bar1'), $table->getField('bar2')]]];
     }
 
     public function providerForTestGetModifyFieldRemoveDefaultValueDDL()
@@ -499,7 +498,7 @@ EOF;
         $c2->getDomain()->setType('INTEGER');
         $t2->addField($c2);
 
-        return array(array(FieldComparator::computeDiff($c1, $c2)));
+        return [[FieldComparator::computeDiff($c1, $c2)]];
     }
 
     public function providerForTestGetModifyEntityRelationsSkipSql3DDL()
@@ -533,7 +532,7 @@ EOF;
         $d2 = $this->getDatabaseFromSchema($schema2);
         $diff = DatabaseComparator::computeDiff($d1, $d2);
 
-        return array(array($diff));
+        return [[$diff]];
     }
 
     public function providerForTestGetModifyEntityRelationsSkipSql4DDL()
@@ -567,7 +566,6 @@ EOF;
         $d2 = $this->getDatabaseFromSchema($schema2);
         $diff = DatabaseComparator::computeDiff($d2, $d1);
 
-        return array(array($diff));
+        return [[$diff]];
     }
-
 }

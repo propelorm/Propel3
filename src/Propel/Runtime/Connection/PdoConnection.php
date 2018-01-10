@@ -140,7 +140,7 @@ class PdoConnection extends \PDO implements ConnectionInterface
      */
     public function prepare($statement, $driver_options = null)
     {
-        return parent::prepare($statement, $driver_options ?: array());
+        return parent::prepare($statement, $driver_options ?: []);
     }
 
     /**

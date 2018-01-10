@@ -27,7 +27,7 @@ class RelatedMapSymmetricalWithSchemasTest extends TestCaseFixturesDatabase
     /**
      * @var DatabaseMap
      */
-  protected $databaseMap;
+    protected $databaseMap;
 
     protected function setUp()
     {

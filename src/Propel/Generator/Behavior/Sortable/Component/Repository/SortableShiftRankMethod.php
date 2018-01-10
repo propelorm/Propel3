@@ -34,10 +34,10 @@ if (null !== \$last) {
     \$criterion->addAnd(\$whereCriteria->getNewCriterion({$this->getEntityMapClassName()}::RANK_COL, \$last, Criteria::LESS_EQUAL));
 }
 \$whereCriteria->add(\$criterion);";
-    if ($useScope) {
-        $body .= "
+        if ($useScope) {
+            $body .= "
 \$whereCriteria->filterByNormalizedListScope(\$scope);";
-    }
+        }
 
         $body .= "
 \$valuesCriteria = \$this->createQuery();

@@ -3,7 +3,6 @@
 
 namespace Propel\Generator\Behavior\ConcreteInheritance\Component;
 
-
 use Propel\Generator\Behavior\ConcreteInheritance\ConcreteInheritanceBehavior;
 use Propel\Generator\Builder\Om\Component\BuildComponent;
 

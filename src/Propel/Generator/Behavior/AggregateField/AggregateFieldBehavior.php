@@ -25,13 +25,13 @@ class AggregateFieldBehavior extends Behavior
     use ComponentTrait;
 
     // default parameters value
-    protected $parameters = array(
+    protected $parameters = [
         'name' => null,
         'expression' => null,
         'condition' => null,
         'foreign_entity' => null,
         'foreign_schema' => null,
-    );
+    ];
 
     /**
      * Multiple aggregates on the same entity is OK.
@@ -61,10 +61,10 @@ class AggregateFieldBehavior extends Behavior
         // add the aggregate field if not present
         if (!$entity->hasField($fieldName)) {
             $entity->addField(
-                array(
+                [
                     'name' => $fieldName,
                     'type' => 'INTEGER',
-                )
+                ]
             );
         }
 
@@ -74,10 +74,10 @@ class AggregateFieldBehavior extends Behavior
             $relationBehavior = new AggregateFieldRelationBehavior();
             $relationBehavior->setName('aggregate_field_relation');
             $relationBehavior->setId('aggregate_field_relation_' . $this->getId());
-            $relationBehavior->addParameter(array('name' => 'foreign_entity', 'value' => $entity->getName()));
-            $relationBehavior->addParameter(array('name' => 'aggregate_name', 'value' => $this->getField()->getName()));
+            $relationBehavior->addParameter(['name' => 'foreign_entity', 'value' => $entity->getName()]);
+            $relationBehavior->addParameter(['name' => 'aggregate_name', 'value' => $this->getField()->getName()]);
             $relationBehavior->addParameter(
-                array('name' => 'update_method', 'value' => 'update' . $this->getField()->getName())
+                ['name' => 'update_method', 'value' => 'update' . $this->getField()->getName()]
             );
             $foreignEntity->addBehavior($relationBehavior);
         }

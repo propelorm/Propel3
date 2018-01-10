@@ -21,7 +21,6 @@ use Propel\Runtime\Persister\SQL\SQLitePersister;
  */
 class SqliteAdapter extends PdoAdapter implements SqlAdapterInterface
 {
-
     public function getPersister($session)
     {
         return new SQLitePersister($session);
@@ -46,7 +45,7 @@ class SqliteAdapter extends PdoAdapter implements SqlAdapterInterface
         parent::initConnection($con, $settings);
 
         //add regex support
-        $con->sqliteCreateFunction('regexp', function($pattern, $value) {
+        $con->sqliteCreateFunction('regexp', function ($pattern, $value) {
             mb_regex_encoding('UTF-8');
             return (false !== mb_ereg($pattern, $value)) ? 1 : 0;
         });

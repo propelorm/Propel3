@@ -10,7 +10,6 @@
 
 namespace Propel\Runtime\Collection;
 
-
 /**
  * Class for iterating over a list of Propel objects
  *
@@ -27,7 +26,7 @@ class ObjectCombinationCollection extends ObjectCollection
      */
     public function getPrimaryKeys($usePrefix = true)
     {
-        $ret = array();
+        $ret = [];
 
         foreach ($this as $combination) {
             $pkCombo = [];
@@ -117,5 +116,4 @@ class ObjectCombinationCollection extends ObjectCollection
     {
         return false !== call_user_func_array([$this, 'search'], func_get_args());
     }
-
 }

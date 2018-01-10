@@ -36,7 +36,6 @@ class ReferrerRelationProperties extends BuildComponent
         $className = $this->useClass($refRelation->getEntity()->getFullClassName());
 
         if ($refRelation->isLocalPrimaryKey()) {
-
             $varName = $this->getPKRefRelationVarName($refRelation);
             $this->addProperty($varName)
                 ->setType($className)

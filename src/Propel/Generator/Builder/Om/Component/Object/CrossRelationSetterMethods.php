@@ -61,17 +61,7 @@ class CrossRelationSetterMethods extends BuildComponent
         $remover = 'remove' . $this->getRelationPhpName($relation);
         $post = $this->getRelationPhpName($crossRelation->getOutgoingRelation(), false);
 
-    $body = "
-if (\$this->$collName === $$collName) {
-    //If `$$collName` passed by reference, and it refers to `\$this->$collName`, update relations only
-    foreach ($$collName as \$obj) {
-        \$this->postRemove$post(\$obj);
-        \$this->postAdd$post(\$obj);
-    }
-    
-    return \$this;
-}
-
+        $body = "
 //break relationship with old objects
 foreach (\$this->$collName as \$item) {
     \$this->{$remover}(\$item);

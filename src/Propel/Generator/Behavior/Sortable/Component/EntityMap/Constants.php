@@ -32,7 +32,6 @@ class Constants extends BuildComponent
         $col = [];
 
         if ($behavior->useScope()) {
-
             if ($behavior->hasMultipleScopes()) {
                 foreach ($behavior->getScopes() as $scope) {
                     $col[] = "$entityName.".strtoupper($scope);
@@ -47,13 +46,17 @@ class Constants extends BuildComponent
 
         $definition = $this->getDefinition();
         $definition->setConstant(PhpConstant::create(
-                'RANK_COL', $entityName . '.' . $behavior->getFieldForParameter('rank_field')->getName())
+                'RANK_COL',
+            $entityName . '.' . $behavior->getFieldForParameter('rank_field')->getName()
+        )
                 ->setDescription('Rank field'));
 
         if ($behavior->useScope()) {
             if ($behavior->hasMultipleScopes()) {
                 $definition->setConstant(PhpConstant::create(
-                    'MULTI_SCOPE_COL', true)
+                    'MULTI_SCOPE_COL',
+                    true
+                )
                     ->setType('bool')
                     ->setDescription('If defined, the `SCOPE_COL` contains a json_encoded array with all fields'));
             }

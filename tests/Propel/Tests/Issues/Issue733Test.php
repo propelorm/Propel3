@@ -5,15 +5,13 @@ namespace Propel\Tests\Issues;
 use Propel\Generator\Util\QuickBuilder;
 use Propel\Tests\TestCase;
 
-
 /**
  * This test proves the bug described in https://github.com/propelorm/Propel2/issues/733.
  *
  * @group database
- */ 
+ */
 class Issue733Test extends TestCase
 {
-
     public function setUp()
     {
         if (!class_exists('\Issue733Test1')) {
@@ -71,7 +69,5 @@ EOF;
 
         // before the fix, this would throw an exception
         $this->assertEquals($o->getCulture(), $o->getLanguage());
-
     }
-
 }

@@ -20,7 +20,6 @@ use Propel\Tests\TestCaseFixtures;
  */
 class Issue646Test extends TestCaseFixtures
 {
-
     protected function setUp()
     {
         parent::setUp();
@@ -42,7 +41,6 @@ class Issue646Test extends TestCaseFixtures
             </table>';
             QuickBuilder::buildSchema($schema);
         }
-
     }
 
     protected function tearDown()
@@ -90,6 +88,5 @@ class Issue646Test extends TestCaseFixtures
         $dates = \PkDateQuery::create()->find();
 
         $this->assertInternalType('array', $dates->toArray());
-
     }
 }

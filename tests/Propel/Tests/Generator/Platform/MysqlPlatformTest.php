@@ -802,7 +802,6 @@ CREATE TABLE `foo`
 
     public function testVendorOptionsQuoting()
     {
-
         $schema   = <<<EOF
 <database name="test" identifierQuoting="true">
     <entity name="foo">
@@ -839,5 +838,4 @@ CREATE TABLE `foo`
 ";
         $this->assertEquals($expected, $this->getPlatform()->getAddEntityDDL($entity));
     }
-
 }

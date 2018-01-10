@@ -75,14 +75,14 @@ class PgsqlSchemaParser extends AbstractSchemaParser
         'double precision'              => PropelTypes::DOUBLE
     ];
 
-    protected static $defaultTypeSizes = array(
+    protected static $defaultTypeSizes = [
         'char'      => 1,
         'character' => 1,
         'integer'   => 32,
         'bigint'    => 64,
         'smallint'  => 16,
         'double precision' => 54
-    );
+    ];
 
     /**
      * Gets a type mapping from native types to Propel types
@@ -101,9 +101,9 @@ class PgsqlSchemaParser extends AbstractSchemaParser
      * @param  Table[]  $additionalTables
      * @return integer
      */
-    public function parse(Database $database, array $additionalTables = array())
+    public function parse(Database $database, array $additionalTables = [])
     {
-        $tableWraps = array();
+        $tableWraps = [];
 
         $this->parseTables($tableWraps, $database);
         foreach ($additionalTables as $table) {
@@ -352,7 +352,7 @@ class PgsqlSchemaParser extends AbstractSchemaParser
         $stmt->bindValue(1, $oid);
         $stmt->execute();
 
-        $foreignKeys = array();
+        $foreignKeys = [];
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             $name = $row['conname'];
             $localTable = $row['fktab'];
@@ -453,7 +453,7 @@ class PgsqlSchemaParser extends AbstractSchemaParser
             WHERE c.oid = ? AND a.attnum = ? AND NOT a.attisdropped
             ORDER BY a.attnum");
 
-        $indexes = array();
+        $indexes = [];
 
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             $name = $row['idxname'];
@@ -493,7 +493,6 @@ class PgsqlSchemaParser extends AbstractSchemaParser
      */
     protected function addPrimaryKey(Table $table, $oid)
     {
-
         $stmt = $this->dbh->prepare("SELECT
             DISTINCT ON(cls.relname)
             cls.relname as idxname,

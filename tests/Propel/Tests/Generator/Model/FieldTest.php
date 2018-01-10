@@ -50,11 +50,11 @@ class FieldTest extends ModelTestCase
     {
         $database = $this->getDatabaseMock('bookstore');
 
-        $entity = $this->getEntityMock('books', array('database' => $database));
+        $entity = $this->getEntityMock('books', ['database' => $database]);
 
         $field = new Field();
         $field->setEntity($entity);
-        $field->loadMapping(array('name' => 'title'));
+        $field->loadMapping(['name' => 'title']);
 
         $this->assertSame('title', $field->getName());
         $this->assertSame('VARCHAR', $field->getDomain()->getType());
@@ -76,10 +76,10 @@ class FieldTest extends ModelTestCase
             ->will($this->returnValue(false))
         ;
 
-        $entity = $this->getEntityMock('books', array(
+        $entity = $this->getEntityMock('books', [
             'database' => $database,
             'platform' => $platform,
-        ));
+        ]);
 
         $domain = $this->getDomainMock('VARCHAR');
         $domain
@@ -91,7 +91,7 @@ class FieldTest extends ModelTestCase
         $field = new Field();
         $field->setEntity($entity);
         $field->setDomain($domain);
-        $field->loadMapping(array('name' => 'title'));
+        $field->loadMapping(['name' => 'title']);
 
         $this->assertSame('title', $field->getName());
     }
@@ -107,19 +107,19 @@ class FieldTest extends ModelTestCase
             ->will($this->returnValue($this->getDomainMock('DATE')))
         ;
 
-        $entity = $this->getEntityMock('books', array(
+        $entity = $this->getEntityMock('books', [
             'database' => $database,
             'platform' => $platform,
-        ));
+        ]);
 
         $field = new Field();
         $field->setEntity($entity);
         $field->setDomain($this->getDomainMock('VARCHAR'));
-        $field->loadMapping(array(
+        $field->loadMapping([
             'type'        => 'date',
             'name'        => 'created_at',
             'defaultExpr' => 'NOW()',
-        ));
+        ]);
 
         $this->assertSame('created_at', $field->getName());
     }
@@ -134,12 +134,12 @@ class FieldTest extends ModelTestCase
             ->will($this->returnValue($this->getDomainMock('INTEGER')))
         ;
 
-        $entity = $this->getEntityMock('books', array('database' => $database));
+        $entity = $this->getEntityMock('books', ['database' => $database]);
 
         $field = new Field();
         $field->setEntity($entity);
         $field->setDomain($this->getDomainMock('BOOLEAN'));
-        $field->loadMapping(array(
+        $field->loadMapping([
             'domain'             => 'BOOLEAN',
             'name'               => 'isPublished',
             'columnName'         => 'is_published',
@@ -161,7 +161,7 @@ class FieldTest extends ModelTestCase
             'size'               => 1,
             'defaultValue'       => 'true',
             'valueSet'           => 'FOO, BAR, BAZ',
-        ));
+        ]);
 
         $this->assertSame('is_published', $field->getColumnName());
         $this->assertSame('isPublished', $field->getName());
@@ -245,14 +245,14 @@ class FieldTest extends ModelTestCase
 
     public function provideDefaultValues()
     {
-        return array(
-            array('DOUBLE', 3.14, 3.14),
-            array('VARCHAR', 'hello', "'hello'"),
-            array('VARCHAR', "john's bike", "'john\\'s bike'"),
-            array('BOOLEAN', 1, 'true'),
-            array('BOOLEAN', 0, 'false'),
-            array('ENUM', 'foo,bar', "'foo,bar'"),
-        );
+        return [
+            ['DOUBLE', 3.14, 3.14],
+            ['VARCHAR', 'hello', "'hello'"],
+            ['VARCHAR', "john's bike", "'john\\'s bike'"],
+            ['BOOLEAN', 1, 'true'],
+            ['BOOLEAN', 0, 'false'],
+            ['ENUM', 'foo,bar', "'foo,bar'"],
+        ];
     }
 
     public function testAddInheritance()
@@ -283,29 +283,29 @@ class FieldTest extends ModelTestCase
     {
         $field = new Field();
 
-        $field->addInheritance(array(
+        $field->addInheritance([
             'key' => 'baz',
             'extends' => 'BaseObject',
             'class' => 'Foo\Bar',
             'package' => 'Foo',
-        ));
+        ]);
 
-        $field->addInheritance(array(
+        $field->addInheritance([
             'key' => 'foo',
             'extends' => 'BaseObject',
             'class' => 'Acme\Foo',
             'package' => 'Acme',
-        ));
+        ]);
 
         $this->assertCount(2, $field->getChildren());
     }
 
     public function testClearRelations()
     {
-        $fks = array(
+        $fks = [
             $this->createMock('Propel\Generator\Model\Relation'),
             $this->createMock('Propel\Generator\Model\Relation'),
-        );
+        ];
 
         $entity = $this->getEntityMock('books');
         $entity
@@ -369,9 +369,9 @@ class FieldTest extends ModelTestCase
         ;
 
         $field = new Field();
-        $field->setEntity($this->getEntityMock('books', array(
+        $field->setEntity($this->getEntityMock('books', [
             'platform' => $platform
-        )));
+        ]));
         $field->setDomain($domain);
         $field->setDomainForType('BOOLEAN');
 
@@ -394,7 +394,7 @@ class FieldTest extends ModelTestCase
             ->will($this->returnValue('NOT NULL'))
         ;
 
-        $entity = $this->getEntityMock('books', array('platform' => $platform));
+        $entity = $this->getEntityMock('books', ['platform' => $platform]);
 
         $field = new Field();
         $field->setEntity($entity);
@@ -425,36 +425,36 @@ class FieldTest extends ModelTestCase
 
     public function providePdoTypes()
     {
-        return array(
-            array('CHAR', \PDO::PARAM_STR),
-            array('VARCHAR', \PDO::PARAM_STR),
-            array('LONGVARCHAR', \PDO::PARAM_STR),
-            array('CLOB', \PDO::PARAM_STR),
-            array('CLOB_EMU', \PDO::PARAM_STR),
-            array('NUMERIC', \PDO::PARAM_INT),
-            array('DECIMAL', \PDO::PARAM_STR),
-            array('TINYINT', \PDO::PARAM_INT),
-            array('SMALLINT', \PDO::PARAM_INT),
-            array('INTEGER', \PDO::PARAM_INT),
-            array('BIGINT', \PDO::PARAM_INT),
-            array('REAL', \PDO::PARAM_STR),
-            array('FLOAT', \PDO::PARAM_STR),
-            array('DOUBLE', \PDO::PARAM_STR),
-            array('BINARY', \PDO::PARAM_STR),
-            array('VARBINARY', \PDO::PARAM_LOB),
-            array('LONGVARBINARY', \PDO::PARAM_LOB),
-            array('BLOB', \PDO::PARAM_LOB),
-            array('DATE', \PDO::PARAM_STR),
-            array('TIME', \PDO::PARAM_STR),
-            array('TIMESTAMP', \PDO::PARAM_STR),
-            array('BOOLEAN', \PDO::PARAM_BOOL),
-            array('BOOLEAN_EMU', \PDO::PARAM_INT),
-            array('OBJECT', \PDO::PARAM_STR),
-            array('ARRAY', \PDO::PARAM_STR),
-            array('ENUM', \PDO::PARAM_STR),
-            array('BU_DATE', \PDO::PARAM_STR),
-            array('BU_TIMESTAMP', \PDO::PARAM_STR),
-        );
+        return [
+            ['CHAR', \PDO::PARAM_STR],
+            ['VARCHAR', \PDO::PARAM_STR],
+            ['LONGVARCHAR', \PDO::PARAM_STR],
+            ['CLOB', \PDO::PARAM_STR],
+            ['CLOB_EMU', \PDO::PARAM_STR],
+            ['NUMERIC', \PDO::PARAM_INT],
+            ['DECIMAL', \PDO::PARAM_STR],
+            ['TINYINT', \PDO::PARAM_INT],
+            ['SMALLINT', \PDO::PARAM_INT],
+            ['INTEGER', \PDO::PARAM_INT],
+            ['BIGINT', \PDO::PARAM_INT],
+            ['REAL', \PDO::PARAM_STR],
+            ['FLOAT', \PDO::PARAM_STR],
+            ['DOUBLE', \PDO::PARAM_STR],
+            ['BINARY', \PDO::PARAM_STR],
+            ['VARBINARY', \PDO::PARAM_LOB],
+            ['LONGVARBINARY', \PDO::PARAM_LOB],
+            ['BLOB', \PDO::PARAM_LOB],
+            ['DATE', \PDO::PARAM_STR],
+            ['TIME', \PDO::PARAM_STR],
+            ['TIMESTAMP', \PDO::PARAM_STR],
+            ['BOOLEAN', \PDO::PARAM_BOOL],
+            ['BOOLEAN_EMU', \PDO::PARAM_INT],
+            ['OBJECT', \PDO::PARAM_STR],
+            ['ARRAY', \PDO::PARAM_STR],
+            ['ENUM', \PDO::PARAM_STR],
+            ['BU_DATE', \PDO::PARAM_STR],
+            ['BU_TIMESTAMP', \PDO::PARAM_STR],
+        ];
     }
 
     public function testEnumType()
@@ -469,7 +469,7 @@ class FieldTest extends ModelTestCase
         $field = new Field();
         $field->setDomain($domain);
         $field->setType('ENUM');
-        $field->setValueSet(array('FOO', 'BAR'));
+        $field->setValueSet(['FOO', 'BAR']);
 
         $this->assertSame('string', $field->getPhpType());
         $this->assertTrue($field->isPhpPrimitiveType());
@@ -534,13 +534,13 @@ class FieldTest extends ModelTestCase
 
     public function provideMappingTemporalTypes()
     {
-        return array(
-            array('DATE'),
-            array('TIME'),
-            array('TIMESTAMP'),
-            array('BU_DATE'),
-            array('BU_TIMESTAMP'),
-        );
+        return [
+            ['DATE'],
+            ['TIME'],
+            ['TIMESTAMP'],
+            ['BU_DATE'],
+            ['BU_TIMESTAMP'],
+        ];
     }
 
     /**
@@ -572,11 +572,11 @@ class FieldTest extends ModelTestCase
 
     public function provideMappingLobTypes()
     {
-        return array(
-            array('VARBINARY', 'string', true),
-            array('LONGVARBINARY', 'string', true),
-            array('BLOB', 'resource', false),
-        );
+        return [
+            ['VARBINARY', 'string', true],
+            ['LONGVARBINARY', 'string', true],
+            ['BLOB', 'resource', false],
+        ];
     }
 
     /**
@@ -608,10 +608,10 @@ class FieldTest extends ModelTestCase
 
     public function provideMappingBooleanTypes()
     {
-        return array(
-            array('BOOLEAN'),
-            array('BOOLEAN_EMU'),
-        );
+        return [
+            ['BOOLEAN'],
+            ['BOOLEAN_EMU'],
+        ];
     }
 
     /**
@@ -644,17 +644,17 @@ class FieldTest extends ModelTestCase
 
     public function provideMappingNumericTypes()
     {
-        return array(
-            array('SMALLINT', 'int', true),
-            array('TINYINT', 'int', true),
-            array('INTEGER', 'int', true),
-            array('BIGINT', 'string', false),
-            array('FLOAT', 'double', true),
-            array('DOUBLE', 'double', true),
-            array('NUMERIC', 'string', false),
-            array('DECIMAL', 'string', false),
-            array('REAL', 'double', true),
-        );
+        return [
+            ['SMALLINT', 'int', true],
+            ['TINYINT', 'int', true],
+            ['INTEGER', 'int', true],
+            ['BIGINT', 'string', false],
+            ['FLOAT', 'double', true],
+            ['DOUBLE', 'double', true],
+            ['NUMERIC', 'string', false],
+            ['DECIMAL', 'string', false],
+            ['REAL', 'double', true],
+        ];
     }
 
     /**
@@ -686,17 +686,17 @@ class FieldTest extends ModelTestCase
 
     public function provideMappingTextTypes()
     {
-        return array(
-            array('CHAR'),
-            array('VARCHAR'),
-            array('LONGVARCHAR'),
-            array('CLOB'),
-            array('DATE'),
-            array('TIME'),
-            array('TIMESTAMP'),
-            array('BU_DATE'),
-            array('BU_TIMESTAMP'),
-        );
+        return [
+            ['CHAR'],
+            ['VARCHAR'],
+            ['LONGVARCHAR'],
+            ['CLOB'],
+            ['DATE'],
+            ['TIME'],
+            ['TIMESTAMP'],
+            ['BU_DATE'],
+            ['BU_TIMESTAMP'],
+        ];
     }
 
     public function testGetSizeDefinition()
@@ -805,7 +805,7 @@ class FieldTest extends ModelTestCase
             ->will($this->returnValue('AUTO_INCREMENT'))
         ;
 
-        $entity = $this->getEntityMock('books', array('platform' => $platform));
+        $entity = $this->getEntityMock('books', ['platform' => $platform]);
         $entity
             ->expects($this->once())
             ->method('getIdMethod')
@@ -829,9 +829,9 @@ class FieldTest extends ModelTestCase
 
     public function testHasPlatform()
     {
-        $entity = $this->getEntityMock('books', array(
+        $entity = $this->getEntityMock('books', [
             'platform' => $this->getPlatformMock(),
-        ));
+        ]);
 
         $field = new Field();
         $field->setEntity($entity);

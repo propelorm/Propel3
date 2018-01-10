@@ -87,12 +87,12 @@ class OnDemandFormatter extends ObjectFormatter
         $col = 0;
 
         // main object
-        $class = $this->isSingleEntityInheritance ? call_user_func(array($this->entityMap, 'getOMClass'), $row, $col, false) : $this->getEntityName();
+        $class = $this->isSingleEntityInheritance ? call_user_func([$this->entityMap, 'getOMClass'], $row, $col, false) : $this->getEntityName();
         $obj = $this->getSingleObjectFromRow($row, $class, $col);
         // related objects using 'with'
         foreach ($this->getWith() as $modelWith) {
             if ($modelWith->isSingleEntityInheritance()) {
-                $class = call_user_func(array($modelWith->getEntityMap(), 'getOMClass'), $row, $col, false);
+                $class = call_user_func([$modelWith->getEntityMap(), 'getOMClass'], $row, $col, false);
                 $refl = new \ReflectionClass($class);
                 if ($refl->isAbstract()) {
                     $col += constant('Map\\' . $class . 'EntityMap::NUM_COLUMNS');
@@ -113,16 +113,16 @@ class OnDemandFormatter extends ObjectFormatter
             // in which case it should not be related to the previous object
             if (null === $endObject || $endObject->isPrimaryKeyNull()) {
                 if ($modelWith->isAdd()) {
-                    call_user_func(array($startObject, $modelWith->getInitMethod()), false);
+                    call_user_func([$startObject, $modelWith->getInitMethod()], false);
                 }
                 continue;
             }
             if (isset($hydrationChain)) {
                 $hydrationChain[$modelWith->getRightName()] = $endObject;
             } else {
-                $hydrationChain = array($modelWith->getRightName() => $endObject);
+                $hydrationChain = [$modelWith->getRightName() => $endObject];
             }
-            call_user_func(array($startObject, $modelWith->getRelationMethod()), $endObject);
+            call_user_func([$startObject, $modelWith->getRelationMethod()], $endObject);
         }
         foreach ($this->getAsFields() as $alias => $clause) {
             $obj->setVirtualField($alias, $row[$col]);

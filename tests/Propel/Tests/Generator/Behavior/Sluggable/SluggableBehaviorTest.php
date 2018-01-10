@@ -105,8 +105,10 @@ XML;
         $t = new \SluggableBehaviorTest\Entity13();
         $t->setSlug('foo');
         $this->assertEquals('foo', $t->getSlug(), 'getSlug() returns the object slug');
-        $this->assertTrue(method_exists('\SluggableBehaviorTest\Entity14', 'getSlug'),
-            'Sluggable adds a getter for the slug field, even if the field does not have the default name');
+        $this->assertTrue(
+            method_exists('\SluggableBehaviorTest\Entity14', 'getSlug'),
+            'Sluggable adds a getter for the slug field, even if the field does not have the default name'
+        );
         $t = new \SluggableBehaviorTest\Entity14();
         $t->setUrl('foo');
         $this->assertEquals('foo', $t->getSlug(), 'getSlug() returns the object slug');
@@ -118,8 +120,10 @@ XML;
         $t = new \SluggableBehaviorTest\Entity13();
         $t->setSlug('foo');
         $this->assertEquals('foo', $t->getSlug(), 'setSlug() sets the object slug');
-        $this->assertTrue(method_exists('\SluggableBehaviorTest\Entity14', 'setSlug'),
-            'Sluggable adds a setter for the slug field, even if the field does not have the default name');
+        $this->assertTrue(
+            method_exists('\SluggableBehaviorTest\Entity14', 'setSlug'),
+            'Sluggable adds a setter for the slug field, even if the field does not have the default name'
+        );
         $t = new \SluggableBehaviorTest\Entity14();
         $t->setSlug('foo');
         $this->assertEquals('foo', $t->getUrl(), 'setSlug() sets the object slug');
@@ -127,17 +131,17 @@ XML;
 
     public function cleanupSlugProvider()
     {
-        return array(
-            array('', 'n-a'),
-            array('foo', 'foo'),
-            array('foo bar', 'foo-bar'),
-            array('foo  bar', 'foo-bar-1'),
-            array('FoO', 'foo-1'),
-            array('fôo', 'foo-2'),
-            array(' foo ', 'foo-3'),
-            array('f/o:o', 'f-o-o'),
-            array('foo1', 'foo1'),
-        );
+        return [
+            ['', 'n-a'],
+            ['foo', 'foo'],
+            ['foo bar', 'foo-bar'],
+            ['foo  bar', 'foo-bar-1'],
+            ['FoO', 'foo-1'],
+            ['fôo', 'foo-2'],
+            [' foo ', 'foo-3'],
+            ['f/o:o', 'f-o-o'],
+            ['foo1', 'foo1'],
+        ];
     }
 
     /**
@@ -155,15 +159,15 @@ XML;
 
     public function limitSlugSizeProvider()
     {
-        return array(
-            array('123', '123'),
-            array(str_repeat('A', 80), str_repeat('a', 80)),
-            array(str_repeat('B', 97), str_repeat('b', 97)),
-            array(str_repeat('C', 98), str_repeat('c', 97)),
-            array(str_repeat('D', 99), str_repeat('d', 97)),
-            array(str_repeat('E', 100), str_repeat('e', 97)),
-            array(str_repeat('F', 150), str_repeat('f', 97)),
-        );
+        return [
+            ['123', '123'],
+            [str_repeat('A', 80), str_repeat('a', 80)],
+            [str_repeat('B', 97), str_repeat('b', 97)],
+            [str_repeat('C', 98), str_repeat('c', 97)],
+            [str_repeat('D', 99), str_repeat('d', 97)],
+            [str_repeat('E', 100), str_repeat('e', 97)],
+            [str_repeat('F', 150), str_repeat('f', 97)],
+        ];
     }
 
     /**
@@ -200,8 +204,11 @@ XML;
 
         $t1->setTitle('Hello My Awesome World');
         $repository->save($t1);
-        $this->assertEquals('hello-my-awesome-world', $t1->getSlug(),
-            'Changing the primary string will change the slug, too');
+        $this->assertEquals(
+            'hello-my-awesome-world',
+            $t1->getSlug(),
+            'Changing the primary string will change the slug, too'
+        );
 
         $repository1 = $this->configuration->getRepository('\SluggableBehaviorTest\Entity14');
         $repository1->deleteAll();
@@ -254,8 +261,11 @@ XML;
         $t->setTitle('Hello, World');
         $t->setSlug('/foo/custom/bar');
         $repository->save($t);
-        $this->assertEquals('/foo/custom/bar/1', $t->getSlug(),
-            'preSave() uses the given slug if it exists and makes it unique');
+        $this->assertEquals(
+            '/foo/custom/bar/1',
+            $t->getSlug(),
+            'preSave() uses the given slug if it exists and makes it unique'
+        );
     }
 
     public function testObjectSlugLifecycle()
@@ -302,8 +312,11 @@ XML;
         $t->setTitle('Hello, My Whole New World');
         $t->setSlug('hello-bar');
         $repository->save($t);
-        $this->assertEquals('hello-bar', $t->getSlug(),
-            'preSave() does not autoupdate slug when it was set by the user');
+        $this->assertEquals(
+            'hello-bar',
+            $t->getSlug(),
+            'preSave() does not autoupdate slug when it was set by the user'
+        );
     }
 
     public function testObjectSlugAutoUpdatePermanent()
@@ -317,8 +330,11 @@ XML;
         $this->assertEquals('/foo/hello-world/bar', $t->getSlug(), 'preSave() creates a slug for new objects');
         $t->setTitle('Hello, My World');
         $repository->save($t);
-        $this->assertEquals('/foo/hello-world/bar', $t->getSlug(),
-            'preSave() does not autoupdate slug on object change for permanent slugs');
+        $this->assertEquals(
+            '/foo/hello-world/bar',
+            $t->getSlug(),
+            'preSave() does not autoupdate slug on object change for permanent slugs'
+        );
         $t->setSlug('hello-bar');
         $repository->save($t);
         $this->assertEquals('hello-bar', $t->getSlug(), 'setSlug() still works for permanent slugs');
@@ -356,10 +372,14 @@ XML;
 
     public function testQueryFindOneBySlug()
     {
-        $this->assertFalse(method_exists('\SluggableBehaviorTest\Entity13Query', 'findOneBySlug'),
-            'The generated query does not provide a findOneBySlug() method if the slug field is "slug".');
-        $this->assertTrue(method_exists('\SluggableBehaviorTest\Entity14Query', 'findOneBySlug'),
-            'The generated query provides a findOneBySlug() method even if the slug field doesn\'t have the default name');
+        $this->assertFalse(
+            method_exists('\SluggableBehaviorTest\Entity13Query', 'findOneBySlug'),
+            'The generated query does not provide a findOneBySlug() method if the slug field is "slug".'
+        );
+        $this->assertTrue(
+            method_exists('\SluggableBehaviorTest\Entity14Query', 'findOneBySlug'),
+            'The generated query provides a findOneBySlug() method even if the slug field doesn\'t have the default name'
+        );
 
         $repository = $this->configuration->getRepository('\SluggableBehaviorTest\Entity14');
         $repository->deleteAll();
@@ -410,8 +430,11 @@ XML;
             $t->setTitle('Hello, World');
             $repository->save($t, $con);
 
-            $this->assertLessThanOrEqual($expectedCount, $con->getQueryCount() - $nbQuery,
-                "no more than $expectedCount query to get a slug when it already exist");
+            $this->assertLessThanOrEqual(
+                $expectedCount,
+                $con->getQueryCount() - $nbQuery,
+                "no more than $expectedCount query to get a slug when it already exist"
+            );
         }
     }
 

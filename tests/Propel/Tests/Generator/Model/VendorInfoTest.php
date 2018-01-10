@@ -23,7 +23,7 @@ class VendorInfoTest extends TestCase
     public function testSetupObject()
     {
         $info = new Vendor();
-        $info->loadMapping(array('type' => 'foo'));
+        $info->loadMapping(['type' => 'foo']);
 
         $this->assertSame('foo', $info->getType());
     }
@@ -49,7 +49,7 @@ class VendorInfoTest extends TestCase
     public function testSetParameters()
     {
         $info = new Vendor();
-        $info->setParameters(array('foo' => 'bar', 'baz' => 'bat'));
+        $info->setParameters(['foo' => 'bar', 'baz' => 'bat']);
 
         $this->assertFalse($info->isEmpty());
         $this->assertArrayHasKey('foo', $info->getParameters());
@@ -59,10 +59,10 @@ class VendorInfoTest extends TestCase
     public function testMergeVendorInfo()
     {
         $current = new Vendor('mysql');
-        $current->setParameters(array('foo' => 'bar', 'baz' => 'bat'));
+        $current->setParameters(['foo' => 'bar', 'baz' => 'bat']);
 
         $toMerge = new Vendor('mysql');
-        $toMerge->setParameters(array('foo' => 'wat', 'int' => 'mix'));
+        $toMerge->setParameters(['foo' => 'wat', 'int' => 'mix']);
 
         $merged = $current->getMergedVendorInfo($toMerge);
 

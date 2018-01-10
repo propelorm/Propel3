@@ -1,8 +1,8 @@
 <?php
 namespace Propel\Generator\Model\Parts;
 
-trait SchemaNamePart {
-
+trait SchemaNamePart
+{
     protected $schemaName;
 
     /**
@@ -37,4 +37,3 @@ trait SchemaNamePart {
 //         }
     }
 }
-

@@ -76,7 +76,7 @@ class NestedSetBehaviorTest extends TestCase
 
     public function testConstantsWithScope()
     {
-        $this->assertEquals(NestedSetEntity10EntityMap::LEFT_COL,  'Propel\Tests\Bookstore\Behavior\NestedSetEntity10.my_left_field');
+        $this->assertEquals(NestedSetEntity10EntityMap::LEFT_COL, 'Propel\Tests\Bookstore\Behavior\NestedSetEntity10.my_left_field');
         $this->assertEquals(NestedSetEntity10EntityMap::RIGHT_COL, 'Propel\Tests\Bookstore\Behavior\NestedSetEntity10.my_right_field');
         $this->assertEquals(NestedSetEntity10EntityMap::LEVEL_COL, 'Propel\Tests\Bookstore\Behavior\NestedSetEntity10.my_level_field');
         $this->assertEquals(NestedSetEntity10EntityMap::SCOPE_COL, 'Propel\Tests\Bookstore\Behavior\NestedSetEntity10.my_scope_field');

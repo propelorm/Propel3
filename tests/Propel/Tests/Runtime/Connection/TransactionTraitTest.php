@@ -28,7 +28,7 @@ class TransactionTraitTest extends TestCase
         $con->expects($this->never())->method('commit');
 
         try {
-            $con->transaction(function() {
+            $con->transaction(function () {
                 throw new \Exception("boom");
             });
             $this->fail('missing exception');
@@ -45,7 +45,7 @@ class TransactionTraitTest extends TestCase
         $con->expects($this->never())->method('rollback');
         $con->expects($this->once())->method('commit');
 
-        $this->assertNull($con->transaction(function() {
+        $this->assertNull($con->transaction(function () {
             // do nothing
         }), "transaction() returns null by default");
     }
@@ -58,7 +58,7 @@ class TransactionTraitTest extends TestCase
         $con->expects($this->never())->method('rollback');
         $con->expects($this->once())->method('commit');
 
-        $this->assertSame("myval", $con->transaction(function() {
+        $this->assertSame("myval", $con->transaction(function () {
             return "myval";
         }), "transaction() returns the returned value from the Closure");
     }
@@ -71,8 +71,8 @@ class TransactionTraitTest extends TestCase
         $con->expects($this->never())->method('rollback');
         $con->expects($this->exactly(2))->method('commit');
 
-        $this->assertNull($con->transaction(function() use ($con) {
-            $this->assertNull($con->transaction(function() {
+        $this->assertNull($con->transaction(function () use ($con) {
+            $this->assertNull($con->transaction(function () {
                 // do nothing
             }), "transaction() returns null by default");
         }), "transaction() returns null by default");
@@ -87,9 +87,9 @@ class TransactionTraitTest extends TestCase
         $con->expects($this->never())->method('commit');
 
         try {
-            $con->transaction(function() use ($con) {
-                $con->transaction(function() {
-                   throw new \Exception("boooom");
+            $con->transaction(function () use ($con) {
+                $con->transaction(function () {
+                    throw new \Exception("boooom");
                 });
             });
             $this->fail("expecting a nested exception to be re-thrown");

@@ -72,5 +72,4 @@ class RelatedMapSymmetricalTest extends TestCaseFixtures
         $this->assertEquals($favoriteToOpinion, $opinionToFavorite->getSymmetricalRelation());
         $this->assertEquals($opinionToFavorite, $favoriteToOpinion->getSymmetricalRelation());
     }
-
 }

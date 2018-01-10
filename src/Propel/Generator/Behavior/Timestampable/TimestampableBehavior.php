@@ -51,18 +51,18 @@ class TimestampableBehavior extends Behavior
 
         if ($this->withCreatedAt() && !$entity->hasField($this->getParameter('create_field'))) {
             $entity->addField(
-                array(
+                [
                     'name' => $this->getParameter('create_field'),
                     'type' => 'TIMESTAMP'
-                )
+                ]
             );
         }
         if ($this->withUpdatedAt() && !$entity->hasField($this->getParameter('update_field'))) {
             $entity->addField(
-                array(
+                [
                     'name' => $this->getParameter('update_field'),
                     'type' => 'TIMESTAMP'
-                )
+                ]
             );
         }
     }

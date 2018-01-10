@@ -9,6 +9,7 @@
  */
 
 namespace Propel\Tests\Helpers;
+
 use Propel\Tests\TestCase;
 
 /**

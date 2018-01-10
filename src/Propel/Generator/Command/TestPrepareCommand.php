@@ -48,17 +48,17 @@ class TestPrepareCommand extends AbstractCommand
     /**
      * @var array
      */
-    protected $fixtures = array(
+    protected $fixtures = [
         //directory - array of connections
-        'bookstore'             => array('bookstore', 'bookstore-cms', 'bookstore-behavior'),
-        'bookstore-packaged'    => array('bookstore-packaged', 'bookstore-log'),
-        'namespaced'            => array('bookstore_namespaced'),
-        'reverse/mysql'         => array('reverse-bookstore'),
-        'reverse/pgsql'         => array('reverse-bookstore'),
-        'schemas'               => array('bookstore-schemas'),
-        'migration'             => array('migration'),
-        'quoting'               => array('quoting'),
-    );
+        'bookstore'             => ['bookstore', 'bookstore-cms', 'bookstore-behavior'],
+        'bookstore-packaged'    => ['bookstore-packaged', 'bookstore-log'],
+        'namespaced'            => ['bookstore_namespaced'],
+        'reverse/mysql'         => ['reverse-bookstore'],
+        'reverse/pgsql'         => ['reverse-bookstore'],
+        'schemas'               => ['bookstore-schemas'],
+        'migration'             => ['migration'],
+        'quoting'               => ['quoting'],
+    ];
 
     /**
      * @var string
@@ -78,13 +78,13 @@ class TestPrepareCommand extends AbstractCommand
     protected function configure()
     {
         $this
-            ->setDefinition(array(
-                new InputOption('vendor',       null, InputOption::VALUE_REQUIRED, 'The database vendor', self::DEFAULT_VENDOR),
-                new InputOption('dsn',          null, InputOption::VALUE_REQUIRED, 'The data source name', self::DEFAULT_DSN),
-                new InputOption('user',          'u', InputOption::VALUE_REQUIRED, 'The database user', self::DEFAULT_DB_USER),
-                new InputOption('password',      'p', InputOption::VALUE_REQUIRED, 'The database password', self::DEFAULT_DB_PASSWD),
-                new InputOption('exclude-database',  null, InputOption::VALUE_NONE, 'Whether this should not touch database\'s schema'),
-            ))
+            ->setDefinition([
+                new InputOption('vendor', null, InputOption::VALUE_REQUIRED, 'The database vendor', self::DEFAULT_VENDOR),
+                new InputOption('dsn', null, InputOption::VALUE_REQUIRED, 'The data source name', self::DEFAULT_DSN),
+                new InputOption('user', 'u', InputOption::VALUE_REQUIRED, 'The database user', self::DEFAULT_DB_USER),
+                new InputOption('password', 'p', InputOption::VALUE_REQUIRED, 'The database password', self::DEFAULT_DB_PASSWD),
+                new InputOption('exclude-database', null, InputOption::VALUE_NONE, 'Whether this should not touch database\'s schema'),
+            ])
             ->setName('test:prepare')
             ->setDescription('Prepare the Propel test suite by building fixtures')
         ;
@@ -121,9 +121,9 @@ class TestPrepareCommand extends AbstractCommand
         if (is_file('propel.yaml.dist')) {
             $content = file_get_contents('propel.yaml.dist');
 
-            $content = str_replace('##DATABASE_VENDOR##',   $input->getOption('vendor'), $content);
-            $content = str_replace('##DATABASE_URL##',      $input->getOption('dsn'), $content);
-            $content = str_replace('##DATABASE_USER##',     $input->getOption('user'), $content);
+            $content = str_replace('##DATABASE_VENDOR##', $input->getOption('vendor'), $content);
+            $content = str_replace('##DATABASE_URL##', $input->getOption('dsn'), $content);
+            $content = str_replace('##DATABASE_USER##', $input->getOption('user'), $content);
             $content = str_replace('##DATABASE_PASSWORD##', $input->getOption('password'), $content);
 
             file_put_contents('propel.yaml', $content);
@@ -132,24 +132,24 @@ class TestPrepareCommand extends AbstractCommand
         }
 
         if (is_file('propel.yaml')) {
-            $in = new ArrayInput(array(
+            $in = new ArrayInput([
                 'command'       => 'config:convert',
                 '--input-dir'   => '.',
                 '--output-dir'  => './build/conf',
                 '--output-file' => sprintf('%s-conf.php', $connections[0]), // the first connection is the main one
-            ));
+            ]);
 
             $command = $this->getApplication()->find('config:convert');
             $command->run($in, $output);
         }
 
         if (0 < count((array) $this->getSchemas('.'))) {
-            $in = new ArrayInput(array(
+            $in = new ArrayInput([
                 'command'      => 'model:build',
                 '--input-dir'  => '.',
                 '--output-dir' => 'build/classes/',
                 '--verbose'    => $input->getOption('verbose'),
-            ));
+            ]);
 
             $command = $this->getApplication()->find('model:build');
             $command->run($in, $output);
@@ -160,39 +160,42 @@ class TestPrepareCommand extends AbstractCommand
         }
 
         if (0 < count($this->getSchemas('.'))) {
-            $in = new ArrayInput(array(
+            $in = new ArrayInput([
                 'command'      => 'sql:build',
                 '--input-dir'  => '.',
                 '--output-dir' => 'build/sql/',
                 '--verbose'    => $input->getOption('verbose'),
-            ));
+            ]);
 
             $command = $this->getApplication()->find('sql:build');
             $command->run($in, $output);
 
-            $conParams = array();
+            $conParams = [];
             foreach ($connections as $con) {
                 if ('sqlite' === substr($input->getOption('dsn'), 0, 6)) {
                     $conParams[] = sprintf(
                         '%s=%s',
-                        $con, $input->getOption('dsn')
+                        $con,
+                        $input->getOption('dsn')
                     );
                 } else {
                     $conParams[] = sprintf(
                         '%s=%s;user=%s;password=%s',
-                        $con, $input->getOption('dsn'),
-                        $input->getOption('user'), $input->getOption('password')
+                        $con,
+                        $input->getOption('dsn'),
+                        $input->getOption('user'),
+                        $input->getOption('password')
                     );
                 }
             }
 
-            $in = new ArrayInput(array(
+            $in = new ArrayInput([
                 'command'      => 'sql:insert',
                 '--input-dir'  => '.',
                 '--sql-dir'    => 'build/sql/',
                 '--connection' => $conParams,
                 '--verbose'    => $input->getOption('verbose'),
-            ));
+            ]);
 
             $command = $this->getApplication()->find('sql:insert');
             $command->run($in, $output);

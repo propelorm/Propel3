@@ -31,7 +31,7 @@ class MssqlSchemaParser extends AbstractSchemaParser
      * Map MSSQL native types to Propel types.
      * @var array
      */
-    private static $mssqlTypeMap = array(
+    private static $mssqlTypeMap = [
         'binary'             => PropelTypes::BINARY,
         'bit'                => PropelTypes::BOOLEAN,
         'char'               => PropelTypes::CHAR,
@@ -68,7 +68,7 @@ class MssqlSchemaParser extends AbstractSchemaParser
         'bigint identity'    => PropelTypes::BIGINT,
         'bigint'             => PropelTypes::BIGINT,
         'sql_variant'        => PropelTypes::VARCHAR,
-    );
+    ];
 
     /**
      * @see AbstractSchemaParser::getTypeMapping()
@@ -78,12 +78,12 @@ class MssqlSchemaParser extends AbstractSchemaParser
         return self::$mssqlTypeMap;
     }
 
-    public function parse(Database $database, array $additionalTables = array())
+    public function parse(Database $database, array $additionalTables = [])
     {
         $dataFetcher = $this->dbh->query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME <> 'dtproperties'");
 
         // First load the tables (important that this happen before filling out details of tables)
-        $tables = array();
+        $tables = [];
         foreach ($dataFetcher as $row) {
             $name = $this->cleanDelimitedIdentifiers($row[0]);
             if ($name === $this->getMigrationTable()) {
@@ -120,7 +120,6 @@ class MssqlSchemaParser extends AbstractSchemaParser
         $dataFetcher = $this->dbh->query("sp_columns '" . $table->getName() . "'");
 
         foreach ($dataFetcher as $row) {
-
             $name = $this->cleanDelimitedIdentifiers($row['COLUMN_NAME']);
             $type = $row['TYPE_NAME'];
             $size = $row['LENGTH'];
@@ -170,9 +169,8 @@ class MssqlSchemaParser extends AbstractSchemaParser
             INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE ccu2 ON ccu2.CONSTRAINT_NAME = rc1.UNIQUE_CONSTRAINT_NAME
             WHERE (ccu1.table_name = '".$table->getName()."')");
 
-        $foreignKeys = array(); // local store to avoid duplicates
+        $foreignKeys = []; // local store to avoid duplicates
         foreach ($dataFetcher as $row) {
-
             $lcol = $this->cleanDelimitedIdentifiers($row['COLUMN_NAME']);
             $ftbl = $this->cleanDelimitedIdentifiers($row['FK_TABLE_NAME']);
             $fcol = $this->cleanDelimitedIdentifiers($row['FK_COLUMN_NAME']);
@@ -192,7 +190,6 @@ class MssqlSchemaParser extends AbstractSchemaParser
             }
             $foreignKeys[$name]->addReference($localColumn, $foreignColumn);
         }
-
     }
 
     /**
@@ -202,7 +199,7 @@ class MssqlSchemaParser extends AbstractSchemaParser
     {
         $dataFetcher = $this->dbh->query("sp_indexes_rowset '" . $table->getName() . "'");
 
-        $indexes = array();
+        $indexes = [];
         foreach ($dataFetcher as $row) {
             $colName = $this->cleanDelimitedIdentifiers($row["COLUMN_NAME"]);
             $name = $this->cleanDelimitedIdentifiers($row['INDEX_NAME']);

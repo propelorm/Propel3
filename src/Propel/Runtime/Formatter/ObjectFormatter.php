@@ -36,7 +36,7 @@ class ObjectFormatter extends AbstractFormatter
             if ($this->hasLimit) {
                 throw new LogicException('Cannot use limit() in conjunction with with() on a one-to-many relationship. Please remove the with() call, or the limit() call.');
             }
-            $pks = array();
+            $pks = [];
             foreach ($dataFetcher as $row) {
                 $object = $this->getAllObjectsFromRow($row);
                 $pk     = $object->getPrimaryKey();
@@ -138,7 +138,7 @@ class ObjectFormatter extends AbstractFormatter
             if (isset($hydrationChain)) {
                 $hydrationChain[$modelWith->getRightName()] = $joinedObject;
             } else {
-                $hydrationChain = array($modelWith->getRightName() => $joinedObject);
+                $hydrationChain = [$modelWith->getRightName() => $joinedObject];
             }
 
 

@@ -213,7 +213,8 @@ class Entity
         }
     }
 
-    protected function getSuperordinate() {
+    protected function getSuperordinate()
+    {
         return $this->database;
     }
 
@@ -1075,7 +1076,7 @@ class Entity
     public function removeIndex($index): Entity
     {
         if (is_string($index)) {
-            $index = $this->indices->find($index, function(Index $index, $query) {
+            $index = $this->indices->find($index, function (Index $index, $query) {
                 return $index->getName() == $query;
             });
         }
@@ -1488,8 +1489,8 @@ class Entity
         foreach ($this->getPrimaryKey() as $primaryKey) {
             if ($primaryKey->isNotNull() && !$primaryKey->hasDefaultValue()
                 && !in_array($primaryKey, $primaryKeys, true)) {
-                    $pks = $primaryKey;
-                }
+                $pks = $primaryKey;
+            }
         }
 
         return $pks;

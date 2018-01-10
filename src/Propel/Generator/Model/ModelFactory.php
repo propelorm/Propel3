@@ -63,11 +63,13 @@ class ModelFactory
     /** @var GeneratorConfigInterface */
     private $config;
 
-    public function __construct(?GeneratorConfigInterface $config = null) {
+    public function __construct(?GeneratorConfigInterface $config = null)
+    {
         $this->config = $config;
     }
 
-    public function setGeneratorConfig(GeneratorConfigInterface $config) {
+    public function setGeneratorConfig(GeneratorConfigInterface $config)
+    {
         $this->config = $config;
     }
 
@@ -84,7 +86,8 @@ class ModelFactory
 //         return null; // or throw exception?
 //     }
 
-    private function load($model, array $attributes, array $definition) {
+    private function load($model, array $attributes, array $definition)
+    {
         if (isset($definition['transform'])) {
             $this->transform($attributes, $definition['transform']);
         }
@@ -96,7 +99,8 @@ class ModelFactory
         return $model;
     }
 
-    private function transform(array &$attributes, array $transforms) {
+    private function transform(array &$attributes, array $transforms)
+    {
         foreach ($transforms as $key => $type) {
             if (isset($attributes[$key])) {
                 $attributes[$key] = $this->transformValue($attributes[$key], $type);

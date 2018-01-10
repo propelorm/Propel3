@@ -172,7 +172,7 @@ trait CrossRelationTrait
      */
     protected function getCrossFKGetterSignature(CrossRelation $crossRelation, $excludeSignatureItem)
     {
-        list (, $getSignature) = $this->getCrossRelationAddMethodInformation($crossRelation);
+        list(, $getSignature) = $this->getCrossRelationAddMethodInformation($crossRelation);
         $getSignature = explode(', ', $getSignature);
 
         if (false !== ($pos = array_search($excludeSignatureItem, $getSignature))) {

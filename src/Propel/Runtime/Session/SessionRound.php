@@ -100,7 +100,6 @@ class SessionRound
         $id = spl_object_hash($entity);
 
         if (!isset($this->persistQueue[$id])) {
-
             if ($this->getConfiguration()->isDebug()) {
                 $currentPk = json_encode($this->getConfiguration()->getEntityMapForEntity($entity)->getPK($entity));
                 $this->getConfiguration()->debug('success persist(' . get_class($entity) . "/$currentPk, " . var_export($deep, true) . ')');
@@ -272,14 +271,18 @@ class SessionRound
                     }
                 }
 
-                $this->getConfiguration()->debug(sprintf('Group #%d: %d [%d insert, %d update] items for %s using %s',
+                $this->getConfiguration()->debug(
+                    sprintf(
+                    'Group #%d: %d [%d insert, %d update] items for %s using %s',
                     $idx+1,
                     count($entityIds),
                     $newItems,
                     count($entityIds) - $newItems,
                     $this->getConfiguration()->getEntityMapForEntity($firstEntity)->getFullClassName(),
-                    get_class($persister)),
-                    Configuration::LOG_CYAN);
+                    get_class($persister)
+                ),
+                    Configuration::LOG_CYAN
+                );
             }
             $this->getConfiguration()->debug("");
             $this->getConfiguration()->debug("");
@@ -315,7 +318,6 @@ class SessionRound
             $this->getConfiguration()->debug(" ######################  SessionRound[{$this->getIdx()}]::doPersist() END ###################### ", Configuration::LOG_CYAN);
             $this->getConfiguration()->debug("", Configuration::LOG_CYAN);
             $this->getConfiguration()->debug("", Configuration::LOG_CYAN);
-
         }
 
         $this->persistQueue = [];

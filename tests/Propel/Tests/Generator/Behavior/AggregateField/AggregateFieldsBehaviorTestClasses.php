@@ -44,7 +44,6 @@ class TestableComment extends AggregateComment
             throw $e;
         }
     }
-
 }
 
 class TestableAggregateCommentQuery extends AggregateCommentQuery
@@ -65,5 +64,4 @@ class TestableAggregateCommentQuery extends AggregateCommentQuery
     {
         return $this->postDelete($affectedRows);
     }
-
 }

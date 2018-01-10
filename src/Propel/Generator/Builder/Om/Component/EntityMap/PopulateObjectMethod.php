@@ -25,7 +25,7 @@ class PopulateObjectMethod extends BuildComponent
     {
         $this->getDefinition()->declareUse('Propel\Runtime\Map\EntityMap');
 
-        $fields = array_filter($this->getEntity()->getFields(), function($field) {
+        $fields = array_filter($this->getEntity()->getFields(), function ($field) {
             return !$field->isLazyLoad();
         });
 
@@ -101,7 +101,7 @@ if (EntityMap::TYPE_NUM === \$indexType) {
             $body .= "
         \$pk = \$pk[0];
 ";
-            }
+        }
 
         $body .= "
 \$hashcode = json_encode(\$pk);

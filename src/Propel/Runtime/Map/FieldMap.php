@@ -94,7 +94,7 @@ class FieldMap
      *
      * @var array
      */
-    protected $valueSet = array();
+    protected $valueSet = [];
 
     /**
      * @var bool
@@ -285,11 +285,11 @@ class FieldMap
     {
         return in_array(
             $this->type,
-            array(
+            [
                 PropelTypes::BLOB,
                 PropelTypes::VARBINARY,
                 PropelTypes::LONGVARBINARY,
-            )
+            ]
         );
     }
 
@@ -302,13 +302,13 @@ class FieldMap
     {
         return in_array(
             $this->type,
-            array(
+            [
                 PropelTypes::TIMESTAMP,
                 PropelTypes::DATE,
                 PropelTypes::TIME,
                 PropelTypes::BU_DATE,
                 PropelTypes::BU_TIMESTAMP,
-            )
+            ]
         );
     }
 
@@ -321,7 +321,7 @@ class FieldMap
     {
         return in_array(
             $this->type,
-            array(
+            [
                 PropelTypes::NUMERIC,
                 PropelTypes::DECIMAL,
                 PropelTypes::TINYINT,
@@ -331,7 +331,7 @@ class FieldMap
                 PropelTypes::REAL,
                 PropelTypes::FLOAT,
                 PropelTypes::DOUBLE,
-            )
+            ]
         );
     }
 
@@ -344,11 +344,11 @@ class FieldMap
     {
         return in_array(
             $this->type,
-            array(
+            [
                 PropelTypes::VARCHAR,
                 PropelTypes::LONGVARCHAR,
                 PropelTypes::CHAR,
-            )
+            ]
         );
     }
 

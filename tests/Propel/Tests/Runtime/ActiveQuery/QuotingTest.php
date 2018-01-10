@@ -21,7 +21,6 @@ use Propel\Tests\TestCaseFixturesDatabase;
  */
 class QuotingTest extends TestCaseFixturesDatabase
 {
-
     protected function getLastQuery()
     {
         /** @var ConnectionWrapper $con */
@@ -125,7 +124,7 @@ class QuotingTest extends TestCaseFixturesDatabase
         if ($this->runningOnPostgreSQL()) {
             $expected = $this->getSql("SELECT g.id, g.name, g.type_id FROM quoting_author g GROUP BY g.id,g.name,g.type_id HAVING g.id > 0");
         } else {
-            $expected = $this->getSql( "SELECT g.id, g.name, g.type_id FROM quoting_author g GROUP BY g.id HAVING g.id > 0");
+            $expected = $this->getSql("SELECT g.id, g.name, g.type_id FROM quoting_author g GROUP BY g.id HAVING g.id > 0");
         }
         $this->assertEquals($expected, $this->getLastQuery());
 
@@ -157,8 +156,5 @@ class QuotingTest extends TestCaseFixturesDatabase
             $expected = $this->getSql("SELECT `group`.`id`, `group`.`title`, `group`.`by`, `group`.`as`, `group`.`author_id` FROM `group` GROUP BY `group`.`as` HAVING `group`.`as` > 0");
         }
         $this->assertEquals($expected, $this->getLastQuery());
-
     }
-
-
 }

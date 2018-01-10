@@ -46,7 +46,7 @@ return \$this;
 ";
 
         $this->addMethod('filterByNormalizedListScope')
-            ->addSimpleParameter('scope' , $behavior->hasMultipleScopes() ? 'array' : 'integer|string')
+            ->addSimpleParameter('scope', $behavior->hasMultipleScopes() ? 'array' : 'integer|string')
             ->addSimpleParameter('method', 'string', 'add')
             ->setDescription("Filters by a normalized form of \$scope. Primarily internal used.")
             ->setTypeDescription("The current query, for fluid interface")

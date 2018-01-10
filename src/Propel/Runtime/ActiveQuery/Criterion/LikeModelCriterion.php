@@ -65,5 +65,4 @@ class LikeModelCriterion extends BasicModelCriterion
         }
         parent::appendPsForUniqueClauseTo($sb, $params);
     }
-
 }

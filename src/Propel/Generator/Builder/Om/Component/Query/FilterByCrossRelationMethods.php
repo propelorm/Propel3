@@ -3,7 +3,6 @@
 
 namespace Propel\Generator\Builder\Om\Component\Query;
 
-
 use gossi\codegen\model\PhpConstant;
 use gossi\codegen\model\PhpParameter;
 use Propel\Generator\Builder\Om\Component\BuildComponent;
@@ -66,8 +65,8 @@ return \$this
             $variableParameter = new PhpParameter($foreignEntity->getCamelCaseName());
 
 //            if ($relation->isComposite()) {
-                $variableParameter->setType('\\'.$fkPhpName);
-                $variableParameter->setTypeDescription("The related object to use as filter");
+            $variableParameter->setType('\\'.$fkPhpName);
+            $variableParameter->setTypeDescription("The related object to use as filter");
 //            } else {
 //                $variableParameter->setType("$fkPhpName|ObjectCollection");
 //                $variableParameter->setTypeDescription("The related object(s) to use as filter");

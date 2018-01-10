@@ -43,7 +43,7 @@ EOF;
         $builder = new QuickBuilder();
         $builder->setSchema($xmlSchema);
 
-        return array(array($builder));
+        return [[$builder]];
     }
 
     /**
@@ -96,7 +96,7 @@ EOF;
      */
     public function testGetClassesLimitedClassTargets(QuickBuilder $builder)
     {
-        $script = $builder->getClasses(array('entitymap', 'object'));
+        $script = $builder->getClasses(['entitymap', 'object']);
         $this->assertContains('class QuickBuildFoo1 {', $script);
         $this->assertNotContains('class QuickBuildFoo1Query extends BaseQuickBuildFoo1Query', $script);
     }
@@ -121,5 +121,4 @@ EOF;
         $this->assertEquals(1, QuickBuildFoo2Query::create()->count());
         $this->assertEquals($foo, QuickBuildFoo2Query::create()->findOne());
     }
-
 }

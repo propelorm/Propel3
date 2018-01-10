@@ -65,16 +65,15 @@ class GeneratedRelationMapWithSchemasTest extends TestCaseFixturesDatabase
     public function testColumnMappings()
     {
         $contestTable = $this->databaseMap->getEntity('Propel\Tests\BookstoreSchemas\BookstoreContest');
-        $this->assertEquals(array('Propel\Tests\BookstoreSchemas\BookstoreContest.bookstoreId' => 'Propel\Tests\BookstoreSchemas\Bookstore.id'), $contestTable->getRelation('Bookstore')->getFieldMappings(), 'getFieldMappings returns local to foreign by default');
-        $this->assertEquals(array('Propel\Tests\BookstoreSchemas\BookstoreContest.bookstoreId' => 'Propel\Tests\BookstoreSchemas\Bookstore.id'), $contestTable->getRelation('Bookstore')->getFieldMappings(RelationMap::LEFT_TO_RIGHT), 'getFieldMappings returns local to foreign when asked left to right for a many to one relationship');
+        $this->assertEquals(['Propel\Tests\BookstoreSchemas\BookstoreContest.bookstoreId' => 'Propel\Tests\BookstoreSchemas\Bookstore.id'], $contestTable->getRelation('Bookstore')->getFieldMappings(), 'getFieldMappings returns local to foreign by default');
+        $this->assertEquals(['Propel\Tests\BookstoreSchemas\BookstoreContest.bookstoreId' => 'Propel\Tests\BookstoreSchemas\Bookstore.id'], $contestTable->getRelation('Bookstore')->getFieldMappings(RelationMap::LEFT_TO_RIGHT), 'getFieldMappings returns local to foreign when asked left to right for a many to one relationship');
 
         $bookTable = $this->databaseMap->getEntity('Propel\Tests\BookstoreSchemas\Bookstore');
-        $this->assertEquals(array('Propel\Tests\BookstoreSchemas\BookstoreContest.bookstoreId' => 'Propel\Tests\BookstoreSchemas\Bookstore.id'), $bookTable->getRelation('BookstoreContest')->getFieldMappings(), 'getFieldMappings returns local to foreign by default');
-        $this->assertEquals(array('Propel\Tests\BookstoreSchemas\Bookstore.id' => 'Propel\Tests\BookstoreSchemas\BookstoreContest.bookstoreId'), $bookTable->getRelation('BookstoreContest')->getFieldMappings(RelationMap::LEFT_TO_RIGHT), 'getFieldMappings returns foreign to local when asked left to right for a one to many relationship');
+        $this->assertEquals(['Propel\Tests\BookstoreSchemas\BookstoreContest.bookstoreId' => 'Propel\Tests\BookstoreSchemas\Bookstore.id'], $bookTable->getRelation('BookstoreContest')->getFieldMappings(), 'getFieldMappings returns local to foreign by default');
+        $this->assertEquals(['Propel\Tests\BookstoreSchemas\Bookstore.id' => 'Propel\Tests\BookstoreSchemas\BookstoreContest.bookstoreId'], $bookTable->getRelation('BookstoreContest')->getFieldMappings(RelationMap::LEFT_TO_RIGHT), 'getFieldMappings returns foreign to local when asked left to right for a one to many relationship');
 
         $bookCustomerTable = $this->databaseMap->getEntity('Propel\Tests\BookstoreSchemas\Customer');
-        $this->assertEquals(array('Propel\Tests\BookstoreSchemas\CustomerAccount.customerId' => 'Propel\Tests\BookstoreSchemas\Customer.id'), $bookCustomerTable->getRelation('CustomerAccount')->getFieldMappings(), 'getFieldMappings returns local to foreign by default');
-        $this->assertEquals(array('Propel\Tests\BookstoreSchemas\Customer.id' => 'Propel\Tests\BookstoreSchemas\CustomerAccount.customerId'), $bookCustomerTable->getRelation('CustomerAccount')->getFieldMappings(RelationMap::LEFT_TO_RIGHT), 'getFieldMappings returns foreign to local when asked left to right for a one to one relationship');
+        $this->assertEquals(['Propel\Tests\BookstoreSchemas\CustomerAccount.customerId' => 'Propel\Tests\BookstoreSchemas\Customer.id'], $bookCustomerTable->getRelation('CustomerAccount')->getFieldMappings(), 'getFieldMappings returns local to foreign by default');
+        $this->assertEquals(['Propel\Tests\BookstoreSchemas\Customer.id' => 'Propel\Tests\BookstoreSchemas\CustomerAccount.customerId'], $bookCustomerTable->getRelation('CustomerAccount')->getFieldMappings(RelationMap::LEFT_TO_RIGHT), 'getFieldMappings returns foreign to local when asked left to right for a one to one relationship');
     }
-
 }

@@ -32,7 +32,7 @@ class CrossRelationAdderMethods extends BuildComponent
         $relatedObjectClassName = $this->getRelationPhpName($relation, false);
         $crossObjectClassName = $this->getClassNameFromEntity($relation->getForeignEntity());
 
-        list ($signature, , $normalizedShortSignature) = $this->getCrossRelationAddMethodInformation($crossRelation, $relation);
+        list($signature, , $normalizedShortSignature) = $this->getCrossRelationAddMethodInformation($crossRelation, $relation);
 
         $body = <<<EOF
 if (!\$this->{$collName}->contains({$normalizedShortSignature})) {
@@ -60,5 +60,21 @@ EOF;
         foreach ($signature as $parameter) {
             $method->addParameter($parameter);
         }
+    }
+
+    protected function getBiDirectional(CrossRelation $crossRelation)
+    {
+        $getterName = 'get' . $this->getRelationPhpName($crossRelation->getIncomingRelation(), true);
+        $relation = $crossRelation->getOutgoingRelation();
+        $varName = $this->getRelationVarName($relation);
+
+        $body = "
+    // set the back reference to this object directly as using provided method either results
+    // in endless loop or in multiple relations
+    if (!\${$varName}->{$getterName}()->contains(\$this)) {
+        \${$varName}->{$getterName}()->push(\$this);
+    }";
+
+        return $body;
     }
 }

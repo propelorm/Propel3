@@ -22,7 +22,7 @@ class PropertySetterMethods extends BuildComponent
                 // it's a implementation detail, we don't need to expose it to the domain model.
                 continue;
             }
-            if ($field->isSkipCodeGeneration()){
+            if ($field->isSkipCodeGeneration()) {
                 continue;
             }
 
@@ -52,11 +52,11 @@ class PropertySetterMethods extends BuildComponent
             $varType = 'integer|' . $dateTimeClass;
 
             $body = "\$$varName = \\Propel\\Runtime\\Util\\PropelDateTime::newInstance(\$$varName, null, '$dateTimeClass');";
-        } else if ($field->isFloatingPointNumber()) {
+        } elseif ($field->isFloatingPointNumber()) {
             $body = "
 \$$varName = (double)\$$varName;
 ";
-        } else if ($field->isBooleanType()) {
+        } elseif ($field->isBooleanType()) {
             $body = "
 if (\$$varName !== null) {
     if (is_string(\$$varName)) {
@@ -66,7 +66,7 @@ if (\$$varName !== null) {
     }
 }
 ";
-        } else if ($field->isEnumType()) {
+        } elseif ($field->isEnumType()) {
             $constName = strtoupper($varName . '_types');
 
             $body = "
@@ -78,7 +78,7 @@ if (\$$varName !== null) {
 ";
         }
 
-            $body .= "
+        $body .= "
 \$this->$varName = \$$varName;
 ";
 

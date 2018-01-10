@@ -3,7 +3,6 @@
 
 namespace Propel\Generator\Builder\Om\Component\Query;
 
-
 use gossi\codegen\model\PhpConstant;
 use gossi\codegen\model\PhpParameter;
 use Propel\Generator\Builder\Om\Component\BuildComponent;
@@ -88,6 +87,5 @@ return \$this
             ->setType($queryClass)
             ->setTypeDescription("A secondary query class using the current class as primary query")
             ->setBody($body);
-
     }
 }

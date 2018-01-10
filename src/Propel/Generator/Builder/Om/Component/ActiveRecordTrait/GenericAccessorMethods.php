@@ -30,7 +30,8 @@ class GenericAccessorMethods extends BuildComponent
         }
     }
 
-    public function addHasArrayElement(Field $field) {
+    public function addHasArrayElement(Field $field)
+    {
         $columnType = ($field->isPhpArrayType()) ? 'array' : 'set';
         $singularName = NamingTool::toUpperCamelCase($field->getSingularName());
 

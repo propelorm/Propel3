@@ -9,7 +9,6 @@ use phootwork\collection\Set;
 
 trait SqlPart
 {
-
     use SuperordinatePart;
 
     /** @var bool */
@@ -238,4 +237,3 @@ trait SqlPart
         return Model::DEFAULT_STRING_FORMAT;
     }
 }
-

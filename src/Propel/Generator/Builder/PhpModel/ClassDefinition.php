@@ -20,5 +20,4 @@ class ClassDefinition extends PhpClass
     {
         return $this->constructorBodyExtras;
     }
-
 }

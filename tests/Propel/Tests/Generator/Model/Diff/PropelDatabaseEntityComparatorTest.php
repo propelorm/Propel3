@@ -125,7 +125,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $databaseDiff = $dc->getDatabaseDiff();
         $this->assertEquals(1, $nbDiffs);
         $this->assertEquals(1, count($databaseDiff->getAddedEntities()));
-        $this->assertEquals(array('Bar' => $t4), $databaseDiff->getAddedEntities());
+        $this->assertEquals(['Bar' => $t4], $databaseDiff->getAddedEntities());
     }
 
     public function testCompareAddedEntitySkipSql()
@@ -196,7 +196,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $databaseDiff = $dc->getDatabaseDiff();
         $this->assertEquals(1, $nbDiffs);
         $this->assertEquals(1, count($databaseDiff->getRemovedEntities()));
-        $this->assertEquals(array('Bar' => $t2), $databaseDiff->getRemovedEntities());
+        $this->assertEquals(['Bar' => $t2], $databaseDiff->getRemovedEntities());
     }
 
     public function testCompareRemovedEntitySkipSql()
@@ -273,7 +273,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $this->assertEquals(1, $nbDiffs);
         $this->assertEquals(1, count($databaseDiff->getModifiedEntities()));
         $entityDiff = EntityComparator::computeDiff($t1, $t3);
-        $this->assertEquals(array('Foo_Entity' => $entityDiff), $databaseDiff->getModifiedEntities());
+        $this->assertEquals(['Foo_Entity' => $entityDiff], $databaseDiff->getModifiedEntities());
     }
 
     public function testCompareRenamedEntity()
@@ -312,9 +312,9 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $databaseDiff = $dc->getDatabaseDiff();
         $this->assertEquals(1, $nbDiffs);
         $this->assertEquals(1, count($databaseDiff->getRenamedEntities()));
-        $this->assertEquals(array('Foo_Entity' => 'Foo_Entity2'), $databaseDiff->getRenamedEntities());
-        $this->assertEquals(array(), $databaseDiff->getAddedEntities());
-        $this->assertEquals(array(), $databaseDiff->getRemovedEntities());
+        $this->assertEquals(['Foo_Entity' => 'Foo_Entity2'], $databaseDiff->getRenamedEntities());
+        $this->assertEquals([], $databaseDiff->getAddedEntities());
+        $this->assertEquals([], $databaseDiff->getRemovedEntities());
     }
 
 
@@ -366,11 +366,11 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $nbDiffs = $dc->compareEntities();
         $databaseDiff = $dc->getDatabaseDiff();
         $this->assertEquals(5, $nbDiffs);
-        $this->assertEquals(array(), $databaseDiff->getRenamedEntities());
-        $this->assertEquals(array('Bar2' => $t4, 'Biz' => $t5), $databaseDiff->getAddedEntities());
-        $this->assertEquals(array('Baz' => $t11, 'Bar' => $t2), $databaseDiff->getRemovedEntities());
+        $this->assertEquals([], $databaseDiff->getRenamedEntities());
+        $this->assertEquals(['Bar2' => $t4, 'Biz' => $t5], $databaseDiff->getAddedEntities());
+        $this->assertEquals(['Baz' => $t11, 'Bar' => $t2], $databaseDiff->getRemovedEntities());
         $entityDiff = EntityComparator::computeDiff($t1, $t3);
-        $this->assertEquals(array('Foo_Entity' => $entityDiff), $databaseDiff->getModifiedEntities());
+        $this->assertEquals(['Foo_Entity' => $entityDiff], $databaseDiff->getModifiedEntities());
     }
 
     public function testCompareSeveralRenamedSameEntities()
@@ -418,8 +418,8 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $databaseDiff = $dc->getDatabaseDiff();
         $this->assertEquals(4, $nbDiffs);
         $this->assertEquals(0, count($databaseDiff->getRenamedEntities()));
-        $this->assertEquals(array('entity4', 'entity5'), array_keys($databaseDiff->getAddedEntities()));
-        $this->assertEquals(array('entity1', 'entity2'), array_keys($databaseDiff->getRemovedEntities()));
+        $this->assertEquals(['entity4', 'entity5'], array_keys($databaseDiff->getAddedEntities()));
+        $this->assertEquals(['entity1', 'entity2'], array_keys($databaseDiff->getRemovedEntities()));
     }
 
 
@@ -462,7 +462,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $dc = new DatabaseComparator();
         $this->assertCount(0, $dc->getExcludedEntities());
 
-        $dc->setExcludedEntities(array('foo'));
+        $dc->setExcludedEntities(['foo']);
         $this->assertCount(1, $dc->getExcludedEntities());
 
         $d1 = new Database();
@@ -470,10 +470,10 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $t2 = new Entity('Bar');
         $d2->addEntity($t2);
 
-        $diff = DatabaseComparator::computeDiff($d1, $d2, false, false, true, array('Bar'));
+        $diff = DatabaseComparator::computeDiff($d1, $d2, false, false, true, ['Bar']);
         $this->assertFalse($diff);
 
-        $diff = DatabaseComparator::computeDiff($d1, $d2, false, false, true, array('Baz'));
+        $diff = DatabaseComparator::computeDiff($d1, $d2, false, false, true, ['Baz']);
         $this->assertInstanceOf('Propel\Generator\Model\Diff\DatabaseDiff', $diff);
 
         $d1 = new Database();
@@ -483,13 +483,13 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $t2 = new Entity('Bar');
         $d2->addEntity($t2);
 
-        $diff = DatabaseComparator::computeDiff($d1, $d2, false, false, true, array('Bar', 'Foo'));
+        $diff = DatabaseComparator::computeDiff($d1, $d2, false, false, true, ['Bar', 'Foo']);
         $this->assertFalse($diff);
 
-        $diff = DatabaseComparator::computeDiff($d1, $d2, false, false, true, array('Foo'));
+        $diff = DatabaseComparator::computeDiff($d1, $d2, false, false, true, ['Foo']);
         $this->assertInstanceOf('Propel\Generator\Model\Diff\DatabaseDiff', $diff);
 
-        $diff = DatabaseComparator::computeDiff($d1, $d2, false, false, true, array('Bar'));
+        $diff = DatabaseComparator::computeDiff($d1, $d2, false, false, true, ['Bar']);
         $this->assertInstanceOf('Propel\Generator\Model\Diff\DatabaseDiff', $diff);
 
 
@@ -502,10 +502,10 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $t2 = new Entity('Foo');
         $d2->addEntity($t2);
 
-        $diff = DatabaseComparator::computeDiff($d1, $d2, false, false, true, array('Bar', 'Foo'));
+        $diff = DatabaseComparator::computeDiff($d1, $d2, false, false, true, ['Bar', 'Foo']);
         $this->assertFalse($diff);
 
-        $diff = DatabaseComparator::computeDiff($d1, $d2, false, false, true, array('Bar'));
+        $diff = DatabaseComparator::computeDiff($d1, $d2, false, false, true, ['Bar']);
         $this->assertInstanceOf('Propel\Generator\Model\Diff\DatabaseDiff', $diff);
     }
 
@@ -514,7 +514,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $dc = new DatabaseComparator();
         $this->assertCount(0, $dc->getExcludedEntities());
 
-        $dc->setExcludedEntities(array('foo'));
+        $dc->setExcludedEntities(['foo']);
         $this->assertCount(1, $dc->getExcludedEntities());
 
         $d1 = new Database();
@@ -522,10 +522,10 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $t2 = new Entity('Bar');
         $d2->addEntity($t2);
 
-        $diff = DatabaseComparator::computeDiff($d1, $d2, false, true, true, array('Bar'));
+        $diff = DatabaseComparator::computeDiff($d1, $d2, false, true, true, ['Bar']);
         $this->assertFalse($diff);
 
-        $diff = DatabaseComparator::computeDiff($d1, $d2, false, true, true, array('Baz'));
+        $diff = DatabaseComparator::computeDiff($d1, $d2, false, true, true, ['Baz']);
         $this->assertInstanceOf('Propel\Generator\Model\Diff\DatabaseDiff', $diff);
 
         $d1 = new Database();
@@ -535,13 +535,13 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $t2 = new Entity('Bar');
         $d2->addEntity($t2);
 
-        $diff = DatabaseComparator::computeDiff($d1, $d2, false, true, true, array('Bar', 'Foo'));
+        $diff = DatabaseComparator::computeDiff($d1, $d2, false, true, true, ['Bar', 'Foo']);
         $this->assertFalse($diff);
 
-        $diff = DatabaseComparator::computeDiff($d1, $d2, false, true, true, array('Foo'));
+        $diff = DatabaseComparator::computeDiff($d1, $d2, false, true, true, ['Foo']);
         $this->assertInstanceOf('Propel\Generator\Model\Diff\DatabaseDiff', $diff);
 
-        $diff = DatabaseComparator::computeDiff($d1, $d2, false, true, true, array('Bar'));
+        $diff = DatabaseComparator::computeDiff($d1, $d2, false, true, true, ['Bar']);
         $this->assertInstanceOf('Propel\Generator\Model\Diff\DatabaseDiff', $diff);
 
 
@@ -554,11 +554,10 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $t2 = new Entity('Foo');
         $d2->addEntity($t2);
 
-        $diff = DatabaseComparator::computeDiff($d1, $d2, false, true, true, array('Bar', 'Foo'));
+        $diff = DatabaseComparator::computeDiff($d1, $d2, false, true, true, ['Bar', 'Foo']);
         $this->assertFalse($diff);
 
-        $diff = DatabaseComparator::computeDiff($d1, $d2, false, true, true, array('Bar'));
+        $diff = DatabaseComparator::computeDiff($d1, $d2, false, true, true, ['Bar']);
         $this->assertInstanceOf('Propel\Generator\Model\Diff\DatabaseDiff', $diff);
     }
-
 }

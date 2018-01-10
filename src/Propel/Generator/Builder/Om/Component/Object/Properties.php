@@ -39,7 +39,7 @@ class Properties extends BuildComponent
                 continue;
             }
 
-            if ($field->isSkipCodeGeneration()){
+            if ($field->isSkipCodeGeneration()) {
                 continue;
             }
 

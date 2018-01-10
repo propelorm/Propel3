@@ -18,7 +18,7 @@ use Propel\Generator\Builder\Om\Component\NamingTrait;
  */
 class Orders extends BuildComponent
 {
-    Use NamingTrait;
+    use NamingTrait;
 
     public function process()
     {

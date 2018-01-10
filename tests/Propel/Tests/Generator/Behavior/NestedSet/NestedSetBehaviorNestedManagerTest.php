@@ -189,26 +189,26 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
         $this->assertTrue($manager->getChildren($t2) instanceof ObjectCollection, 'getChildren() returns a collection');
         $this->assertEquals(0, count($manager->getChildren($t2)), 'getChildren() returns an empty collection for leafs');
         $children = $manager->getChildren($t3);
-        $expected = array(
-            't4' => array(5, 6, 2),
-            't5' => array(7, 12, 2),
-        );
+        $expected = [
+            't4' => [5, 6, 2],
+            't5' => [7, 12, 2],
+        ];
         $this->assertEquals($expected, $this->dumpNodes($children, true), 'getChildren() returns a collection of children');
 
         $con = $this->getConfiguration()->getconnectionManager(NestedSetEntity9EntityMap::DATABASE_NAME)->getReadConnection();
         $children = $manager->getChildren($t5, null, $con);
-        $expected = array(
-            't6' => array(8, 9, 3),
-            't7' => array(10, 11, 3),
-        );
+        $expected = [
+            't6' => [8, 9, 3],
+            't7' => [10, 11, 3],
+        ];
         $this->assertEquals($expected, $this->dumpNodes($children, true), 'getChildren() accepts a connection as parameter');
 
         $c = new Criteria(NestedSetEntity9EntityMap::DATABASE_NAME);
         $c->add(NestedSetEntity9EntityMap::FIELD_TITLE, 't5');
         $children = $manager->getChildren($t3, $c);
-        $expected = array(
-            't5' => array(7, 12, 2),
-        );
+        $expected = [
+            't5' => [7, 12, 2],
+        ];
         $this->assertEquals($expected, $this->dumpNodes($children, true), 'getChildren() accepts a criteria as parameter');
     }
 
@@ -265,17 +265,17 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
                |  \
                t6 t7
         */
-        $this->assertEquals(array(), $manager->getSiblings($t1), 'getSiblings() returns an empty array for root');
+        $this->assertEquals([], $manager->getSiblings($t1), 'getSiblings() returns an empty array for root');
         $siblings = $manager->getSiblings($t5);
-        $expected = array(
-            't4' => array(5, 6, 2),
-        );
+        $expected = [
+            't4' => [5, 6, 2],
+        ];
         $this->assertEquals($expected, $this->dumpNodes($siblings), 'getSiblings() returns an array of siblings');
         $siblings = $manager->getSiblings($t5, true);
-        $expected = array(
-            't4' => array(5, 6, 2),
-            't5' => array(7, 12, 2)
-        );
+        $expected = [
+            't4' => [5, 6, 2],
+            't5' => [7, 12, 2]
+        ];
         $this->assertEquals($expected, $this->dumpNodes($siblings), 'getSiblings(true) includes the current node');
         $manager->moveToNextSiblingOf($t5, $t3);
         /* Results in
@@ -287,10 +287,10 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
         */
         $this->assertEquals(0, count($manager->getSiblings($t4)), 'getSiblings() returns an empty collection for lone children');
         $siblings = $manager->getSiblings($t3);
-        $expected = array(
-            't2' => array(2, 3, 1),
-            't5' => array(8, 13, 1),
-        );
+        $expected = [
+            't2' => [2, 3, 1],
+            't5' => [8, 13, 1],
+        ];
         $this->assertEquals($expected, $this->dumpNodes($siblings), 'getSiblings() returns all siblings');
         $this->assertEquals('t2', $siblings[0]->getTitle(), 'getSiblings() returns siblings in natural order');
         $this->assertEquals('t5', $siblings[1]->getTitle(), 'getSiblings() returns siblings in natural order');
@@ -309,21 +309,21 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
                |  \
                t6 t7
         */
-        $this->assertEquals(array(), $manager->getDescendants($t2), 'getDescendants() returns an empty array for leafs');
+        $this->assertEquals([], $manager->getDescendants($t2), 'getDescendants() returns an empty array for leafs');
         $descendants = $manager->getDescendants($t3);
-        $expected = array(
-            't4' => array(5, 6, 2),
-            't5' => array(7, 12, 2),
-            't6' => array(8, 9, 3),
-            't7' => array(10, 11, 3),
-        );
+        $expected = [
+            't4' => [5, 6, 2],
+            't5' => [7, 12, 2],
+            't6' => [8, 9, 3],
+            't7' => [10, 11, 3],
+        ];
         $this->assertEquals($expected, $this->dumpNodes($descendants), 'getDescendants() returns an array of descendants');
         $c = new Criteria(NestedSetEntity9EntityMap::DATABASE_NAME);
         $c->add(NestedSetEntity9EntityMap::FIELD_TITLE, 't5');
         $descendants = $manager->getDescendants($t3, $c);
-        $expected = array(
-            't5' => array(7, 12, 2),
-        );
+        $expected = [
+            't5' => [7, 12, 2],
+        ];
         $this->assertEquals($expected, $this->dumpNodes($descendants), 'getDescendants() accepts a criteria as parameter');
     }
 
@@ -346,12 +346,12 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
          t9 t10
         */
         $descendants = $manager->getDescendants($t3);
-        $expected = array(
-            't4' => array(5, 6, 2),
-            't5' => array(7, 12, 2),
-            't6' => array(8, 9, 3),
-            't7' => array(10, 11, 3),
-        );
+        $expected = [
+            't4' => [5, 6, 2],
+            't5' => [7, 12, 2],
+            't6' => [8, 9, 3],
+            't7' => [10, 11, 3],
+        ];
         $this->assertEquals($expected, $this->dumpNodes($descendants), 'getDescendants() returns descendants from the current scope only');
     }
 
@@ -369,13 +369,13 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
                t6 t7
         */
         $descendants = $manager->getBranch($t3);
-        $expected = array(
-            't3' => array(4, 13, 1),
-            't4' => array(5, 6, 2),
-            't5' => array(7, 12, 2),
-            't6' => array(8, 9, 3),
-            't7' => array(10, 11, 3),
-        );
+        $expected = [
+            't3' => [4, 13, 1],
+            't4' => [5, 6, 2],
+            't5' => [7, 12, 2],
+            't6' => [8, 9, 3],
+            't7' => [10, 11, 3],
+        ];
         $this->assertEquals($expected, $this->dumpNodes($descendants), 'getBranch() returns an array of descendants, including the current node');
         $c = new Criteria(NestedSetEntity9EntityMap::DATABASE_NAME);
         $c->add(NestedSetEntity9EntityMap::FIELD_TITLE, 't3', Criteria::NOT_EQUAL);
@@ -397,19 +397,19 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
                |  \
                t6 t7
         */
-        $this->assertEquals(array(), $manager->getAncestors($t1), 'getAncestors() returns an empty array for roots');
+        $this->assertEquals([], $manager->getAncestors($t1), 'getAncestors() returns an empty array for roots');
         $ancestors = $manager->getAncestors($t5);
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't3' => array(4, 13, 1),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't3' => [4, 13, 1],
+        ];
         $this->assertEquals($expected, $this->dumpNodes($ancestors), 'getAncestors() returns an array of ancestors');
         $c = new Criteria(NestedSetEntity9EntityMap::DATABASE_NAME);
         $c->add(NestedSetEntity9EntityMap::FIELD_TITLE, 't3');
         $ancestors = $manager->getAncestors($t5, $c);
-        $expected = array(
-            't3' => array(4, 13, 1),
-        );
+        $expected = [
+            't3' => [4, 13, 1],
+        ];
         $this->assertEquals($expected, $this->dumpNodes($ancestors), 'getAncestors() accepts a criteria as parameter');
     }
 
@@ -431,12 +431,12 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
          | \
          t9 t10
         */
-        $this->assertEquals(array(), $manager->getAncestors($t1), 'getAncestors() returns an empty array for roots');
+        $this->assertEquals([], $manager->getAncestors($t1), 'getAncestors() returns an empty array for roots');
         $ancestors = $manager->getAncestors($t5);
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't3' => array(4, 13, 1),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't3' => [4, 13, 1],
+        ];
         $this->assertEquals($expected, $this->dumpNodes($ancestors), 'getAncestors() returns ancestors from the current scope only');
     }
 
@@ -547,12 +547,12 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
         $repository->save($t4);
         
 
-        $expected = array(
-            't1' => array(1, 8, 0),
-            't2' => array(4, 7, 1),
-            't3' => array(2, 3, 1),
-            't4' => array(5, 6, 2),
-        );
+        $expected = [
+            't1' => [1, 8, 0],
+            't2' => [4, 7, 1],
+            't3' => [2, 3, 1],
+            't4' => [5, 6, 2],
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'addChild() adds the child and saves it');
     }
 
@@ -579,16 +579,16 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
         $this->assertEquals(5, $t8->getLeftValue(), 'insertAsFirstChildOf() sets the left value correctly');
         $this->assertEquals(6, $t8->getRightValue(), 'insertAsFirstChildOf() sets the right value correctly');
         $this->assertEquals(2, $t8->getLevel(), 'insertAsFirstChildOf() sets the level correctly');
-        $expected = array(
-            't1' => array(1, 16, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 15, 1),
-            't4' => array(7, 8, 2),
-            't5' => array(9, 14, 2),
-            't6' => array(10, 11, 3),
-            't7' => array(12, 13, 3),
-            't8' => array(5, 6, 2)
-        );
+        $expected = [
+            't1' => [1, 16, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 15, 1],
+            't4' => [7, 8, 2],
+            't5' => [9, 14, 2],
+            't6' => [10, 11, 3],
+            't7' => [12, 13, 3],
+            't8' => [5, 6, 2]
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'insertAsFirstChildOf() shifts the other nodes correctly');
         try {
             $manager->insertAsFirstChildOf($t8, $t4);
@@ -653,22 +653,22 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
         $this->assertEquals(1, $t11->getScopeValue(), 'insertAsFirstChildOf() sets the scope value correctly');
         $session->persist($t11);
         $session->commit();
-        $expected = array(
-            't1' => array(1, 16, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 15, 1),
-            't4' => array(7, 8, 2),
-            't5' => array(9, 14, 2),
-            't6' => array(10, 11, 3),
-            't7' => array(12, 13, 3),
-            't11' => array(5, 6, 2)
-        );
+        $expected = [
+            't1' => [1, 16, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 15, 1],
+            't4' => [7, 8, 2],
+            't5' => [9, 14, 2],
+            't6' => [10, 11, 3],
+            't7' => [12, 13, 3],
+            't11' => [5, 6, 2]
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(1), 'insertAsFirstChildOf() shifts the other nodes correctly');
-        $expected = array(
-            't8' => array(1, 6, 0),
-            't9' => array(2, 3, 1),
-            't10' => array(4, 5, 1),
-        );
+        $expected = [
+            't8' => [1, 6, 0],
+            't9' => [2, 3, 1],
+            't10' => [4, 5, 1],
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 'insertAsFirstChildOf() does not shift anything out of the scope');
     }
 
@@ -725,16 +725,16 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
         $this->assertEquals(13, $t8->getLeftValue(), 'insertAsLastChildOf() sets the left value correctly');
         $this->assertEquals(14, $t8->getRightValue(), 'insertAsLastChildOf() sets the right value correctly');
         $this->assertEquals(2, $t8->getLevel(), 'insertAsLastChildOf() sets the level correctly');
-        $expected = array(
-            't1' => array(1, 16, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 15, 1),
-            't4' => array(5, 6, 2),
-            't5' => array(7, 12, 2),
-            't6' => array(8, 9, 3),
-            't7' => array(10, 11, 3),
-            't8' => array(13, 14, 2)
-        );
+        $expected = [
+            't1' => [1, 16, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 15, 1],
+            't4' => [5, 6, 2],
+            't5' => [7, 12, 2],
+            't6' => [8, 9, 3],
+            't7' => [10, 11, 3],
+            't8' => [13, 14, 2]
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'insertAsLastChildOf() shifts the other nodes correctly');
         try {
             $manager->insertAsLastChildOf($t8, $t4);
@@ -799,22 +799,22 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
         $this->assertEquals(1, $t11->getScopeValue(), 'insertAsLastChildOf() sets the scope value correctly');
         $session->persist($t11);
         $session->commit();
-        $expected = array(
-            't1' => array(1, 16, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 15, 1),
-            't4' => array(5, 6, 2),
-            't5' => array(7, 12, 2),
-            't6' => array(8, 9, 3),
-            't7' => array(10, 11, 3),
-            't11' => array(13, 14, 2)
-        );
+        $expected = [
+            't1' => [1, 16, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 15, 1],
+            't4' => [5, 6, 2],
+            't5' => [7, 12, 2],
+            't6' => [8, 9, 3],
+            't7' => [10, 11, 3],
+            't11' => [13, 14, 2]
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(1), 'insertAsLastChildOf() shifts the other nodes correctly');
-        $expected = array(
-            't8' => array(1, 6, 0),
-            't9' => array(2, 3, 1),
-            't10' => array(4, 5, 1),
-        );
+        $expected = [
+            't8' => [1, 6, 0],
+            't9' => [2, 3, 1],
+            't10' => [4, 5, 1],
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 'insertAsLastChildOf() does not shift anything out of the scope');
     }
 
@@ -871,16 +871,16 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
         $this->assertEquals(4, $t8->getLeftValue(), 'insertAsPrevSiblingOf() sets the left value correctly');
         $this->assertEquals(5, $t8->getRightValue(), 'insertAsPrevSiblingOf() sets the right value correctly');
         $this->assertEquals(1, $t8->getLevel(), 'insertAsPrevSiblingOf() sets the level correctly');
-        $expected = array(
-            't1' => array(1, 16, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(6, 15, 1),
-            't4' => array(7, 8, 2),
-            't5' => array(9, 14, 2),
-            't6' => array(10, 11, 3),
-            't7' => array(12, 13, 3),
-            't8' => array(4, 5, 1)
-        );
+        $expected = [
+            't1' => [1, 16, 0],
+            't2' => [2, 3, 1],
+            't3' => [6, 15, 1],
+            't4' => [7, 8, 2],
+            't5' => [9, 14, 2],
+            't6' => [10, 11, 3],
+            't7' => [12, 13, 3],
+            't8' => [4, 5, 1]
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'insertAsPrevSiblingOf() shifts the other nodes correctly');
         try {
             $manager->insertAsPrevSiblingOf($t8, $t4);
@@ -960,22 +960,22 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
         $manager->insertAsPrevSiblingOf($t11, $fixtures[2]); // prev sibling of t3
         $this->assertEquals(1, $t11->getScopeValue(), 'insertAsPrevSiblingOf() sets the scope value correctly');
         $repository->save($t11);
-        $expected = array(
-            't1' => array(1, 16, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(6, 15, 1),
-            't4' => array(7, 8, 2),
-            't5' => array(9, 14, 2),
-            't6' => array(10, 11, 3),
-            't7' => array(12, 13, 3),
-            't11' => array(4, 5, 1)
-        );
+        $expected = [
+            't1' => [1, 16, 0],
+            't2' => [2, 3, 1],
+            't3' => [6, 15, 1],
+            't4' => [7, 8, 2],
+            't5' => [9, 14, 2],
+            't6' => [10, 11, 3],
+            't7' => [12, 13, 3],
+            't11' => [4, 5, 1]
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(1), 'insertAsPrevSiblingOf() shifts the other nodes correctly');
-        $expected = array(
-            't8' => array(1, 6, 0),
-            't9' => array(2, 3, 1),
-            't10' => array(4, 5, 1),
-        );
+        $expected = [
+            't8' => [1, 6, 0],
+            't9' => [2, 3, 1],
+            't10' => [4, 5, 1],
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 'insertAsPrevSiblingOf() does not shift anything out of the scope');
     }
 
@@ -1043,16 +1043,16 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
         $this->assertEquals(14, $t8->getLeftValue(), 'insertAsNextSiblingOf() sets the left value correctly');
         $this->assertEquals(15, $t8->getRightValue(), 'insertAsNextSiblingOf() sets the right value correctly');
         $this->assertEquals(1, $t8->getLevel(), 'insertAsNextSiblingOf() sets the level correctly');
-        $expected = array(
-            't1' => array(1, 16, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 13, 1),
-            't4' => array(5, 6, 2),
-            't5' => array(7, 12, 2),
-            't6' => array(8, 9, 3),
-            't7' => array(10, 11, 3),
-            't8' => array(14, 15, 1)
-        );
+        $expected = [
+            't1' => [1, 16, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 13, 1],
+            't4' => [5, 6, 2],
+            't5' => [7, 12, 2],
+            't6' => [8, 9, 3],
+            't7' => [10, 11, 3],
+            't8' => [14, 15, 1]
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'insertAsNextSiblingOf() shifts the other nodes correctly');
         try {
             $manager->insertAsNextSiblingOf($t8, $t4);
@@ -1127,22 +1127,22 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
         $manager->insertAsNextSiblingOf($t11, $fixtures[2]); // next sibling of t3
         $this->assertEquals(1, $t11->getScopeValue(), 'insertAsNextSiblingOf() sets the scope value correctly');
         $repository->save($t11);
-        $expected = array(
-            't1' => array(1, 16, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 13, 1),
-            't4' => array(5, 6, 2),
-            't5' => array(7, 12, 2),
-            't6' => array(8, 9, 3),
-            't7' => array(10, 11, 3),
-            't11' => array(14, 15, 1)
-        );
+        $expected = [
+            't1' => [1, 16, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 13, 1],
+            't4' => [5, 6, 2],
+            't5' => [7, 12, 2],
+            't6' => [8, 9, 3],
+            't7' => [10, 11, 3],
+            't11' => [14, 15, 1]
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(1), 'insertAsNextSiblingOf() shifts the other nodes correctly');
-        $expected = array(
-            't8' => array(1, 6, 0),
-            't9' => array(2, 3, 1),
-            't10' => array(4, 5, 1),
-        );
+        $expected = [
+            't8' => [1, 6, 0],
+            't9' => [2, 3, 1],
+            't10' => [4, 5, 1],
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 'insertAsNextSiblingOf() does not shift anything out of the scope');
     }
 
@@ -1332,41 +1332,41 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
         }
         // moving down
         $manager->moveToFirstChildOf($t3, $t2);
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't2' => array(2, 13, 1),
-            't3' => array(3, 12, 2),
-            't4' => array(4, 5, 3),
-            't5' => array(6, 11, 3),
-            't6' => array(7, 8, 4),
-            't7' => array(9, 10, 4),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't2' => [2, 13, 1],
+            't3' => [3, 12, 2],
+            't4' => [4, 5, 3],
+            't5' => [6, 11, 3],
+            't6' => [7, 8, 4],
+            't7' => [9, 10, 4],
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'moveToFirstChildOf() moves the entire subtree down correctly');
         // moving up
         list($t1, $t2, $t3, $t4, $t5, $t6, $t7) = $this->initTree();
         $manager->moveToFirstChildOf($t5, $t1);
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't2' => array(8, 9, 1),
-            't3' => array(10, 13, 1),
-            't4' => array(11, 12, 2),
-            't5' => array(2, 7, 1),
-            't6' => array(3, 4, 2),
-            't7' => array(5, 6, 2),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't2' => [8, 9, 1],
+            't3' => [10, 13, 1],
+            't4' => [11, 12, 2],
+            't5' => [2, 7, 1],
+            't6' => [3, 4, 2],
+            't7' => [5, 6, 2],
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'moveToFirstChildOf() moves the entire subtree up correctly');
         // moving to the same level
         list($t1, $t2, $t3, $t4, $t5, $t6, $t7) = $this->initTree();
         $manager->moveToFirstChildOf($t5, $t3);
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 13, 1),
-            't4' => array(11, 12, 2),
-            't5' => array(5, 10, 2),
-            't6' => array(6, 7, 3),
-            't7' => array(8, 9, 3),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 13, 1],
+            't4' => [11, 12, 2],
+            't5' => [5, 10, 2],
+            't6' => [6, 7, 3],
+            't7' => [8, 9, 3],
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'moveToFirstChildOf() moves the entire subtree to the same level correctly');
     }
 
@@ -1404,10 +1404,10 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
 
         $this->assertEquals($t2->getScopeValue(), $t10->getScopeValue(), 'Should have now the same scope');
 
-        $expected = array(
-            't8' => array(1, 4, 0),
-            't9' => array(2, 3, 1),
-        );
+        $expected = [
+            't8' => [1, 4, 0],
+            't9' => [2, 3, 1],
+        ];
 
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 't10 removed from scope 2, therefore t8 `right` has been changed');
         $this->assertEquals(15, $t3->getRightValue(), 't3 has shifted by one item, so from 13 to 15');
@@ -1430,7 +1430,7 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
         $this->assertEquals($oldt4Left+(2*3), $t4->getLeftValue(), 't4 was moved by 3 items before it');
         $this->assertEquals(3, $t9->getLevel(), 'New level is 3');
 
-        $expected = array();
+        $expected = [];
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 'root of scope 2 to scope 1, therefore scope 2 is empty');
     }
 
@@ -1455,41 +1455,41 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
         }
         // moving up
         $manager->moveToLastChildOf($t5, $t1);
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 7, 1),
-            't4' => array(5, 6, 2),
-            't5' => array(8, 13, 1),
-            't6' => array(9, 10, 2),
-            't7' => array(11, 12, 2),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 7, 1],
+            't4' => [5, 6, 2],
+            't5' => [8, 13, 1],
+            't6' => [9, 10, 2],
+            't7' => [11, 12, 2],
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'moveToLastChildOf() moves the entire subtree up correctly');
         // moving down
         list($t1, $t2, $t3, $t4, $t5, $t6, $t7) = $this->initTree();
         $manager->moveToLastChildOf($t3, $t2);
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't2' => array(2, 13, 1),
-            't3' => array(3, 12, 2),
-            't4' => array(4, 5, 3),
-            't5' => array(6, 11, 3),
-            't6' => array(7, 8, 4),
-            't7' => array(9, 10, 4),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't2' => [2, 13, 1],
+            't3' => [3, 12, 2],
+            't4' => [4, 5, 3],
+            't5' => [6, 11, 3],
+            't6' => [7, 8, 4],
+            't7' => [9, 10, 4],
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'moveToLastChildOf() moves the entire subtree down correctly');
         // moving to the same level
         list($t1, $t2, $t3, $t4, $t5, $t6, $t7) = $this->initTree();
         $manager->moveToLastChildOf($t4, $t3);
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 13, 1),
-            't4' => array(11, 12, 2),
-            't5' => array(5, 10, 2),
-            't6' => array(6, 7, 3),
-            't7' => array(8, 9, 3),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 13, 1],
+            't4' => [11, 12, 2],
+            't5' => [5, 10, 2],
+            't6' => [6, 7, 3],
+            't7' => [8, 9, 3],
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'moveToLastChildOf() moves the entire subtree to the same level correctly');
     }
 
@@ -1524,10 +1524,10 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
 
         $this->assertEquals($t2->getScopeValue(), $t10->getScopeValue(), 'Should have now the same scope');
 
-        $expected = array(
-            't8' => array(1, 4, 0),
-            't9' => array(2, 3, 1),
-        );
+        $expected = [
+            't8' => [1, 4, 0],
+            't9' => [2, 3, 1],
+        ];
 
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 't10 removed from scope 2, therefore t8 `right` has been changed');
         $this->assertEquals(15, $t3->getRightValue(), 't3 has shifted by one item, so from 13 to 15');
@@ -1547,7 +1547,7 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
         $this->assertEquals(19, $t3->getRightValue(), 't3 was extended for 3 more children, from 13+(3*2) to 19');
         $this->assertEquals(3, $t9->getLevel(), 'New level is 3');
 
-        $expected = array();
+        $expected = [];
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 'root of scope 2 to scope 1, therefore scope 2 is empty');
     }
 
@@ -1585,15 +1585,15 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
             | \    |
             t6 t7  t4
         */
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(10, 13, 1),
-            't4' => array(11, 12, 2),
-            't5' => array(4, 9, 1),
-            't6' => array(5, 6, 2),
-            't7' => array(7, 8, 2),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't2' => [2, 3, 1],
+            't3' => [10, 13, 1],
+            't4' => [11, 12, 2],
+            't5' => [4, 9, 1],
+            't6' => [5, 6, 2],
+            't7' => [7, 8, 2],
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'moveToPrevSiblingOf() moves the entire subtree up correctly');
         // moving down
         list($t1, $t2, $t3, $t4, $t5, $t6, $t7) = $this->initTree();
@@ -1607,15 +1607,15 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
             | \
             t6 t7
         */
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 13, 1),
-            't4' => array(11, 12, 2),
-            't5' => array(5, 10, 2),
-            't6' => array(6, 7, 3),
-            't7' => array(8, 9, 3),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 13, 1],
+            't4' => [11, 12, 2],
+            't5' => [5, 10, 2],
+            't6' => [6, 7, 3],
+            't7' => [8, 9, 3],
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'moveToPrevSiblingOf() moves the entire subtree down correctly');
         // moving at the same level
         list($t1, $t2, $t3, $t4, $t5, $t6, $t7) = $this->initTree();
@@ -1629,15 +1629,15 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
                |  \
                t6 t7
         */
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 13, 1),
-            't4' => array(5, 6, 2),
-            't5' => array(7, 12, 2),
-            't6' => array(8, 9, 3),
-            't7' => array(10, 11, 3),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 13, 1],
+            't4' => [5, 6, 2],
+            't5' => [7, 12, 2],
+            't6' => [8, 9, 3],
+            't7' => [10, 11, 3],
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'moveToPrevSiblingOf() moves the entire subtree at the same level correctly');
     }
 
@@ -1674,10 +1674,10 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
 
         $this->assertEquals($t2->getScopeValue(), $t10->getScopeValue(), 'Should have now the same scope');
 
-        $expected = array(
-            't8' => array(1, 4, 0),
-            't9' => array(2, 3, 1),
-        );
+        $expected = [
+            't8' => [1, 4, 0],
+            't9' => [2, 3, 1],
+        ];
 
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 't10 removed from scope 2, therefore t8 `right` has been changed');
         $this->assertEquals(15, $t3->getRightValue(), 't3 has shifted by one item, so from 13 to 15');
@@ -1698,7 +1698,7 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
         $this->assertEquals(2, $t9->getLevel(), 'New level is 2');
         $this->assertEquals(1, $t8->getLevel(), 'New level is 1');
 
-        $expected = array();
+        $expected = [];
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 'root of scope 2 to scope 1, therefore scope 2 is empty');
     }
 
@@ -1736,15 +1736,15 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
             |   | \
             t4  t6 t7
         */
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 7, 1),
-            't4' => array(5, 6, 2),
-            't5' => array(8, 13, 1),
-            't6' => array(9, 10, 2),
-            't7' => array(11, 12, 2),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 7, 1],
+            't4' => [5, 6, 2],
+            't5' => [8, 13, 1],
+            't6' => [9, 10, 2],
+            't7' => [11, 12, 2],
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'moveToNextSiblingOf() moves the entire subtree up correctly');
         // moving down
         list($t1, $t2, $t3, $t4, $t5, $t6, $t7) = $this->initTree();
@@ -1758,15 +1758,15 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
                |  \
                t6 t7
         */
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 13, 1),
-            't4' => array(5, 6, 2),
-            't5' => array(7, 12, 2),
-            't6' => array(8, 9, 3),
-            't7' => array(10, 11, 3),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 13, 1],
+            't4' => [5, 6, 2],
+            't5' => [7, 12, 2],
+            't6' => [8, 9, 3],
+            't7' => [10, 11, 3],
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'moveToNextSiblingOf() moves the entire subtree down correctly');
         // moving at the same level
         list($t1, $t2, $t3, $t4, $t5, $t6, $t7) = $this->initTree();
@@ -1780,15 +1780,15 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
             | \
             t6 t7
         */
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 13, 1),
-            't4' => array(11, 12, 2),
-            't5' => array(5, 10, 2),
-            't6' => array(6, 7, 3),
-            't7' => array(8, 9, 3),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 13, 1],
+            't4' => [11, 12, 2],
+            't5' => [5, 10, 2],
+            't6' => [6, 7, 3],
+            't7' => [8, 9, 3],
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'moveToNextSiblingOf() moves the entire subtree at the same level correctly');
     }
 
@@ -1828,10 +1828,10 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
 
         $this->assertEquals($t2->getScopeValue(), $t10->getScopeValue(), 'Should have now the same scope');
 
-        $expected = array(
-            't8' => array(1, 4, 0),
-            't9' => array(2, 3, 1),
-        );
+        $expected = [
+            't8' => [1, 4, 0],
+            't9' => [2, 3, 1],
+        ];
 
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 't10 removed from scope 2, therefore t8 `right` has been changed');
         $this->assertEquals(15, $t3->getRightValue(), 't3 has shifted by one item, so from 13 to 15');
@@ -1855,7 +1855,7 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
         $this->assertEquals(1, $t8->getLevel(), 'New level is 1');
         $this->assertEquals(2, $t9->getLevel(), 'New level is 2');
 
-        $expected = array();
+        $expected = [];
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 'root of scope 2 to scope 1, therefore scope 2 is empty');
     }
 
@@ -1893,7 +1893,6 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
         $t2 = new NestedSetEntity9();
         $manager->makeRoot($t2);
         $repository->save($t2);
-        
     }
 
     public function testDeleteDescendants()
@@ -1914,11 +1913,11 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
         $this->assertEquals(5, $t3->getRightValue(), 'deleteDescendants() updates the current node');
         $this->assertEquals(5, $t4->getLeftValue(), 'deleteDescendants() does not update existing nodes (because delete() clears the instance cache)');
 
-        $expected = array(
-            't1' => array(1, 6, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 5, 1),
-        );
+        $expected = [
+            't1' => [1, 6, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 5, 1],
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'deleteDescendants() shifts the entire subtree correctly');
         list($t1, $t2, $t3, $t4, $t5, $t6, $t7) = $this->initTree();
         /* Tree used for tests
@@ -1931,9 +1930,9 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
                t6 t7
         */
         $this->assertEquals(6, $manager->deleteDescendants($t1), 'deleteDescendants() can be called on the root node');
-        $expected = array(
-            't1' => array(1, 2, 0),
-        );
+        $expected = [
+            't1' => [1, 2, 0],
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'deleteDescendants() can delete all descendants of the root node');
     }
 
@@ -1956,17 +1955,17 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
          t9 t10
         */
         $this->assertEquals(4, $manager->deleteDescendants($t3), 'deleteDescendants() returns the number of deleted nodes');
-        $expected = array(
-            't1' => array(1, 6, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 5, 1),
-        );
+        $expected = [
+            't1' => [1, 6, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 5, 1],
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(1), 'deleteDescendants() shifts the entire subtree correctly');
-        $expected = array(
-            't8' => array(1, 6, 0),
-            't9' => array(2, 3, 1),
-            't10' => array(4, 5, 1),
-        );
+        $expected = [
+            't8' => [1, 6, 0],
+            't9' => [2, 3, 1],
+            't10' => [4, 5, 1],
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 'deleteDescendants() does not delete anything out of the scope');
     }
 
@@ -2103,18 +2102,18 @@ class NestedSetBehaviorNestedManagerTest extends TestCase
         $session->remove($t5);
         $session->commit();
 
-        $expected = array(
-            't1' => array(1, 8, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 7, 1),
-            't4' => array(5, 6, 2),
-        );
+        $expected = [
+            't1' => [1, 8, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 7, 1],
+            't4' => [5, 6, 2],
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(1), 'delete() deletes all descendants and shifts the entire subtree correctly');
-        $expected = array(
-            't8' => array(1, 6, 0),
-            't9' => array(2, 3, 1),
-            't10' => array(4, 5, 1),
-        );
+        $expected = [
+            't8' => [1, 6, 0],
+            't9' => [2, 3, 1],
+            't10' => [4, 5, 1],
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 'delete() does not delete anything out of the scope');
     }
 

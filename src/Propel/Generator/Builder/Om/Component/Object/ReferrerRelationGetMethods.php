@@ -78,4 +78,4 @@ return \$this->$varName;
             ->setBody($body)
             ->setDescription("Returns the associated $foreignClassName object or null if none is associated.");
     }
-} 
+}

@@ -22,7 +22,7 @@ class SetSlugMethod extends BuildComponent
         $this->addMethod('setSlug')
             ->setDescription("Standard setter method for the slug. Alias of `$methodName`")
             ->setType("\$this|{$this->getObjectClassName()}")
-            ->addSimpleDescParameter('slug', 'string', 'The value of the slug',null)
+            ->addSimpleDescParameter('slug', 'string', 'The value of the slug', null)
             ->setBody("return \$this->$methodName(\$slug);")
         ;
     }

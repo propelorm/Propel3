@@ -67,12 +67,12 @@ if (\$this->isInTree(\$child)) {
 \$child->setRightValue(\$left + 1);
 \$child->setLevel(\$parent->getLevel() + 1);";
 
-    if ($useScope) {
-        $body .= "
+        if ($useScope) {
+            $body .= "
 \$child->setScopeValue(\$parent->getScopeValue());";
-    }
+        }
 
-    $body .= "
+        $body .= "
 // Keep the tree modification query for the save() transaction
 \$query = [
     'callable'  => 'makeRoomForLeaf',
@@ -110,13 +110,13 @@ if (\$this->isInTree(\$child)) {
 \$child->setLevel(\$parent->getLevel() + 1);
 ";
 
-if ($useScope) {
-    $body .= "
+        if ($useScope) {
+            $body .= "
 \$child->setScopeValue(\$parent->getScopeValue());
 ";
-}
+        }
 
-$body .= "
+        $body .= "
 // Keep the tree modification query for the save() transaction
 \$query = [
     'callable'  => 'makeRoomForLeaf',
@@ -149,11 +149,11 @@ if (\$this->isInTree(\$node)) {
 \$node->setLeftValue(\$left);
 \$node->setRightValue(\$left + 1);
 \$node->setLevel(\$sibling->getLevel());";
-    if ($useScope) {
-        $body .= "
+        if ($useScope) {
+            $body .= "
 \$node->setScopeValue(\$sibling->getScopeValue());";
-    }
-    $body .= "
+        }
+        $body .= "
 
 // Keep the tree modification query for the save() transaction
 \$query = [
@@ -188,11 +188,11 @@ if (\$this->isInTree(\$node)) {
 \$node->setLeftValue(\$left);
 \$node->setRightValue(\$left + 1);
 \$node->setLevel(\$sibling->getLevel());";
-    if ($useScope) {
-        $body .= "
+        if ($useScope) {
+            $body .= "
 \$node->setScopeValue(\$sibling->getScopeValue());";
-    }
-    $body .= "
+        }
+        $body .= "
 
 // Keep the tree modification query for the save() transaction
 \$query = [

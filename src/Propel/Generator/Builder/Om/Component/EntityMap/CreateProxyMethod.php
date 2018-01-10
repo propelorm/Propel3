@@ -24,8 +24,12 @@ class CreateProxyMethod extends BuildComponent
 
         //reset lazy loaded properties
         foreach ($this->getEntity()->getFields() as $field) {
-            if ($field->isPrimaryKey()) continue;
-            if (!$field->isLazyLoad()) continue;
+            if ($field->isPrimaryKey()) {
+                continue;
+            }
+            if (!$field->isLazyLoad()) {
+                continue;
+            }
 
             $propertiesToUnset[] = '$unset($object, ' . json_encode($field->getName()) . ');';
         }

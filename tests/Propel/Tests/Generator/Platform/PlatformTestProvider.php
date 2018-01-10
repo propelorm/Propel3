@@ -23,7 +23,6 @@ use Propel\Generator\Model\Unique;
  */
 abstract class PlatformTestProvider extends PlatformTestBase
 {
-
     public function providerForTestGetAddEntitiesDDL()
     {
         $schema = <<<EOF
@@ -44,7 +43,7 @@ abstract class PlatformTestProvider extends PlatformTestBase
 </database>
 EOF;
 
-        return array(array($schema));
+        return [[$schema]];
     }
 
     public function providerForTestGetAddEntitiesDDLSchema()
@@ -78,7 +77,7 @@ EOF;
 </database>
 EOF;
 
-        return array(array($schema));
+        return [[$schema]];
     }
 
     public function providerForTestGetAddEntitiesSkipSQLDDL()
@@ -104,7 +103,7 @@ EOF;
 </database>
 EOF;
 
-        return array(array($schema));
+        return [[$schema]];
     }
 
     public function providerForTestGetAddEntityDDLSimplePK()
@@ -118,7 +117,7 @@ EOF;
 </database>
 EOF;
 
-        return array(array($schema));
+        return [[$schema]];
     }
 
     public function providerForTestGetAddEntityDDLNonIntegerPK()
@@ -132,7 +131,7 @@ EOF;
 </database>
 EOF;
 
-        return array(array($schema));
+        return [[$schema]];
     }
 
     public function providerForTestGetAddEntityDDLCompositePK()
@@ -147,7 +146,7 @@ EOF;
 </database>
 EOF;
 
-        return array(array($schema));
+        return [[$schema]];
     }
 
     public function providerForTestGetAddEntityDDLUniqueIndex()
@@ -164,7 +163,7 @@ EOF;
 </database>
 EOF;
 
-        return array(array($schema));
+        return [[$schema]];
     }
 
     public function providerForTestGetAddEntityDDLSchema()
@@ -178,7 +177,7 @@ EOF;
 </database>
 EOF;
 
-        return array(array($schema));
+        return [[$schema]];
     }
 
     public function providerForTestGetUniqueDDL()
@@ -196,9 +195,9 @@ EOF;
         $index->addField($field2);
         $entity->addUnique($index);
 
-        return array(
-            array($index)
-        );
+        return [
+            [$index]
+        ];
     }
 
     public function providerForTestGetIndicesDDL()
@@ -219,9 +218,9 @@ EOF;
         $index2->addField($field1);
         $entity->addIndex($index2);
 
-        return array(
-            array($entity)
-        );
+        return [
+            [$entity]
+        ];
     }
 
     public function providerForTestGetIndexDDL()
@@ -239,9 +238,9 @@ EOF;
         $index->addField($field2);
         $entity->addIndex($index);
 
-        return array(
-            array($index)
-        );
+        return [
+            [$index]
+        ];
     }
 
     public function providerForTestPrimaryKeyDDL()
@@ -252,9 +251,9 @@ EOF;
         $field->setPrimaryKey(true);
         $entity->addField($field);
 
-        return array(
-            array($entity)
-        );
+        return [
+            [$entity]
+        ];
     }
 
     public function providerForTestGetRelationDDL()
@@ -280,9 +279,9 @@ EOF;
         $fk->setOnDelete('CASCADE');
         $entity1->addRelation($fk);
 
-        return array(
-            array($fk)
-        );
+        return [
+            [$fk]
+        ];
     }
 
     public function providerForTestGetRelationSkipSqlDDL()
@@ -291,9 +290,9 @@ EOF;
         $fk = $arr[0][0];
         $fk->setSkipSql(true);
 
-        return array(
-            array($fk)
-        );
+        return [
+            [$fk]
+        ];
     }
 
     public function providerForTestGetRelationsDDL()
@@ -334,9 +333,8 @@ EOF;
         $fk->setOnDelete('SETNULL');
         $entity1->addRelation($fk);
 
-        return array(
-            array($entity1)
-        );
+        return [
+            [$entity1]
+        ];
     }
-
 }

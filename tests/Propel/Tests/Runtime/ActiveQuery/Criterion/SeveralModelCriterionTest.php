@@ -24,17 +24,17 @@ class SeveralModelCriterionTest extends BaseTestCase
 {
     public function testAppendPsToAddsBindingInfoForNotNullValues()
     {
-        $cton = new SeveralModelCriterion(new Criteria(), 'A.COL BETWEEN ? AND ?', 'A.COL', array('foo', 'bar'));
+        $cton = new SeveralModelCriterion(new Criteria(), 'A.COL BETWEEN ? AND ?', 'A.COL', ['foo', 'bar']);
 
-        $params = array();
+        $params = [];
         $ps = '';
         $cton->appendPsTo($ps, $params);
 
         $this->assertEquals('A.COL BETWEEN :p1 AND :p2', $ps);
-        $expected = array(
-            array('entity' => 'A', 'field' => 'COL', 'value' => 'foo'),
-            array('entity' => 'A', 'field' => 'COL', 'value' => 'bar')
-        );
+        $expected = [
+            ['entity' => 'A', 'field' => 'COL', 'value' => 'foo'],
+            ['entity' => 'A', 'field' => 'COL', 'value' => 'bar']
+        ];
         $this->assertEquals($expected, $params);
     }
 
@@ -43,9 +43,9 @@ class SeveralModelCriterionTest extends BaseTestCase
      */
     public function testAppendPsToThrowsExceptionWhenOneOfTheValuesIsNull()
     {
-        $cton = new SeveralModelCriterion(new Criteria(), 'A.COL BETWEEN ? AND ?', 'A.COL', array('foo', null));
+        $cton = new SeveralModelCriterion(new Criteria(), 'A.COL BETWEEN ? AND ?', 'A.COL', ['foo', null]);
 
-        $params = array();
+        $params = [];
         $ps = '';
         $cton->appendPsTo($ps, $params);
     }
@@ -57,9 +57,8 @@ class SeveralModelCriterionTest extends BaseTestCase
     {
         $cton = new SeveralModelCriterion(new Criteria(), 'A.COL BETWEEN ? AND ?', 'A.COL', null);
 
-        $params = array();
+        $params = [];
         $ps = '';
         $cton->appendPsTo($ps, $params);
     }
-
 }

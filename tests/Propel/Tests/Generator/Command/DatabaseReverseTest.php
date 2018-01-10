@@ -18,25 +18,25 @@ class DatabaseReverseTest extends TestCaseFixturesDatabase
         $command = new DatabaseReverseCommand();
         $app->add($command);
 
-	$currentDir = getcwd();
+        $currentDir = getcwd();
         $outputDir = __DIR__.'/../../../../reversecommand';
 
-	chdir(__DIR__.'/../../../../Fixtures/bookstore');
+        chdir(__DIR__.'/../../../../Fixtures/bookstore');
 
-        $input = new \Symfony\Component\Console\Input\ArrayInput(array(
+        $input = new \Symfony\Component\Console\Input\ArrayInput([
             'command' => 'database:reverse',
             '--database-name' => 'reverse-test',
             '--output-dir' => $outputDir,
             '--verbose' => true,
             '--platform' => ucfirst($this->getDriver()).'Platform',
             'connection' => $this->getConnectionDsn('bookstore-schemas', true)
-        ));
+        ]);
 
         $output = new \Symfony\Component\Console\Output\StreamOutput(fopen("php://temp", 'r+'));
         $app->setAutoExit(false);
         $result = $app->run($input, $output);
 
-	chdir($currentDir);
+        chdir($currentDir);
 
         if (0 !== $result) {
             rewind($output->getStream());
@@ -55,6 +55,5 @@ class DatabaseReverseTest extends TestCaseFixturesDatabase
         $this->assertEquals('acct_access_role', $table['name']);
         $this->assertEquals('AcctAccessRole', $table['phpName']);
         $this->assertCount(2, $table->xpath('column'));
-
     }
 }

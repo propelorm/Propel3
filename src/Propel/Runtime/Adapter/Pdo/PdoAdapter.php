@@ -57,7 +57,7 @@ abstract class PdoAdapter implements SqlAdapterInterface
 
         // load any driver options from the config file
         // driver options are those PDO settings that have to be passed during the connection construction
-        $driver_options = array();
+        $driver_options = [];
         if (isset($conparams['options']) && is_array($conparams['options'])) {
             foreach ($conparams['options'] as $option => $optiondata) {
                 $value = $optiondata;
@@ -73,7 +73,7 @@ abstract class PdoAdapter implements SqlAdapterInterface
 
         try {
             $con = new PdoConnection($dsn, $user, $password, $driver_options);
-            $this->initConnection($con, isset($conparams['settings']) && is_array($conparams['settings']) ? $conparams['settings'] : array());
+            $this->initConnection($con, isset($conparams['settings']) && is_array($conparams['settings']) ? $conparams['settings'] : []);
         } catch (\PDOException $e) {
             throw new AdapterException("Unable to open PDO connection", 0, $e);
         }
@@ -250,7 +250,7 @@ abstract class PdoAdapter implements SqlAdapterInterface
      **/
     public function quoteTableIdentifier($entity)
     {
-        return implode(' ', array_map(array($this, 'quoteIdentifier'), explode(' ', $entity)));
+        return implode(' ', array_map([$this, 'quoteIdentifier'], explode(' ', $entity)));
     }
 
     /**
@@ -418,12 +418,11 @@ abstract class PdoAdapter implements SqlAdapterInterface
      */
     public function createSelectSqlPart(Criteria $criteria, $aliasAll = false)
     {
-        $selectClause = array();
+        $selectClause = [];
 
         if ($aliasAll) {
             $this->turnSelectFieldsToAliases($criteria);
             // no select fields after that, they are all aliases
-
         } else {
             foreach ($criteria->getSelectFields() as $fieldName) {
                 $selectClause[] = $fieldName;
@@ -577,5 +576,4 @@ abstract class PdoAdapter implements SqlAdapterInterface
 
         return $stmt->bindValue($parameter, $value, $cMap->getPdoType());
     }
-
 }

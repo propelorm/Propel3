@@ -26,20 +26,20 @@ class FindMethod extends BuildComponent
         $entityMapClassName = $this->getEntityMapClassName();
         $entity = $this->getEntity();
 
-            $body = "
+        $body = "
 if (null === \$key) {
     return null;
 }";
-            if ($entity->hasCompositePrimaryKey()) {
-                $pks = array();
-                foreach ($entity->getPrimaryKey() as $index => $column) {
-                    $pks [] = "\$key[$index]";
-                }
-            } else {
-                $pks = '$key';
+        if ($entity->hasCompositePrimaryKey()) {
+            $pks = [];
+            foreach ($entity->getPrimaryKey() as $index => $column) {
+                $pks [] = "\$key[$index]";
             }
-            $pkHash = $this->getFirstLevelCacheKeySnippet($pks);
-            $body .= "
+        } else {
+            $pks = '$key';
+        }
+        $pkHash = $this->getFirstLevelCacheKeySnippet($pks);
+        $body .= "
 if ((null !== (\$obj = \$this->getInstanceFromFirstLevelCache('{$entity->getFullClassName()}', {$pkHash})))) {
     // the object is already in the instance pool
     return \$obj;

@@ -27,7 +27,7 @@ class CriteriaMergeTest extends TestCaseFixtures
 {
     protected function assertCriteriaTranslation(Criteria $criteria, $expectedSql, $message = '')
     {
-        $params = array();
+        $params = [];
         $result = $criteria->createSelectSql($params);
         $this->assertEquals($expectedSql, $result, $message);
     }
@@ -78,24 +78,24 @@ class CriteriaMergeTest extends TestCaseFixtures
         $c1->setDistinct();
         $c2 = new ModelCriteria();
         $c1->mergeWith($c2);
-        $this->assertEquals(array(Criteria::DISTINCT), $c1->getSelectModifiers(), 'mergeWith() does not remove an existing select modifier');
+        $this->assertEquals([Criteria::DISTINCT], $c1->getSelectModifiers(), 'mergeWith() does not remove an existing select modifier');
         $c1 = new ModelCriteria();
         $c2 = new ModelCriteria();
         $c2->setDistinct();
         $c1->mergeWith($c2);
-        $this->assertEquals(array(Criteria::DISTINCT), $c1->getSelectModifiers(), 'mergeWith() merges the select modifiers');
+        $this->assertEquals([Criteria::DISTINCT], $c1->getSelectModifiers(), 'mergeWith() merges the select modifiers');
         $c1 = new ModelCriteria();
         $c1->setDistinct();
         $c2 = new ModelCriteria();
         $c2->setDistinct();
         $c1->mergeWith($c2);
-        $this->assertEquals(array(Criteria::DISTINCT), $c1->getSelectModifiers(), 'mergeWith() does not duplicate select modifiers');
+        $this->assertEquals([Criteria::DISTINCT], $c1->getSelectModifiers(), 'mergeWith() does not duplicate select modifiers');
         $c1 = new ModelCriteria();
         $c1->setAll();
         $c2 = new ModelCriteria();
         $c2->setDistinct();
         $c1->mergeWith($c2);
-        $this->assertEquals(array(Criteria::ALL), $c1->getSelectModifiers(), 'mergeWith() does not merge the select modifiers in case of conflict');
+        $this->assertEquals([Criteria::ALL], $c1->getSelectModifiers(), 'mergeWith() does not merge the select modifiers in case of conflict');
     }
 
     public function testMergeWithSelectFields()
@@ -105,25 +105,25 @@ class CriteriaMergeTest extends TestCaseFixtures
         $c1->addSelectField(BookEntityMap::FIELD_ID);
         $c2 = new ModelCriteria();
         $c1->mergeWith($c2);
-        $this->assertEquals(array(BookEntityMap::FIELD_TITLE, BookEntityMap::FIELD_ID), $c1->getSelectFields(), 'mergeWith() does not remove an existing select fields');
+        $this->assertEquals([BookEntityMap::FIELD_TITLE, BookEntityMap::FIELD_ID], $c1->getSelectFields(), 'mergeWith() does not remove an existing select fields');
         $c1 = new ModelCriteria();
         $c2 = new ModelCriteria();
         $c2->addSelectField(BookEntityMap::FIELD_TITLE);
         $c2->addSelectField(BookEntityMap::FIELD_ID);
         $c1->mergeWith($c2);
-        $this->assertEquals(array(BookEntityMap::FIELD_TITLE, BookEntityMap::FIELD_ID), $c1->getSelectFields(), 'mergeWith() merges the select fields to an empty select');
+        $this->assertEquals([BookEntityMap::FIELD_TITLE, BookEntityMap::FIELD_ID], $c1->getSelectFields(), 'mergeWith() merges the select fields to an empty select');
         $c1 = new ModelCriteria();
         $c1->addSelectField(BookEntityMap::FIELD_TITLE);
         $c2 = new ModelCriteria();
         $c2->addSelectField(BookEntityMap::FIELD_ID);
         $c1->mergeWith($c2);
-        $this->assertEquals(array(BookEntityMap::FIELD_TITLE, BookEntityMap::FIELD_ID), $c1->getSelectFields(), 'mergeWith() merges the select fields after the existing select fields');
+        $this->assertEquals([BookEntityMap::FIELD_TITLE, BookEntityMap::FIELD_ID], $c1->getSelectFields(), 'mergeWith() merges the select fields after the existing select fields');
         $c1 = new ModelCriteria();
         $c1->addSelectField(BookEntityMap::FIELD_TITLE);
         $c2 = new ModelCriteria();
         $c2->addSelectField(BookEntityMap::FIELD_TITLE);
         $c1->mergeWith($c2);
-        $this->assertEquals(array(BookEntityMap::FIELD_TITLE, BookEntityMap::FIELD_TITLE), $c1->getSelectFields(), 'mergeWith() merges the select fields to an existing select, even if duplicated');
+        $this->assertEquals([BookEntityMap::FIELD_TITLE, BookEntityMap::FIELD_TITLE], $c1->getSelectFields(), 'mergeWith() merges the select fields to an existing select, even if duplicated');
     }
 
     public function testMergeWithAsFields()
@@ -133,19 +133,19 @@ class CriteriaMergeTest extends TestCaseFixtures
         $c1->addAsField('bar', BookEntityMap::FIELD_ID);
         $c2 = new ModelCriteria();
         $c1->mergeWith($c2);
-        $this->assertEquals(array('foo' => BookEntityMap::FIELD_TITLE, 'bar' => BookEntityMap::FIELD_ID), $c1->getAsFields(), 'mergeWith() does not remove an existing as fields');
+        $this->assertEquals(['foo' => BookEntityMap::FIELD_TITLE, 'bar' => BookEntityMap::FIELD_ID], $c1->getAsFields(), 'mergeWith() does not remove an existing as fields');
         $c1 = new ModelCriteria();
         $c2 = new ModelCriteria();
         $c2->addAsField('foo', BookEntityMap::FIELD_TITLE);
         $c2->addAsField('bar', BookEntityMap::FIELD_ID);
         $c1->mergeWith($c2);
-        $this->assertEquals(array('foo' => BookEntityMap::FIELD_TITLE, 'bar' => BookEntityMap::FIELD_ID), $c1->getAsFields(), 'mergeWith() merges the select fields to an empty as');
+        $this->assertEquals(['foo' => BookEntityMap::FIELD_TITLE, 'bar' => BookEntityMap::FIELD_ID], $c1->getAsFields(), 'mergeWith() merges the select fields to an empty as');
         $c1 = new ModelCriteria();
         $c1->addAsField('foo', BookEntityMap::FIELD_TITLE);
         $c2 = new ModelCriteria();
         $c2->addAsField('bar', BookEntityMap::FIELD_ID);
         $c1->mergeWith($c2);
-        $this->assertEquals(array('foo' => BookEntityMap::FIELD_TITLE, 'bar' => BookEntityMap::FIELD_ID), $c1->getAsFields(), 'mergeWith() merges the select fields after the existing as fields');
+        $this->assertEquals(['foo' => BookEntityMap::FIELD_TITLE, 'bar' => BookEntityMap::FIELD_ID], $c1->getAsFields(), 'mergeWith() merges the select fields after the existing as fields');
     }
 
     /**
@@ -167,31 +167,31 @@ class CriteriaMergeTest extends TestCaseFixtures
         $c1->addAscendingOrderByField(BookEntityMap::FIELD_ID);
         $c2 = new ModelCriteria();
         $c1->mergeWith($c2);
-        $this->assertEquals(array(BookEntityMap::FIELD_TITLE . ' ASC', BookEntityMap::FIELD_ID . ' ASC'), $c1->getOrderByFields(), 'mergeWith() does not remove an existing orderby fields');
+        $this->assertEquals([BookEntityMap::FIELD_TITLE . ' ASC', BookEntityMap::FIELD_ID . ' ASC'], $c1->getOrderByFields(), 'mergeWith() does not remove an existing orderby fields');
         $c1 = new ModelCriteria();
         $c2 = new ModelCriteria();
         $c2->addAscendingOrderByField(BookEntityMap::FIELD_TITLE);
         $c2->addAscendingOrderByField(BookEntityMap::FIELD_ID);
         $c1->mergeWith($c2);
-        $this->assertEquals(array(BookEntityMap::FIELD_TITLE . ' ASC', BookEntityMap::FIELD_ID . ' ASC'), $c1->getOrderByFields(), 'mergeWith() merges the select fields to an empty order by');
+        $this->assertEquals([BookEntityMap::FIELD_TITLE . ' ASC', BookEntityMap::FIELD_ID . ' ASC'], $c1->getOrderByFields(), 'mergeWith() merges the select fields to an empty order by');
         $c1 = new ModelCriteria();
         $c1->addAscendingOrderByField(BookEntityMap::FIELD_TITLE);
         $c2 = new ModelCriteria();
         $c2->addAscendingOrderByField(BookEntityMap::FIELD_ID);
         $c1->mergeWith($c2);
-        $this->assertEquals(array(BookEntityMap::FIELD_TITLE . ' ASC', BookEntityMap::FIELD_ID . ' ASC'), $c1->getOrderByFields(), 'mergeWith() merges the select fields after the existing orderby fields');
+        $this->assertEquals([BookEntityMap::FIELD_TITLE . ' ASC', BookEntityMap::FIELD_ID . ' ASC'], $c1->getOrderByFields(), 'mergeWith() merges the select fields after the existing orderby fields');
         $c1 = new ModelCriteria();
         $c1->addAscendingOrderByField(BookEntityMap::FIELD_TITLE);
         $c2 = new ModelCriteria();
         $c2->addAscendingOrderByField(BookEntityMap::FIELD_TITLE);
         $c1->mergeWith($c2);
-        $this->assertEquals(array(BookEntityMap::FIELD_TITLE . ' ASC'), $c1->getOrderByFields(), 'mergeWith() does not merge duplicated orderby fields');
+        $this->assertEquals([BookEntityMap::FIELD_TITLE . ' ASC'], $c1->getOrderByFields(), 'mergeWith() does not merge duplicated orderby fields');
         $c1 = new ModelCriteria();
         $c1->addAscendingOrderByField(BookEntityMap::FIELD_TITLE);
         $c2 = new ModelCriteria();
         $c2->addDescendingOrderByField(BookEntityMap::FIELD_TITLE);
         $c1->mergeWith($c2);
-        $this->assertEquals(array(BookEntityMap::FIELD_TITLE . ' ASC', BookEntityMap::FIELD_TITLE . ' DESC'), $c1->getOrderByFields(), 'mergeWith() merges duplicated orderby fields with inverse direction');
+        $this->assertEquals([BookEntityMap::FIELD_TITLE . ' ASC', BookEntityMap::FIELD_TITLE . ' DESC'], $c1->getOrderByFields(), 'mergeWith() merges duplicated orderby fields with inverse direction');
     }
 
     public function testMergeWithGroupByFields()
@@ -201,25 +201,25 @@ class CriteriaMergeTest extends TestCaseFixtures
         $c1->addGroupByField(BookEntityMap::FIELD_ID);
         $c2 = new ModelCriteria();
         $c1->mergeWith($c2);
-        $this->assertEquals(array(BookEntityMap::FIELD_TITLE, BookEntityMap::FIELD_ID), $c1->getGroupByFields(), 'mergeWith() does not remove an existing groupby fields');
+        $this->assertEquals([BookEntityMap::FIELD_TITLE, BookEntityMap::FIELD_ID], $c1->getGroupByFields(), 'mergeWith() does not remove an existing groupby fields');
         $c1 = new ModelCriteria();
         $c2 = new ModelCriteria();
         $c2->addGroupByField(BookEntityMap::FIELD_TITLE);
         $c2->addGroupByField(BookEntityMap::FIELD_ID);
         $c1->mergeWith($c2);
-        $this->assertEquals(array(BookEntityMap::FIELD_TITLE, BookEntityMap::FIELD_ID), $c1->getGroupByFields(), 'mergeWith() merges the select fields to an empty groupby');
+        $this->assertEquals([BookEntityMap::FIELD_TITLE, BookEntityMap::FIELD_ID], $c1->getGroupByFields(), 'mergeWith() merges the select fields to an empty groupby');
         $c1 = new ModelCriteria();
         $c1->addGroupByField(BookEntityMap::FIELD_TITLE);
         $c2 = new ModelCriteria();
         $c2->addGroupByField(BookEntityMap::FIELD_ID);
         $c1->mergeWith($c2);
-        $this->assertEquals(array(BookEntityMap::FIELD_TITLE, BookEntityMap::FIELD_ID), $c1->getGroupByFields(), 'mergeWith() merges the select fields after the existing groupby fields');
+        $this->assertEquals([BookEntityMap::FIELD_TITLE, BookEntityMap::FIELD_ID], $c1->getGroupByFields(), 'mergeWith() merges the select fields after the existing groupby fields');
         $c1 = new ModelCriteria();
         $c1->addGroupByField(BookEntityMap::FIELD_TITLE);
         $c2 = new ModelCriteria();
         $c2->addGroupByField(BookEntityMap::FIELD_TITLE);
         $c1->mergeWith($c2);
-        $this->assertEquals(array(BookEntityMap::FIELD_TITLE), $c1->getGroupByFields(), 'mergeWith() does not merge duplicated groupby fields');
+        $this->assertEquals([BookEntityMap::FIELD_TITLE], $c1->getGroupByFields(), 'mergeWith() does not merge duplicated groupby fields');
     }
 
     public function testMergeWithWhereConditions()
@@ -374,18 +374,18 @@ class CriteriaMergeTest extends TestCaseFixtures
         $c1->addAlias('b', BookEntityMap::TABLE_NAME);
         $c2 = new ModelCriteria();
         $c1->mergeWith($c2);
-        $this->assertEquals(array('b' => BookEntityMap::TABLE_NAME), $c1->getAliases(), 'mergeWith() does not remove an existing alias');
+        $this->assertEquals(['b' => BookEntityMap::TABLE_NAME], $c1->getAliases(), 'mergeWith() does not remove an existing alias');
         $c1 = new ModelCriteria();
         $c2 = new ModelCriteria();
         $c2->addAlias('a', AuthorEntityMap::TABLE_NAME);
         $c1->mergeWith($c2);
-        $this->assertEquals(array('a' => AuthorEntityMap::TABLE_NAME), $c1->getAliases(), 'mergeWith() merge aliases to an empty alias');
+        $this->assertEquals(['a' => AuthorEntityMap::TABLE_NAME], $c1->getAliases(), 'mergeWith() merge aliases to an empty alias');
         $c1 = new ModelCriteria();
         $c1->addAlias('b', BookEntityMap::TABLE_NAME);
         $c2 = new ModelCriteria();
         $c2->addAlias('a', AuthorEntityMap::TABLE_NAME);
         $c1->mergeWith($c2);
-        $this->assertEquals(array('b' => BookEntityMap::TABLE_NAME, 'a' => AuthorEntityMap::TABLE_NAME), $c1->getAliases(), 'mergeWith() merge aliases to an existing alias');
+        $this->assertEquals(['b' => BookEntityMap::TABLE_NAME, 'a' => AuthorEntityMap::TABLE_NAME], $c1->getAliases(), 'mergeWith() merge aliases to an existing alias');
     }
 
     /**
@@ -437,5 +437,4 @@ class CriteriaMergeTest extends TestCaseFixtures
         $c2->setLimit(456);
         $this->assertEquals(123, $c1->getLimit(), 'further modifying a merged criteria does not affect the merger');
     }
-
 }

@@ -30,12 +30,12 @@ class MigrationManager extends AbstractManager
     /**
      * @var array
      */
-    protected $connections = array();
+    protected $connections = [];
 
     /**
      * @var ConnectionInterface[]
      */
-    protected $adapterConnections = array();
+    protected $adapterConnections = [];
 
     /**
      * @var string
@@ -126,7 +126,7 @@ class MigrationManager extends AbstractManager
             throw new \Exception('You must define database connection settings in a buildtime-conf.xml file to use migrations');
         }
 
-        $migrationTimestamps = array();
+        $migrationTimestamps = [];
         foreach ($connections as $name => $params) {
             $conn = $this->getAdapterConnection($name);
             $platform = $this->getGeneratorConfig()->createPlatformForDatabase($conn);
@@ -198,7 +198,8 @@ class MigrationManager extends AbstractManager
         $platform = $this->getPlatform($datasource);
         $conn = $this->getAdapterConnection($datasource);
         $conn->transaction(function () use ($conn, $platform, $timestamp) {
-            $sql = sprintf('DELETE FROM %s WHERE %s = ?',
+            $sql = sprintf(
+                'DELETE FROM %s WHERE %s = ?',
                 $this->getMigrationTable(),
                 $platform->doQuoting('version')
             );
@@ -212,7 +213,8 @@ class MigrationManager extends AbstractManager
     {
         $platform = $this->getPlatform($datasource);
         $conn = $this->getAdapterConnection($datasource);
-        $sql = sprintf('INSERT INTO %s (%s) VALUES (?)',
+        $sql = sprintf(
+            'INSERT INTO %s (%s) VALUES (?)',
             $this->getMigrationTable(),
             $platform->doQuoting('version')
         );
@@ -224,7 +226,7 @@ class MigrationManager extends AbstractManager
     public function getMigrationTimestamps()
     {
         $path = $this->getWorkingDirectory();
-        $migrationTimestamps = array();
+        $migrationTimestamps = [];
 
         if (is_dir($path)) {
             $files = scandir($path);
@@ -248,7 +250,7 @@ class MigrationManager extends AbstractManager
 
     public function hasPendingMigrations()
     {
-        return array() !== $this->getValidMigrationTimestamps();
+        return [] !== $this->getValidMigrationTimestamps();
     }
 
     public function getAlreadyExecutedMigrationTimestamps()
@@ -279,7 +281,8 @@ class MigrationManager extends AbstractManager
     public function getMigrationObject($timestamp)
     {
         $className = $this->getMigrationClassName($timestamp);
-        require_once sprintf('%s/%s.php',
+        require_once sprintf(
+            '%s/%s.php',
             $this->getWorkingDirectory(),
             $className
         );

@@ -37,15 +37,15 @@ EOF;
 
     public function valueSetConstantProvider()
     {
-        return array(
-            array('\ComplexColumnTypeEntity103::BAR_TYPE_FOO', 'foo'),
-            array('\ComplexColumnTypeEntity103::BAR_TYPE_BAR', 'bar'),
-            array('\ComplexColumnTypeEntity103::BAR_TYPE_BAZ', 'baz'),
-            array('\ComplexColumnTypeEntity103::BAR_TYPE_1', '1'),
-            array('\ComplexColumnTypeEntity103::BAR_TYPE_4', '4'),
-            array('\ComplexColumnTypeEntity103::BAR_TYPE__', '('),
-            array('\ComplexColumnTypeEntity103::BAR_TYPE_FOO_BAR', 'foo bar'),
-        );
+        return [
+            ['\ComplexColumnTypeEntity103::BAR_TYPE_FOO', 'foo'],
+            ['\ComplexColumnTypeEntity103::BAR_TYPE_BAR', 'bar'],
+            ['\ComplexColumnTypeEntity103::BAR_TYPE_BAZ', 'baz'],
+            ['\ComplexColumnTypeEntity103::BAR_TYPE_1', '1'],
+            ['\ComplexColumnTypeEntity103::BAR_TYPE_4', '4'],
+            ['\ComplexColumnTypeEntity103::BAR_TYPE__', '('],
+            ['\ComplexColumnTypeEntity103::BAR_TYPE_FOO_BAR', 'foo bar'],
+        ];
     }
 
     /**
@@ -59,7 +59,7 @@ EOF;
 
     public function testGetValueSets()
     {
-        $expected = array('foo', 'bar', 'baz', '1', '4', '(', 'foo bar');
+        $expected = ['foo', 'bar', 'baz', '1', '4', '(', 'foo bar'];
         $this->assertEquals($expected, \ComplexColumnTypeEntity103::BAR_TYPES);
     }
 }

@@ -33,5 +33,4 @@ class Unique extends Index
     {
         return true;
     }
-
 }

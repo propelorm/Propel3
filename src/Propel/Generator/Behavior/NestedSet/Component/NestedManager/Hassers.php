@@ -55,7 +55,7 @@ return \$repository->createQuery()
     ->inTree(\$node->getScopeValue())";
         }
 
-    $body .= "
+        $body .= "
     ->count(\$con) > 0;
 ";
         $this->addMethod('hasPrevSibling')

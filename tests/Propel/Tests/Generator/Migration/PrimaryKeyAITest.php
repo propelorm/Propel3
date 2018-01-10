@@ -7,7 +7,6 @@ namespace Propel\Tests\Generator\Migration;
  */
 class PrimaryKeyAITest extends MigrationTestCase
 {
-
     public function testAdd()
     {
         $originXml = '
@@ -122,5 +121,4 @@ class PrimaryKeyAITest extends MigrationTestCase
 ';
         $this->migrateAndTest($originXml, $targetXml);
     }
-
 }

@@ -24,7 +24,8 @@ use Propel\Tests\TestCase;
  */
 class GeneratedQueryObjectColumnTypeTest extends TestCase
 {
-    protected $c1, $c2;
+    protected $c1;
+    protected $c2;
 
     public function setUp()
     {

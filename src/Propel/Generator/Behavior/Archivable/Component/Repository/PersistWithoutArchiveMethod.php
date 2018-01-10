@@ -21,7 +21,6 @@ use Propel\Generator\Builder\Om\Component\RelationTrait;
  */
 class PersistWithoutArchiveMethod extends BuildComponent
 {
-
     public function process()
     {
         /** @var ArchivableBehavior $behavior */

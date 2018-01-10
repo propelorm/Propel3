@@ -26,11 +26,11 @@ class BasicModelCriterion extends AbstractModelCriterion
     {
         if (null !== $this->value) {
             if (false !== strpos($this->clause, '?')) {
-                $params[] = array(
+                $params[] = [
                     'entity' => $this->realEntity,
                     'field' => $this->field,
                     'value' => $this->value
-                );
+                ];
                 $sb .= str_replace('?', ':p' . count($params), $this->clause);
             } else {
                 $sb .= $this->clause;
@@ -39,5 +39,4 @@ class BasicModelCriterion extends AbstractModelCriterion
             $sb .= $this->clause;
         }
     }
-
 }

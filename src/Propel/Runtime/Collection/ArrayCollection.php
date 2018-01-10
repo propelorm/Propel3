@@ -104,7 +104,7 @@ class ArrayCollection extends Collection
      */
     public function toArray($keyField = null, $usePrefix = false)
     {
-        $ret = array();
+        $ret = [];
         foreach ($this as $key => $element) {
             $key = null === $keyField ? $key : $element[$keyField];
             $key = $usePrefix ? ($this->getModel() . '_' . $key) : $key;
@@ -146,7 +146,7 @@ class ArrayCollection extends Collection
      */
     public function toKeyValue($keyField, $valueField)
     {
-        $ret = array();
+        $ret = [];
         foreach ($this as $obj) {
             $ret[$obj[$keyField]] = $obj[$valueField];
         }

@@ -29,12 +29,12 @@ class ComputeMethod extends BuildComponent
         /** @var AggregateFieldBehavior $behavior */
         $behavior = $this->getBehavior();
 
-        $conditions = array();
+        $conditions = [];
         if ($behavior->getParameter('condition')) {
             $conditions[] = $behavior->getParameter('condition');
         }
 
-        $bindings = array();
+        $bindings = [];
         $database = $this->getEntity()->getDatabase();
         foreach ($behavior->getRelation()->getFieldObjectsMapping() as $index => $fieldReference) {
             /** @var Field $local */
@@ -67,13 +67,13 @@ class ComputeMethod extends BuildComponent
 \$lastKnownValues = \$this->getEntityMap()->getLastKnownValues(\$entity, true);
 ";
 
-foreach ($bindings as $key => $binding) {
-    $body .= "
+        foreach ($bindings as $key => $binding) {
+            $body .= "
 \$stmt->bindValue(':p{$key}', \$lastKnownValues['{$binding}']);
 ";
-    }
+        }
 
-    $body .= "
+        $body .= "
 \$stmt->execute();
 
 return \$stmt->fetchColumn();

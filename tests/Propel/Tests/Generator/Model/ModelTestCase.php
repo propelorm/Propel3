@@ -36,13 +36,13 @@ abstract class ModelTestCase extends TestCase
      * @param  array    $options An array of options
      * @return Behavior
      */
-    protected function getBehaviorMock($name, array $options = array())
+    protected function getBehaviorMock($name, array $options = [])
     {
-        $defaults = array(
-            'additional_builders' => array(),
+        $defaults = [
+            'additional_builders' => [],
             'is_entity_modified'   => false,
             'modification_order'  => 0,
-        );
+        ];
 
         $options = array_merge($defaults, $options);
 
@@ -103,14 +103,14 @@ abstract class ModelTestCase extends TestCase
      * @param  array      $options An array of options
      * @return Relation
      */
-    protected function getRelationMock($name = null, array $options = array())
+    protected function getRelationMock($name = null, array $options = [])
     {
-        $defaults = array(
+        $defaults = [
             'target' => '',
             'entity' => null,
-            'other_fks' => array(),
-            'local_fields' => array(),
-        );
+            'other_fks' => [],
+            'local_fields' => [],
+        ];
 
         $options = array_merge($defaults, $options);
 
@@ -160,10 +160,10 @@ abstract class ModelTestCase extends TestCase
      * @param  array  $options An array of options
      * @return Index
      */
-    protected function getIndexMock($name = null, array $options = array())
+    protected function getIndexMock($name = null, array $options = [])
     {
-        $defaults = array(
-        );
+        $defaults = [
+        ];
 
         $options = array_merge($defaults, $options);
 
@@ -192,7 +192,7 @@ abstract class ModelTestCase extends TestCase
      * @param  array  $options An array of options
      * @return Unique
      */
-    protected function getUniqueIndexMock($name = null, array $options = array())
+    protected function getUniqueIndexMock($name = null, array $options = [])
     {
         $unique = $this
             ->getMockBuilder('Propel\Generator\Model\Unique')
@@ -219,11 +219,11 @@ abstract class ModelTestCase extends TestCase
      * @param  array  $options An array of options
      * @return Schema
      */
-    protected function getSchemaMock($name = null, array $options = array())
+    protected function getSchemaMock($name = null, array $options = [])
     {
-        $defaults = array(
+        $defaults = [
             'generator_config' => null,
-        );
+        ];
 
         $options = array_merge($defaults, $options);
 
@@ -296,9 +296,9 @@ abstract class ModelTestCase extends TestCase
      * @param  array  $options An array of options
      * @return Domain
      */
-    protected function getDomainMock($name = null, array $options = array())
+    protected function getDomainMock($name = null, array $options = [])
     {
-        $defaults = array();
+        $defaults = [];
 
         $options = array_merge($defaults, $options);
 
@@ -324,7 +324,7 @@ abstract class ModelTestCase extends TestCase
      * @param  array  $options An array of options
      * @return Entity
      */
-    protected function getEntityMock($name, array $options = array())
+    protected function getEntityMock($name, array $options = [])
     {
         $defaults = [
             'name' => $name,
@@ -409,11 +409,11 @@ abstract class ModelTestCase extends TestCase
      * @param  array    $options An array of options
      * @return Database
      */
-    protected function getDatabaseMock($name, array $options = array())
+    protected function getDatabaseMock($name, array $options = [])
     {
-        $defaults = array(
+        $defaults = [
             'platform' => null,
-        );
+        ];
 
         $options = array_merge($defaults, $options);
 
@@ -443,11 +443,11 @@ abstract class ModelTestCase extends TestCase
      * @param  array  $options An array of options
      * @return Field
      */
-    protected function getFieldMock($name, array $options = array())
+    protected function getFieldMock($name, array $options = [])
     {
-        $defaults = array(
+        $defaults = [
             'size' => null,
-        );
+        ];
 
         $options = array_merge($defaults, $options);
 

@@ -3,7 +3,6 @@
 
 namespace Propel\Generator\Behavior\Timestampable\Component\Query;
 
-
 use Propel\Generator\Behavior\Timestampable\TimestampableBehavior;
 use Propel\Generator\Builder\Om\Component\BuildComponent;
 use Propel\Generator\Builder\Om\Component\NamingTrait;

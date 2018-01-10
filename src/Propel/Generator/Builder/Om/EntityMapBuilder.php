@@ -32,7 +32,6 @@ class EntityMapBuilder extends AbstractBuilder
 
         if ($this->getGeneratorConfig() &&
             $customNameSpace = $this->getBuildProperty('generator.objectModel.namespaceMap')) {
-
             $injectNamespace = $customNameSpace;
         }
 

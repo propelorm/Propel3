@@ -23,7 +23,6 @@ class PhpdocFixer
         $forbiddenContextHereDocKeyword = null;
 
         for ($this->i = 0, $l = strlen($content); $this->i < $l; $this->i++) {
-
             if (!$inForbiddenContext) {
                 //check if we start a forbidden context
                 if ($this->matchEat("<<<")) {
@@ -176,5 +175,4 @@ class PhpdocFixer
 
         return null;
     }
-
 }

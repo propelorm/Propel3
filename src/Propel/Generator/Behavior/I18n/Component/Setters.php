@@ -33,13 +33,15 @@ class Setters extends BuildComponent
     {
         $this->addMethod('set' . NamingTool::toUpperCamelCase($behavior->getLocaleField()->getName()))
             ->setDescription('Sets the locale for translations')
-            ->addParameter(PhpParameter::create('locale')
+            ->addParameter(
+                PhpParameter::create('locale')
                 ->setType('string', "Locale to use for the translation, e.g. 'fr_FR'")
                 ->setDefaultValue($behavior->getDefaultLocale())
             )
             ->setType('$this|' . $this->getClassNameFromEntity($behavior->getEntity()))
             ->setTypeDescription('The current object (for fluent API support)')
-            ->setBody("
+            ->setBody(
+                "
 \$this->currentLocale = \$locale;
 
 return \$this;
@@ -50,18 +52,21 @@ return \$this;
     private function addSetLocaleAlias($alias, $behavior)
     {
         $this->addMethod('set' . NamingTool::toUpperCamelCase($alias))
-            ->setDescription("
+            ->setDescription(
+                "
 Sets the locale for translations.
 Alias for setLocale(), for BC purpose.
 "
             )
-            ->addParameter(PhpParameter::create('locale')
+            ->addParameter(
+                PhpParameter::create('locale')
                 ->setType('string', "Locale to use for the translation, e.g. 'fr_FR'")
                 ->setDefaultValue($behavior->getDefaultLocale())
             )
             ->setType('$this|' . $this->getClassNameFromEntity($behavior->getEntity()))
             ->setTypeDescription('The current object (for fluent API support)')
-            ->setBody("
+            ->setBody(
+                "
 return \$this->set{$behavior->getLocaleField()->getName()}(\$locale);
 "
             );
@@ -79,11 +84,13 @@ return \$this;
 
         $this->addMethod('setTranslation')
             ->setDescription('Sets the translation for a given locale')
-            ->addParameter(PhpParameter::create('translation')
+            ->addParameter(
+                PhpParameter::create('translation')
                 ->setType($this->getClassNameFromEntity($behavior->getI18nEntity()))
                 ->setDescription('The translation object')
             )
-            ->addParameter(PhpParameter::create('locale')
+            ->addParameter(
+                PhpParameter::create('locale')
                 ->setType('string', "Locale to use for the translation, e.g. 'fr_FR'")
                 ->setDefaultValue($behavior->getDefaultLocale())
             )

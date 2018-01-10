@@ -34,7 +34,7 @@ class I18nBehavior extends Behavior
     const DEFAULT_LOCALE = 'en_US';
 
     // default parameters value
-    protected $parameters = array(
+    protected $parameters = [
         'i18n_entity'      => '%ENTITYNAME%I18n',
         'i18n_fields'      => '',
         'i18n_relation_field' => null,
@@ -42,7 +42,7 @@ class I18nBehavior extends Behavior
         'locale_length'     => 5,
         'default_locale'    => null,
         'locale_alias'      => '',
-    );
+    ];
 
     protected $tableModificationOrder = 70;
 
@@ -55,10 +55,10 @@ class I18nBehavior extends Behavior
     {
         foreach ($this->getDatabase()->getEntities() as $entity) {
             if ($entity->hasBehavior('i18n') && !$entity->getBehavior('i18n')->getParameter('default_locale')) {
-                $entity->getBehavior('i18n')->addParameter(array(
+                $entity->getBehavior('i18n')->addParameter([
                     'name'  => 'default_locale',
                     'value' => $this->getParameter('default_locale'),
-                ));
+                ]);
             }
         }
     }
@@ -93,7 +93,7 @@ class I18nBehavior extends Behavior
 
     public function getI18nFields()
     {
-        $fields = array();
+        $fields = [];
         $i18nEntity = $this->getI18nEntity();
         if ($fieldNames = $this->getI18nFieldNamesFromConfig()) {
             // Strategy 1: use the i18n_fields parameter
@@ -118,9 +118,9 @@ class I18nBehavior extends Behavior
     {
         $entity = $this->getEntity();
 
-        return strtr($string, array(
+        return strtr($string, [
             '%ENTITYNAME%' => $entity->getName(),
-        ));
+        ]);
     }
 
     public function PostDelete(RepositoryBuilder $repositoryBuilder)
@@ -168,14 +168,14 @@ class I18nBehavior extends Behavior
         if ($database->hasEntity($i18nEntityName)) {
             $this->i18nEntity = $database->getEntity($i18nEntityName);
         } else {
-            $this->i18nEntity = $database->addEntity(array(
+            $this->i18nEntity = $database->addEntity([
                 'name'      => $i18nEntityName,
                 'package'   => $entity->getPackage(),
                 'schema'    => $entity->getSchema(),
                 'namespace' => $entity->getNamespace() ? '\\' . $entity->getNamespace() : null,
                 'skipSql'   => $entity->isSkipSql(),
                 'identifierQuoting' => $entity->getIdentifierQuoting()
-            ));
+            ]);
 
             // every behavior adding a table should re-execute database behaviors
             foreach ($database->getBehaviors() as $behavior) {
@@ -200,7 +200,7 @@ class I18nBehavior extends Behavior
         if ($this->getParameter('i18n_relation_field')) {
             // custom i18n table pk name
             $i18nField->setName($this->getParameter('i18n_relation_field'));
-        } else if (in_array($entity->getName(), $i18nEntity->getForeignEntityNames())) {
+        } elseif (in_array($entity->getName(), $i18nEntity->getForeignEntityNames())) {
             // custom i18n table pk name not set, but some fk already exists
             return;
         }
@@ -227,13 +227,13 @@ class I18nBehavior extends Behavior
         $localeFieldName = $this->getLocaleFieldName();
 
         if (!$this->i18nEntity->hasField($localeFieldName)) {
-            $this->i18nEntity->addField(array(
+            $this->i18nEntity->addField([
                 'name'       => $localeFieldName,
                 'type'       => PropelTypes::VARCHAR,
                 'size'       => $this->getParameter('locale_length') ? (int) $this->getParameter('locale_length') : 5,
                 'default'    => $this->getDefaultLocale(),
                 'primaryKey' => true
-            ));
+            ]);
         }
     }
 
@@ -245,7 +245,7 @@ class I18nBehavior extends Behavior
         $entity     = $this->getEntity();
         $i18nEntity = $this->i18nEntity;
 
-        $i18nValidateParams = array();
+        $i18nValidateParams = [];
         foreach ($this->getI18nFieldNamesFromConfig() as $fieldName) {
             if (!$i18nEntity->hasField($fieldName)) {
                 if (!$entity->hasField($fieldName)) {

@@ -71,11 +71,11 @@ class PropelPDOTest extends BookstoreTestBase
 
         $stmt->execute();
         $con->commit();
-        $authorArr = array(0 => 'Test', 1 => 'User');
+        $authorArr = [0 => 'Test', 1 => 'User'];
 
         $i = 0;
         try {
-            $row = $stmt->fetch( PDO::FETCH_NUM );
+            $row = $stmt->fetch(PDO::FETCH_NUM);
             $stmt->closeCursor();
             $this->assertEquals($authorArr, $row, 'PDO driver supports calling $stmt->fetch after the transaction has been closed');
         } catch (PDOException $e) {
@@ -83,21 +83,21 @@ class PropelPDOTest extends BookstoreTestBase
         }
     }
 
-	public function testPdoSignature()
-	{
-		$con = $this->con;
-		$stmt = $con->prepare('SELECT author.FIRST_NAME, author.LAST_NAME FROM author');
-		$stmt->execute();
-		$stmt->fetchAll(\PDO::FETCH_COLUMN, 0); // should not throw exception: Third parameter not allowed for PDO::FETCH_COLUMN
+    public function testPdoSignature()
+    {
+        $con = $this->con;
+        $stmt = $con->prepare('SELECT author.FIRST_NAME, author.LAST_NAME FROM author');
+        $stmt->execute();
+        $stmt->fetchAll(\PDO::FETCH_COLUMN, 0); // should not throw exception: Third parameter not allowed for PDO::FETCH_COLUMN
 
-		$stmt = $con->prepare('SELECT author.FIRST_NAME, author.LAST_NAME FROM author');
-		$stmt->execute();
-		$stmt->fetchAll(\PDO::FETCH_ASSOC); // should not throw exception
+        $stmt = $con->prepare('SELECT author.FIRST_NAME, author.LAST_NAME FROM author');
+        $stmt->execute();
+        $stmt->fetchAll(\PDO::FETCH_ASSOC); // should not throw exception
 
-		$stmt = $con->prepare('SELECT author.FIRST_NAME, author.LAST_NAME FROM author');
-		$stmt->execute();
-		$stmt->fetchAll(); // should not throw exception
-	}
+        $stmt = $con->prepare('SELECT author.FIRST_NAME, author.LAST_NAME FROM author');
+        $stmt->execute();
+        $stmt->fetchAll(); // should not throw exception
+    }
 
     public function testCommitAfterFetch()
     {
@@ -112,10 +112,10 @@ class PropelPDOTest extends BookstoreTestBase
         $stmt = $con->prepare('SELECT author.FIRST_NAME, author.LAST_NAME FROM author');
 
         $stmt->execute();
-        $authorArr = array(0 => 'Test', 1 => 'User');
+        $authorArr = [0 => 'Test', 1 => 'User'];
 
         $i = 0;
-        $row = $stmt->fetch( PDO::FETCH_NUM );
+        $row = $stmt->fetch(PDO::FETCH_NUM);
         $stmt->closeCursor();
         $con->commit();
         $this->assertEquals($authorArr, $row, 'PDO driver supports calling $stmt->fetch before the transaction has been closed');
@@ -135,7 +135,6 @@ class PropelPDOTest extends BookstoreTestBase
         $this->assertTrue($con->isInTransaction(), 'PropelPDO is in transaction after main transaction begin');
 
         try {
-
             $a = new Author();
             $a->setFirstName('Test');
             $a->setLastName('User');
@@ -149,7 +148,6 @@ class PropelPDOTest extends BookstoreTestBase
             $this->assertTrue($con->isInTransaction(), 'PropelPDO is in transaction after nested transaction begin');
 
             try {
-
                 $a2 = new Author();
                 $a2->setFirstName('Test2');
                 $a2->setLastName('User2');
@@ -161,7 +159,6 @@ class PropelPDOTest extends BookstoreTestBase
 
                 $this->assertEquals(1, $con->getNestedTransactionCount(), 'nested transaction decremented after nested transaction commit');
                 $this->assertTrue($con->isInTransaction(), 'PropelPDO is in transaction after main transaction commit');
-
             } catch (Exception $e) {
                 $con->rollBack();
                 throw $e;
@@ -171,7 +168,6 @@ class PropelPDOTest extends BookstoreTestBase
 
             $this->assertEquals(0, $con->getNestedTransactionCount(), 'nested transaction decremented after main transaction commit');
             $this->assertFalse($con->isInTransaction(), 'PropelPDO is not in transaction after main transaction commit');
-
         } catch (Exception $e) {
             $con->rollBack();
             throw $e;
@@ -194,7 +190,6 @@ class PropelPDOTest extends BookstoreTestBase
 
         $con->beginTransaction();
         try {
-
             $a = new Author();
             $a->setFirstName('Test');
             $a->setLastName('User');
@@ -246,7 +241,6 @@ class PropelPDOTest extends BookstoreTestBase
 
         $con->beginTransaction();
         try {
-
             $a = new Author();
             $a->setFirstName('Test');
             $a->setLastName('User');
@@ -257,7 +251,6 @@ class PropelPDOTest extends BookstoreTestBase
 
             $con->beginTransaction();
             try {
-
                 $a2 = new Author();
                 $a2->setFirstName('Test2');
                 $a2->setLastName('User2');
@@ -343,7 +336,7 @@ class PropelPDOTest extends BookstoreTestBase
     {
         $con = $this->con;
         $c = new Criteria();
-        $c->add(BookEntityMap::FIELD_ID, array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), Criteria::IN);
+        $c->add(BookEntityMap::FIELD_ID, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], Criteria::IN);
         $books = BookQuery::create(null, $c)->find();
         $expected = $this->getSql("SELECT book.id, book.title, book.isbn, book.price, book.publisher_id, book.author_id FROM book WHERE book.id IN (1,1,1,1,1,1,1,1,1,1,1,1)");
         $this->assertEquals($expected, $con->getLastExecutedQuery(), 'PropelPDO correctly replaces arguments in queries');
@@ -460,14 +453,14 @@ class PropelPDOTest extends BookstoreTestBase
         $handler = new LastMessageHandler();
         $testLog->pushHandler($handler);
         $con->setLogger($testLog);
-        $con->setLogMethods(array(
+        $con->setLogMethods([
             'exec',
             'query',
             'execute',
             'beginTransaction',
             'commit',
             'rollBack',
-        ));
+        ]);
         $con->useDebug(true);
 
         $con->beginTransaction();

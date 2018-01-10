@@ -18,7 +18,7 @@ use Propel\Runtime\Map\FieldMap;
  *
  * @author Francois
  */
-Abstract class AbstractModelCriterion extends AbstractCriterion
+abstract class AbstractModelCriterion extends AbstractCriterion
 {
     protected $clause = '';
 
@@ -66,7 +66,8 @@ Abstract class AbstractModelCriterion extends AbstractCriterion
         /** @var AbstractModelCriterion $crit */
         $crit = $obj;
 
-        $isEquiv = (((null === $this->entity && null === $crit->getEntity())
+        $isEquiv = ((
+            (null === $this->entity && null === $crit->getEntity())
             || (null !== $this->entity && $crit->getEntity() === $this->entity)
                           )
             && $this->clause === $crit->getClause()

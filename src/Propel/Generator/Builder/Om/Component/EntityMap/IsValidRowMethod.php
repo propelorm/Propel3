@@ -30,7 +30,7 @@ class IsValidRowMethod extends BuildComponent
             if ($field->isImplementationDetail()) {
                 continue;
             }
-            if (!$field->isPrimaryKey()){
+            if (!$field->isPrimaryKey()) {
                 continue;
             }
 

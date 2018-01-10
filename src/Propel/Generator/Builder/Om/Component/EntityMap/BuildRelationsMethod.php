@@ -60,7 +60,6 @@ class BuildRelationsMethod extends BuildComponent
         }
 
         foreach ($this->getEntity()->getCrossRelations() as $crossRelation) {
-
             $relation = $crossRelation->getOutgoingRelation();
             $relationName = var_export($this->getRelationVarName($relation, true), true);
             $refName = $relationName;

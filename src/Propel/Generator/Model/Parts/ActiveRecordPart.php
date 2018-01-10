@@ -1,8 +1,8 @@
 <?php
 namespace Propel\Generator\Model\Parts;
 
-trait ActiveRecordPart {
-
+trait ActiveRecordPart
+{
     use SuperordinatePart;
 
     /**
@@ -45,4 +45,3 @@ trait ActiveRecordPart {
         return $this->activeRecord;
     }
 }
-

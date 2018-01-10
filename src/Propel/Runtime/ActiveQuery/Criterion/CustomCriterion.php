@@ -41,5 +41,4 @@ class CustomCriterion extends AbstractCriterion
             $sb .= (string) $this->value;
         }
     }
-
 }

@@ -181,10 +181,12 @@ class ConfigurationManager
             if ($numFiles > 1) {
                 $realPath = realpath($fileName);
                 throw new InvalidArgumentException(
-                    sprintf('Propel expects only one configuration file in %s. Found %s',
+                    sprintf(
+                        'Propel expects only one configuration file in %s. Found %s',
                     $realPath,
                     implode(', ', $files)
-                ));
+                )
+                );
             } elseif ($numFiles === 0) {
                 $this->config = $extraConf;
                 return;

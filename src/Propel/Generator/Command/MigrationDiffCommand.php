@@ -34,17 +34,17 @@ class MigrationDiffCommand extends AbstractCommand
         parent::configure();
 
         $this
-            ->addOption('output-dir',         null, InputOption::VALUE_REQUIRED,  'The output directory where the migration files are located')
-            ->addOption('migration-table',    null, InputOption::VALUE_REQUIRED,  'Migration table name', null)
-            ->addOption('connection',         null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Connection to use. Example: \'bookstore=mysql:host=127.0.0.1;dbname=test;user=root;password=foobar\' where "bookstore" is your propel database name (used in your schema.xml)', array())
-            ->addOption('table-renaming',     null, InputOption::VALUE_NONE,      'Detect table renaming', null)
-            ->addOption('editor',             null, InputOption::VALUE_OPTIONAL,  'The text editor to use to open diff files', null)
-            ->addOption('skip-removed-table', null, InputOption::VALUE_NONE,      'Option to skip removed table from the migration')
-            ->addOption('skip-tables',        null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL, 'List of excluded tables', array())
+            ->addOption('output-dir', null, InputOption::VALUE_REQUIRED, 'The output directory where the migration files are located')
+            ->addOption('migration-table', null, InputOption::VALUE_REQUIRED, 'Migration table name', null)
+            ->addOption('connection', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Connection to use. Example: \'bookstore=mysql:host=127.0.0.1;dbname=test;user=root;password=foobar\' where "bookstore" is your propel database name (used in your schema.xml)', [])
+            ->addOption('table-renaming', null, InputOption::VALUE_NONE, 'Detect table renaming', null)
+            ->addOption('editor', null, InputOption::VALUE_OPTIONAL, 'The text editor to use to open diff files', null)
+            ->addOption('skip-removed-table', null, InputOption::VALUE_NONE, 'Option to skip removed table from the migration')
+            ->addOption('skip-tables', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL, 'List of excluded tables', [])
             ->addOption('disable-identifier-quoting', null, InputOption::VALUE_NONE, 'Disable identifier quoting in SQL queries for reversed database tables.')
-            ->addOption('comment',            "m",  InputOption::VALUE_OPTIONAL,  'A comment for the migration', '')
+            ->addOption('comment', "m", InputOption::VALUE_OPTIONAL, 'A comment for the migration', '')
             ->setName('migration:diff')
-            ->setAliases(array('diff'))
+            ->setAliases(['diff'])
             ->setDescription('Generate diff classes')
             ;
     }
@@ -54,7 +54,7 @@ class MigrationDiffCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $configOptions = array();
+        $configOptions = [];
 
         if ($this->hasInputOption('connection', $input)) {
             foreach ($input->getOption('connection') as $conn) {
@@ -86,14 +86,14 @@ class MigrationDiffCommand extends AbstractCommand
         $manager->setGeneratorConfig($generatorConfig);
         $manager->setSchemas($this->getSchemas($generatorConfig->getSection('paths')['schemaDir'], $input->getOption('recursive')));
 
-        $connections = array();
+        $connections = [];
         $optionConnections = $input->getOption('connection');
         if (!$optionConnections) {
             $connections = $generatorConfig->getBuildConnections();
         } else {
             foreach ($optionConnections as $connection) {
                 list($name, $dsn, $infos) = $this->parseConnection($connection);
-                $connections[$name] = array_merge(array('dsn' => $dsn), $infos);
+                $connections[$name] = array_merge(['dsn' => $dsn], $infos);
             }
         }
 
@@ -109,7 +109,6 @@ class MigrationDiffCommand extends AbstractCommand
         $reversedSchema = new Schema();
 
         foreach ($manager->getDatabases() as $appDatabase) {
-
             $name = $appDatabase->getName();
             if (!$params = @$connections[$name]) {
                 $output->writeln(sprintf('<info>No connection configured for database "%s"</info>', $name));
@@ -164,8 +163,8 @@ class MigrationDiffCommand extends AbstractCommand
         $output->writeln('Comparing models...');
         $tableRenaming = $input->getOption('table-renaming');
 
-        $migrationsUp   = array();
-        $migrationsDown = array();
+        $migrationsUp   = [];
+        $migrationsDown = [];
         $removeTable = !$input->getOption('skip-removed-table');
         $excludedTables = $input->getOption('skip-tables');
         foreach ($reversedSchema->getDatabases() as $database) {
@@ -194,7 +193,8 @@ class MigrationDiffCommand extends AbstractCommand
             foreach ($databaseDiff->getPossibleRenamedTables() as $fromTableName => $toTableName) {
                 $output->writeln(sprintf(
                     '<info>Possible table renaming detected: "%s" to "%s". It will be deleted and recreated. Use --table-renaming to only rename it.</info>',
-                        $fromTableName, $toTableName
+                        $fromTableName,
+                    $toTableName
                 ));
             }
 

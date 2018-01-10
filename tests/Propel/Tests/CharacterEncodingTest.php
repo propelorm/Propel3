@@ -74,7 +74,6 @@ class CharacterEncodingTest extends BookstoreTestBase
 
         $this->assertEquals(37, iconv_strlen($b->getTitle(), 'utf-8'), "Expected 37 characters (not bytes) in title.");
         $this->assertTrue(strlen($b->getTitle()) > iconv_strlen($b->getTitle(), 'utf-8'), "Expected more bytes than characters in title.");
-
     }
 
     public function testInvalidCharset()
@@ -102,7 +101,6 @@ class CharacterEncodingTest extends BookstoreTestBase
             } catch (Exception $x) {
                 print $x;
             }
-
         } else {
 
             // No exception is thrown by MySQL ... (others need to be tested still)
@@ -110,6 +108,5 @@ class CharacterEncodingTest extends BookstoreTestBase
 
             $this->assertEquals("", $a->getLastName(), "Expected last_name to be empty (after inserting invalid charset data)");
         }
-
     }
 }

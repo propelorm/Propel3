@@ -101,7 +101,6 @@ class TableMapExceptionsTest extends BookstoreTestBase
             } else {
                 $this->assertContains($this->getSql('[INSERT INTO book (author_id) VALUES (:p1)]'), $e->getMessage(), 'SQL query is written in the exception message');
             }
-
         }
     }
 }

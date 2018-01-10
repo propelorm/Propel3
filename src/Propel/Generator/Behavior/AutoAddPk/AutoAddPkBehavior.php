@@ -20,11 +20,11 @@ use Propel\Generator\Model\Behavior;
 class AutoAddPkBehavior extends Behavior
 {
     // default parameters value
-    protected $parameters = array(
+    protected $parameters = [
         'name'          => 'id',
         'autoIncrement' => 'true',
         'type'          => 'INTEGER'
-    );
+    ];
 
     /**
      * Copy the behavior to the database entities
@@ -47,7 +47,7 @@ class AutoAddPkBehavior extends Behavior
     {
         $entity = $this->getEntity();
         if (!$entity->hasPrimaryKey() && !$entity->hasBehavior('concrete_inheritance')) {
-            $fieldAttributes = array_merge(array('primaryKey' => 'true'), $this->getParameters());
+            $fieldAttributes = array_merge(['primaryKey' => 'true'], $this->getParameters());
             $this->getEntity()->addField($fieldAttributes);
         }
     }

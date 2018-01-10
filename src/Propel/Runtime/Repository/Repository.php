@@ -92,7 +92,7 @@ abstract class Repository
     /**
      * @return mixed
      */
-    abstract function createObject();
+    abstract public function createObject();
 
     /**
      * @return EntityMap

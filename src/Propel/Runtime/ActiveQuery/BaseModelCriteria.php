@@ -19,7 +19,7 @@ class BaseModelCriteria extends Criteria implements \IteratorAggregate
 
     protected $formatter;
 
-    protected $with = array();
+    protected $with = [];
 
     protected $defaultFormatterClass = ModelCriteria::FORMAT_OBJECT;
 
@@ -242,5 +242,4 @@ class BaseModelCriteria extends Criteria implements \IteratorAggregate
         }
         throw new LogicException('The current formatter doesn\'t return an iterable result');
     }
-
 }

@@ -740,5 +740,4 @@ CREATE TABLE `bar`
 
         $this->assertEquals($expectedRelationSql, $relationTableSql);
     }
-
 }

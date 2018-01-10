@@ -37,7 +37,8 @@ class Getters extends BuildComponent
         $this->addMethod('get' . NamingTool::toUpperCamelCase($behavior->getLocaleField()->getName()))
             ->setDescription('Gets the locale for translations')
             ->setType('string', "Locale to use for the translation, e.g. 'fr_FR'")
-            ->setBody("
+            ->setBody(
+                "
 return \$this->currentLocale;
 "
             );
@@ -54,7 +55,8 @@ Gets the locale for translations.
 Alias for getLocale(), for BC purpose.
                 ")
             ->setType('string', "Locale to use for the translation, e.g. 'fr_FR'")
-            ->setBody("
+            ->setBody(
+                "
 return \$this->get$method();
 "
             );
@@ -96,11 +98,13 @@ return \$this->currentTranslations[\$locale];
 
         $this->addMethod('getTranslation')
             ->setDescription('Returns the current translation for a given locale')
-            ->addParameter(PhpParameter::create('locale')
+            ->addParameter(
+                PhpParameter::create('locale')
                 ->setType('string', "Locale to use for the translation, e.g. 'fr_FR'")
                 ->setDefaultValue($behavior->getDefaultLocale())
             )
-            ->addParameter(PhpParameter::create('con')
+            ->addParameter(
+                PhpParameter::create('con')
                 ->setType('ConnectionInterface', 'an optional connection object')
                 ->setDefaultValue(null)
             )
@@ -112,7 +116,8 @@ return \$this->currentTranslations[\$locale];
     {
         $this->addMethod('getCurrentTranslation')
             ->setDescription('Returns the current translation')
-            ->addParameter(PhpParameter::create('con')
+            ->addParameter(
+                PhpParameter::create('con')
                 ->setType('ConnectionInterface', 'An optional connection object')
                 ->setDefaultValue(null)
             )

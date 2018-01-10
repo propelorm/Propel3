@@ -36,7 +36,6 @@ class EntityRelationComparatorTest extends TestCase
 
     public function testCompareSameFks()
     {
-
         $c1 = new Field('Foo');
         $c2 = new Field('Bar');
 
@@ -123,7 +122,7 @@ class EntityRelationComparatorTest extends TestCase
         $tableDiff = $tc->getEntityDiff();
         $this->assertEquals(1, $nbDiffs);
         $this->assertEquals(1, count($tableDiff->getAddedFks()));
-        $this->assertEquals(array('baz_fk_4e99e8' => $fk2), $tableDiff->getAddedFks());
+        $this->assertEquals(['baz_fk_4e99e8' => $fk2], $tableDiff->getAddedFks());
     }
 
     public function testCompareRemovedFks()
@@ -150,7 +149,7 @@ class EntityRelationComparatorTest extends TestCase
         $tableDiff = $tc->getEntityDiff();
         $this->assertEquals(1, $nbDiffs);
         $this->assertEquals(1, count($tableDiff->getRemovedFks()));
-        $this->assertEquals(array('baz_fk_4e99e8' => $fk1), $tableDiff->getRemovedFks());
+        $this->assertEquals(['baz_fk_4e99e8' => $fk1], $tableDiff->getRemovedFks());
     }
 
     public function testCompareModifiedFks()
@@ -182,6 +181,6 @@ class EntityRelationComparatorTest extends TestCase
         $tableDiff = $tc->getEntityDiff();
         $this->assertEquals(1, $nbDiffs);
         $this->assertEquals(1, count($tableDiff->getModifiedFks()));
-        $this->assertEquals(array('my_foreign_key' => array($fk1, $fk2)), $tableDiff->getModifiedFks());
+        $this->assertEquals(['my_foreign_key' => [$fk1, $fk2]], $tableDiff->getModifiedFks());
     }
 }

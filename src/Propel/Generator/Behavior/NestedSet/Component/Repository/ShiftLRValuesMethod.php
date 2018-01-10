@@ -59,7 +59,7 @@ class ShiftLRValuesMethod extends BuildComponent
         $method = $this->addMethod('shiftRLValues')
             ->setDescription("Adds \$delta to all L and R values that are >= \$first and <= \$last.
    '\$delta' can also be negative.")
-            ->addSimpleDescParameter('delta',  'int', 'Value to be shifted by, can be negative')
+            ->addSimpleDescParameter('delta', 'int', 'Value to be shifted by, can be negative')
             ->addSimpleDescParameter('first', 'int', 'First node to be shifted')
             ->addSimpleDescParameter('last', 'int', 'Last node to be shifted (optional)', null)
             ->setBody($body)

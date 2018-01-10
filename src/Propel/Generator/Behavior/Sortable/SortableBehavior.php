@@ -31,11 +31,11 @@ class SortableBehavior extends Behavior
     use ComponentTrait;
 
     // default parameters value
-    protected $parameters = array(
+    protected $parameters = [
         'rank_field'  => 'sortable_rank',
         'use_scope'    => 'false',
         'scope_field' => '',
-    );
+    ];
 
     public function __construct()
     {
@@ -52,20 +52,20 @@ class SortableBehavior extends Behavior
         $entity = $this->getEntity();
 
         if (!$entity->hasField($this->getParameter('rank_field'))) {
-            $entity->addField(array(
+            $entity->addField([
                 'name' => $this->getParameter('rank_field'),
                 'type' => 'INTEGER'
-            ));
+            ]);
         }
 
         if ($this->useScope()) {
             foreach ($this->getScopes() as $scopeFieldName) {
                 if (!$entity->hasField($scopeFieldName)) {
                     $entity->addField(
-                        array(
+                        [
                             'name' => $scopeFieldName,
                             'type' => 'INTEGER'
-                        )
+                        ]
                     );
                 }
             }
@@ -191,13 +191,11 @@ class SortableBehavior extends Behavior
         $buildScopeVars  = '';
 
         if ($this->hasMultipleScopes()) {
-
             $methodSignature = [];
             $buildScope      = [];
             $buildScopeVars  = [];
 
             foreach ($this->getScopes() as $idx => $scope) {
-
                 $field = $this->getEntity()->getField($scope);
                 $paramName  = 'scope' . $field->getName();
 
@@ -216,7 +214,6 @@ class SortableBehavior extends Behavior
 
             $buildScope      = "\n".implode('', $buildScope)."\n";
             $buildScopeVars  = "\n".implode('', $buildScopeVars)."\n";
-
         } elseif ($this->useScope()) {
             $field = $this->getEntity()->getField($this->getParameter('scope_field'));
 
@@ -254,7 +251,7 @@ class SortableBehavior extends Behavior
     {
         return $this->getParameter('scope_field')
             ? explode(',', str_replace(' ', '', trim($this->getParameter('scope_field'))))
-            : array();
+            : [];
     }
 
     /**

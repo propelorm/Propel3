@@ -22,7 +22,6 @@ use Propel\Tests\Bookstore\Behavior\AggregatePoll;
 use Propel\Tests\Bookstore\Behavior\AggregatePollQuery;
 use Propel\Tests\Helpers\Bookstore\BookstoreTestBase;
 
-
 /**
  * Tests for AggregateFieldBehavior class
  *
@@ -134,7 +133,7 @@ class AggregateFieldBehaviorTest extends BookstoreTestBase
         $this->assertEquals(2, $poll->getVotesCount());
 
         AggregateItemQuery::create()
-            ->update(array('score' => 4), true);
+            ->update(['score' => 4], true);
 
         $this->assertEquals(8, $poll->getTotalScore(), 'Updating related objects with a query updates the aggregate column');
         $this->assertEquals(2, $poll->getVotesCount());
@@ -147,7 +146,7 @@ class AggregateFieldBehaviorTest extends BookstoreTestBase
         $this->assertEquals(2, $poll->getVotesCount());
         AggregateItemQuery::create()
             ->setEntityAlias('foo', true)
-            ->update(array('score' => 4), true);
+            ->update(['score' => 4], true);
         $this->assertEquals(8, $poll->getTotalScore(), 'Updating related objects with a query using alias updates the aggregate column');
         $this->assertEquals(2, $poll->getVotesCount());
     }
@@ -235,7 +234,6 @@ class AggregateFieldBehaviorTest extends BookstoreTestBase
         $item2->setAggregatePoll($poll);
         $item2->save();
 
-        return array($poll, $item1, $item2);
+        return [$poll, $item1, $item2];
     }
-
 }

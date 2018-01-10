@@ -75,8 +75,7 @@ class BasicCriterion extends AbstractCriterion
             if (Criteria::CURRENT_DATE === $this->value || Criteria::CURRENT_TIME === $this->value || Criteria::CURRENT_TIMESTAMP === $this->value) {
                 $sb .= $field . $this->comparison . $this->value;
             } else {
-
-                $params[] = array('entity' => $this->realEntity, 'field' => $this->field, 'value' => $this->value);
+                $params[] = ['entity' => $this->realEntity, 'field' => $this->field, 'value' => $this->value];
 
                 // default case, it is a normal col = value expression; value
                 // will be replaced w/ '?' and will be inserted later using PDO bindValue()
@@ -85,7 +84,6 @@ class BasicCriterion extends AbstractCriterion
                 } else {
                     $sb .= $field . $this->comparison . ':p'.count($params);
                 }
-
             }
         } else {
             // value is null, which means it was either not specified or specifically

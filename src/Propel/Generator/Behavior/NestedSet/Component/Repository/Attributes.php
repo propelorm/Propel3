@@ -21,9 +21,9 @@ class Attributes extends BuildComponent
         $this->addProperty('nestedManager', null)
             ->setType('NestedManagerInterface')
             ->setDescription('Instance of NestedManagerInterface');
-        $this->addProperty('nestedSetQueries', array())
+        $this->addProperty('nestedSetQueries', [])
             ->setDescription('Queries to be executed in the save transaction');
-        $this->addProperty('nestedSetEntityPool', array())
+        $this->addProperty('nestedSetEntityPool', [])
             ->setDescription('Array of Nested Set entities. This property is useful to maintain the entities in sync with the database.');
     }
 }

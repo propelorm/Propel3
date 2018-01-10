@@ -89,7 +89,7 @@ class GeneratorConfigTest extends ConfigTestCase
 
     public function testGetConfiguredPlatform()
     {
-        $this->setConfig(array('generator' => array('platformClass' => '\\Propel\\Generator\\Platform\\PgsqlPlatform')));
+        $this->setConfig(['generator' => ['platformClass' => '\\Propel\\Generator\\Platform\\PgsqlPlatform']]);
         $actual = $this->generatorConfig->createPlatformForDatabase();
         $this->assertInstanceOf('\\Propel\\Generator\\Platform\\PgsqlPlatform', $actual);
     }
@@ -105,7 +105,7 @@ class GeneratorConfigTest extends ConfigTestCase
 
     public function testGetConfiguredPlatformGivenPlatform()
     {
-        $this->setConfig(array('generator' => array('platformClass' => '\\Propel\\Generator\\Platform\\PgsqlPlatform')));
+        $this->setConfig(['generator' => ['platformClass' => '\\Propel\\Generator\\Platform\\PgsqlPlatform']]);
         $actual = $this->generatorConfig->createPlatformForDatabase();
 
         $this->assertInstanceOf('\\Propel\\Generator\\Platform\\PgsqlPlatform', $actual);
@@ -124,10 +124,10 @@ class GeneratorConfigTest extends ConfigTestCase
     public function testGetConfiguredSchemaParserGivenClass()
     {
         $this->setConfig(
-            array('migrations' => array(
+            ['migrations' => [
                 'tableName' => 'propel_migration',
                 'parserClass' => '\\Propel\\Generator\\Reverse\\PgsqlSchemaParser'
-            ))
+            ]]
         );
         $stubCon = $this->getMockBuilder('\\Propel\\Runtime\\Connection\\ConnectionWrapper')
             ->disableOriginalConstructor()->getMock();
@@ -144,10 +144,10 @@ class GeneratorConfigTest extends ConfigTestCase
     public function testGetConfiguredSchemaParserGivenNonSchemaParserClass()
     {
         $this->setConfig(
-            array('migrations' => array(
+            ['migrations' => [
                 'tableName' => 'propel_migration',
                 'parserClass' => '\\Propel\\Generator\\Platform\\MysqlPlatform'
-            ))
+            ]]
         );
 
         $actual = $this->generatorConfig->getConfiguredSchemaParser();
@@ -162,10 +162,10 @@ class GeneratorConfigTest extends ConfigTestCase
     public function testGetConfiguredSchemaParserGivenBadClass()
     {
         $this->setConfig(
-            array('migrations' => array(
+            ['migrations' => [
                 'tableName' => 'propel_migration',
                 'parserClass' => '\\Propel\\Generator\\Reverse\\BadSchemaParser'
-            ))
+            ]]
         );
 
         $actual = $this->generatorConfig->getConfiguredSchemaParser();
@@ -229,22 +229,22 @@ class GeneratorConfigTest extends ConfigTestCase
 
     public function testGetBuildConnections()
     {
-        $expected = array(
-            'mysource' => array(
+        $expected = [
+            'mysource' => [
                 'adapter' => 'sqlite',
                 'classname' => 'Propel\\Runtime\\Connection\\DebugPDO',
                 'dsn' => 'sqlite:' . sys_get_temp_dir() . '/mydb',
                 'user' => 'root',
                 'password' => ''
-            ),
-            'yoursource' => array(
+            ],
+            'yoursource' => [
                 'adapter' => 'mysql',
                 'classname' => 'Propel\\Runtime\\Connection\\DebugPDO',
                 'dsn' => 'mysql:host=localhost;dbname=yourdb',
                 'user' => 'root',
                 'password' => ''
-            )
-        );
+            ]
+        ];
 
         $actual = $this->generatorConfig->getBuildConnections();
 
@@ -253,13 +253,13 @@ class GeneratorConfigTest extends ConfigTestCase
 
     public function testGetBuildConnection()
     {
-        $expected = array(
+        $expected = [
             'adapter' => 'sqlite',
             'classname' => 'Propel\\Runtime\\Connection\\DebugPDO',
             'dsn' => 'sqlite:' . sys_get_temp_dir() . '/mydb',
             'user' => 'root',
             'password' => ''
-        );
+        ];
 
         $actual = $this->generatorConfig->getBuildConnection();
 
@@ -268,13 +268,13 @@ class GeneratorConfigTest extends ConfigTestCase
 
     public function testGetBuildConnectionGivenDatabase()
     {
-        $expected = array(
+        $expected = [
             'adapter' => 'mysql',
             'classname' => 'Propel\\Runtime\\Connection\\DebugPDO',
             'dsn' => 'mysql:host=localhost;dbname=yourdb',
             'user' => 'root',
             'password' => ''
-        );
+        ];
 
         $actual = $this->generatorConfig->getBuildConnection('yoursource');
 

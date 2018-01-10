@@ -66,7 +66,7 @@ return \$this->getRepository()->getNestedManager()->getNextSibling(\$this, \$con
 ";
         $this->addMethod('getNextSibling')
             ->setDescription('Gets next sibling for the given node if it exists.')
-            ->setType('mixed','Propel object if exists else false')
+            ->setType('mixed', 'Propel object if exists else false')
             ->addSimpleDescParameter('con', 'ConnectionInterface', 'Connection to use.', null)
             ->setBody($body)
         ;

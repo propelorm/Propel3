@@ -35,7 +35,7 @@ class OracleAdapterTest extends TestCaseFixtures
         $c = new BookQuery();
         $c->addSelfSelectFields();
         $c->setLimit(1);
-        $params = array();
+        $params = [];
         $sql = $c->createSelectSql($params);
         $this->assertEquals('SELECT B.* FROM (SELECT A.*, rownum AS PROPEL_ROWNUM FROM (SELECT book.id, book.title, book.isbn, book.price, book.publisher_id, book.author_id FROM book) A ) B WHERE  B.PROPEL_ROWNUM <= 1', $sql, 'applyLimit() creates a subselect with the original column names by default');
     }
@@ -50,5 +50,4 @@ class OracleAdapterTest extends TestCaseFixtures
         $selectSql = $db->createSelectSqlPart($c);
         $this->assertEquals('SELECT Propel\Tests\Bookstore\Book.id, Propel\Tests\Bookstore\Book.id AS book_ID', $selectSql, 'createSelectSqlPart() returns a SQL SELECT clause with both select and as columns');
     }
-
 }

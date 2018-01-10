@@ -62,7 +62,6 @@ EOF;
 
     public function testDatabasePackageName()
     {
-
         $schema = <<<EOF
 <database name="bookstore" package="my.sub-directory">
     <entity name="book">

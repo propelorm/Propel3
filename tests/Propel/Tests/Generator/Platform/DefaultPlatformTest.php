@@ -50,17 +50,17 @@ class DefaultPlatformTest extends TestCase
 
     public function provideValidBooleanValues()
     {
-        return array(
-            array(true),
-            array('TRUE'),
-            array('true'),
-            array('1'),
-            array(1),
-            array('y'),
-            array('Y'),
-            array('yes'),
-            array('YES'),
-        );
+        return [
+            [true],
+            ['TRUE'],
+            ['true'],
+            ['1'],
+            [1],
+            ['y'],
+            ['Y'],
+            ['yes'],
+            ['YES'],
+        ];
     }
 
     /**
@@ -76,18 +76,18 @@ class DefaultPlatformTest extends TestCase
 
     public function provideInvalidBooleanValues()
     {
-        return array(
-            array(false),
-            array('FALSE'),
-            array('false'),
-            array('0'),
-            array(0),
-            array('n'),
-            array('N'),
-            array('no'),
-            array('NO'),
-            array('foo'),
-        );
+        return [
+            [false],
+            ['FALSE'],
+            ['false'],
+            ['0'],
+            [0],
+            ['n'],
+            ['N'],
+            ['no'],
+            ['NO'],
+            ['foo'],
+        ];
     }
 
     public function testQuote()
@@ -126,20 +126,20 @@ class DefaultPlatformTest extends TestCase
 
     public function getFieldDefaultValueDDLDataProvider()
     {
-        return array(
-            array($this->createField(PropelTypes::INTEGER, 0), "DEFAULT 0"),
-            array($this->createField(PropelTypes::INTEGER, '0'), "DEFAULT 0"),
-            array($this->createField(PropelTypes::VARCHAR, 'foo'), "DEFAULT 'foo'"),
-            array($this->createField(PropelTypes::VARCHAR, 0), "DEFAULT '0'"),
-            array($this->createField(PropelTypes::BOOLEAN, true), "DEFAULT 1"),
-            array($this->createField(PropelTypes::BOOLEAN, false), "DEFAULT 0"),
-            array($this->createField(PropelTypes::BOOLEAN, 'true'), "DEFAULT 1"),
-            array($this->createField(PropelTypes::BOOLEAN, 'false'), "DEFAULT 0"),
-            array($this->createField(PropelTypes::BOOLEAN, 'TRUE'), "DEFAULT 1"),
-            array($this->createEnumField(array('foo', 'bar', 'baz'), 'foo'), "DEFAULT 'foo'"),
-            array($this->createEnumField(array('foo', 'bar', 'baz'), 'bar'), "DEFAULT 'bar'"),
-            array($this->createEnumField(array('foo', 'bar', 'baz'), 'baz'), "DEFAULT 'baz'"),
-        );
+        return [
+            [$this->createField(PropelTypes::INTEGER, 0), "DEFAULT 0"],
+            [$this->createField(PropelTypes::INTEGER, '0'), "DEFAULT 0"],
+            [$this->createField(PropelTypes::VARCHAR, 'foo'), "DEFAULT 'foo'"],
+            [$this->createField(PropelTypes::VARCHAR, 0), "DEFAULT '0'"],
+            [$this->createField(PropelTypes::BOOLEAN, true), "DEFAULT 1"],
+            [$this->createField(PropelTypes::BOOLEAN, false), "DEFAULT 0"],
+            [$this->createField(PropelTypes::BOOLEAN, 'true'), "DEFAULT 1"],
+            [$this->createField(PropelTypes::BOOLEAN, 'false'), "DEFAULT 0"],
+            [$this->createField(PropelTypes::BOOLEAN, 'TRUE'), "DEFAULT 1"],
+            [$this->createEnumField(['foo', 'bar', 'baz'], 'foo'), "DEFAULT 'foo'"],
+            [$this->createEnumField(['foo', 'bar', 'baz'], 'bar'), "DEFAULT 'bar'"],
+            [$this->createEnumField(['foo', 'bar', 'baz'], 'baz'), "DEFAULT 'baz'"],
+        ];
     }
 
     /**
@@ -149,5 +149,4 @@ class DefaultPlatformTest extends TestCase
     {
         $this->assertEquals($default, $this->getPlatform()->getFieldDefaultValueDDL($column));
     }
-
 }

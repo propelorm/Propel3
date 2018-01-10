@@ -166,8 +166,8 @@ if (null === \$con) {
 
 ";
 
-    if ($useScope) {
-        $body .= "
+        if ($useScope) {
+            $body .= "
     if (\$targetScope != \$scope) {
 
         //move subtree to < 0, so the items are out of scope.
@@ -186,9 +186,9 @@ if (null === \$con) {
         \$preventDefault = true;
     }
 ";
-    }
+        }
 
-    $body .= "
+        $body .= "
 
     if (!\$preventDefault) {
 

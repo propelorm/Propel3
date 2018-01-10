@@ -29,7 +29,7 @@ class RemoveMethod extends BuildComponent
 EOF;
 
         if ($this->getEntity()->isReadOnly()) {
-$body = <<<EOF
+            $body = <<<EOF
 throw new BadMethodCallException('Readonly entity cannot be deleted');
 EOF;
             $this->useClass('Propel\Runtime\Exception\BadMethodCallException');

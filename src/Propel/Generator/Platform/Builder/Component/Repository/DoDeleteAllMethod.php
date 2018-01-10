@@ -37,7 +37,7 @@ class DoDeleteAllMethod extends BuildComponent
         ";
 
         if ($entity->isReadOnly()) {
-$body = <<<EOF
+            $body = <<<EOF
 throw new BadMethodCallException('Readonly entity cannot be deleted');
 EOF;
             $this->useClass('Propel\Runtime\Exception\BadMethodCallException');

@@ -80,7 +80,7 @@ EOF;
 
         $actual = $this->loader->load('empty.yaml');
 
-        $this->assertEquals(array(), $actual);
+        $this->assertEquals([], $actual);
     }
 
     /**
@@ -100,6 +100,5 @@ EOF;
         $actual = $this->loader->load('notreadable.yaml');
         $this->assertEquals('bar', $actual['foo']);
         $this->assertEquals('baz', $actual['bar']);
-
     }
 }

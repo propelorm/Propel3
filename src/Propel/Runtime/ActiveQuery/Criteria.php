@@ -156,37 +156,37 @@ class Criteria
      * Storage of select data. Collection of field names.
      * @var array
      */
-    protected $selectFields = array();
+    protected $selectFields = [];
 
     /**
      * Storage of aliased select data. Collection of field names.
      * @var string[]
      */
-    protected $asFields = array();
+    protected $asFields = [];
 
     /**
      * Storage of select modifiers data. Collection of modifier names.
      * @var string[]
      */
-    protected $selectModifiers = array();
+    protected $selectModifiers = [];
 
     /**
      * Storage of conditions data. Collection of Criterion objects.
      * @var AbstractCriterion[]
      */
-    protected $map = array();
+    protected $map = [];
 
     /**
      * Storage of ordering data. Collection of field names.
      * @var array
      */
-    protected $orderByFields = array();
+    protected $orderByFields = [];
 
     /**
      * Storage of grouping data. Collection of field names.
      * @var array
      */
-    protected $groupByFields = array();
+    protected $groupByFields = [];
 
     /**
      * Storage of having data.
@@ -199,9 +199,9 @@ class Criteria
      *
      * @var Join[]
      */
-    protected $joins = array();
+    protected $joins = [];
 
-    protected $selectQueries = array();
+    protected $selectQueries = [];
 
     /**
      * The name of the database.
@@ -235,7 +235,7 @@ class Criteria
      */
     protected $queryComment;
 
-    protected $aliases = array();
+    protected $aliases = [];
 
     protected $useTransaction = false;
 
@@ -243,7 +243,7 @@ class Criteria
      * Storage for Criterions expected to be combined
      * @var array
      */
-    protected $namedCriterions = array();
+    protected $namedCriterions = [];
 
     /**
      * Default operator for combination of criterions
@@ -304,22 +304,22 @@ class Criteria
      */
     public function clear()
     {
-        $this->map = array();
-        $this->namedCriterions = array();
+        $this->map = [];
+        $this->namedCriterions = [];
         $this->ignoreCase = false;
         $this->singleRecord = false;
-        $this->selectModifiers = array();
-        $this->selectFields = array();
-        $this->orderByFields = array();
-        $this->groupByFields = array();
+        $this->selectModifiers = [];
+        $this->selectFields = [];
+        $this->orderByFields = [];
+        $this->groupByFields = [];
         $this->having = null;
-        $this->asFields = array();
-        $this->joins = array();
-        $this->selectQueries = array();
+        $this->asFields = [];
+        $this->joins = [];
+        $this->selectQueries = [];
         $this->dbName = $this->originalDbName;
         $this->offset = 0;
         $this->limit = 0;
-        $this->aliases = array();
+        $this->aliases = [];
         $this->useTransaction = false;
         $this->ifLvlCount = false;
         $this->wasTrue = false;
@@ -449,10 +449,10 @@ class Criteria
     public function getEntityNameAndAlias($entityAliasOrName)
     {
         if (isset($this->aliases[$entityAliasOrName])) {
-            return array($this->aliases[$entityAliasOrName], $entityAliasOrName);
+            return [$this->aliases[$entityAliasOrName], $entityAliasOrName];
         }
 
-        return array($entityAliasOrName, null);
+        return [$entityAliasOrName, null];
     }
 
     /**
@@ -632,7 +632,7 @@ class Criteria
      */
     public function getEntitiesFields()
     {
-        $entities = array();
+        $entities = [];
         foreach ($this->keys() as $key) {
             $entityName = substr($key, 0, strrpos($key, '.'));
             $entities[$entityName][] = $key;
@@ -869,10 +869,10 @@ class Criteria
      * @param  string         $name       optional name to combine the criterion later
      * @return $this|Criteria
      */
-    public function combine($criterions = array(), $operator = self::LOGICAL_AND, $name = null)
+    public function combine($criterions = [], $operator = self::LOGICAL_AND, $name = null)
     {
         $operatorMethod = (self::LOGICAL_AND === strtoupper($operator)) ? 'addAnd' : 'addOr';
-        $namedCriterions = array();
+        $namedCriterions = [];
         foreach ($criterions as $key) {
             if (array_key_exists($key, $this->namedCriterions)) {
                 $namedCriterions[]= $this->namedCriterions[$key];
@@ -913,9 +913,9 @@ class Criteria
     public function addJoin($left, $right, $joinType = null)
     {
         if (is_array($left)) {
-            $conditions = array();
+            $conditions = [];
             foreach ($left as $key => $value) {
-                $condition = array($value, $right[$key]);
+                $condition = [$value, $right[$key]];
                 $conditions[] = $condition;
             }
 
@@ -938,8 +938,12 @@ class Criteria
         list($rightEntityName, $rightEntityAlias) = $this->getEntityNameAndAlias($rightEntityAlias);
 
         $join->addExplicitCondition(
-            $leftEntityName, $leftFieldName, $leftEntityAlias,
-            $rightEntityName, $rightFieldName, $rightEntityAlias,
+            $leftEntityName,
+            $leftFieldName,
+            $leftEntityAlias,
+            $rightEntityName,
+            $rightFieldName,
+            $rightEntityAlias,
             Join::EQUAL
         );
 
@@ -981,7 +985,7 @@ class Criteria
                 $leftFieldName = substr($left, $pos + 1);
                 list($leftEntityName, $leftEntityAlias) = $this->getEntityNameAndAlias($leftEntityAlias);
             } else {
-                list($leftEntityName, $leftEntityAlias) = array(null, null);
+                list($leftEntityName, $leftEntityAlias) = [null, null];
                 $leftFieldName = $left;
             }
 
@@ -990,7 +994,7 @@ class Criteria
                 $rightFieldName = substr($right, $pos + 1);
                 list($rightEntityName, $rightEntityAlias) = $this->getEntityNameAndAlias($rightEntityAlias);
             } else {
-                list($rightEntityName, $rightEntityAlias) = array(null, null);
+                list($rightEntityName, $rightEntityAlias) = [null, null];
                 $rightFieldName = $right;
             }
 
@@ -1168,7 +1172,7 @@ class Criteria
      */
     public function removeSelectModifier($modifier)
     {
-        $this->selectModifiers = array_values(array_diff($this->selectModifiers, array($modifier)));
+        $this->selectModifiers = array_values(array_diff($this->selectModifiers, [$modifier]));
 
         return $this;
     }
@@ -1350,7 +1354,7 @@ class Criteria
      */
     public function clearSelectFields()
     {
-        $this->selectFields = $this->asFields = array();
+        $this->selectFields = $this->asFields = [];
 
         return $this;
     }
@@ -1421,7 +1425,7 @@ class Criteria
      */
     public function clearOrderByFields()
     {
-        $this->orderByFields = array();
+        $this->orderByFields = [];
 
         return $this;
     }
@@ -1433,7 +1437,7 @@ class Criteria
      */
     public function clearGroupByFields()
     {
-        $this->groupByFields = array();
+        $this->groupByFields = [];
 
         return $this;
     }
@@ -1484,20 +1488,17 @@ class Criteria
      */
     public function toString()
     {
-
         $sb = 'Criteria:';
         try {
-
-            $params = array();
+            $params = [];
             $sb .= "\nSQL (may not be complete): ".$this->createSelectSql($params);
 
             $sb .= "\nParams: ";
-            $paramstr = array();
+            $paramstr = [];
             foreach ($params as $param) {
                 $paramstr[] = $param['entity'] . '.' . $param['field'] . ' => ' . var_export($param['value'], true);
             }
             $sb .= implode(', ', $paramstr);
-
         } catch (\Exception $exc) {
             $sb .= '(Error: ' . $exc->getMessage() . ')';
         }
@@ -1535,7 +1536,7 @@ class Criteria
             // Important: nested criterion objects are checked
 
             $criteria = $crit; // alias
-            if  ($this->offset            === $criteria->getOffset()
+            if ($this->offset            === $criteria->getOffset()
                 && $this->limit           === $criteria->getLimit()
                 && $this->ignoreCase      === $criteria->isIgnoreCase()
                 && $this->singleRecord    === $criteria->isSingleRecord()
@@ -1546,8 +1547,7 @@ class Criteria
                 && $this->orderByFields  === $criteria->getOrderByFields()
                 && $this->groupByFields  === $criteria->getGroupByFields()
                 && $this->aliases         === $criteria->getAliases()
-               ) // what about having ??
-            {
+               ) { // what about having ??
                 foreach ($criteria->keys() as $key) {
                     if ($this->containsKey($key)) {
                         $a = $this->getCriterion($key);
@@ -1829,11 +1829,11 @@ class Criteria
         $adapter = $this->getConfiguration()->getAdapter($this->getDbName());
         $dbMap = $this->getConfiguration()->getDatabase($this->getDbName());
 
-        $fromClause = array();
-        $joinClause = array();
-        $joinEntities = array();
-        $whereClause = array();
-        $orderByClause = array();
+        $fromClause = [];
+        $joinClause = [];
+        $joinEntities = [];
+        $whereClause = [];
+        $orderByClause = [];
 
         $orderBy = $this->getOrderByFields();
 
@@ -1905,7 +1905,6 @@ class Criteria
             $entity = null;
             foreach ($criterion->getAttachedCriterion() as $attachedCriterion) {
                 if ($entityName = $attachedCriterion->getEntityName()) {
-
                     $entity = $this->getEntityForAlias($entityName);
                     if ($entity !== null) {
                         $fromClause[] = $entity . ' ' . $entityName;
@@ -1932,7 +1931,7 @@ class Criteria
 
         // Unique from clause elements
         $fromClause = array_unique($fromClause);
-        $fromClause = array_diff($fromClause, array(''));
+        $fromClause = array_diff($fromClause, ['']);
 
         // entities should not exist in both the from and join clauses
         if ($joinEntities && $fromClause) {
@@ -1953,7 +1952,6 @@ class Criteria
         }
 
         if (!empty($orderBy)) {
-
             foreach ($orderBy as $orderByField) {
 
                 // Add function expression as-is.
@@ -2025,7 +2023,7 @@ class Criteria
         }
 
         // quote if necessary and replace entity name -> real sql table name
-        $fromClause = array_map(array($this, 'quoteTableIdentifierForEntity'), $fromClause);
+        $fromClause = array_map([$this, 'quoteTableIdentifierForEntity'], $fromClause);
 
         // add subQuery to From after adding quotes
         foreach ($this->getSelectQueries() as $subQueryAlias => $subQueryCriteria) {
@@ -2082,11 +2080,11 @@ class Criteria
      */
     public function quoteIdentifier($string, $entityName = '')
     {
-/*        if ($this->isIdentifierQuotingEnabled()) {
-            $adapter = $this->getConfiguration()->getAdapter($this->getDbName());
-
-            return $adapter->quote($string);
-        }*/
+        /*        if ($this->isIdentifierQuotingEnabled()) {
+                    $adapter = $this->getConfiguration()->getAdapter($this->getDbName());
+        
+                    return $adapter->quote($string);
+                }*/
 
         $rightSide = '';
         //find entity name and ask entityMap if quoting is enabled
@@ -2166,7 +2164,7 @@ class Criteria
      */
     public function replaceNames(&$sql)
     {
-        $this->replacedFields = array();
+        $this->replacedFields = [];
         $this->currentAlias = '';
         $this->foundMatch = false;
         $isAfterBackslash = false;
@@ -2190,7 +2188,7 @@ class Criteria
                             $isInString = false;
                         }
                     } elseif (!$isInString) {
-                        $parsedString .= preg_replace_callback('/([\w\\\]+(\.\w+)?)/', array($this, 'doReplaceNameInExpression'), $stringToTransform);
+                        $parsedString .= preg_replace_callback('/([\w\\\]+(\.\w+)?)/', [$this, 'doReplaceNameInExpression'], $stringToTransform);
                         $stringToTransform = '';
                         $stringQuotes = $char;
                         $isInString = true;
@@ -2212,7 +2210,7 @@ class Criteria
         }
 
         if ($stringToTransform) {
-            $parsedString .= preg_replace_callback('/([\w\\\]+(\.\w+)?)/', array($this, 'doReplaceNameInExpression'), $stringToTransform);
+            $parsedString .= preg_replace_callback('/([\w\\\]+(\.\w+)?)/', [$this, 'doReplaceNameInExpression'], $stringToTransform);
         }
 
         $sql = $parsedString;
@@ -2283,13 +2281,13 @@ class Criteria
 
         try {
             $qualifiedCols = $this->keys(); // we need entity.field cols when populating values
-            $fields = array(); // but just 'field' cols for the SQL
+            $fields = []; // but just 'field' cols for the SQL
             foreach ($qualifiedCols as $qualifiedCol) {
                 $fields[] = substr($qualifiedCol, strrpos($qualifiedCol, '.') + 1);
             }
 
             // add identifiers
-            $fields = array_map(array($this, 'quoteIdentifier'), $fields);
+            $fields = array_map([$this, 'quoteIdentifier'], $fields);
             $entityName = $this->quoteTableIdentifierForEntity($entityName);
 
             $sql = 'INSERT INTO ' . $entityName
@@ -2311,7 +2309,6 @@ class Criteria
             $stmt = $con->prepare($sql);
             $db->bindValues($stmt, $params, $dbMap, $db);
             $stmt->execute();
-
         } catch (\Exception $e) {
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), 0, $e);
@@ -2383,7 +2380,7 @@ class Criteria
         // Get list of required entities, containing all fields
         $entitiesFields = $this->getEntitiesFields();
         if (empty($entitiesFields) && ($entity = $this->getPrimaryEntityName())) {
-            $entitiesFields = array($entity => array());
+            $entitiesFields = [$entity => []];
         }
 
         // we also need the fields for the update SQL
@@ -2402,9 +2399,8 @@ class Criteria
         $affectedRows = 0; // initialize this in case the next loop has no iterations.
 
         foreach ($entitiesFields as $entityName => $fields) {
-
-            $whereClause = array();
-            $params = array();
+            $whereClause = [];
+            $params = [];
             $stmt = null;
             try {
                 $sql = 'UPDATE ';
@@ -2473,9 +2469,9 @@ class Criteria
                 $db->cleanupSQL($sql, $params, $updateValues, $dbMap);
 
                 $paramsReplace = $params;
-                $readable = preg_replace_callback('/\?/', function() use (&$paramsReplace) {
-                        return var_export(array_shift($paramsReplace), true);
-                    }, $sql);
+                $readable = preg_replace_callback('/\?/', function () use (&$paramsReplace) {
+                    return var_export(array_shift($paramsReplace), true);
+                }, $sql);
                 $this->getConfiguration()->debug("sql-update: $readable");
 
                 $stmt = $con->prepare($sql);
@@ -2488,7 +2484,6 @@ class Criteria
                 $affectedRows = $stmt->rowCount();
 
                 $stmt = null; // close
-
             } catch (\Exception $e) {
                 if ($stmt) {
                     $stmt = null; // close
@@ -2496,7 +2491,6 @@ class Criteria
 //                Propel::log($e->getMessage(), Propel::LOG_ERR);
                 throw new PropelException(sprintf('Unable to execute UPDATE statement [%s]', $sql), 0, $e);
             }
-
         } // foreach entity in the criteria
 
         return $affectedRows;
@@ -2507,15 +2501,15 @@ class Criteria
         if (!$values) {
             $values = $this;
         }
-        $params = array();
+        $params = [];
         foreach ($fields as $key) {
             if ($values->containsKey($key)) {
                 $crit = $values->getCriterion($key);
-                $params[] = array(
+                $params[] = [
                     'field' => $crit->getField(),
                     'entity' => $crit->getEntityName(),
                     'value' => $crit->getValue()
-                );
+                ];
             }
         }
 
@@ -2537,7 +2531,7 @@ class Criteria
             || count($this->selectQueries) > 0
         ;
 
-        $params = array();
+        $params = [];
         if ($needsComplexCount) {
             if ($this->needsSelectAliases()) {
                 if ($this->getHaving()) {
@@ -2576,7 +2570,7 @@ class Criteria
      */
     public function needsSelectAliases()
     {
-        $fieldNames = array();
+        $fieldNames = [];
         foreach ($this->getSelectFields() as $fullyQualifiedFieldName) {
             if ($pos = strrpos($fullyQualifiedFieldName, '.')) {
                 $fieldName = substr($fullyQualifiedFieldName, $pos);
@@ -2620,9 +2614,8 @@ class Criteria
         $affectedRows = 0; // initialize this in case the next loop has no iterations.
 
         foreach ($entities as $entityName => $fields) {
-
-            $whereClause = array();
-            $params = array();
+            $whereClause = [];
+            $params = [];
             $stmt = null;
             try {
                 $sql = $adapter->getDeleteFromClause($this, $entityName);
@@ -2646,7 +2639,6 @@ class Criteria
                 $this->getConfiguration()->log($e->getMessage(), Configuration::LOG_ERR);
                 throw new PropelException(sprintf('Unable to execute DELETE statement [%s]', $sql), 0, $e);
             }
-
         } // for each entity
 
         return $affectedRows;
@@ -2694,7 +2686,7 @@ class Criteria
         $con = $this->getConfiguration()->getConnectionManager($this->getDbName())->getReadConnection();
         $adapter = $this->getConfiguration()->getAdapter($this->getDbName());
 
-        $params = array();
+        $params = [];
         $sql = $this->createSelectSql($params);
         try {
             $stmt = $con->prepare($sql);
@@ -2837,5 +2829,4 @@ class Criteria
     {
         $this->identifierQuoting = $identifierQuoting;
     }
-
 }

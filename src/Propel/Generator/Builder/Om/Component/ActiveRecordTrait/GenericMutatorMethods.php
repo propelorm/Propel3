@@ -18,5 +18,4 @@ class GenericMutatorMethods extends BuildComponent
     public function process()
     {
     }
-
 }

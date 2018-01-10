@@ -116,7 +116,7 @@ class SqlManager extends AbstractManager
      */
     public function insertSql($datasource = null)
     {
-        $statementsToInsert = array();
+        $statementsToInsert = [];
         foreach ($this->getProperties($this->getSqlDbMapFilename()) as $sqlFile => $database) {
             if (null !== $datasource && $database !== $datasource) {
                 // skip
@@ -125,7 +125,7 @@ class SqlManager extends AbstractManager
             }
 
             if (!isset($statementsToInsert[$database])) {
-                $statementsToInsert[$database] = array();
+                $statementsToInsert[$database] = [];
             }
 
             if (null === $datasource || (null !== $database && $database === $datasource)) {
@@ -182,7 +182,7 @@ class SqlManager extends AbstractManager
         $username = isset($buildConnection['user']) && $buildConnection['user'] ? $buildConnection['user'] : null;
         $password = isset($buildConnection['password']) && $buildConnection['password'] ? $buildConnection['password'] : null;
 
-        $con = ConnectionFactory::create(array('dsn' => $dsn, 'user' => $username, 'password' => $password), AdapterFactory::create($buildConnection['adapter']));
+        $con = ConnectionFactory::create(['dsn' => $dsn, 'user' => $username, 'password' => $password], AdapterFactory::create($buildConnection['adapter']));
 
         return $con;
     }

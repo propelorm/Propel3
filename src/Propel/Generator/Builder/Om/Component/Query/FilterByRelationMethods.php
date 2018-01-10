@@ -3,7 +3,6 @@
 
 namespace Propel\Generator\Builder\Om\Component\Query;
 
-
 use gossi\codegen\model\PhpConstant;
 use gossi\codegen\model\PhpParameter;
 use Propel\Generator\Builder\Om\Component\BuildComponent;
@@ -54,7 +53,7 @@ class FilterByRelationMethods extends BuildComponent
 if ($objectName instanceof $fkPhpName) {
     return \$this";
         foreach ($relation->getFieldObjectsMapArray() as $map) {
-            list ($localColumnObject, $foreignColumnObject) = $map;
+            list($localColumnObject, $foreignColumnObject) = $map;
             $body .= "
         ->addUsingAlias(" . $localColumnObject->getFQConstantName() . ", " . $objectName . "->get" . $foreignColumnObject->getName() . "(), \$comparison)";
         }
@@ -71,7 +70,7 @@ if ($objectName instanceof $fkPhpName) {
 
     return \$this
         ->addUsingAlias($localColumnConstant, {$objectName}->toKeyValue('$keyColumn', '$foreignColumnName'), \$comparison);";
-}
+        }
         $body .= "
 } else {";
         if ($relation->isComposite()) {
@@ -89,8 +88,8 @@ if ($objectName instanceof $fkPhpName) {
         $variableParameter = new PhpParameter($foreignEntity->getCamelCaseName());
 
 //        if ($relation->isComposite()) {
-            $variableParameter->setType($fkPhpName);
-            $variableParameter->setTypeDescription("The related object to use as filter");
+        $variableParameter->setType($fkPhpName);
+        $variableParameter->setTypeDescription("The related object to use as filter");
 //        } else {
 //            $variableParameter->setType("$fkPhpName|ObjectCollection");
 //            $variableParameter->setTypeDescription("The related object(s) to use as filter");
@@ -103,6 +102,5 @@ if ($objectName instanceof $fkPhpName) {
             ->setType("\$this|" . $this->getQueryClassName())
             ->setTypeDescription("The current query, for fluid interface")
             ->setBody($body);
-
     }
 }

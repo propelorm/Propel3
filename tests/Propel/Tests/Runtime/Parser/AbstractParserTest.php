@@ -61,5 +61,4 @@ EOF;
         $this->assertEquals($testContent, $content);
         unlink($testFile);
     }
-
 }

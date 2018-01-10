@@ -6,7 +6,8 @@ namespace Propel\Runtime\Session;
 use MJS\TopSort\ElementNotFoundException;
 use MJS\TopSort\Implementations\GroupedStringSort;
 
-class DependencyGraph {
+class DependencyGraph
+{
 
     /**
      * @var Session
@@ -18,7 +19,7 @@ class DependencyGraph {
      */
     protected $orderedList;
 
-    function __construct($session)
+    public function __construct($session)
     {
         $this->session = $session;
         $this->sorter = new GroupedStringSort([], true);
@@ -68,8 +69,8 @@ class DependencyGraph {
         return $this->orderedList;
     }
 
-    public function getGroups(){
-
+    public function getGroups()
+    {
         if (!$this->orderedList) {
             $this->getList();
         }

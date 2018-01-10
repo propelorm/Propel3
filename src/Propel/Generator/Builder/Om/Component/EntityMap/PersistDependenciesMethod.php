@@ -41,7 +41,7 @@ if (\$isset(\$entity, '$relationName') && \$relationEntity = \$reader(\$entity, 
         }
 
         //Prevent add an entity twice
-        $alreadyAdded = array();
+        $alreadyAdded = [];
 
         foreach ($this->getEntity()->getReferrers() as $relation) {
             $relationName = $this->getRefRelationVarName($relation);
@@ -97,7 +97,6 @@ if (\$isset(\$entity, '$varName') && \$relationEntities = \$reader(\$entity, '$v
         }
         \$session->persist(\$relationEntity[$idx], \$deep);";
                 }
-
             } else {
                 $body .= "
         \$session->persist(\$relationEntity, \$deep);";

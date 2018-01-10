@@ -2,8 +2,8 @@
 
 namespace Propel\Tests\Runtime\TypeTests;
 
-class DummyObjectClass {
-
+class DummyObjectClass
+{
     public $propPublic;
 
     protected $propProtected;
@@ -57,5 +57,4 @@ class DummyObjectClass {
     {
         return $this->propPublic;
     }
-
 }

@@ -27,7 +27,7 @@ class ConnectionManagerSingle implements ConnectionManagerInterface, LoggerAware
     /**
      * @var array
      */
-    protected $configuration = array();
+    protected $configuration = [];
 
     protected $logger;
 
@@ -41,7 +41,7 @@ class ConnectionManagerSingle implements ConnectionManagerInterface, LoggerAware
      */
     protected $adapter;
 
-    function __construct(AdapterInterface $adapter)
+    public function __construct(AdapterInterface $adapter)
     {
         $this->adapter = $adapter;
     }

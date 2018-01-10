@@ -29,7 +29,7 @@ class ModelBuildCommand extends AbstractCommand
         parent::configure();
 
         $this
-            ->addOption('mysql-engine', null, InputOption::VALUE_REQUIRED,  'MySQL engine (MyISAM, InnoDB, ...)')
+            ->addOption('mysql-engine', null, InputOption::VALUE_REQUIRED, 'MySQL engine (MyISAM, InnoDB, ...)')
             ->addOption('output-dir', null, InputOption::VALUE_REQUIRED, 'The output directory')
             ->addOption('object-class', null, InputOption::VALUE_REQUIRED, 'The object class generator name')
             ->addOption('object-stub-class', null, InputOption::VALUE_REQUIRED, 'The object stub class generator name')
@@ -46,7 +46,7 @@ class ModelBuildCommand extends AbstractCommand
             ->addOption('disable-namespace-auto-package', null, InputOption::VALUE_NONE, 'Disable namespace auto-packaging')
             ->addOption('composer-dir', null, InputOption::VALUE_REQUIRED, 'Directory in which your composer.json resides', null)
             ->setName('model:build')
-            ->setAliases(array('build'))
+            ->setAliases(['build'])
             ->setDescription('Build the model classes based on Propel XML schemas')
         ;
     }
@@ -56,7 +56,7 @@ class ModelBuildCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $configOptions = array();
+        $configOptions = [];
         $inputOptions = $input->getOptions();
 
         foreach ($inputOptions as $key => $option) {

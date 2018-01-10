@@ -17,12 +17,12 @@ class GraphvizGenerateTest extends TestCaseFixtures
 
         $outputDir = __DIR__.'/../../../../graphviztest';
 
-        $input = new \Symfony\Component\Console\Input\ArrayInput(array(
+        $input = new \Symfony\Component\Console\Input\ArrayInput([
             'command' => 'graphviz:generate',
             '--input-dir' => __DIR__ . '/../../../../Fixtures/bookstore',
             '--output-dir' => $outputDir,
             '--verbose' => true
-        ));
+        ]);
 
         $output = new \Symfony\Component\Console\Output\StreamOutput(fopen("php://temp", 'r+'));
         $app->setAutoExit(false);
@@ -39,5 +39,4 @@ class GraphvizGenerateTest extends TestCaseFixtures
         $content = file_get_contents($outputDir.'/bookstore.schema.dot');
         $this->assertContains('digraph G {', $content);
     }
-
 }

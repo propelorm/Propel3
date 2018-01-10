@@ -75,14 +75,14 @@ abstract class EntityMap
      *
      * @var FieldMap[]
      */
-    protected $fields = array();
+    protected $fields = [];
 
     /**
      * Fields in the entity, using entity phpName as key
      *
      * @var FieldMap[]
      */
-    protected $fieldsByLowercaseName = array();
+    protected $fieldsByLowercaseName = [];
 
     /**
      * The (class) name of the entity
@@ -150,22 +150,22 @@ abstract class EntityMap
      *
      * @var FieldMap[]
      */
-    protected $primaryKeys = array();
+    protected $primaryKeys = [];
 
     /**
      * The foreign key fields in the entity
      *
      * @var FieldMap[]
      */
-    protected $foreignKeys = array();
+    protected $foreignKeys = [];
 
     /**
      *  The relationships in the entity
      *
      * @var RelationMap[]
      */
-    protected $relations = array();
-    protected $relationsByNormalizedName = array();
+    protected $relations = [];
+    protected $relationsByNormalizedName = [];
 
     /**
      *  Relations are lazy loaded. This property tells if the relations are loaded or not
@@ -643,7 +643,6 @@ abstract class EntityMap
             $relation = $this->getRelation($fieldName);
             
             if ($relation->isManyToMany()) {
-
                 $query = $relation->getForeignEntity()->createQuery();
 
                 $join = new ModelJoin();
@@ -1369,8 +1368,11 @@ abstract class EntityMap
             $name = FieldMap::normalizeName($name);
         }
         if (!$this->hasField($name, false)) {
-            throw new FieldNotFoundException(sprintf('Cannot fetch field for undefined field: %s in %s.', $name,
-                $this->getFullClassName()));
+            throw new FieldNotFoundException(sprintf(
+                'Cannot fetch field for undefined field: %s in %s.',
+                $name,
+                $this->getFullClassName()
+            ));
         }
 
         if (isset($this->fields[$name])) {
@@ -1554,7 +1556,7 @@ abstract class EntityMap
         $name,
         $foreignEntityName,
         $type,
-        $fieldMapping = array(),
+        $fieldMapping = [],
         $onDelete = null,
         $onUpdate = null,
         $refName = null,
@@ -1617,13 +1619,12 @@ abstract class EntityMap
         $name,
         $foreignEntityName,
         $type,
-        $fieldMapping = array(),
+        $fieldMapping = [],
         $onDelete = null,
         $onUpdate = null,
         $refName = null,
         $polymorphic = false
-    )
-    {
+    ) {
         $relation = $this->addRelation($name, $foreignEntityName, $type, $fieldMapping, $onDelete, $onUpdate, $refName, $polymorphic);
         $relation->setReferrer(true);
         return $relation;
@@ -1710,7 +1711,7 @@ abstract class EntityMap
      */
     public function getBehaviors()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -1838,7 +1839,7 @@ abstract class EntityMap
     public function translateFieldNames($row, $fromType, $toType)
     {
         $toNames = $this->getFieldNames($toType);
-        $newRow = array();
+        $newRow = [];
         foreach ($row as $name => $field) {
             if ($key = $this->fieldKeys[$fromType][$name]) {
                 $newRow[$toNames[$key]] = $field;

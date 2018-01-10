@@ -139,54 +139,54 @@ class NestedSetBehaviorRepositoryTest extends TestCase
         $this->initTree();
         $repository->shiftRLValues($delta = 1, $left = 1);
         $this->clearEntityPool();
-        $expected = array(
-            't1' => array(2, 15, 0),
-            't2' => array(3, 4, 1),
-            't3' => array(5, 14, 1),
-            't4' => array(6, 7, 2),
-            't5' => array(8, 13, 2),
-            't6' => array(9, 10, 3),
-            't7' => array(11, 12, 3),
-        );
+        $expected = [
+            't1' => [2, 15, 0],
+            't2' => [3, 4, 1],
+            't3' => [5, 14, 1],
+            't4' => [6, 7, 2],
+            't5' => [8, 13, 2],
+            't6' => [9, 10, 3],
+            't7' => [11, 12, 3],
+        ];
 
         $this->assertEquals($expected, $this->dumpTree(), 'shiftRLValues shifts all nodes with a positive amount');
         $this->initTree();
         $repository->shiftRLValues($delta = -1, $left = 1);
         $this->clearEntityPool();
-        $expected = array(
-            't1' => array(0, 13, 0),
-            't2' => array(1, 2, 1),
-            't3' => array(3, 12, 1),
-            't4' => array(4, 5, 2),
-            't5' => array(6, 11, 2),
-            't6' => array(7, 8, 3),
-            't7' => array(9, 10, 3),
-        );
+        $expected = [
+            't1' => [0, 13, 0],
+            't2' => [1, 2, 1],
+            't3' => [3, 12, 1],
+            't4' => [4, 5, 2],
+            't5' => [6, 11, 2],
+            't6' => [7, 8, 3],
+            't7' => [9, 10, 3],
+        ];
         $this->assertEquals($this->dumpTree(), $expected, 'shiftRLValues can shift all nodes with a negative amount');
         $this->initTree();
         $repository->shiftRLValues($delta = 3, $left = 1);
         $this->clearEntityPool();
-        $expected = array(
-            't1'=> array(4, 17, 0),
-            't2' => array(5, 6, 1),
-            't3' => array(7, 16, 1),
-            't4' => array(8, 9, 2),
-            't5' => array(10, 15, 2),
-            't6' => array(11, 12, 3),
-            't7' => array(13, 14, 3),
-        );
+        $expected = [
+            't1'=> [4, 17, 0],
+            't2' => [5, 6, 1],
+            't3' => [7, 16, 1],
+            't4' => [8, 9, 2],
+            't5' => [10, 15, 2],
+            't6' => [11, 12, 3],
+            't7' => [13, 14, 3],
+        ];
         $this->assertEquals($this->dumpTree(), $expected, 'shiftRLValues shifts all nodes several units to the right');
         $repository->shiftRLValues($delta = -3, $left = 1);
         $this->clearEntityPool();
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 13, 1),
-            't4' => array(5, 6, 2),
-            't5' => array(7, 12, 2),
-            't6' => array(8, 9, 3),
-            't7' => array(10, 11, 3),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 13, 1],
+            't4' => [5, 6, 2],
+            't5' => [7, 12, 2],
+            't6' => [8, 9, 3],
+            't7' => [10, 11, 3],
+        ];
         $this->assertEquals($this->dumpTree(), $expected, 'shiftRLValues shifts all nodes several units to the left');
     }
 
@@ -196,41 +196,41 @@ class NestedSetBehaviorRepositoryTest extends TestCase
         $this->initTree();
         $repository->shiftRLValues($delta = 1, $left = 15);
         $this->clearEntityPool();
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 13, 1),
-            't4' => array(5, 6, 2),
-            't5' => array(7, 12, 2),
-            't6' => array(8, 9, 3),
-            't7' => array(10, 11, 3),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 13, 1],
+            't4' => [5, 6, 2],
+            't5' => [7, 12, 2],
+            't6' => [8, 9, 3],
+            't7' => [10, 11, 3],
+        ];
         $this->assertEquals($this->dumpTree(), $expected, 'shiftRLValues does not shift anything when the left parameter is higher than the highest right value');
         $this->initTree();
         $repository->shiftRLValues($delta = 1, $left = 5);
         $this->clearEntityPool();
-        $expected = array(
-            't1' => array(1, 15, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 14, 1),
-            't4' => array(6, 7, 2),
-            't5' => array(8, 13, 2),
-            't6' => array(9, 10, 3),
-            't7' => array(11, 12, 3),
-        );
+        $expected = [
+            't1' => [1, 15, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 14, 1],
+            't4' => [6, 7, 2],
+            't5' => [8, 13, 2],
+            't6' => [9, 10, 3],
+            't7' => [11, 12, 3],
+        ];
         $this->assertEquals($this->dumpTree(), $expected, 'shiftRLValues shifts only the nodes having a LR value higher than the given left parameter');
         $this->initTree();
         $repository->shiftRLValues($delta = 1, $left = 1);
         $this->clearEntityPool();
-        $expected = array(
-            't1'=> array(2, 15, 0),
-            't2' => array(3, 4, 1),
-            't3' => array(5, 14, 1),
-            't4' => array(6, 7, 2),
-            't5' => array(8, 13, 2),
-            't6' => array(9, 10, 3),
-            't7' => array(11, 12, 3),
-        );
+        $expected = [
+            't1'=> [2, 15, 0],
+            't2' => [3, 4, 1],
+            't3' => [5, 14, 1],
+            't4' => [6, 7, 2],
+            't5' => [8, 13, 2],
+            't6' => [9, 10, 3],
+            't7' => [11, 12, 3],
+        ];
         $this->assertEquals($this->dumpTree(), $expected, 'shiftRLValues shifts all nodes when the left parameter is 1');
     }
 
@@ -240,41 +240,41 @@ class NestedSetBehaviorRepositoryTest extends TestCase
         $this->initTree();
         $repository->shiftRLValues($delta = 1, $left = 1, $right = 0);
         $this->clearEntityPool();
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 13, 1),
-            't4' => array(5, 6, 2),
-            't5' => array(7, 12, 2),
-            't6' => array(8, 9, 3),
-            't7' => array(10, 11, 3),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 13, 1],
+            't4' => [5, 6, 2],
+            't5' => [7, 12, 2],
+            't6' => [8, 9, 3],
+            't7' => [10, 11, 3],
+        ];
         $this->assertEquals($this->dumpTree(), $expected, 'shiftRLValues does not shift anything when the right parameter is 0');
         $this->initTree();
         $repository->shiftRLValues($delta = 1, $left = 1, $right = 5);
         $this->clearEntityPool();
-        $expected = array(
-            't1' => array(2, 14, 0),
-            't2' => array(3, 4, 1),
-            't3' => array(5, 13, 1),
-            't4' => array(6, 6, 2),
-            't5' => array(7, 12, 2),
-            't6' => array(8, 9, 3),
-            't7' => array(10, 11, 3),
-        );
+        $expected = [
+            't1' => [2, 14, 0],
+            't2' => [3, 4, 1],
+            't3' => [5, 13, 1],
+            't4' => [6, 6, 2],
+            't5' => [7, 12, 2],
+            't6' => [8, 9, 3],
+            't7' => [10, 11, 3],
+        ];
         $this->assertEquals($this->dumpTree(), $expected, 'shiftRLValues shiftRLValues shifts only the nodes having a LR value lower than the given right parameter');
         $this->initTree();
         $repository->shiftRLValues($delta = 1, $left = 1, $right = 15);
         $this->clearEntityPool();
-        $expected = array(
-            't1'=> array(2, 15, 0),
-            't2' => array(3, 4, 1),
-            't3' => array(5, 14, 1),
-            't4' => array(6, 7, 2),
-            't5' => array(8, 13, 2),
-            't6' => array(9, 10, 3),
-            't7' => array(11, 12, 3),
-        );
+        $expected = [
+            't1'=> [2, 15, 0],
+            't2' => [3, 4, 1],
+            't3' => [5, 14, 1],
+            't4' => [6, 7, 2],
+            't5' => [8, 13, 2],
+            't6' => [9, 10, 3],
+            't7' => [11, 12, 3],
+        ];
         $this->assertEquals($this->dumpTree(), $expected, 'shiftRLValues shifts all nodes when the right parameter is higher than the highest right value');
     }
 
@@ -284,78 +284,78 @@ class NestedSetBehaviorRepositoryTest extends TestCase
         $this->initTreeWithScope();
         $repository->shiftRLValues(1, 100, null, 1);
         $this->clearEntityPool(true);
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 13, 1),
-            't4' => array(5, 6, 2),
-            't5' => array(7, 12, 2),
-            't6' => array(8, 9, 3),
-            't7' => array(10, 11, 3),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 13, 1],
+            't4' => [5, 6, 2],
+            't5' => [7, 12, 2],
+            't6' => [8, 9, 3],
+            't7' => [10, 11, 3],
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(1), 'shiftRLValues does not shift anything when the first parameter is higher than the highest right value');
-        $expected = array(
-            't8' => array(1, 6, 0),
-            't9' => array(2, 3, 1),
-            't10' => array(4, 5, 1),
-        );
+        $expected = [
+            't8' => [1, 6, 0],
+            't9' => [2, 3, 1],
+            't10' => [4, 5, 1],
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 'shiftRLValues does not shift anything out of the scope');
         $this->initTreeWithScope();
         $repository->shiftRLValues(1, 1, null, 1);
         $this->clearEntityPool(true);
-        $expected = array(
-            't1' => array(2, 15, 0),
-            't2' => array(3, 4, 1),
-            't3' => array(5, 14, 1),
-            't4' => array(6, 7, 2),
-            't5' => array(8, 13, 2),
-            't6' => array(9, 10, 3),
-            't7' => array(11, 12, 3),
-        );
+        $expected = [
+            't1' => [2, 15, 0],
+            't2' => [3, 4, 1],
+            't3' => [5, 14, 1],
+            't4' => [6, 7, 2],
+            't5' => [8, 13, 2],
+            't6' => [9, 10, 3],
+            't7' => [11, 12, 3],
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(1), 'shiftRLValues can shift all nodes to the right');
-        $expected = array(
-            't8' => array(1, 6, 0),
-            't9' => array(2, 3, 1),
-            't10' => array(4, 5, 1),
-        );
+        $expected = [
+            't8' => [1, 6, 0],
+            't9' => [2, 3, 1],
+            't10' => [4, 5, 1],
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 'shiftRLValues does not shift anything out of the scope');
         $this->initTreeWithScope();
         $repository->shiftRLValues(-1, 1, null, 1);
         $this->clearEntityPool(true);
-        $expected = array(
-            't1' => array(0, 13, 0),
-            't2' => array(1, 2, 1),
-            't3' => array(3, 12, 1),
-            't4' => array(4, 5, 2),
-            't5' => array(6, 11, 2),
-            't6' => array(7, 8, 3),
-            't7' => array(9, 10, 3),
-        );
-        $this->assertEquals($expected, $this->dumpTreeWithScope(1),'shiftRLValues can shift all nodes to the left');
-        $expected = array(
-            't8' => array(1, 6, 0),
-            't9' => array(2, 3, 1),
-            't10' => array(4, 5, 1),
-        );
+        $expected = [
+            't1' => [0, 13, 0],
+            't2' => [1, 2, 1],
+            't3' => [3, 12, 1],
+            't4' => [4, 5, 2],
+            't5' => [6, 11, 2],
+            't6' => [7, 8, 3],
+            't7' => [9, 10, 3],
+        ];
+        $this->assertEquals($expected, $this->dumpTreeWithScope(1), 'shiftRLValues can shift all nodes to the left');
+        $expected = [
+            't8' => [1, 6, 0],
+            't9' => [2, 3, 1],
+            't10' => [4, 5, 1],
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 'shiftRLValues does not shift anything out of the scope');
         $this->initTreeWithScope();
         $repository->shiftRLValues(1, 5, null, 1);
         $this->clearEntityPool(true);
-        $expected = array(
-            't1' => array(1, 15, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 14, 1),
-            't4' => array(6, 7, 2),
-            't5' => array(8, 13, 2),
-            't6' => array(9, 10, 3),
-            't7' => array(11, 12, 3),
-        );
+        $expected = [
+            't1' => [1, 15, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 14, 1],
+            't4' => [6, 7, 2],
+            't5' => [8, 13, 2],
+            't6' => [9, 10, 3],
+            't7' => [11, 12, 3],
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(1), 'shiftRLValues can shift some nodes to the right');
-        $expected = array(
-            't8' => array(1, 6, 0),
-            't9' => array(2, 3, 1),
-            't10' => array(4, 5, 1),
-        );
+        $expected = [
+            't8' => [1, 6, 0],
+            't9' => [2, 3, 1],
+            't10' => [4, 5, 1],
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 'shiftRLValues does not shift anything out of the scope');
     }
 
@@ -374,28 +374,28 @@ class NestedSetBehaviorRepositoryTest extends TestCase
         $this->initTree();
         $repository->shiftLevel($delta = 1, $first = 7, $last = 12);
         $this->clearEntityPool();
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 13, 1),
-            't4' => array(5, 6, 2),
-            't5' => array(7, 12, 3),
-            't6' => array(8, 9, 4),
-            't7' => array(10, 11, 4),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 13, 1],
+            't4' => [5, 6, 2],
+            't5' => [7, 12, 3],
+            't6' => [8, 9, 4],
+            't7' => [10, 11, 4],
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'shiftLevel shifts all nodes with a left value between the first and last');
         $this->initTree();
         $repository->shiftLevel($delta = -1, $first = 7, $last = 12);
         $this->clearEntityPool();
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 13, 1),
-            't4' => array(5, 6, 2),
-            't5' => array(7, 12, 1),
-            't6' => array(8, 9, 2),
-            't7' => array(10, 11, 2),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 13, 1],
+            't4' => [5, 6, 2],
+            't5' => [7, 12, 1],
+            't6' => [8, 9, 2],
+            't7' => [10, 11, 2],
+        ];
         $this->assertEquals($this->dumpTree(), $expected, 'shiftLevel shifts all nodes wit ha negative amount');
     }
 
@@ -405,21 +405,21 @@ class NestedSetBehaviorRepositoryTest extends TestCase
         $this->initTreeWithScope();
         $repository->shiftLevel($delta = 1, $first = 7, $last = 12, $scope = 1);
         $this->clearEntityPool(true);
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 13, 1),
-            't4' => array(5, 6, 2),
-            't5' => array(7, 12, 3),
-            't6' => array(8, 9, 4),
-            't7' => array(10, 11, 4),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 13, 1],
+            't4' => [5, 6, 2],
+            't5' => [7, 12, 3],
+            't6' => [8, 9, 4],
+            't7' => [10, 11, 4],
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(1), 'shiftLevel can shift level with a scope');
-        $expected = array(
-            't8' => array(1, 6, 0),
-            't9' => array(2, 3, 1),
-            't10' => array(4, 5, 1),
-        );
+        $expected = [
+            't8' => [1, 6, 0],
+            't9' => [2, 3, 1],
+            't10' => [4, 5, 1],
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 'shiftLevel does not shift anything out of the scope');
     }
 
@@ -428,33 +428,33 @@ class NestedSetBehaviorRepositoryTest extends TestCase
         $repository = $this->getRepository();
         $fixtures = $this->initTree();
         $repository->shiftRLValues(1, 5);
-        $expected = array(
-            't1' => array(1, 14),
-            't2' => array(2, 3),
-            't3' => array(4, 13),
-            't4' => array(5, 6),
-            't5' => array(7, 12),
-            't6' => array(8, 9),
-            't7' => array(10, 11),
-        );
-        $actual = array();
+        $expected = [
+            't1' => [1, 14],
+            't2' => [2, 3],
+            't3' => [4, 13],
+            't4' => [5, 6],
+            't5' => [7, 12],
+            't6' => [8, 9],
+            't7' => [10, 11],
+        ];
+        $actual = [];
         foreach ($fixtures as $t) {
-            $actual[$t->getTitle()] = array($t->getLeftValue(), $t->getRightValue());
+            $actual[$t->getTitle()] = [$t->getLeftValue(), $t->getRightValue()];
         }
         $this->assertEquals($actual, $expected, 'Loaded nodes are not in sync before calling updateLoadedNodes()');
         $repository->updateLoadedNodes();
-        $expected = array(
-            't1' => array(1, 15),
-            't2' => array(2, 3),
-            't3' => array(4, 14),
-            't4' => array(6, 7),
-            't5' => array(8, 13),
-            't6' => array(9, 10),
-            't7' => array(11, 12),
-        );
-        $actual = array();
+        $expected = [
+            't1' => [1, 15],
+            't2' => [2, 3],
+            't3' => [4, 14],
+            't4' => [6, 7],
+            't5' => [8, 13],
+            't6' => [9, 10],
+            't7' => [11, 12],
+        ];
+        $actual = [];
         foreach ($fixtures as $t) {
-            $actual[$t->getTitle()] = array($t->getLeftValue(), $t->getRightValue());
+            $actual[$t->getTitle()] = [$t->getLeftValue(), $t->getRightValue()];
         }
         $this->assertEquals($actual, $expected, 'Loaded nodes are in sync after calling updateLoadedNodes()');
     }
@@ -473,15 +473,15 @@ class NestedSetBehaviorRepositoryTest extends TestCase
                t6 t7
         */
         $t = $repository->makeRoomForLeaf(5); // first child of t3
-        $expected = array(
-            't1' => array(1, 16, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 15, 1),
-            't4' => array(7, 8, 2),
-            't5' => array(9, 14, 2),
-            't6' => array(10, 11, 3),
-            't7' => array(12, 13, 3),
-        );
+        $expected = [
+            't1' => [1, 16, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 15, 1],
+            't4' => [7, 8, 2],
+            't5' => [9, 14, 2],
+            't6' => [10, 11, 3],
+            't7' => [12, 13, 3],
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'makeRoomForLeaf() shifts the other nodes correctly');
     }
 
@@ -504,21 +504,21 @@ class NestedSetBehaviorRepositoryTest extends TestCase
          t9 t10
          */
         $t = $repository->makeRoomForLeaf(5, 1); // first child of t3
-        $expected = array(
-            't1' => array(1, 16, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 15, 1),
-            't4' => array(7, 8, 2),
-            't5' => array(9, 14, 2),
-            't6' => array(10, 11, 3),
-            't7' => array(12, 13, 3),
-        );
+        $expected = [
+            't1' => [1, 16, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 15, 1],
+            't4' => [7, 8, 2],
+            't5' => [9, 14, 2],
+            't6' => [10, 11, 3],
+            't7' => [12, 13, 3],
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(1), 'makeRoomForLeaf() shifts the other nodes correctly');
-        $expected = array(
-            't8' => array(1, 6, 0),
-            't9' => array(2, 3, 1),
-            't10' => array(4, 5, 1),
-        );
+        $expected = [
+            't8' => [1, 6, 0],
+            't9' => [2, 3, 1],
+            't10' => [4, 5, 1],
+        ];
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 'makeRoomForLeaf() does not shift anything out of the scope');
     }
 
@@ -535,15 +535,15 @@ class NestedSetBehaviorRepositoryTest extends TestCase
 
         // fix the levels
         $repository->fixLevels();
-        $expected = array(
-            't1' => array(1, 14, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 13, 1),
-            't4' => array(5, 6, 2),
-            't5' => array(7, 12, 2),
-            't6' => array(8, 9, 3),
-            't7' => array(10, 11, 3),
-        );
+        $expected = [
+            't1' => [1, 14, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 13, 1],
+            't4' => [5, 6, 2],
+            't5' => [7, 12, 2],
+            't6' => [8, 9, 3],
+            't7' => [10, 11, 3],
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'fixLevels() fixes the levels correctly');
 
         $repository->fixLevels();
@@ -578,12 +578,12 @@ class NestedSetBehaviorRepositoryTest extends TestCase
         */
         $repository->remove($t5);
         //$this->assertEquals(13, $t3->getRightValue(), 'delete() does not update existing nodes (because delete() clears the instance cache)');
-        $expected = array(
-            't1' => array(1, 8, 0),
-            't2' => array(2, 3, 1),
-            't3' => array(4, 7, 1),
-            't4' => array(5, 6, 2),
-        );
+        $expected = [
+            't1' => [1, 8, 0],
+            't2' => [2, 3, 1],
+            't3' => [4, 7, 1],
+            't4' => [5, 6, 2],
+        ];
         $this->assertEquals($expected, $this->dumpTree(), 'delete() deletes all descendants and shifts the entire subtree correctly');
         list($t1, $t2, $t3, $t4, $t5, $t6, $t7) = $this->initTree();
         try {
@@ -592,7 +592,7 @@ class NestedSetBehaviorRepositoryTest extends TestCase
         } catch (PropelException $e) {
             $this->assertTrue(true, 'delete() throws an exception when called on a root node');
         }
-        $this->assertNotEquals(array(), $repository->createQuery()->find(), 'delete() called on the root node does not delete the whole tree');
+        $this->assertNotEquals([], $repository->createQuery()->find(), 'delete() called on the root node does not delete the whole tree');
     }
 
     public function DeleteNotInTree()

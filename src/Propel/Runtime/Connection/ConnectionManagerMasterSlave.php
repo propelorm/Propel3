@@ -27,7 +27,7 @@ class ConnectionManagerMasterSlave implements ConnectionManagerInterface, Logger
     /**
      * @var array
      */
-    protected $writeConfiguration = array();
+    protected $writeConfiguration = [];
 
     /**
      * @var \Propel\Runtime\Connection\ConnectionInterface
@@ -59,7 +59,7 @@ class ConnectionManagerMasterSlave implements ConnectionManagerInterface, Logger
      */
     protected $adapter;
 
-    function __construct(AdapterInterface $adapter)
+    public function __construct(AdapterInterface $adapter)
     {
         $this->adapter = $adapter;
     }

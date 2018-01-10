@@ -123,9 +123,9 @@ class PhpDumper
      *
      * @return string The array exported.
      */
-    static public function exportArray(array $array, $indent)
+    public static function exportArray(array $array, $indent)
     {
-        $code = array();
+        $code = [];
         foreach ($array as $key => $value) {
             if (is_array($value)) {
                 $value = self::exportArray($value, $indent + 4);
@@ -154,7 +154,6 @@ EOF;
         $classHasNamespace = !!$this->definition->getNamespace();
 
         foreach ($this->definition->getUseStatements() as $useStatement) {
-
             $useNamespace = explode('\\', $useStatement->getFqcn());
             if (count($useNamespace) === 1 && !$classHasNamespace && !$useStatement->getAlias()) {
                 //we shouldn't `use` a class without namespace in our non-namespaced class

@@ -26,19 +26,19 @@ use Propel\Generator\Model\Behavior;
 class ConcreteInheritanceParentBehavior extends Behavior
 {
     // default parameters value
-    protected $parameters = array(
+    protected $parameters = [
         'descendant_field' => 'descendantClass'
-    );
+    ];
 
     public function modifyEntity()
     {
         $table = $this->getEntity();
         if (!$table->hasField($this->getParameter('descendant_field'))) {
-            $table->addField(array(
+            $table->addField([
                 'name' => $this->getParameter('descendant_field'),
                 'type' => 'VARCHAR',
                 'size' => 100
-            ));
+            ]);
         }
     }
 

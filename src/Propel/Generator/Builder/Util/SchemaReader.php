@@ -79,7 +79,7 @@ class SchemaReader
      * first dimension is for schemas(key is the path to the schema file),
      * second is for tags within the schema
      */
-    private $schemasTagsStack = array();
+    private $schemasTagsStack = [];
 
     /**
      * Creates a new instance for the specified database type.
@@ -153,7 +153,7 @@ class SchemaReader
             return;
         }
         // store current schema file path
-        $this->schemasTagsStack[$xmlFile] = array();
+        $this->schemasTagsStack[$xmlFile] = [];
         $this->currentXmlFile = $xmlFile;
 
         $parser = xml_parser_create();
@@ -187,7 +187,7 @@ class SchemaReader
                     0,
                     $e
                 );
-            } else if ($this->currDB) {
+            } elseif ($this->currDB) {
                 throw new SchemaException(
                     sprintf('There was an schema error %s', $this->currDB->getName()),
                     0,
@@ -340,7 +340,6 @@ class SchemaReader
                     $this->_throwInvalidTagException($parser, $name);
             }
         } elseif ('field' === $parentTag || 'column' === $parentTag) {
-
             switch ($name) {
                 case 'inheritance':
                     $this->currField->addInheritance($attributes);
@@ -354,7 +353,6 @@ class SchemaReader
                     $this->_throwInvalidTagException($parser, $name);
             }
         } elseif ('relation' === $parentTag || 'foreign-key' === $parentTag) {
-
             switch ($name) {
                 case 'reference':
                     if ('foreign-key' === $parentTag) {
@@ -374,7 +372,6 @@ class SchemaReader
                     $this->_throwInvalidTagException($parser, $name);
             }
         } elseif ('index' === $parentTag) {
-
             switch ($name) {
                 case 'index-column':
                 case 'index-field':
@@ -393,7 +390,6 @@ class SchemaReader
                     $this->_throwInvalidTagException($parser, $name);
             }
         } elseif ('unique' === $parentTag) {
-
             switch ($name) {
                 case 'unique-column':
                 case 'unique-field':
@@ -412,7 +408,6 @@ class SchemaReader
                     $this->_throwInvalidTagException($parser, $name);
             }
         } elseif ($parentTag === 'behavior') {
-
             switch ($name) {
                 case 'parameter':
                     $this->currBehavior->addParameter($attributes);
@@ -422,7 +417,6 @@ class SchemaReader
                     $this->_throwInvalidTagException($parser, $name);
             }
         } elseif ('vendor' === $parentTag) {
-
             switch ($name) {
                 case 'parameter':
                     $this->currVendorObject->setParameter($attributes['name'], $attributes['value']);

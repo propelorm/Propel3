@@ -35,7 +35,7 @@ class SqliteSchemaParser extends AbstractSchemaParser
      *
      * @var array
      */
-    private static $sqliteTypeMap = array(
+    private static $sqliteTypeMap = [
         'tinyint'    => PropelTypes::TINYINT,
         'smallint'   => PropelTypes::SMALLINT,
         'mediumint'  => PropelTypes::SMALLINT,
@@ -65,7 +65,7 @@ class SqliteSchemaParser extends AbstractSchemaParser
         'text'       => PropelTypes::LONGVARCHAR,
         'enum'       => PropelTypes::CHAR,
         'set'        => PropelTypes::CHAR,
-    );
+    ];
 
     /**
      * Gets a type mapping from native types to Propel types
@@ -77,7 +77,7 @@ class SqliteSchemaParser extends AbstractSchemaParser
         return self::$sqliteTypeMap;
     }
 
-    public function parse(Database $database, array $additionalTables = array())
+    public function parse(Database $database, array $additionalTables = [])
     {
         if ($this->getGeneratorConfig()) {
             $this->addVendorInfo = $this->getGeneratorConfig()->get()['migrations']['addVendorInfo'];
@@ -124,7 +124,7 @@ class SqliteSchemaParser extends AbstractSchemaParser
                 $filter = sprintf(" AND name LIKE '%s§%%'", $schema);
             }
             $filter .= sprintf(" AND (name = '%s' OR name LIKE '%%§%1\$s')", $filterTable->getCommonName());
-        } else if ($schema = $database->getSchema()) {
+        } elseif ($schema = $database->getSchema()) {
             $filter = sprintf(" AND name LIKE '%s§%%'", $schema);
         }
 
@@ -217,8 +217,8 @@ class SqliteSchemaParser extends AbstractSchemaParser
                 if ("'" !== substr($default, 0, 1) && strpos($default, '(')) {
                     $defaultType = ColumnDefaultValue::TYPE_EXPR;
                     if ('datetime(CURRENT_TIMESTAMP, \'localtime\')' === $default) {
-                            $default = 'CURRENT_TIMESTAMP';
-                        }
+                        $default = 'CURRENT_TIMESTAMP';
+                    }
                 } else {
                     $defaultType = ColumnDefaultValue::TYPE_VALUE;
                     $default = str_replace("'", '', $default);

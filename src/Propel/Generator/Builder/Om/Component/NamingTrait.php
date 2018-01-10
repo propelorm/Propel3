@@ -1,7 +1,6 @@
 <?php
 namespace Propel\Generator\Builder\Om\Component;
 
-
 use gossi\codegen\model\PhpParameter;
 use gossi\codegen\model\PhpProperty;
 use Propel\Generator\Builder\Om\AbstractBuilder;
@@ -90,7 +89,7 @@ trait NamingTrait
         $entityClassName = $info['entityClassName'];
 
         if ($builder->getEntity()->isActiveRecord() && (($builder instanceof ActiveRecordTraitbuilder) || ($builder instanceof ObjectBuilder))) {
-                $getConfiguration = "\$this->getPropelConfiguration()";
+            $getConfiguration = "\$this->getPropelConfiguration()";
         } else {
             $getConfiguration = "\\Propel\\Runtime\\Configuration::getCurrentConfiguration()";
         }

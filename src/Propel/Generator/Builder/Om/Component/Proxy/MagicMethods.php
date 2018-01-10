@@ -17,7 +17,6 @@ class MagicMethods extends BuildComponent
 
     public function process()
     {
-
         $body = '
 ';
 

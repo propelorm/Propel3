@@ -112,7 +112,6 @@ CREATE TABLE `issue617_group`
 
         $this->assertContains($expected, $sql);
         $this->updateSchema($builder->getDatabase());
-
     }
 
     /**
@@ -191,6 +190,5 @@ ALTER TABLE `issue617_user`
         $this->setupInitSchema();
         $this->dropForeignKey();
         $this->checkDeletedFk();
-
     }
 }

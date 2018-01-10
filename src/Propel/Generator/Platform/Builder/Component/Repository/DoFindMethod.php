@@ -39,13 +39,13 @@ class DoFindMethod extends BuildComponent
 
 //        $this->getDefinition()->declareClassFromBuilder($this->getStubObjectBuilder());
 //        $this->declareClasses('\PDO');
-        $selectFields = array();
+        $selectFields = [];
         foreach ($entity->getFields() as $field) {
             if (!$field->isLazyLoad()) {
                 $selectFields[] = $this->quoteIdentifier($this->getPlatform()->getName($field));
             }
         }
-        $conditions = array();
+        $conditions = [];
         foreach ($entity->getPrimaryKey() as $index => $field) {
             $conditions []= sprintf('%s = :p%d', $this->quoteIdentifier($field->getName()), $index);
         }
@@ -55,7 +55,7 @@ class DoFindMethod extends BuildComponent
             $this->quoteIdentifier($entity->getTableName()),
             implode(' AND ', $conditions)
         );
-        $pks = array();
+        $pks = [];
         if ($entity->hasCompositePrimaryKey()) {
             foreach ($entity->getPrimaryKey() as $index => $field) {
                 $pks []= "\$key[$index]";
@@ -119,7 +119,7 @@ class DoFindMethod extends BuildComponent
 //        \$stmt->closeCursor();
 //
 //        return \$obj;
-//";
+        //";
 
         $this->addMethod('doFind', 'protected')
             ->addSimpleParameter('key')

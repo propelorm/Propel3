@@ -4,8 +4,8 @@ namespace Propel\Generator\Model\Parts;
 use Propel\Generator\Platform\PlatformInterface;
 use Propel\Generator\Config\GeneratorConfigInterface;
 
-trait PlatformMutatorPart {
-
+trait PlatformMutatorPart
+{
     use PlatformAccessorPart;
 
     /**
@@ -34,5 +34,4 @@ trait PlatformMutatorPart {
         $this->platform = $platform;
         return $this;
     }
-
 }
