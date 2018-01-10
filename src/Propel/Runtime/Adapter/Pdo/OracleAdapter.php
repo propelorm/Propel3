@@ -121,7 +121,7 @@ class OracleAdapter extends PdoAdapter implements SqlAdapterInterface
         if ($offset > 0) {
             $sql .= ' B.PROPEL_ROWNUM > ' . $offset;
             if ($limit > 0) {
-                $sql .= ' AND B.PROPEL_ROWNUM <= ' . ( $offset + $limit );
+                $sql .= ' AND B.PROPEL_ROWNUM <= ' . ($offset + $limit);
             }
         } else {
             $sql .= ' B.PROPEL_ROWNUM <= ' . $limit;

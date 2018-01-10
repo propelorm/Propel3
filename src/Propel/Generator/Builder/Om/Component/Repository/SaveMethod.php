@@ -29,7 +29,7 @@ class SaveMethod extends BuildComponent
 EOF;
 
         if ($this->getEntity()->isReadOnly()) {
-$body = <<<EOF
+            $body = <<<EOF
 throw new BadMethodCallException('Readonly entity cannot be saved');
 EOF;
             $this->useClass('Propel\Runtime\Exception\BadMethodCallException');

@@ -54,7 +54,7 @@ class ObjectCollection extends Collection
      */
     public function getPrimaryKeys($usePrefix = true)
     {
-        $ret = array();
+        $ret = [];
 
         /** @var $obj */
         foreach ($this as $key => $obj) {
@@ -123,7 +123,7 @@ class ObjectCollection extends Collection
      */
     public function toArray($keyField = null, $usePrefix = false, $keyType = EntityMap::TYPE_PHPNAME, $includeLazyLoadFields = true, $alreadyDumpedObjectsWatcher = null)
     {
-        $ret = array();
+        $ret = [];
         $keyGetterMethod = 'get' . $keyField;
 
         /** @var $obj */
@@ -169,7 +169,7 @@ class ObjectCollection extends Collection
         if (null === $keyField && false === $usePrefix) {
             return parent::getArrayCopy();
         }
-        $ret = array();
+        $ret = [];
         $keyGetterMethod = 'get' . $keyField;
         foreach ($this as $key => $obj) {
             $key = null === $keyField ? $key : $obj->$keyGetterMethod();
@@ -196,7 +196,7 @@ class ObjectCollection extends Collection
      */
     public function toKeyValue($keyField = 'PrimaryKey', $valueField = null)
     {
-        $ret = array();
+        $ret = [];
         $keyGetterMethod = 'get' . $keyField;
         $valueGetterMethod = (null === $valueField) ? '__toString' : ('get' . $valueField);
         foreach ($this as $obj) {
@@ -226,7 +226,7 @@ class ObjectCollection extends Collection
      */
     public function toKeyIndex($keyField = 'PrimaryKey')
     {
-        $ret = array();
+        $ret = [];
         $keyGetterMethod = 'get' . ucfirst($keyField);
         foreach ($this as $obj) {
             $ret[$obj->$keyGetterMethod()] = $obj;
@@ -252,7 +252,7 @@ class ObjectCollection extends Collection
 
     /**
      * @param $instance
-     * 
+     *
      * @return mixed
      */
     protected function getHashCode($instance)

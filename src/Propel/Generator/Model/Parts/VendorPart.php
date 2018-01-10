@@ -4,8 +4,8 @@ namespace Propel\Generator\Model\Parts;
 use Propel\Generator\Model\Vendor;
 use phootwork\collection\Map;
 
-trait VendorPart {
-
+trait VendorPart
+{
     protected $vendor;
 
     protected function initVendor()
@@ -49,4 +49,3 @@ trait VendorPart {
         return $this->vendor->toArray();
     }
 }
-

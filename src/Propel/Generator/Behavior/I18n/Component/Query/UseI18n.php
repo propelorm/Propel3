@@ -16,7 +16,6 @@ use Propel\Generator\Builder\Om\Component\NamingTrait;
 use Propel\Generator\Builder\Om\Component\RelationTrait;
 use Propel\Generator\Model\NamingTool;
 
-
 class UseI18n extends BuildComponent
 {
     use RelationTrait;
@@ -36,15 +35,18 @@ return \$this
         $this->addMethod('useI18nQuery')
             ->setDescription('Use the I18n relation query object')
             ->setDocblock('@see       useQuery()')
-            ->addParameter(PhpParameter::create('locale')
+            ->addParameter(
+                PhpParameter::create('locale')
                 ->setType('string', "Locale to use for the join condition, e.g. 'fr_FR'")
                 ->setDefaultValue($behavior->getDefaultLocale())
             )
-            ->addParameter(PhpParameter::create('relationAlias')
+            ->addParameter(
+                PhpParameter::create('relationAlias')
                 ->setType('string', 'optional alias for the relation')
                 ->setDefaultValue(null)
             )
-            ->addParameter(PhpParameter::create('joinType')
+            ->addParameter(
+                PhpParameter::create('joinType')
                 ->setType('string')
                 ->setDescription("Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.")
                 ->setDefaultValue('LEFT JOIN')

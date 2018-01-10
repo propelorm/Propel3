@@ -30,7 +30,7 @@ class RepositoryBuilder extends AbstractBuilder
 //            //we have a stub class, so this will be the normal base
 //            return parent::getFullClassName('Base', 'Base') . 'Repository';
 //        } else {
-            return parent::getFullClassName('Base', 'Base') . 'Repository';
+        return parent::getFullClassName('Base', 'Base') . 'Repository';
 //        }
     }
 

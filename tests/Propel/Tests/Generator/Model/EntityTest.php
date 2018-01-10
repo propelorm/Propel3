@@ -53,14 +53,14 @@ class EntityTest extends ModelTestCase
 
     public function provideNamespaces()
     {
-        return array(
-            array('\Acme', '\Acme'),
-            array('Acme', 'Acme'),
-            array('Acme\\', 'Acme'),
-            array('\Acme\Model', '\Acme\Model'),
-            array('Acme\Model', 'Acme\Model'),
-            array('Acme\Model\\', 'Acme\Model'),
-        );
+        return [
+            ['\Acme', '\Acme'],
+            ['Acme', 'Acme'],
+            ['Acme\\', 'Acme'],
+            ['\Acme\Model', '\Acme\Model'],
+            ['Acme\Model', 'Acme\Model'],
+            ['Acme\Model\\', 'Acme\Model'],
+        ];
     }
 
     public function testNames()

@@ -29,12 +29,12 @@ class ConfigConvertCommand extends AbstractCommand
     protected function configure()
     {
         $this
-            ->addOption('input-dir',   null, InputOption::VALUE_REQUIRED,  'The input directory',   self::DEFAULT_INPUT_DIRECTORY)
-            ->addOption('output-dir',  null, InputOption::VALUE_REQUIRED,  'The output directory')
-            ->addOption('output-file', null, InputOption::VALUE_REQUIRED,  'The output file',       self::DEFAULT_OUTPUT_FILE)
+            ->addOption('input-dir', null, InputOption::VALUE_REQUIRED, 'The input directory', self::DEFAULT_INPUT_DIRECTORY)
+            ->addOption('output-dir', null, InputOption::VALUE_REQUIRED, 'The output directory')
+            ->addOption('output-file', null, InputOption::VALUE_REQUIRED, 'The output file', self::DEFAULT_OUTPUT_FILE)
             ->addOption('recursive', null, InputOption::VALUE_NONE, 'Search recursive for *schema.xml inside the input directory')
             ->setName('config:convert')
-            ->setAliases(array('convert-conf'))
+            ->setAliases(['convert-conf'])
             ->setDescription('Transform the configuration to PHP code leveraging the ServiceContainer')
         ;
     }
@@ -73,8 +73,8 @@ class ConfigConvertCommand extends AbstractCommand
             $manager->setWorkingDirectory($input->getOption('output-dir'));
 
             $databaseToEntities = [];
-            foreach ($manager->getDatabases() as $database){
-                $entities = array_map(function(Entity $entity) {
+            foreach ($manager->getDatabases() as $database) {
+                $entities = array_map(function (Entity $entity) {
                     return $entity->getFullClassName();
                 }, $database->getEntities());
 
@@ -92,7 +92,6 @@ class ConfigConvertCommand extends AbstractCommand
             $currentContent = file_get_contents($outputFilePath);
             if ($currentContent == $phpConf) {
                 $output->writeln(sprintf('No change required in the current configuration file <info>"%s"</info>.', $outputFilePath));
-
             } else {
                 file_put_contents($outputFilePath, $phpConf);
                 $output->writeln(sprintf('Successfully updated PHP configuration in file <info>"%s"</info>.', $outputFilePath));

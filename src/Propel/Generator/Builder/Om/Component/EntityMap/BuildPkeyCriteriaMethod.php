@@ -64,7 +64,7 @@ throw new LogicException('The {$this->getObjectClassName()} entity has no primar
                 foreach ($relation->getFieldObjectsMapArray() as $map) {
                     /** @var Field $localField */
                     /** @var Field $foreignField */
-                    list ($localField, $foreignField) = $map;
+                    list($localField, $foreignField) = $map;
                     $foreignFieldName = $foreignField->getName();
 
                     $placeholder[] = '?';

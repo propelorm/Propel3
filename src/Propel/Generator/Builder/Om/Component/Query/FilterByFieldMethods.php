@@ -3,7 +3,6 @@
 
 namespace Propel\Generator\Builder\Om\Component\Query;
 
-
 use gossi\codegen\model\PhpConstant;
 use gossi\codegen\model\PhpParameter;
 use Propel\Generator\Builder\Om\Component\BuildComponent;
@@ -77,7 +76,6 @@ Use scalar values for equality.
 Use array values for in_array() equivalent.
 Use associative array('min' => \$minValue, 'max' => \$maxValue) for intervals.");
         } elseif ($field->isTemporalType()) {
-
             $variableParameter->setTypeDescription("The value to use as filter.
 Values can be integers (unix timestamps), DateTime objects, or strings.
 Empty strings are treated as NULL.
@@ -93,11 +91,9 @@ Example usage:
 \$query->filterBy$fieldPhpName(array('max' => 'yesterday')); // WHERE $fieldName > '2011-03-13'
 </code>";
         } elseif ($field->getType() == PropelTypes::PHP_ARRAY) {
-
             $variableParameter->setType('array');
             $variableParameter->setTypeDescription("The value to use as filter.");
         } elseif ($field->isTextType()) {
-
             $variableParameter->setType('string');
             $variableParameter->setTypeDescription("The value to use as filter.");
 
@@ -108,9 +104,7 @@ Example usage:
 \$query->filterBy$fieldPhpName('fooValue');   // WHERE $fieldName = 'fooValue'
 \$query->filterBy$fieldPhpName('%fooValue%', Criteria::LIKE); // WHERE $fieldName LIKE '%fooValue%'
 </code>";
-
         } elseif ($field->isBooleanType()) {
-
             $variableParameter->setType('boolean|string');
             $variableParameter->setTypeDescription("The value to use as filter.
  Non-boolean arguments are converted using the following rules:
@@ -124,7 +118,6 @@ Example usage:
 \$query->filterBy$fieldPhpName(true); // WHERE $fieldName = true
 \$query->filterBy$fieldPhpName('yes'); // WHERE $fieldName = true
 </code>";
-
         }
 
         $body = '';
@@ -269,6 +262,5 @@ return \$this->addUsingAlias($qualifiedName, \$$variableName, \$comparison);
             ->setType("\$this|" . $this->getQueryClassName())
             ->setTypeDescription("The current query, for fluid interface")
             ->setBody($body);
-
     }
 }

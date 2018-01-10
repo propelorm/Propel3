@@ -59,7 +59,6 @@ class OraclePlatform extends SqlDefaultPlatform
         $this->setSchemaDomainMapping(new Domain(PropelTypes::OBJECT, 'LONG RAW'));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::PHP_ARRAY, 'NVARCHAR2', '2000'));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::ENUM, 'NVARCHAR2'));
-
     }
 
     public function getMaxFieldNameLength()
@@ -115,7 +114,7 @@ ALTER SESSION SET NLS_TIMESTAMP_FORMAT='YYYY-MM-DD HH24:MI:SS';
     {
         $entityDescription = $entity->hasDescription() ? $this->getCommentLineDDL($entity->getDescription()) : '';
 
-        $lines = array();
+        $lines = [];
 
         foreach ($entity->getFields() as $field) {
             $lines[] = $this->getFieldDDL($field);
@@ -134,7 +133,8 @@ ALTER SESSION SET NLS_TIMESTAMP_FORMAT='YYYY-MM-DD HH24:MI:SS';
     %s
 )%s;
 ";
-        $ret = sprintf($pattern,
+        $ret = sprintf(
+            $pattern,
             $entityDescription,
             $this->quoteIdentifier($entity->getName()),
             implode($sep, $lines),
@@ -162,7 +162,8 @@ CREATE SEQUENCE %s
     INCREMENT BY 1 START WITH 1 NOMAXVALUE NOCYCLE NOCACHE ORDER;
 ";
 
-            return sprintf($pattern,
+            return sprintf(
+                $pattern,
                 $this->quoteIdentifier($this->getSequenceName($entity))
             );
         }
@@ -196,7 +197,8 @@ DROP SEQUENCE " . $this->quoteIdentifier($this->getSequenceName($entity)) . ";
         if ($entity->hasPrimaryKey()) {
             $pattern = 'CONSTRAINT %s PRIMARY KEY (%s)%s';
 
-            return sprintf($pattern,
+            return sprintf(
+                $pattern,
                 $this->quoteIdentifier($this->getPrimaryKeyName($entity)),
                 $this->getFieldListDDL($entity->getPrimaryKey()),
                 $this->generateBlockStorage($entity, true)
@@ -206,7 +208,8 @@ DROP SEQUENCE " . $this->quoteIdentifier($this->getSequenceName($entity)) . ";
 
     public function getUniqueDDL(Unique $unique)
     {
-        return sprintf('CONSTRAINT %s UNIQUE (%s)',
+        return sprintf(
+            'CONSTRAINT %s UNIQUE (%s)',
             $this->quoteIdentifier($unique->getName()),
             $this->getFieldListDDL($unique->getFieldObjects())
         );
@@ -219,7 +222,8 @@ DROP SEQUENCE " . $this->quoteIdentifier($this->getSequenceName($entity)) . ";
         }
         $pattern = "CONSTRAINT %s
     FOREIGN KEY (%s) REFERENCES %s (%s)";
-        $script = sprintf($pattern,
+        $script = sprintf(
+            $pattern,
             $this->quoteIdentifier($relation->getName()),
             $this->getFieldListDDL($relation->getLocalFieldObjects()),
             $this->quoteIdentifier($relation->getForeignEntity()->getFQTableName()),
@@ -342,7 +346,8 @@ USING INDEX
 CREATE %sINDEX %s ON %s (%s)%s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $index->isUnique() ? 'UNIQUE ' : '',
             $this->quoteIdentifier($index->getName()),
             $this->quoteIdentifier($index->getEntity()->getName()),
@@ -386,7 +391,8 @@ CREATE %sINDEX %s ON %s (%s)%s;
         $snippet = "
 \$dataFetcher = %s->query('SELECT %s.nextval FROM dual');
 %s = \$dataFetcher->fetchField();";
-        $script = sprintf($snippet,
+        $script = sprintf(
+            $snippet,
             $connectionVariableName,
             $sequenceName,
             $fieldValueMutator

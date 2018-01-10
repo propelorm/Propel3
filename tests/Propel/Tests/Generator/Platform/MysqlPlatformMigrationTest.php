@@ -404,9 +404,9 @@ ALTER TABLE `foo` ADD
         $diff = DatabaseComparator::computeDiff($d1, $d2, false, true);
         $renamedTables = $diff->getRenamedEntities();
 
-        $firstPair = array(key($renamedTables), current($renamedTables));
+        $firstPair = [key($renamedTables), current($renamedTables)];
         next($renamedTables);
-        $secondPair = array(key($renamedTables), current($renamedTables));
+        $secondPair = [key($renamedTables), current($renamedTables)];
 
         $this->assertEquals('foo', $firstPair[0]);
         $this->assertEquals('foo_bla', $firstPair[1]);

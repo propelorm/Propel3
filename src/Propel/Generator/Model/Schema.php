@@ -235,7 +235,7 @@ class Schema
      */
     public function hasDatabase($name): bool
     {
-        return $this->databases->search($name, function(Database $db, $query) {
+        return $this->databases->search($name, function (Database $db, $query) {
             return $db->getName() === $query;
         });
     }
@@ -272,7 +272,7 @@ class Schema
             return $this->databases->get(0);
         }
 
-        return $this->databases->find($name, function(Database $db, $query) {
+        return $this->databases->find($name, function (Database $db, $query) {
             return $db->getName() === $query;
         });
     }
@@ -414,4 +414,3 @@ class Schema
         return $this->toString();
     }
 }
-

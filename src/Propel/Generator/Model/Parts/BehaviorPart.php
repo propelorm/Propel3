@@ -33,8 +33,10 @@ trait BehaviorPart
 
             // the user probably just forgot to specify the "id" attribute
             if ($behavior->getId() === $behavior->getName()) {
-                throw new BuildException(sprintf('Behavior "%s" is already registered. Specify a different ID attribute to register the same behavior several times.',
-                    $behavior->getName()));
+                throw new BuildException(sprintf(
+                    'Behavior "%s" is already registered. Specify a different ID attribute to register the same behavior several times.',
+                    $behavior->getName()
+                ));
             }
 
             // or he copy-pasted it and forgot to update it.
@@ -44,7 +46,7 @@ trait BehaviorPart
         }
 
         $this->registerBehavior($behavior);
-        $this->behaviors->set($behavior->getId(),  $behavior);
+        $this->behaviors->set($behavior->getId(), $behavior);
 
         return $this;
     }
@@ -56,7 +58,8 @@ trait BehaviorPart
      * @param Behavior $behavior
      * @return $this
      */
-    public function removeBehavior(Behavior $behavior) {
+    public function removeBehavior(Behavior $behavior)
+    {
         $this->unregisterBehavior($behavior);
         $this->behaviors->remove($behavior->getId());
 

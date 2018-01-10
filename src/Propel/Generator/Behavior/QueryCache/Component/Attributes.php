@@ -24,5 +24,4 @@ class Attributes extends BuildComponent
             $cacheBackend->setValue(PhpConstant::create('[]'));
         }
     }
-
 }

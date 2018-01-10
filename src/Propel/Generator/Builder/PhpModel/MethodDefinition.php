@@ -14,8 +14,8 @@ class MethodDefinition extends PhpMethod
      *
      * @return $this
      */
-    public function addSimpleParameter($name, $type = null, $defaultValue = null) {
-
+    public function addSimpleParameter($name, $type = null, $defaultValue = null)
+    {
         if (2 < func_num_args()) {
             if (is_array($defaultValue)) {
                 $defaultValue = PhpConstant::create('[]', null, true);

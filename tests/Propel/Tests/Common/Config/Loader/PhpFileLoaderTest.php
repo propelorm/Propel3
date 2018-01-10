@@ -102,6 +102,5 @@ EOF;
         $actual = $this->loader->load('notreadable.php');
         $this->assertEquals('bar', $actual['foo']);
         $this->assertEquals('baz', $actual['bar']);
-
     }
 }

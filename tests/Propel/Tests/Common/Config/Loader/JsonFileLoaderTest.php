@@ -77,7 +77,7 @@ EOF;
 
         $actual = $this->loader->load('empty.json');
 
-        $this->assertEquals(array(), $actual);
+        $this->assertEquals([], $actual);
     }
 
     /**
@@ -99,6 +99,5 @@ EOF;
         $actual = $this->loader->load('notreadable.json');
         $this->assertEquals('bar', $actual['foo']);
         $this->assertEquals('baz', $actual['bar']);
-
     }
 }

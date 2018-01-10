@@ -402,4 +402,3 @@ EOF;
         $this->assertEquals($translation2, $o->getTranslation('fr_FR'));
     }
 }
-

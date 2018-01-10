@@ -41,14 +41,14 @@ class MigrationTest extends TestCaseFixturesDatabase
             unlink($file);
         }
 
-        $input = new \Symfony\Component\Console\Input\ArrayInput(array(
+        $input = new \Symfony\Component\Console\Input\ArrayInput([
             'command' => 'migration:diff',
             '--input-dir' => $this->inputDir,
             '--output-dir' => $this->outputDir,
             '--platform' => ucfirst($this->getDriver()) . 'Platform',
             '--connection' => $this->connectionOption,
             '--verbose' => true
-        ));
+        ]);
 
         $output = new \Symfony\Component\Console\Output\StreamOutput(fopen("php://temp", 'r+'));
         $app->setAutoExit(false);
@@ -76,14 +76,14 @@ class MigrationTest extends TestCaseFixturesDatabase
         $command = new MigrationUpCommand();
         $app->add($command);
 
-        $input = new \Symfony\Component\Console\Input\ArrayInput(array(
+        $input = new \Symfony\Component\Console\Input\ArrayInput([
             'command' => 'migration:up',
             '--input-dir' => $this->inputDir,
             '--output-dir' => $this->outputDir,
             '--platform' => ucfirst($this->getDriver()) . 'Platform',
             '--connection' => $this->connectionOption,
             '--verbose' => true
-        ));
+        ]);
 
         $output = new \Symfony\Component\Console\Output\StreamOutput(fopen("php://temp", 'r+'));
         $app->setAutoExit(false);
@@ -105,14 +105,14 @@ class MigrationTest extends TestCaseFixturesDatabase
         $command = new MigrationDownCommand();
         $app->add($command);
 
-        $input = new \Symfony\Component\Console\Input\ArrayInput(array(
+        $input = new \Symfony\Component\Console\Input\ArrayInput([
             'command' => 'migration:down',
             '--input-dir' => $this->inputDir,
             '--output-dir' => $this->outputDir,
             '--platform' => ucfirst($this->getDriver()) . 'Platform',
             '--connection' => $this->connectionOption,
             '--verbose' => true
-        ));
+        ]);
 
         $output = new \Symfony\Component\Console\Output\StreamOutput(fopen("php://temp", 'r+'));
         $app->setAutoExit(false);
@@ -134,14 +134,14 @@ class MigrationTest extends TestCaseFixturesDatabase
         $command = new MigrationMigrateCommand();
         $app->add($command);
 
-        $input = new \Symfony\Component\Console\Input\ArrayInput(array(
+        $input = new \Symfony\Component\Console\Input\ArrayInput([
             'command' => 'migration:migrate',
             '--input-dir' => $this->inputDir,
             '--output-dir' => $this->outputDir,
             '--platform' => ucfirst($this->getDriver()) . 'Platform',
             '--connection' => $this->connectionOption,
             '--verbose' => true
-        ));
+        ]);
 
         $output = new \Symfony\Component\Console\Output\StreamOutput(fopen("php://temp", 'r+'));
         $app->setAutoExit(false);
@@ -159,5 +159,4 @@ class MigrationTest extends TestCaseFixturesDatabase
         //revert this migration change so we have the same database structure as before this test
         $this->testDownCommand();
     }
-
 }

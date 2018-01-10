@@ -145,7 +145,7 @@ EOF;
     public function testDoesNotCopyForeignKeys()
     {
         $entityMap = QuickBuilder::$configuration->getEntityMap('ArchivableTest1Archive');
-        $this->assertEquals(array(), $entityMap->getRelations());
+        $this->assertEquals([], $entityMap->getRelations());
     }
 
     public function testCopiesIndices()

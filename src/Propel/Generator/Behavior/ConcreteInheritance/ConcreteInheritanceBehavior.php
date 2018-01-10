@@ -32,11 +32,11 @@ class ConcreteInheritanceBehavior extends Behavior
     use ComponentTrait;
 
     // default parameters value
-    protected $parameters = array(
+    protected $parameters = [
         'extends' => '',
         'copy_data_to_parent' => 'true',
         'descendant_field'   => 'descendantClass',
-    );
+    ];
 
     public function modifyEntity()
     {
@@ -48,7 +48,7 @@ class ConcreteInheritanceBehavior extends Behavior
             if (!$parentEntity->hasBehavior('concrete_inheritance_parent')) {
                 $parentBehavior = new ConcreteInheritanceParentBehavior();
                 $parentBehavior->setName('concrete_inheritance_parent');
-                $parentBehavior->addParameter(array('name' => 'descendant_field', 'value' => $this->getParameter('descendant_field')));
+                $parentBehavior->addParameter(['name' => 'descendant_field', 'value' => $this->getParameter('descendant_field')]);
 
                 $parentEntity->addBehavior($parentBehavior);
                 // The parent table's behavior modifyTable() must be executed before this one
@@ -144,7 +144,6 @@ class ConcreteInheritanceBehavior extends Behavior
         $entityClass = $this->getParentEntity()->getFullClassName();
 
         if ($this->isCopyData()) {
-
             $getter = 'get' . $this->getParentEntity()->getName();
 
             $code = <<<EOF
@@ -161,7 +160,7 @@ EOF;
         }
     }
 
-    public function preDelete(RepositoryBuilder $repositoryBuilder  )
+    public function preDelete(RepositoryBuilder $repositoryBuilder)
     {
         if ($this->isCopyData()) {
             $getter = 'get' . $this->getParentEntity()->getName();

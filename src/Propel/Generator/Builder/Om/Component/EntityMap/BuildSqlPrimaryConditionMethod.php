@@ -29,7 +29,6 @@ $entityReader = $this->getPropReader();
         $placeholder = [];
 
         foreach ($this->getEntity()->getPrimaryKey() as $field) {
-
             $fieldName = $field->getName();
             $propertyName = $field->getName();
             $placeholder[] = sprintf('%s = ?', $field->getColumnName());

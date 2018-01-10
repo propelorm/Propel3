@@ -189,11 +189,11 @@ EOF;
 //        $body = "return \$this->create{$firstFkName}Query($shortSignature, \$criteria)->find();";
 
 //        $description = <<<EOF
-//Returns a not cached ObjectCollection of $relatedObjectClassName objects. This will hit always the databases.
-//If you have attached new $relatedObjectClassName object to this object you need to call `save` first to get
-//the correct return value. Use get$relatedName() to get the current internal state.
-//$phpDoc
-//EOF;
+        //Returns a not cached ObjectCollection of $relatedObjectClassName objects. This will hit always the databases.
+        //If you have attached new $relatedObjectClassName object to this object you need to call `save` first to get
+        //the correct return value. Use get$relatedName() to get the current internal state.
+        //$phpDoc
+        //EOF;
 
         $items = [];
         foreach ($crossRelation->getRelations() as $relation) {
@@ -265,4 +265,4 @@ EOF;
                 ->setBody($body);
         }
     }
-} 
+}

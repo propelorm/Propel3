@@ -65,7 +65,6 @@ class MssqlPropelPDO extends PropelPDO
                     if ($this->useDebug) {
                         $this->log('Commit transaction', null, __METHOD__);
                     }
-
                 }
             }
             $this->nestedTransactionCount--;
@@ -150,5 +149,4 @@ class MssqlPropelPDO extends PropelPDO
     {
         return '[' . $text . ']';
     }
-
 }

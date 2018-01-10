@@ -50,7 +50,7 @@ EOF;
 
     /**
      * {@inheritdoc}
-     * 
+     *
      * @param mixed $value
      * @param FieldMap $fieldMap
      */
@@ -64,14 +64,14 @@ EOF;
      *
      * @param mixed $value
      * @param FieldMap $fieldMap
-     * 
+     *
      * @return mixed
      */
     abstract public function propertyToDatabase($value, FieldMap $fieldMap);
 
     /**
      * {@inheritdoc}
-     * 
+     *
      * @param $value
      * @param FieldMap $fieldMap
      * @return mixed

@@ -45,7 +45,6 @@ define('_LOB_SAMPLE_FILE_PATH', __DIR__ . '/../../../../Fixtures/etc/lob');
  */
 class BookstoreDataPopulator
 {
-
     public static function populate()
     {
         // Add publisher records
@@ -264,7 +263,7 @@ class BookstoreDataPopulator
     {
         $configuration = Configuration::getCurrentConfiguration();
 
-        $entityClasses = array(
+        $entityClasses = [
             'Propel\Tests\Bookstore\Author',
             'Propel\Tests\Bookstore\Bookstore',
             'Propel\Tests\Bookstore\BookstoreContest',
@@ -286,7 +285,7 @@ class BookstoreDataPopulator
             'Propel\Tests\Bookstore\BookSummary',
             'Propel\Tests\Bookstore\RecordLabel',
             'Propel\Tests\Bookstore\ReleasePool',
-        );
+        ];
 
         // free the memory from existing objects
         foreach ($entityClasses as $entityClass) {
@@ -295,5 +294,4 @@ class BookstoreDataPopulator
                 ->deleteAll();
         }
     }
-
 }

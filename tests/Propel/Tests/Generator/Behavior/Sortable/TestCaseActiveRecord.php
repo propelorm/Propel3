@@ -195,7 +195,7 @@ XML;
     protected function getFixturesArray()
     {
         $ts = \SortableEntity11Query::create()->orderByRank()->find();
-        $ret = array();
+        $ret = [];
         foreach ($ts as $t) {
             $ret[$t->getRank()] = $t->getTitle();
         }
@@ -206,7 +206,7 @@ XML;
     protected function getFixturesArrayWithScope($scope = null)
     {
         $ts  = \SortableEntity12Query::create()->filterByMyScopeField($scope)->orderByPosition()->find();
-        $ret = array();
+        $ret = [];
         foreach ($ts as $t) {
             $ret[$t->getRank()] = $t->getTitle();
         }

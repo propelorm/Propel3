@@ -8,13 +8,11 @@
 
 namespace Propel\Tests\Generator\Builder;
 
-
 use Propel\Generator\Builder\PhpdocFixer;
 use Propel\Tests\TestCase;
 
 class PhpdocFixerTest extends TestCase
 {
-
     public function testFunction()
     {
         $fixer = new PhpdocFixer();
@@ -475,7 +473,6 @@ EOF;
 
         $result = $fixer->fix($docBlock);
         $this->assertEquals($expected, $result);
-
     }
 
     public function testSimple()
@@ -491,7 +488,5 @@ EOF;
 EOF;
 
         $this->assertEquals($docBlock, $fixer->fix($docBlock));
-
     }
-
-} 
+}

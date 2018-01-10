@@ -32,7 +32,7 @@ class ConfigurationManagerTest extends ConfigTestCase
     public function setUp()
     {
         $this->currentDir = getcwd();
-        $this->fixturesDir = realpath( __DIR__ . '/../../../../Fixtures') . '/Configuration';
+        $this->fixturesDir = realpath(__DIR__ . '/../../../../Fixtures') . '/Configuration';
 
         $this->getFilesystem()->mkdir($this->fixturesDir);
         chdir($this->fixturesDir);
@@ -99,7 +99,7 @@ EOF;
         $this->getFilesystem()->dumpFile('doctrine.yaml', $yamlConf);
         try {
             $manager = new TestableConfigurationManager();
-            $this->assertNotNull($manager,  'Manager loaded');
+            $this->assertNotNull($manager, 'Manager loaded');
         } catch (\Exception $e) {
             $this->fail($e->getMessage());
         }

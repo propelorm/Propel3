@@ -55,12 +55,11 @@ class RawModelCriterion extends AbstractModelCriterion
         if (1 !== substr_count($this->clause, '?')) {
             throw new InvalidClauseException(sprintf('Could not build SQL for expression "%s" because Criteria::MODEL_CLAUSE_RAW works only with a clause containing a single question mark placeholder', $this->field));
         }
-        $params[] = array(
+        $params[] = [
             'entity' => null,
             'type'  => $this->type,
             'value' => $this->value
-        );
+        ];
         $sb .= str_replace('?', ':p' . count($params), $this->clause);
     }
-
 }

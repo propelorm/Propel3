@@ -28,15 +28,15 @@ class SqlBuildCommand extends AbstractCommand
         parent::configure();
 
         $this
-            ->addOption('mysql-engine', null, InputOption::VALUE_REQUIRED,  'MySQL engine (MyISAM, InnoDB, ...)')
-            ->addOption('output-dir',   null, InputOption::VALUE_REQUIRED,  'The output directory')
-            ->addOption('validate',     null, InputOption::VALUE_NONE,      '')
-            ->addOption('connection',   null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Connection to use', array())
-            ->addOption('schema-name',  null, InputOption::VALUE_REQUIRED,  'The schema name for RDBMS supporting them', '')
+            ->addOption('mysql-engine', null, InputOption::VALUE_REQUIRED, 'MySQL engine (MyISAM, InnoDB, ...)')
+            ->addOption('output-dir', null, InputOption::VALUE_REQUIRED, 'The output directory')
+            ->addOption('validate', null, InputOption::VALUE_NONE, '')
+            ->addOption('connection', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Connection to use', [])
+            ->addOption('schema-name', null, InputOption::VALUE_REQUIRED, 'The schema name for RDBMS supporting them', '')
             //->addOption('encoding',     null, InputOption::VALUE_REQUIRED,  'The encoding to use for the database')
-            ->addOption('table-prefix', null, InputOption::VALUE_REQUIRED,  'Add a prefix to all the table names in the database', '')
+            ->addOption('table-prefix', null, InputOption::VALUE_REQUIRED, 'Add a prefix to all the table names in the database', '')
             ->setName('sql:build')
-            ->setAliases(array('sql'))
+            ->setAliases(['sql'])
             ->setDescription('Build SQL files')
         ;
     }
@@ -46,7 +46,7 @@ class SqlBuildCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $configOptions = array();
+        $configOptions = [];
 
         foreach ($input->getOptions() as $key => $option) {
             if (null !== $option) {
@@ -59,10 +59,10 @@ class SqlBuildCommand extends AbstractCommand
                     case 'output-dir':
                         $configOptions['propel']['paths']['sqlDir'] = $option;
                         break;
-                    case 'schema-name';
+                    case 'schema-name':
                         $configOptions['propel']['generator']['schema']['basename'] = $option;
                         break;
-                    case 'mysql-engine';
+                    case 'mysql-engine':
                         $configOptions['propel']['database']['adapters']['mysql']['tableType'] = $option;
                         break;
                 }
@@ -75,14 +75,14 @@ class SqlBuildCommand extends AbstractCommand
 
         $manager = new SqlManager();
 
-        $connections = array();
+        $connections = [];
         $optionConnections = $input->getOption('connection');
         if (!$optionConnections) {
             $connections = $generatorConfig->getBuildConnections();
         } else {
             foreach ($optionConnections as $connection) {
                 list($name, $dsn, $infos) = $this->parseConnection($connection);
-                $connections[$name] = array_merge(array('dsn' => $dsn), $infos);
+                $connections[$name] = array_merge(['dsn' => $dsn], $infos);
             }
         }
         $manager->setConnections($connections);

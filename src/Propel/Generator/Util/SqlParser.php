@@ -158,7 +158,7 @@ class SqlParser
     public static function parseFile($file)
     {
         if (!file_exists($file)) {
-            return array();
+            return [];
         }
 
         return self::parseString(file_get_contents($file));
@@ -166,15 +166,15 @@ class SqlParser
 
     public function convertLineFeedsToUnixStyle()
     {
-        $this->setSQL(str_replace(array("\r\n", "\r"), "\n", $this->sql));
+        $this->setSQL(str_replace(["\r\n", "\r"], "\n", $this->sql));
     }
 
     public function stripSQLCommentLines()
     {
-        $this->setSQL(preg_replace(array(
+        $this->setSQL(preg_replace([
             '#^\s*(//|--|\#).*(\n|$)#m',    // //, --, or # style comments
             '#^\s*/\*.*?\*/#s'              // c-style comments
-        ), '', $this->sql));
+        ], '', $this->sql));
     }
 
     /**
@@ -185,7 +185,7 @@ class SqlParser
     public function explodeIntoStatements()
     {
         $this->pos = 0;
-        $sqlStatements = array();
+        $sqlStatements = [];
         while ($sqlStatement = $this->getNextStatement()) {
             $sqlStatements[] = $sqlStatement;
         }
@@ -242,5 +242,4 @@ class SqlParser
 
         return trim($parsedString);
     }
-
 }

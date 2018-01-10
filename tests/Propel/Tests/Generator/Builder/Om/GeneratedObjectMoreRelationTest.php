@@ -80,7 +80,6 @@ EOF;
         \MoreRelationTest\PageQuery::create()->doDeleteAll();
 
         for ($i=1;$i<=2;$i++) {
-
             $page = new \MoreRelationTest\Page();
             $page->setTitle('Page '.$i);
 
@@ -131,8 +130,11 @@ EOF;
         $pageComment = \MoreRelationTest\CommentQuery::create()->filterByPage($page)->findOne();
         $currentCount = count($page->getComments());
 
-        $this->assertSame(spl_object_hash($page->getComments()[0]), spl_object_hash($pageComment),
-            'lazy loading of one-to-many adds the reference/proxy to first level cache, so a query returns that object');
+        $this->assertSame(
+            spl_object_hash($page->getComments()[0]),
+            spl_object_hash($pageComment),
+            'lazy loading of one-to-many adds the reference/proxy to first level cache, so a query returns that object'
+        );
 
         /** @var $newPageObject \MoreRelationTest\Page */
         $newPageObject = \MoreRelationTest\PageQuery::create()->findOne(); //resets the cached comments through getComments()
@@ -168,7 +170,7 @@ EOF;
         $count = \MoreRelationTest\CommentQuery::create()->filterByPageId($id)->count();
         $this->assertEquals(1, $count, 'We assigned a collection of only one item.');
 
-        $count = \MoreRelationTest\CommentQuery::create()->filterByPageId(NULL)->count();
+        $count = \MoreRelationTest\CommentQuery::create()->filterByPageId(null)->count();
         $this->assertEquals(0, $count, 'There should be no unassigned comment.');
 
         $page->removeComment($comment);
@@ -179,7 +181,7 @@ EOF;
         $count = \MoreRelationTest\CommentQuery::create()->filterByPageId($id)->count();
         $this->assertEquals(0, $count, 'no comments are linked with the page');
 
-        $count = \MoreRelationTest\CommentQuery::create()->filterByPageId(NULL)->count();
+        $count = \MoreRelationTest\CommentQuery::create()->filterByPageId(null)->count();
         $this->assertEquals(0, $count, 'we have now no unassigned comments');
     }
 
@@ -216,7 +218,7 @@ EOF;
         $count = \MoreRelationTest\ContentCommentQuery::create()->filterByContentId($id)->count();
         $this->assertEquals(2, $count, 'We assigned a collection of two items.');
 
-        $count = \MoreRelationTest\ContentCommentQuery::create()->filterByContentId(NULL)->count();
+        $count = \MoreRelationTest\ContentCommentQuery::create()->filterByContentId(null)->count();
         $this->assertEquals(1, $count, 'There should be one unassigned contentComment.');
     }
 

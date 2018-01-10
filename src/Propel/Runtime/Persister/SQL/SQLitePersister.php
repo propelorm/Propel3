@@ -70,7 +70,7 @@ class SQLitePersister extends SqlPersister
         $message = $PDOException->getMessage();
 
         if (false !== strpos($message, 'Integrity constraint violation:')) {
-            if(preg_match('/UNIQUE constraint failed: ([^\.]+)\.([^\.]+)/', $message, $matches)) {
+            if (preg_match('/UNIQUE constraint failed: ([^\.]+)\.([^\.]+)/', $message, $matches)) {
                 return UniqueConstraintException::createForField($entityMap, $matches[2]);
             }
         }
@@ -89,7 +89,7 @@ class SQLitePersister extends SqlPersister
      */
     protected function readAutoincrementWithoutSequenceTable(FieldMap $autoIncrementField, ConnectionInterface $connection)
     {
-          $sql = <<<EOF
+        $sql = <<<EOF
     SELECT "%s"
     FROM  "%s"
     ORDER BY "%s" DESC

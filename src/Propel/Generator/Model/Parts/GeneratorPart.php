@@ -3,8 +3,8 @@ namespace Propel\Generator\Model\Parts;
 
 use Propel\Generator\Model\Model;
 
-trait GeneratorPart {
-
+trait GeneratorPart
+{
     use SuperordinatePart;
 
     /**
@@ -84,4 +84,3 @@ trait GeneratorPart {
         return Model::DEFAULT_MUTATOR_ACCESSIBILITY;
     }
 }
-

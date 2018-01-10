@@ -10,7 +10,6 @@
 
 namespace Propel\Tests\Generator\Behavior\Sortable;
 
-
 /**
  * Tests for SortableBehavior class
  *
@@ -450,7 +449,6 @@ class SortableBehaviorActiveRecordWithScopeTest extends TestCaseActiveRecord
         $this->assertEquals($t1_2->getRank(), 3);
         $this->assertEquals($t1_3->getRank(), 1);
         $this->assertEquals($t1_4->getRank(), 2);
-
     }
 
     public function testMoveMultipleScopes()
@@ -560,5 +558,4 @@ class SortableBehaviorActiveRecordWithScopeTest extends TestCaseActiveRecord
         $this->assertEquals($t1_1->getRank(), 1);
         $this->assertEquals($t1_2->getRank(), 2);
     }
-
 }

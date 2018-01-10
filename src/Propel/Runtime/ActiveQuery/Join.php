@@ -40,7 +40,7 @@ class Join
      * the left parts of the join condition
      * @var array
      */
-    protected $left = array();
+    protected $left = [];
 
     //
     /**
@@ -48,14 +48,14 @@ class Join
      *
      * @var array
      */
-    protected $right = array();
+    protected $right = [];
 
     /**
      * the comparison operators for each pair of fields in the join condition
      *
      * @var string[]
      */
-    protected $operators = array();
+    protected $operators = [];
 
     /**
      * The type of the join (LEFT JOIN, ...)
@@ -172,7 +172,7 @@ class Join
      *
      * @throws \Propel\Runtime\Exception\LogicException
      */
-    public function addConditions($lefts, $rights, $operators = array())
+    public function addConditions($lefts, $rights, $operators = [])
     {
         if (count($lefts) != count($rights)) {
             throw new LogicException(
@@ -241,13 +241,13 @@ class Join
      */
     public function getConditions()
     {
-        $conditions = array();
+        $conditions = [];
         for ($i = 0; $i < $this->count; $i++) {
-            $conditions[] = array(
+            $conditions[] = [
                 'left' => $this->getLeftField($i),
                 'operator' => $this->getOperator($i),
                 'right' => $this->getRightField($i)
-            );
+            ];
         }
 
         return $conditions;
@@ -363,7 +363,7 @@ class Join
      */
     public function getLeftFields()
     {
-        $fields = array();
+        $fields = [];
         foreach ($this->left as $index => $field) {
             $fields[] = $this->getLeftField($index);
         }
@@ -494,7 +494,7 @@ class Join
      */
     public function getRightFields()
     {
-        $fields = array();
+        $fields = [];
         foreach ($this->right as $index => $field) {
             $fields[] = $this->getRightField($index);
         }
@@ -658,7 +658,7 @@ class Join
     public function getClause(&$params)
     {
         if (null === $this->joinCondition) {
-            $conditions = array();
+            $conditions = [];
             for ($i = 0; $i < $this->count; $i++) {
                 $conditions [] = $this->getLeftField($i) . $this->getOperator($i) . $this->getRightField($i);
             }
@@ -689,8 +689,8 @@ class Join
      */
     public function equals($join)
     {
-        $parametersOfThisClauses = array();
-        $parametersOfJoinClauses = array();
+        $parametersOfThisClauses = [];
+        $parametersOfJoinClauses = [];
 
         return null !== $join
         && $join instanceof Join
@@ -706,7 +706,7 @@ class Join
      */
     public function toString()
     {
-        $params = array();
+        $params = [];
 
         return $this->getClause($params);
     }

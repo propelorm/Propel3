@@ -82,18 +82,21 @@ class SchemaParserVisitor extends XmlParserNoopVisitor
         'vendor'
     ];
 
-    public function __construct(SchemaReader $reader) {
+    public function __construct(SchemaReader $reader)
+    {
         $this->reader = $reader;
         $this->behaviorManager = new BehaviorManager();
         $this->tagStack = new Stack();
     }
 
-    public function setSchema(Schema $schema) {
+    public function setSchema(Schema $schema)
+    {
         $this->schema = $schema;
         $this->behaviorManager->setGeneratorConfig($schema->getGeneratorConfig());
     }
 
-    public function visitElementStart($name, $attributes, $line, $column) {
+    public function visitElementStart($name, $attributes, $line, $column)
+    {
         $parentTag = $this->tagStack->peek();
 
         // root
@@ -115,7 +118,7 @@ class SchemaParserVisitor extends XmlParserNoopVisitor
         }
 
         // regonized parent tag
-        else if (in_array($parentTag, $this->allowedTags)) {
+        elseif (in_array($parentTag, $this->allowedTags)) {
             $methodName = 'visit' . NamingTool::toUpperCamelCase($parentTag);
             if (method_exists($this, $methodName)) {
                 $this->$methodName($name, $attributes, $line, $column);
@@ -130,7 +133,8 @@ class SchemaParserVisitor extends XmlParserNoopVisitor
         $this->tagStack->push($name);
     }
 
-    protected function visitDatabase($name, $attributes, $line, $column) {
+    protected function visitDatabase($name, $attributes, $line, $column)
+    {
         switch ($name) {
             case 'external-schema':
                 $schema = new Schema();
@@ -195,11 +199,13 @@ class SchemaParserVisitor extends XmlParserNoopVisitor
         }
     }
 
-    private function visitTable($name, $attributes, $line, $column) {
+    private function visitTable($name, $attributes, $line, $column)
+    {
         $this->visitEntity($name, $attributes, $line, $column);
     }
 
-    protected function visitEntity($name, $attributes, $line, $column) {
+    protected function visitEntity($name, $attributes, $line, $column)
+    {
         switch ($name) {
             case 'column':
             case 'field':
@@ -267,11 +273,13 @@ class SchemaParserVisitor extends XmlParserNoopVisitor
         }
     }
 
-    private function visitColumn($name, $attributes, $line, $column) {
+    private function visitColumn($name, $attributes, $line, $column)
+    {
         $this->visitField($name, $attributes, $line, $column);
     }
 
-    protected function visitField($name, $attributes, $line, $column) {
+    protected function visitField($name, $attributes, $line, $column)
+    {
         switch ($name) {
             case 'inheritance':
                 $inheritance = ModelFactory::createMappingModel($name, $attributes);
@@ -288,7 +296,8 @@ class SchemaParserVisitor extends XmlParserNoopVisitor
     }
 
 
-    private function visitForeignKey($name, $attributes, $line, $column) {
+    private function visitForeignKey($name, $attributes, $line, $column)
+    {
         if ($name === 'reference') {
             $attributes['local'] = NamingTool::toCamelCase($attributes['local']);
             $attributes['foreign'] = NamingTool::toCamelCase($attributes['foreign']);
@@ -296,7 +305,8 @@ class SchemaParserVisitor extends XmlParserNoopVisitor
         $this->visitRelation($name, $attributes, $line, $column);
     }
 
-    protected function visitRelation($name, $attributes, $line, $column) {
+    protected function visitRelation($name, $attributes, $line, $column)
+    {
         switch ($name) {
             case 'reference':
                 $this->currRelation->addReference($attributes);
@@ -311,7 +321,8 @@ class SchemaParserVisitor extends XmlParserNoopVisitor
         }
     }
 
-    protected function visitIndex($name, $attributes, $line, $column) {
+    protected function visitIndex($name, $attributes, $line, $column)
+    {
         $parentTag = $this->tagStack->peek();
         switch ($name) {
             case 'index-column':
@@ -332,7 +343,8 @@ class SchemaParserVisitor extends XmlParserNoopVisitor
         }
     }
 
-    protected function visitUnique($name, $attributes, $line, $column) {
+    protected function visitUnique($name, $attributes, $line, $column)
+    {
         $parentTag = $this->tagStack->peek();
         switch ($name) {
             case 'unique-column':
@@ -353,7 +365,8 @@ class SchemaParserVisitor extends XmlParserNoopVisitor
         }
     }
 
-    protected function visitBehavior($name, $attributes, $line, $column) {
+    protected function visitBehavior($name, $attributes, $line, $column)
+    {
         switch ($name) {
             case 'parameter':
                 $this->currBehavior->addParameter($attributes);
@@ -364,7 +377,8 @@ class SchemaParserVisitor extends XmlParserNoopVisitor
         }
     }
 
-    protected function visitVendor($name, $attributes, $line, $column) {
+    protected function visitVendor($name, $attributes, $line, $column)
+    {
         switch ($name) {
             case 'parameter':
                 $this->currVendor->setParameter($attributes['name'], $attributes['value']);
@@ -375,29 +389,33 @@ class SchemaParserVisitor extends XmlParserNoopVisitor
         }
     }
 
-    protected function parseVendor(MappingModel $parent, $attributes) {
+    protected function parseVendor(MappingModel $parent, $attributes)
+    {
         $vendor = ModelFactory::createMappingModel('vendor-info', $attributes);
         $parent->addVendorInfo($vendor);
         $this->currVendor = $vendor;
     }
 
-    protected function parseBehavior($parent, $attributes) {
+    protected function parseBehavior($parent, $attributes)
+    {
         $behavior = $this->behaviorManager->load($attributes['name']);
         $behavior->loadMapping($attributes);
         $parent->addBehavior($behavior);
         $this->currBehavior = $behavior;
     }
 
-    public function visitElementEnd($name, $line, $column) {
+    public function visitElementEnd($name, $line, $column)
+    {
         if ('index' === $name) {
             $this->currEntity->addIndex($this->currIndex);
-        } else if ('unique' === $name) {
+        } elseif ('unique' === $name) {
             $this->currEntity->addUnique($this->currUnique);
         }
         $this->tagStack->pop();
     }
 
-    protected function throwInvalidTagException($name, $line, $column) {
+    protected function throwInvalidTagException($name, $line, $column)
+    {
         $location = '';
         if (null !== $this->schema->getFilename()) {
             $location .= sprintf('file %s,', $this->schema->getFilename());
@@ -410,5 +428,4 @@ class SchemaParserVisitor extends XmlParserNoopVisitor
 
         throw new SchemaException(sprintf('Unexpected tag <%s> in %s', $name, $location));
     }
-
 }

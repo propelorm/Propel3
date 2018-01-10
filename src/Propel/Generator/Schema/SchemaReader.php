@@ -29,7 +29,8 @@ class SchemaReader
     private $visitor;
     private $parsedFiles;
        
-    public function __construct() {
+    public function __construct()
+    {
         $this->visitor = new SchemaParserVisitor($this);
         $this->parser = new XmlParser();
         $this->parser->setOption(XmlParser::OPTION_CASE_FOLDING, 0);
@@ -66,11 +67,13 @@ class SchemaReader
         return $schema;
     }
     
-    public function parseExternal(Schema $schema) {
+    public function parseExternal(Schema $schema)
+    {
         $this->parseSchema($schema);
     }
     
-    private function parseSchema(Schema $schema) {
+    private function parseSchema(Schema $schema)
+    {
         $filename = $schema->getFilename();
         if (!file_exists($filename)) {
             throw new SchemaException(sprintf('XML schema file (%s) no found.', $filename));

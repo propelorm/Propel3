@@ -29,9 +29,13 @@ $id = spl_object_hash($entity);
 $originValues = $this->getLastKnownValues($id);
 ';
 
-        foreach ($this->getEntity()->getFields() as $field){
-            if ($field->isImplementationDetail()) continue;
-            if ($field->isRelation()) continue;
+        foreach ($this->getEntity()->getFields() as $field) {
+            if ($field->isImplementationDetail()) {
+                continue;
+            }
+            if ($field->isRelation()) {
+                continue;
+            }
             $fieldName = $field->getName();
 
             $body .= "
@@ -104,7 +108,6 @@ if (false === \$lazyLastLoaded && false === \$lazyNowLoaded) {
             \$changes['$relationFieldName'] = null;
         }
 ";
-
             }
 
             $body .= "

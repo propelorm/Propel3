@@ -10,7 +10,6 @@
 
 namespace Propel\Generator\Behavior\Sluggable\Component\Repository;
 
-
 use Propel\Generator\Builder\Om\Component\BuildComponent;
 use Propel\Generator\Builder\Om\Component\NamingTrait;
 use Propel\Generator\Builder\Om\Component\SimpleTemplateTrait;

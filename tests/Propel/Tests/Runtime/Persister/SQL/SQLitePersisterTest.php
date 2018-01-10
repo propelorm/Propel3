@@ -87,7 +87,7 @@ EOF;
         $song->setSinger($singer);
         $song->save();
 
-        $this->assertEquals(1, $songQuery->count(),'1 Song');
+        $this->assertEquals(1, $songQuery->count(), '1 Song');
         $this->assertEquals(1, $singerQuery->count(), '1 Singer');
 
         $singerQuery->deleteAll();
@@ -100,7 +100,7 @@ EOF;
         $song->setSinger($singer);
         $song->save();
 
-        $this->assertEquals(1, $songQuery->count(),'1 Song');
+        $this->assertEquals(1, $songQuery->count(), '1 Song');
         $this->assertEquals(1, $singerQuery->count(), '1 Singer');
     }
 

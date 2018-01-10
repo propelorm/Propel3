@@ -24,9 +24,9 @@ class ActiveRecordTest extends TestCaseFixtures
     public function testGetVirtualColumns()
     {
         $b = new ActiveBook();
-        $this->assertEquals(array(), $b->getVirtualFields(), 'getVirtualFields() returns an empty array for new objects');
+        $this->assertEquals([], $b->getVirtualFields(), 'getVirtualFields() returns an empty array for new objects');
         $b->foo = 'bar';
-        $this->assertEquals(array('foo' => 'bar'), $b->getVirtualFields(), 'getVirtualFields() returns an associative array of virtual columns');
+        $this->assertEquals(['foo' => 'bar'], $b->getVirtualFields(), 'getVirtualFields() returns an associative array of virtual columns');
     }
 
     public function testHasVirtualColumn()

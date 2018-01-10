@@ -32,7 +32,7 @@ class CrossRelationRemoverMethods extends BuildComponent
         $relatedObjectClassName = $this->getRelationPhpName($relation, false);
         $crossObjectClassName = $relation->getForeignEntity()->getFullClassName();
 
-        list ($signature, , $normalizedShortSignature, $phpDoc) = $this->getCrossRelationAddMethodInformation($crossRelation, $relation);
+        list($signature, , $normalizedShortSignature, $phpDoc) = $this->getCrossRelationAddMethodInformation($crossRelation, $relation);
 
         $body = <<<EOF
 if (false !== \$pos = \$this->{$collName}->search({$normalizedShortSignature})) {

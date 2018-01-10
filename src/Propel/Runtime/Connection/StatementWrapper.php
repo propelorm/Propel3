@@ -36,18 +36,18 @@ class StatementWrapper extends \PDOStatement implements \IteratorAggregate
      * @see self::bindValue()
      * @var array
      */
-    protected static $typeMap = array(
+    protected static $typeMap = [
         0  => 'PDO::PARAM_NULL',
         1  => 'PDO::PARAM_INT',
         2  => 'PDO::PARAM_STR',
         3  => 'PDO::PARAM_LOB',
         5  => 'PDO::PARAM_BOOL',
-    );
+    ];
 
     /**
      * @var array  The values that have been bound
      */
-    protected $boundValues = array();
+    protected $boundValues = [];
 
     /**
      * @var string
@@ -209,7 +209,7 @@ class StatementWrapper extends \PDOStatement implements \IteratorAggregate
     {
         $sql = $this->statement->queryString;
         $parameters = $parameters ?: $this->boundValues;
-        $matches = array();
+        $matches = [];
 
         if (preg_match_all('/(:p[0-9]+\b)/', $sql, $matches)) {
             $size = count($matches[1]);
@@ -220,7 +220,7 @@ class StatementWrapper extends \PDOStatement implements \IteratorAggregate
         }
 
         $paramsReplaceReadable = $parameters;
-        $readable = preg_replace_callback('/\?/', function() use (&$paramsReplaceReadable) {
+        $readable = preg_replace_callback('/\?/', function () use (&$paramsReplaceReadable) {
             $value = array_shift($paramsReplaceReadable);
             if (is_string($value) && strlen($value) > 64) {
                 $value = substr($value, 0, 64) . '...';
@@ -334,7 +334,6 @@ class StatementWrapper extends \PDOStatement implements \IteratorAggregate
 
     public function __call($method, $args)
     {
-        return call_user_func_array(array($this->statement, $method), $args);
+        return call_user_func_array([$this->statement, $method], $args);
     }
-
 }

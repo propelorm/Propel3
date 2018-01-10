@@ -17,5 +17,4 @@ namespace Propel\Runtime\EntityManager;
  */
 interface NestedManagerInterface
 {
-
 }

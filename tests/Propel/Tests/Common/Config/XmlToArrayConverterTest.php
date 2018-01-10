@@ -16,8 +16,8 @@ class XmlToArrayConverterTest extends ConfigTestCase
 {
     public function provider()
     {
-        return array(
-            array(<<< XML
+        return [
+            [<<< XML
 <?xml version='1.0' standalone='yes'?>
 <movies>
  <movie>
@@ -28,9 +28,9 @@ class XmlToArrayConverterTest extends ConfigTestCase
  </movie>
 </movies>
 XML
-, array('movie' => array(0 => array('title' => 'Star Wars'), 1 => array('title' => 'The Lord Of The Rings')))
-            ),
-            array(<<< XML
+, ['movie' => [0 => ['title' => 'Star Wars'], 1 => ['title' => 'The Lord Of The Rings']]]
+            ],
+            [<<< XML
 <?xml version="1.0" encoding="utf-8"?>
 <config>
   <log>
@@ -46,23 +46,23 @@ XML
   </log>
 </config>
 XML
-, array('log' => array(
-                'logger' => array(
-                    array(
+, ['log' => [
+                'logger' => [
+                    [
                         'type' => 'stream',
                         'path' => '/var/log/propel.log',
                         'level' => '300',
                         'name' => 'defaultLogger',
-                    ),
-                    array(
+                    ],
+                    [
                         'type' => 'stream',
                         'path' => '/var/log/propel_bookstore.log',
                         'name' => 'bookstore',
-                    ),
-                ),
-            ))
-            ),
-            array(<<<XML
+                    ],
+                ],
+            ]]
+            ],
+            [<<<XML
 <?xml version="1.0" encoding="utf-8"?>
 <config>
   <datasources default="bookstore">
@@ -83,21 +83,21 @@ XML
   </datasources>
 </config>
 XML
-, array('datasources' => array(
-    'bookstore' => array(
+, ['datasources' => [
+    'bookstore' => [
         'adapter' => 'mysql',
-        'connection' => array('dsn' => 'mysql:host=localhost;dbname=bookstore'),
-        'slaves' => array(
-            'connection' => array(
-                array('dsn' => 'mysql:host=slave-server1;dbname=bookstore'),
-                array('dsn' => 'mysql:host=slave-server2;dbname=bookstore'),
-            ),
-        ),
-    ),
+        'connection' => ['dsn' => 'mysql:host=localhost;dbname=bookstore'],
+        'slaves' => [
+            'connection' => [
+                ['dsn' => 'mysql:host=slave-server1;dbname=bookstore'],
+                ['dsn' => 'mysql:host=slave-server2;dbname=bookstore'],
+            ],
+        ],
+    ],
     'default' => 'bookstore',
-    ))
-            ),
-            array(<<<XML
+    ]]
+            ],
+            [<<<XML
 <?xml version="1.0" encoding="utf-8"?>
 <config>
   <datasources default="bookstore">
@@ -110,17 +110,17 @@ XML
   </datasources>
 </config>
 XML
-, array('datasources' => array(
-                'bookstore' => array(
+, ['datasources' => [
+                'bookstore' => [
                     'adapter' => 'mysql',
-                    'connection' => array(
+                    'connection' => [
                         'dsn' => 'mysql:host=localhost;dbname=bookstore',
-                    ),
-                ),
+                    ],
+                ],
                 'default' => 'bookstore',
-            ))
-            ),
-            array(<<<XML
+            ]]
+            ],
+            [<<<XML
 <?xml version="1.0" encoding="utf-8"?>
 <config>
   <profiler class="\Runtime\Runtime\Util\Profiler">
@@ -134,18 +134,18 @@ XML
   </profiler>
  </config>
 XML
-, array('profiler' => array(
+, ['profiler' => [
                 'class' => '\Runtime\Runtime\Util\Profiler',
                 'slowTreshold' => 0.2,
-                'details' => array(
-                    'time' => array('name' => 'Time', 'precision' => 3, 'pad' => '8'),
-                    'mem' => array('name' => 'Memory', 'precision' => 3, 'pad' => '8'),
-                ),
+                'details' => [
+                    'time' => ['name' => 'Time', 'precision' => 3, 'pad' => '8'],
+                    'mem' => ['name' => 'Memory', 'precision' => 3, 'pad' => '8'],
+                ],
                 'innerGlue' => ': ',
                 'outerGlue' => ' | '
-            ))
-            )
-        );
+            ]]
+            ]
+        ];
     }
 
     /**
@@ -249,6 +249,6 @@ XML;
         $this->dumpTempFile('empty.xml', '');
         $actual = XmlToArrayConverter::convert(sys_get_temp_dir() . '/empty.xml');
 
-        $this->assertEquals(array(), $actual);
+        $this->assertEquals([], $actual);
     }
 }

@@ -87,7 +87,7 @@ return \$this->isInTree(\$descNode) && \$descNode->getLeftValue() > \$parentNode
 
     protected function addIsAncestorOf()
     {
-       $this->addMethod('isAncestorOf')
+        $this->addMethod('isAncestorOf')
            ->setDescription('Tests if node is a ancestor of another node')
            ->setType('bool')
            ->addSimpleDescParameter('node', "{$this->getObjectClassName()}", "The node to test if ancestor.")

@@ -4,8 +4,8 @@ namespace Propel\Generator\Model\Parts;
 use Propel\Generator\Config\GeneratorConfigInterface;
 use Propel\Generator\Platform\PlatformInterface;
 
-trait PlatformAccessorPart {
-
+trait PlatformAccessorPart
+{
     use SuperordinatePart;
 
     /** @var GeneratorConfigInterface */
@@ -48,4 +48,3 @@ trait PlatformAccessorPart {
         return null;
     }
 }
-

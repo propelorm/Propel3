@@ -108,7 +108,6 @@ EOF;
             $property = $builder->getDefinition()->getProperty($field->getName());
 
             if ($field->hasDefaultValue()) {
-
                 if ($field->getDefaultValue()->isExpression() && strtoupper($field->getDefaultValue()->getValue()) === 'CURRENT_TIMESTAMP') {
                     $property->unsetExpression();
                     $property->unsetValue();

@@ -101,7 +101,6 @@ class GeneratedObjectTest extends BookstoreTestBase
         // note that this is different from how it's represented in schema, but should resolve to same unix timestamp
         $review->setReviewDate('2001-01-01');
         $this->assertTrue($review->isModified(), "Expect Review to have been marked 'modified' after default date/time value set.");
-
     }
 
     /**
@@ -390,7 +389,6 @@ class GeneratedObjectTest extends BookstoreTestBase
 
         $this->assertEquals($pub1->getId(), $book->getPublisherId(), "Expected book to have old publisher id (again).");
         $this->assertSame($pub1, $book->getPublisher(), "Expected book to have old publisher object associated (again).");
-
     }
 
     /**
@@ -417,10 +415,9 @@ class GeneratedObjectTest extends BookstoreTestBase
         $opinion->save();
 
 
-        $opinion2 = BookOpinionQuery::create()->findPk(array($bookId, $readerId));
+        $opinion2 = BookOpinionQuery::create()->findPk([$bookId, $readerId]);
 
         $this->assertSame($opinion, $opinion2, "Expected same object to be retrieved from differently type-casted primary key values.");
-
     }
 
     /**
@@ -429,7 +426,6 @@ class GeneratedObjectTest extends BookstoreTestBase
      */
     public function testSaveReturnValues()
     {
-
         $author = new Author();
         $author->setFirstName("Mark");
         $author->setLastName("Kurlansky");
@@ -467,7 +463,6 @@ class GeneratedObjectTest extends BookstoreTestBase
         $book->setTitle("Salt: A World History");
         $affected = $book->save();
         $this->assertEquals(2, $affected, "Expected 2 affected rows when saving updated book with updated author.");
-
     }
 
     public function testSaveCanInsertNonEmptyObjects()
@@ -497,7 +492,6 @@ class GeneratedObjectTest extends BookstoreTestBase
         $super->addSubordinate($e2);
 
         $affected = $super->save();
-
     }
 
     public function testIsModifiedIsFalseForNewObjects()
@@ -726,14 +720,14 @@ class GeneratedObjectTest extends BookstoreTestBase
         $b->setTitle('Don Juan');
 
         $arr1 = $b->toArray();
-        $expectedKeys = array(
+        $expectedKeys = [
             'Id',
             'Title',
             'ISBN',
             'Price',
             'PublisherId',
             'AuthorId'
-        );
+        ];
         $this->assertEquals($expectedKeys, array_keys($arr1), 'toArray() returns an associative array with TableMap::TYPE_PHPNAME keys by default');
         $this->assertEquals('Don Juan', $arr1['Title'], 'toArray() returns an associative array representation of the object');
     }
@@ -751,14 +745,14 @@ class GeneratedObjectTest extends BookstoreTestBase
         $b->setTitle('Don Juan');
 
         $arr1 = $b->toArray(TableMap::TYPE_COLNAME);
-        $expectedKeys = array(
+        $expectedKeys = [
             BookTableMap::FIELD_ID,
             BookTableMap::FIELD_TITLE,
             BookTableMap::FIELD_ISBN,
             BookTableMap::FIELD_PRICE,
             BookTableMap::FIELD_PUBLISHER_ID,
             BookTableMap::FIELD_AUTHOR_ID
-        );
+        ];
         $this->assertEquals($expectedKeys, array_keys($arr1), 'toArray() accepts a $keyType parameter to change the result keys');
         $this->assertEquals('Don Juan', $arr1[BookTableMap::FIELD_TITLE], 'toArray() returns an associative array representation of the object');
     }
@@ -780,10 +774,10 @@ EOF;
         $builder->setConfig($generatorConfig);
         $builder->buildClasses();
 
-        $expectedKeys = array(
+        $expectedKeys = [
             'idKeyType',
             'nameKeyType',
-        );
+        ];
         $object = new TestKeyTypeTable();
         $this->assertEquals($expectedKeys, array_keys($object->toArray()), 'toArray() returns an associative array with pre-defined key type in properties.');
     }
@@ -904,13 +898,13 @@ EOF;
     {
         $b = new BookOpinion();
         $this->assertTrue($b->isPrimaryKeyNull());
-        $b->setPrimaryKey(array(123, 456));
+        $b->setPrimaryKey([123, 456]);
         $this->assertFalse($b->isPrimaryKeyNull());
-        $b->setPrimaryKey(array(123, null));
+        $b->setPrimaryKey([123, null]);
         $this->assertFalse($b->isPrimaryKeyNull());
-        $b->setPrimaryKey(array(null, 456));
+        $b->setPrimaryKey([null, 456]);
         $this->assertFalse($b->isPrimaryKeyNull());
-        $b->setPrimaryKey(array(null, null));
+        $b->setPrimaryKey([null, null]);
         $this->assertTrue($b->isPrimaryKeyNull());
     }
 
@@ -1067,21 +1061,21 @@ EOF;
 
     public static function conditionsForTestReadOnly()
     {
-        return array(
-            array('reload'),
-            array('delete'),
-            array('save'),
-            array('doSave'),
-            array('importFrom')
-        );
+        return [
+            ['reload'],
+            ['delete'],
+            ['save'],
+            ['doSave'],
+            ['importFrom']
+        ];
     }
 
     public static function conditionsForTestVisibility()
     {
-        return array(
-            array('setCode'),
-            array('setCapital')
-        );
+        return [
+            ['setCode'],
+            ['setCapital']
+        ];
     }
 
     /**
@@ -1367,7 +1361,7 @@ EOF;
         AuthorQuery::create()->deleteAll();
 
         $books = new ObjectCollection();
-        foreach (array('foo', 'bar') as $title) {
+        foreach (['foo', 'bar'] as $title) {
             $b = new Book();
             $b->setTitle($title);
             $b->setISBN('FA404');
@@ -1386,7 +1380,7 @@ EOF;
         $this->assertEquals('bar', $books[1]->getTitle());
 
         $books = new ObjectCollection();
-        foreach (array('bam', 'bom') as $title) {
+        foreach (['bam', 'bom'] as $title) {
             $b = new Book();
             $b->setTitle($title);
             $b->setISBN('FA404');
@@ -1493,7 +1487,7 @@ EOF;
         BookQuery::create()->deleteAll();
 
         $bookSummaries = new ObjectCollection();
-        foreach (array('foo', 'bar') as $summary) {
+        foreach (['foo', 'bar'] as $summary) {
             $s = new BookSummary();
             $s->setSummary($summary);
             $bookSummaries[] = $s;
@@ -1510,7 +1504,7 @@ EOF;
         $this->assertEquals('bar', $bookSummaries[1]->getSummary());
 
         $bookSummaries = new ObjectCollection();
-        foreach (array('bam', 'bom') as $summary) {
+        foreach (['bam', 'bom'] as $summary) {
             $s = new BookSummary();
             $s->setSummary($summary);
             $bookSummaries[] = $s;

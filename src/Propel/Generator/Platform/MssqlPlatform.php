@@ -118,7 +118,8 @@ END
         if ($entity->hasPrimaryKey()) {
             $pattern = 'CONSTRAINT %s PRIMARY KEY (%s)';
 
-            return sprintf($pattern,
+            return sprintf(
+                $pattern,
                 $this->quoteIdentifier($this->getPrimaryKeyName($entity)),
                 $this->getFieldListDDL($entity->getPrimaryKey())
             );
@@ -137,7 +138,8 @@ END
 ;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($relation->getEntity()->getFQTableName()),
             $this->getRelationDDL($relation)
         );
@@ -149,7 +151,8 @@ END
             return;
         }
         $pattern = 'CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)';
-        $script = sprintf($pattern,
+        $script = sprintf(
+            $pattern,
             $this->quoteIdentifier($relation->getName()),
             $this->getFieldListDDL($relation->getLocalFieldObjects()),
             $this->quoteIdentifier($relation->getForeignEntity()->getFQTableName()),
@@ -183,7 +186,7 @@ END
      */
     public function doQuoting($text)
     {
-        return '[' . strtr($text, array('.' => '].[')) . ']';
+        return '[' . strtr($text, ['.' => '].[']) . ']';
     }
 
     public function getTimestampFormatter()

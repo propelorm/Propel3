@@ -77,14 +77,14 @@ class SqlitePlatform extends SqlDefaultPlatform
 
     public function getDefaultTypeSizes()
     {
-        return array(
+        return [
             'char'      => 1,
             'character' => 1,
             'integer'   => 32,
             'bigint'    => 64,
             'smallint'  => 16,
             'double precision' => 54
-        );
+        ];
     }
 
     /**
@@ -95,10 +95,13 @@ class SqlitePlatform extends SqlDefaultPlatform
         parent::setGeneratorConfig($generatorConfig);
 
         if (null !== ($relationSupport = $generatorConfig->getConfigProperty('database.adapter.sqlite.relation'))) {
-            $this->relationSupport = filter_var($relationSupport, FILTER_VALIDATE_BOOLEAN);;
+            $this->relationSupport = filter_var($relationSupport, FILTER_VALIDATE_BOOLEAN);
+            ;
         }
         if (null !== ($entityAlteringWorkaround = $generatorConfig->getConfigProperty('database.adapter.sqlite.entityAlteringWorkaround'))) {
-            $this->entityAlteringWorkaround = filter_var($entityAlteringWorkaround, FILTER_VALIDATE_BOOLEAN);;;
+            $this->entityAlteringWorkaround = filter_var($entityAlteringWorkaround, FILTER_VALIDATE_BOOLEAN);
+            ;
+            ;
         }
     }
 
@@ -115,7 +118,8 @@ class SqlitePlatform extends SqlDefaultPlatform
 ALTER TABLE %s ADD %s;
 ";
         foreach ($fields as $field) {
-            $ret .= sprintf($pattern,
+            $ret .= sprintf(
+                $pattern,
                 $this->quoteIdentifier($field->getEntity()->getFQTableName()),
                 $this->getFieldDDL($field)
             );
@@ -129,7 +133,8 @@ ALTER TABLE %s ADD %s;
      */
     public function getModifyEntityDDL(EntityDiff $entityDiff)
     {
-        $changedNotEdientityThroughDirectDDL = $this->entityAlteringWorkaround && (false
+        $changedNotEdientityThroughDirectDDL = $this->entityAlteringWorkaround && (
+            false
             || $entityDiff->hasModifiedFks()
             || $entityDiff->hasModifiedIndices()
             || $entityDiff->hasModifiedFields()
@@ -145,10 +150,8 @@ ALTER TABLE %s ADD %s;
         );
 
         if ($this->entityAlteringWorkaround && !$changedNotEdientityThroughDirectDDL && $entityDiff->hasAddedFields()) {
-
             $addedCols = $entityDiff->getAddedFields();
             foreach ($addedCols as $field) {
-
                 $sqlChangeNotSupported = false
 
                     //The field may not have a PRIMARY KEY or UNIQUE constraint.
@@ -158,7 +161,9 @@ ALTER TABLE %s ADD %s;
                     //The field may not have a default value of CURRENT_TIME, CURRENT_DATE, CURRENT_TIMESTAMP,
                     //or an expression in parentheses.
                     || false !== array_search(
-                        $field->getDefaultValue(), array('CURRENT_TIME', 'CURRENT_DATE', 'CURRENT_TIMESTAMP'))
+                        $field->getDefaultValue(),
+                        ['CURRENT_TIME', 'CURRENT_DATE', 'CURRENT_TIMESTAMP']
+                    )
                     || substr(trim($field->getDefaultValue()), 0, 1) == '('
 
                     //If a NOT NULL constraint is specified, then the field must have a default value other than NULL.
@@ -169,7 +174,6 @@ ALTER TABLE %s ADD %s;
                     $changedNotEdientityThroughDirectDDL = true;
                     break;
                 }
-
             }
         }
 
@@ -211,7 +215,7 @@ DROP TABLE %s;
         }
 
         foreach ($entityDiff->getRenamedFields() as $field) {
-            list ($from, $to) = $field;
+            list($from, $to) = $field;
             $fieldMap[$from->getColumnName()] = $to->getColumnName();
         }
 
@@ -221,13 +225,13 @@ DROP TABLE %s;
                     $fieldMap[$field->getColumnName()] = $field->getColumnName();
                 }
             }
-
         }
 
         $createEntity = $this->getAddEntityDDL($newEntity);
         $createEntity .= $this->getAddIndicesDDL($newEntity);
 
-        $sql = sprintf($pattern,
+        $sql = sprintf(
+            $pattern,
             $this->quoteIdentifier($tempEntityName), //CREATE TEMPORARY TABLE %s
             $originEntityFields, //select %s
             $this->quoteIdentifier($originEntity->getFQTableName()), //from %s
@@ -451,7 +455,7 @@ PRAGMA foreign_keys = ON;
         $entity = clone $entity;
         $entityDescription = $entity->hasDescription() ? $this->getCommentLineDDL($entity->getDescription()) : '';
 
-        $lines = array();
+        $lines = [];
 
         foreach ($entity->getFields() as $field) {
             $lines[] = $this->getFieldDDL($field);
@@ -486,7 +490,8 @@ PRAGMA foreign_keys = ON;
 );
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $entityDescription,
             $this->quoteIdentifier($entity->getFQTableName()),
             implode($sep, $lines)
@@ -501,7 +506,8 @@ PRAGMA foreign_keys = ON;
 
         $pattern = "FOREIGN KEY (%s) REFERENCES %s (%s)";
 
-        $script = sprintf($pattern,
+        $script = sprintf(
+            $pattern,
             $this->getFieldListDDL($relation->getLocalFieldObjects()),
             $this->quoteIdentifier($relation->getForeignEntity()->getFQTableName()),
             $this->getFieldListDDL($relation->getForeignFieldObjects())
@@ -521,13 +527,13 @@ PRAGMA foreign_keys = ON;
 
     public function hasSize($sqlType)
     {
-        return !in_array($sqlType, array(
+        return !in_array($sqlType, [
             'MEDIUMTEXT',
             'LONGTEXT',
             'BLOB',
             'MEDIUMBLOB',
             'LONGBLOB',
-        ));
+        ]);
     }
 
     /**
@@ -535,7 +541,7 @@ PRAGMA foreign_keys = ON;
      */
     public function doQuoting($text)
     {
-        return '[' . strtr($text, array('.' => '].[')) . ']';
+        return '[' . strtr($text, ['.' => '].[']) . ']';
     }
 
     public function supportsSchemas()
@@ -547,5 +553,4 @@ PRAGMA foreign_keys = ON;
     {
         return true;
     }
-
 }

@@ -57,7 +57,7 @@ trait ComponentHelperTrait
                     $defDt = new \DateTime($val);
                     $defaultValue = var_export($defDt->format($fmt), true);
                 }
-            } catch( \Exception $exception ) {
+            } catch (\Exception $exception) {
                 // prevent endless loop when timezone is undefined
                 date_default_timezone_set('America/Los_Angeles');
                 throw new EngineException(
@@ -65,7 +65,9 @@ trait ComponentHelperTrait
                         'Unable to parse default temporal value "%s" for column "%s"',
                         $field->getDefaultValueString(),
                         $field->getFullyQualifiedName()
-                    ), 0, $exception
+                    ),
+                    0,
+                    $exception
                 );
             }
         } elseif ($field->isEnumType()) {
@@ -162,7 +164,7 @@ trait ComponentHelperTrait
      */
     public function getPhpReservedWords()
     {
-        return array(
+        return [
             'and',
             'or',
             'xor',
@@ -235,6 +237,6 @@ trait ComponentHelperTrait
             'this',
             'trait',
             'namespace'
-        );
+        ];
     }
 }

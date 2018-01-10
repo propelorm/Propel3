@@ -28,7 +28,7 @@ trait SimpleTemplateTrait
      *
      * @return string
      */
-    protected function renderTemplate(array $context = array(), $template = '')
+    protected function renderTemplate(array $context = [], $template = '')
     {
         $m = new \Mustache_Engine;
         $classReflection = new \ReflectionClass(get_called_class());
@@ -45,5 +45,4 @@ trait SimpleTemplateTrait
 
         return $m->render(file_get_contents($filePath), $context);
     }
-
 }

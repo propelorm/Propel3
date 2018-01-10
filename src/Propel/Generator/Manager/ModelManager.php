@@ -63,7 +63,7 @@ class ModelManager extends AbstractManager
                         // -----------------------------------------------------------------------------------------
 
                         // these files are always created / overwrite any existing files
-                        foreach (array('activerecordtrait', 'proxy', 'object', 'entitymap', 'query', 'repository') as $target) {
+                        foreach (['activerecordtrait', 'proxy', 'object', 'entitymap', 'query', 'repository'] as $target) {
                             $builder = $generatorConfig->getConfiguredBuilder($entity, $target);
                             $nbWrittenFiles += $this->doBuild($builder);
                         }
@@ -74,7 +74,7 @@ class ModelManager extends AbstractManager
 
                         // these classes are only generated if they don't already exist
                         $overwrite = false;
-                        foreach (array('querystub', 'repositorystub') as $target) {
+                        foreach (['querystub', 'repositorystub'] as $target) {
                             $builder = $generatorConfig->getConfiguredBuilder($entity, $target);
                             $nbWrittenFiles += $this->doBuild($builder, $overwrite);
                         }
@@ -88,7 +88,7 @@ class ModelManager extends AbstractManager
                             if ($col->isEnumeratedClasses()) {
                                 foreach ($col->getChildren() as $child) {
                                     $overwrite = true;
-                                    foreach (array('queryinheritance') as $target) {
+                                    foreach (['queryinheritance'] as $target) {
                                         if (!$child->getAncestor() && $child->getClassName() == $entity->getName()) {
                                             continue;
                                         }
@@ -97,7 +97,7 @@ class ModelManager extends AbstractManager
                                         $nbWrittenFiles += $this->doBuild($builder, $overwrite);
                                     }
                                     $overwrite = false;
-                                    foreach (array('objectmultiextend', 'queryinheritancestub') as $target) {
+                                    foreach (['objectmultiextend', 'queryinheritancestub'] as $target) {
                                         $builder = $generatorConfig->getConfiguredBuilder($entity, $target);
                                         $builder->setChild($child);
                                         $nbWrittenFiles += $this->doBuild($builder, $overwrite);

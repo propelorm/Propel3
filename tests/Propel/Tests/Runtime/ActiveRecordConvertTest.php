@@ -86,7 +86,7 @@ class ActiveRecordConvertTest extends TestCaseFixtures
 
 EOF;
 
-        return array(array($expected));
+        return [[$expected]];
     }
 
     /**
@@ -136,7 +136,7 @@ author:
 
 EOF;
 
-        return array(array($expected));
+        return [[$expected]];
     }
 
     /**
@@ -168,7 +168,7 @@ EOF;
 {"id":9012,"title":"Don Juan","ISBN":"0140422161","price":12.99,"publisher":{"id":1234,"name":"Penguin","books":["*RECURSION*"]},"author":{"id":5678,"firstName":"George","lastName":"Byron","email":null,"age":null,"books":["*RECURSION*"]}}
 EOF;
 
-        return array(array($expected));
+        return [[$expected]];
     }
 
     /**
@@ -198,7 +198,7 @@ EOF;
     {
         $expected = "id,title,ISBN,price,publisher,author\r\n9012,Don Juan,0140422161,12.99,\"a:3:{s:2:\\\"id\\\";i:1234;s:4:\\\"name\\\";s:7:\\\"Penguin\\\";s:5:\\\"books\\\";a:1:{i:0;s:11:\\\"*RECURSION*\\\";}}\",\"a:6:{s:2:\\\"id\\\";i:5678;s:9:\\\"firstName\\\";s:6:\\\"George\\\";s:8:\\\"lastName\\\";s:5:\\\"Byron\\\";s:5:\\\"email\\\";N;s:3:\\\"age\\\";N;s:5:\\\"books\\\";a:1:{i:0;s:11:\\\"*RECURSION*\\\";}}\"\r\n";
 
-        return array(array($expected));
+        return [[$expected]];
     }
 
     /**
@@ -223,5 +223,4 @@ EOF;
         $this->assertEquals($this->book->getAuthor()->getId(), $book->getAuthor()->getId());
         $this->assertEquals($this->book->getAuthor()->getLastName(), $book->getAuthor()->getLastName());
     }
-
 }

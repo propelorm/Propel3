@@ -31,7 +31,6 @@ $entityReader = $this->getPropReader();
         ';
 
         foreach ($this->getEntity()->getFields() as $field) {
-
             if (!$this->getEntity()->isAllowPkInsert() && $field->isAutoIncrement()) {
                 continue;
             }
@@ -85,7 +84,7 @@ if (null !== \$value) {
             foreach ($relation->getFieldObjectsMapArray() as $map) {
                 /** @var Field $localField */
                 /** @var Field $foreignField */
-                list ($localField, $foreignField) = $map;
+                list($localField, $foreignField) = $map;
                 $foreignFieldName = $foreignField->getName();
 
                 if ($foreignField->isImplementationDetail()) {

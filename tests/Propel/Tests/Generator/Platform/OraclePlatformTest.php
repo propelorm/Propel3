@@ -589,5 +589,4 @@ EOF;
 
         $this->assertEquals($expected, $this->getPlatform()->getAddEntitiesDDL($database));
     }
-
 }

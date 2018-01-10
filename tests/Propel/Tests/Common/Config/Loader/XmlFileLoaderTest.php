@@ -80,7 +80,7 @@ EOF;
 
         $actual = $this->loader->load('empty.xml');
 
-        $this->assertEquals(array(), $actual);
+        $this->assertEquals([], $actual);
     }
 
     /**
@@ -103,6 +103,5 @@ XML;
         $actual = $this->loader->load('notreadable.xml');
         $this->assertEquals('bar', $actual['foo']);
         $this->assertEquals('baz', $actual['bar']);
-
     }
 }

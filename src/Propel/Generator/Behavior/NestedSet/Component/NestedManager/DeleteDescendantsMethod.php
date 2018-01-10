@@ -34,11 +34,11 @@ if (\$this->isLeaf(\$node)) {
 \$left = \$node->getLeftValue();
 \$right = \$node->getRightValue();
 ";
-    if ($useScope) {
-        $body .= "
+        if ($useScope) {
+            $body .= "
 \$scope = \$node->getScopeValue();";
-    }
-    $body .= "
+        }
+        $body .= "
 \$ret = \$repository->createQuery()
     ->descendantsOf(\$node)
     ->delete(\$con);

@@ -3,7 +3,6 @@
 
 namespace Propel\Generator\Builder\Om\Component;
 
-
 trait RepositoryTrait
 {
 

@@ -21,7 +21,7 @@ use Propel\Runtime\DataFetcher\DataFetcherInterface;
  */
 class ArrayFormatter extends AbstractFormatter
 {
-    protected $alreadyHydratedObjects = array();
+    protected $alreadyHydratedObjects = [];
 
     protected $emptyVariable;
 
@@ -52,8 +52,8 @@ class ArrayFormatter extends AbstractFormatter
             $collection[] = $item;
         }
 
-        $this->currentObjects = array();
-        $this->alreadyHydratedObjects = array();
+        $this->currentObjects = [];
+        $this->alreadyHydratedObjects = [];
         $dataFetcher->close();
 
         return $collection;
@@ -79,8 +79,8 @@ class ArrayFormatter extends AbstractFormatter
                 $result = &$object;
             }
         }
-        $this->currentObjects = array();
-        $this->alreadyHydratedObjects = array();
+        $this->currentObjects = [];
+        $this->alreadyHydratedObjects = [];
         $dataFetcher->close();
 
         return $result;
@@ -123,14 +123,14 @@ class ArrayFormatter extends AbstractFormatter
             $mainObjectIsNew = true;
         }
 
-        $hydrationChain = array();
+        $hydrationChain = [];
 
         // related objects added using with()
         foreach ($this->getWith() as $relAlias => $modelWith) {
 
             // determine class to use
             if ($modelWith->isSingleEntityInheritance()) {
-                $class = call_user_func(array($modelWith->getEntityMap(), 'getOMClass'), $row, $col, false);
+                $class = call_user_func([$modelWith->getEntityMap(), 'getOMClass'], $row, $col, false);
                 $refl = new \ReflectionClass($class);
                 if ($refl->isAbstract()) {
                     $col += constant('Map\\'.$class . 'EntityMap::NUM_COLUMNS');
@@ -142,7 +142,7 @@ class ArrayFormatter extends AbstractFormatter
 
             // hydrate related object or take it from registry
             $key = call_user_func(
-                array($modelWith->getEntityMap(), 'getPrimaryKeyHashFromRow'),
+                [$modelWith->getEntityMap(), 'getPrimaryKeyHashFromRow'],
                 $row,
                 $col,
                 $this->getDataFetcher()->getIndexType()
@@ -151,9 +151,8 @@ class ArrayFormatter extends AbstractFormatter
             // in order to get the $col variable increased anyway
             $secondaryObject = $this->getSingleObjectFromRow($row, $class, $col);
             if (!isset($this->alreadyHydratedObjects[$relAlias][$key])) {
-
                 if ($secondaryObject->isPrimaryKeyNull()) {
-                    $this->alreadyHydratedObjects[$relAlias][$key] = array();
+                    $this->alreadyHydratedObjects[$relAlias][$key] = [];
                 } else {
                     $this->alreadyHydratedObjects[$relAlias][$key] = $secondaryObject->toArray();
                 }

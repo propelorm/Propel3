@@ -41,7 +41,6 @@ class ConcreteInheritanceBehaviorTest extends BookstoreTestBase
     {
         parent::setUp();
         if (!class_exists('ConcreteContentSetPkQuery')) {
-
             $schema = <<<EOF
 <database name="concrete_content_set_pk" activeRecord="true">
     <table name="concrete_content_set_pk" phpName="ConcreteContentSetPk" allowPkInsert="true">
@@ -76,7 +75,7 @@ EOF;
 
     public function testmodifyEntityAddsParentField()
     {
-        $contentFields = array('id', 'title', 'concreteCategoryId');
+        $contentFields = ['id', 'title', 'concreteCategoryId'];
         $article = $this->getConfiguration()->getEntityMap(ConcreteArticleEntityMap::ENTITY_CLASS);
         foreach ($contentFields as $field) {
             $this->assertTrue($article->hasField($field), 'modifyEntity() adds the Fields of the parent table');

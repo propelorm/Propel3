@@ -34,9 +34,9 @@ class DatabaseReverseCommand extends AbstractCommand
         parent::configure();
 
         $this
-            ->addOption('output-dir',    null, InputOption::VALUE_REQUIRED, 'The output directory', self::DEFAULT_OUTPUT_DIRECTORY)
+            ->addOption('output-dir', null, InputOption::VALUE_REQUIRED, 'The output directory', self::DEFAULT_OUTPUT_DIRECTORY)
             ->addOption('database-name', null, InputOption::VALUE_REQUIRED, 'The database name used in the created schema.xml. If not defined we use `connection`.')
-            ->addOption('schema-name',   null, InputOption::VALUE_REQUIRED, 'The schema name to generate', self::DEFAULT_SCHEMA_NAME)
+            ->addOption('schema-name', null, InputOption::VALUE_REQUIRED, 'The schema name to generate', self::DEFAULT_SCHEMA_NAME)
             ->addArgument(
                 'connection',
                 InputArgument::OPTIONAL,
@@ -44,7 +44,7 @@ class DatabaseReverseCommand extends AbstractCommand
                 'default'
             )
             ->setName('database:reverse')
-            ->setAliases(array('reverse'))
+            ->setAliases(['reverse'])
             ->setDescription('Reverse-engineer a XML schema file based on given database. Uses given `connection` as name, as dsn or your `reverse.connection` configuration in propel config as connection.')
         ;
     }
@@ -54,7 +54,7 @@ class DatabaseReverseCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $configOptions = array();
+        $configOptions = [];
 
         $connection = $input->getArgument('connection');
         if (false === strpos($connection, ':')) {

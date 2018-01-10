@@ -3,7 +3,6 @@
 
 namespace Propel\Runtime;
 
-
-interface EntityProxyInterface {
-
+interface EntityProxyInterface
+{
 }

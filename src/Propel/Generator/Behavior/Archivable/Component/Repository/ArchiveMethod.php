@@ -44,13 +44,13 @@ if (!\$archive = \$this->getArchive(\$entity)) {
 \$entityMap->copyInto(\$entity, \$archive);
 ";
 
-    if ($archivedAtField = $behavior->getArchivedAtField()) {
-        $body .= "
+        if ($archivedAtField = $behavior->getArchivedAtField()) {
+            $body .= "
 \$archive->set{$archivedAtField->getMethodName()}(time());
 ";
-    }
+        }
 
-$body .= "
+        $body .= "
 \$session->persist(\$archive);
 
 return \$archive;

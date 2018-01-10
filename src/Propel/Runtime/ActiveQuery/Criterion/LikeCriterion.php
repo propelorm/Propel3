@@ -82,7 +82,7 @@ class LikeCriterion extends AbstractCriterion
             }
         }
 
-        $params[] = array('entity' => $this->realEntity, 'field' => $this->field, 'value' => $this->value);
+        $params[] = ['entity' => $this->realEntity, 'field' => $this->field, 'value' => $this->value];
 
         $sb .= $field . $this->comparison;
 
@@ -94,5 +94,4 @@ class LikeCriterion extends AbstractCriterion
             $sb .= ':p'.count($params);
         }
     }
-
 }

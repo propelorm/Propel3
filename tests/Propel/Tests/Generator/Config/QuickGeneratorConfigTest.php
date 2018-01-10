@@ -59,23 +59,23 @@ class QuickGeneratorConfigTest extends TestCase
 
     public function testPassExtraConfigProperties()
     {
-        $extraConf = array(
-            'propel' => array(
-                'runtime' => array(
+        $extraConf = [
+            'propel' => [
+                'runtime' => [
                     'defaultConnection' => 'fakeConn',
-                    'connections' => array('fakeConn', 'default')
-                ),
-                'paths' => array(
+                    'connections' => ['fakeConn', 'default']
+                ],
+                'paths' => [
                     'composerDir' => 'path/to/composer'
-                )
-            )
-        );
+                ]
+            ]
+        ];
         $generatorConfig = new QuickGeneratorConfig($extraConf);
 
         $this->assertEquals('path/to/composer', $generatorConfig->get()['paths']['composerDir']);
         $this->assertEquals('fakeConn', $generatorConfig->get()['runtime']['defaultConnection']);
-        $this->assertEquals(array('fakeConn', 'default'), $generatorConfig->get()['runtime']['connections']);
-        $this->assertEquals(array('adapter' => 'sqlite','classname' => 'Propel\Runtime\Connection\DebugPDO','dsn' => 'sqlite::memory:','user' => '',
-        'password' => ''), $generatorConfig->get()['database']['connections']['default']);
+        $this->assertEquals(['fakeConn', 'default'], $generatorConfig->get()['runtime']['connections']);
+        $this->assertEquals(['adapter' => 'sqlite','classname' => 'Propel\Runtime\Connection\DebugPDO','dsn' => 'sqlite::memory:','user' => '',
+        'password' => ''], $generatorConfig->get()['database']['connections']['default']);
     }
 }

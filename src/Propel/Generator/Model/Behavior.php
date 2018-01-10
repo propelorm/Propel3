@@ -347,7 +347,6 @@ class Behavior
      */
     public function modifyEntity()
     {
-
     }
 
     /**
@@ -452,7 +451,6 @@ class Behavior
      */
     public function objectBuilderModification(ObjectBuilder $builder)
     {
-
     }
 
     /**
@@ -462,7 +460,6 @@ class Behavior
      */
     public function queryBuilderModification(QueryBuilder $builder)
     {
-
     }
 
     /**
@@ -472,7 +469,6 @@ class Behavior
      */
     public function repositoryBuilderModification(RepositoryBuilder $builder)
     {
-
     }
 
     /**
@@ -482,7 +478,6 @@ class Behavior
      */
     public function entityMapBuilderModification(EntityMapBuilder $builder)
     {
-
     }
 
     /**
@@ -492,7 +487,6 @@ class Behavior
      */
     public function activeRecordTraitBuilderModification(ActiveRecordTraitBuilder $builder)
     {
-
     }
 
     /**
@@ -594,5 +588,4 @@ class Behavior
     public function postUpdate(RepositoryBuilder $builder)
     {
     }
-
 }

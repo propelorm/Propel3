@@ -33,7 +33,7 @@ class FieldComparatorTest extends TestCase
         $c2->getDomain()->replaceSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
-        $this->assertEquals(array(), FieldComparator::compareFields($c1, $c2));
+        $this->assertEquals([], FieldComparator::compareFields($c1, $c2));
     }
 
     public function testCompareType()
@@ -42,10 +42,10 @@ class FieldComparatorTest extends TestCase
         $c1->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
         $c2 = new Field();
         $c2->getDomain()->copy($this->platform->getDomainForType('LONGVARCHAR'));
-        $expectedChangedProperties = array(
-            'type'    => array('VARCHAR', 'LONGVARCHAR'),
-            'sqlType' => array('VARCHAR', 'TEXT'),
-        );
+        $expectedChangedProperties = [
+            'type'    => ['VARCHAR', 'LONGVARCHAR'],
+            'sqlType' => ['VARCHAR', 'TEXT'],
+        ];
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
     }
 
@@ -55,7 +55,7 @@ class FieldComparatorTest extends TestCase
         $c1->getDomain()->replaceScale(2);
         $c2 = new Field();
         $c2->getDomain()->replaceScale(3);
-        $expectedChangedProperties = array('scale' => array(2, 3));
+        $expectedChangedProperties = ['scale' => [2, 3]];
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
     }
 
@@ -65,7 +65,7 @@ class FieldComparatorTest extends TestCase
         $c1->getDomain()->replaceSize(2);
         $c2 = new Field();
         $c2->getDomain()->replaceSize(3);
-        $expectedChangedProperties = array('size' => array(2, 3));
+        $expectedChangedProperties = ['size' => [2, 3]];
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
     }
 
@@ -76,7 +76,7 @@ class FieldComparatorTest extends TestCase
         $c2 = new Field();
         $c2->getDomain()->copy($this->platform->getDomainForType('INTEGER'));
         $c2->getDomain()->setSqlType('INTEGER(10) UNSIGNED');
-        $expectedChangedProperties = array('sqlType' => array('INTEGER', 'INTEGER(10) UNSIGNED'));
+        $expectedChangedProperties = ['sqlType' => ['INTEGER', 'INTEGER(10) UNSIGNED']];
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
     }
 
@@ -86,7 +86,7 @@ class FieldComparatorTest extends TestCase
         $c1->setNotNull(true);
         $c2 = new Field();
         $c2->setNotNull(false);
-        $expectedChangedProperties = array('notNull' => array(true, false));
+        $expectedChangedProperties = ['notNull' => [true, false]];
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
     }
 
@@ -95,10 +95,10 @@ class FieldComparatorTest extends TestCase
         $c1 = new Field();
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $c2 = new Field();
-        $expectedChangedProperties = array(
-            'defaultValueType' => array(FieldDefaultValue::TYPE_VALUE, null),
-            'defaultValueValue' => array(123, null)
-        );
+        $expectedChangedProperties = [
+            'defaultValueType' => [FieldDefaultValue::TYPE_VALUE, null],
+            'defaultValueValue' => [123, null]
+        ];
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
     }
 
@@ -107,10 +107,10 @@ class FieldComparatorTest extends TestCase
         $c1 = new Field();
         $c2 = new Field();
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
-        $expectedChangedProperties = array(
-            'defaultValueType' => array(null, FieldDefaultValue::TYPE_VALUE),
-            'defaultValueValue' => array(null, 123)
-        );
+        $expectedChangedProperties = [
+            'defaultValueType' => [null, FieldDefaultValue::TYPE_VALUE],
+            'defaultValueValue' => [null, 123]
+        ];
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
     }
 
@@ -120,9 +120,9 @@ class FieldComparatorTest extends TestCase
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $c2 = new Field();
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue(456, FieldDefaultValue::TYPE_VALUE));
-        $expectedChangedProperties = array(
-            'defaultValueValue' => array(123, 456)
-        );
+        $expectedChangedProperties = [
+            'defaultValueValue' => [123, 456]
+        ];
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
     }
 
@@ -132,9 +132,9 @@ class FieldComparatorTest extends TestCase
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $c2 = new Field();
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_EXPR));
-        $expectedChangedProperties = array(
-            'defaultValueType' => array(FieldDefaultValue::TYPE_VALUE, FieldDefaultValue::TYPE_EXPR)
-        );
+        $expectedChangedProperties = [
+            'defaultValueType' => [FieldDefaultValue::TYPE_VALUE, FieldDefaultValue::TYPE_EXPR]
+        ];
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
     }
 
@@ -147,7 +147,7 @@ class FieldComparatorTest extends TestCase
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue("NOW()", FieldDefaultValue::TYPE_EXPR));
         $c2 = new Field();
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue("CURRENT_TIMESTAMP", FieldDefaultValue::TYPE_EXPR));
-        $this->assertEquals(array(), FieldComparator::compareFields($c1, $c2));
+        $this->assertEquals([], FieldComparator::compareFields($c1, $c2));
     }
 
     public function testCompareAutoincrement()
@@ -156,7 +156,7 @@ class FieldComparatorTest extends TestCase
         $c1->setAutoIncrement(true);
         $c2 = new Field();
         $c2->setAutoIncrement(false);
-        $expectedChangedProperties = array('autoIncrement' => array(true, false));
+        $expectedChangedProperties = ['autoIncrement' => [true, false]];
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
     }
 
@@ -171,15 +171,15 @@ class FieldComparatorTest extends TestCase
         $c2->getDomain()->replaceSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
-        $expectedChangedProperties = array(
-            'type' => array('INTEGER', 'DOUBLE'),
-            'sqlType' => array('INTEGER', 'DOUBLE'),
-            'scale' => array(NULL, 2),
-            'size' => array(NULL, 3),
-            'notNull' => array(false, true),
-            'defaultValueType' => array(NULL, FieldDefaultValue::TYPE_VALUE),
-            'defaultValueValue' => array(NULL, 123)
-        );
+        $expectedChangedProperties = [
+            'type' => ['INTEGER', 'DOUBLE'],
+            'sqlType' => ['INTEGER', 'DOUBLE'],
+            'scale' => [null, 2],
+            'size' => [null, 3],
+            'notNull' => [false, true],
+            'defaultValueType' => [null, FieldDefaultValue::TYPE_VALUE],
+            'defaultValueValue' => [null, 123]
+        ];
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
     }
 }

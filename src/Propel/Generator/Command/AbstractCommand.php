@@ -33,7 +33,7 @@ abstract class AbstractCommand extends Command
     protected function configure()
     {
         $this
-            ->addOption('input-dir', null, InputOption::VALUE_REQUIRED,  'The input directory where for example the configuration file is placed.', self::DEFAULT_INPUT_DIRECTORY)
+            ->addOption('input-dir', null, InputOption::VALUE_REQUIRED, 'The input directory where for example the configuration file is placed.', self::DEFAULT_INPUT_DIRECTORY)
             ->addOption('recursive', null, InputOption::VALUE_NONE, 'Search recursive for *schema.xml inside the input directory')
         ;
     }
@@ -118,7 +118,7 @@ abstract class AbstractCommand extends Command
         $pos  = strpos($dsn, ':');
         $adapter = substr($dsn, 0, $pos);
 
-        $extras = array();
+        $extras = [];
         foreach (explode(';', $dsn) as $element) {
             $parts = preg_split('/=/', $element);
 
@@ -128,12 +128,12 @@ abstract class AbstractCommand extends Command
         }
         $extras['adapter'] = $adapter;
 
-        return array($name, $dsn, $extras);
+        return [$name, $dsn, $extras];
     }
 
     /**
      * Parse a connection string and return an array of properties to pass to GeneratorConfig constructor.
-     * The connection must be in the following format: 
+     * The connection must be in the following format:
      * `bookstore=mysql:host=127.0.0.1;dbname=test;user=root;password=foobar`
      * where "bookstore" is your propel database name (used in your schema.xml).
      *
@@ -143,7 +143,7 @@ abstract class AbstractCommand extends Command
      * @return array
      */
     protected function connectionToProperties($connection, $section = null)
-    {        
+    {
         list($name, $dsn, $infos) = $this->parseConnection($connection);
         $config['propel']['database']['connections'][$name]['classname'] = '\Propel\Runtime\Connection\ConnectionWrapper';
         $config['propel']['database']['connections'][$name]['adapter'] = strtolower($infos['adapter']);

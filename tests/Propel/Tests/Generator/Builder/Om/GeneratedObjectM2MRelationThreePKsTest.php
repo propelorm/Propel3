@@ -87,7 +87,6 @@ class GeneratedObjectM2MRelationThreePKsTest extends PlatformDatabaseBuildTimeBa
      */
     public function test1()
     {
-
         \Relation2UserQuery::create()->deleteAll();
         \Relation2GroupQuery::create()->deleteAll();
         \Relation2UserGroupQuery::create()->deleteAll();
@@ -178,7 +177,6 @@ class GeneratedObjectM2MRelationThreePKsTest extends PlatformDatabaseBuildTimeBa
         $this->assertEquals(1, \Relation2UserQuery::create()->count(), 'We have one user.');
         $this->assertEquals(1, \Relation2GroupQuery::create()->count(), 'We have one group.');
         $this->assertEquals(1, \Relation2PositionQuery::create()->count(), 'We have one position.');
-
     }
 
     /*
@@ -363,8 +361,8 @@ class GeneratedObjectM2MRelationThreePKsTest extends PlatformDatabaseBuildTimeBa
     /**
      * 7. remove, set
      */
-    public function test7(){
-
+    public function test7()
+    {
         \Relation2UserQuery::create()->deleteAll();
         \Relation2GroupQuery::create()->deleteAll();
         \Relation2UserGroupQuery::create()->deleteAll();
@@ -415,8 +413,8 @@ class GeneratedObjectM2MRelationThreePKsTest extends PlatformDatabaseBuildTimeBa
     /**
      * 8. remove, get
      */
-    public function test8(){
-
+    public function test8()
+    {
         \Relation2UserQuery::create()->deleteAll();
         \Relation2GroupQuery::create()->deleteAll();
         \Relation2UserGroupQuery::create()->deleteAll();
@@ -458,8 +456,8 @@ class GeneratedObjectM2MRelationThreePKsTest extends PlatformDatabaseBuildTimeBa
     /**
      * 9. set, add
      */
-    public function test9(){
-
+    public function test9()
+    {
         \Relation2UserQuery::create()->deleteAll();
         \Relation2GroupQuery::create()->deleteAll();
         \Relation2UserGroupQuery::create()->deleteAll();
@@ -496,8 +494,8 @@ class GeneratedObjectM2MRelationThreePKsTest extends PlatformDatabaseBuildTimeBa
     /**
      * 10. set, remove
      */
-    public function test10(){
-
+    public function test10()
+    {
         \Relation2UserQuery::create()->deleteAll();
         \Relation2GroupQuery::create()->deleteAll();
         \Relation2UserGroupQuery::create()->deleteAll();
@@ -536,8 +534,8 @@ class GeneratedObjectM2MRelationThreePKsTest extends PlatformDatabaseBuildTimeBa
     /**
      * 11-12. set, set - set, get
      */
-    public function test11_12(){
-
+    public function test11_12()
+    {
         \Relation2UserQuery::create()->deleteAll();
         \Relation2GroupQuery::create()->deleteAll();
         \Relation2UserGroupQuery::create()->deleteAll();
@@ -663,7 +661,6 @@ class GeneratedObjectM2MRelationThreePKsTest extends PlatformDatabaseBuildTimeBa
         $this->assertEquals(1, \Relation3UserQuery::create()->count(), 'We have one user.');
         $this->assertEquals(0, \Relation3UserGroupQuery::create()->count(), 'We have zero connection.');
         $this->assertEquals(0, \Relation3UserQuery::create()->filterByGroup($admins)->count(), 'Hans has zero groups.');
-
     }
 
 
@@ -866,5 +863,4 @@ class GeneratedObjectM2MRelationThreePKsTest extends PlatformDatabaseBuildTimeBa
         $this->assertEquals(0, \Relation6UserGroupQuery::create()->count(), 'We have zero connection.');
         $this->assertEquals(0, \Relation6UserQuery::create()->filterByGroup($admins)->count(), 'Hans has zero groups.');
     }
-
 }

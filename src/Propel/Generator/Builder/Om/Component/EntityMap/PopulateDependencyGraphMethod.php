@@ -39,11 +39,11 @@ if (\$isset(\$entity, '$relationName') && \$dep = \$reader(\$entity, '$relationN
 //        foreach ($this->getEntity()->getReferrers() as $relation) {
 //            $relationName = $this->getRefRelationCollVarName($relation);
 //            $body .= "
-//if (\$deps = \$reader(\$entity, '$relationName')) {
+        //if (\$deps = \$reader(\$entity, '$relationName')) {
 //    foreach (\$deps as \$dep) {
 //        \$dependencies[] = \$dep;
 //    }
-//}
+        //}
 //            ";
 //        }
 
@@ -51,12 +51,12 @@ if (\$isset(\$entity, '$relationName') && \$dep = \$reader(\$entity, '$relationN
 //        foreach ($this->getEntity()->getCrossRelations() as $crossRelation) {
 //            $relationName = $this->getCrossRelationVarName($crossRelation);
 //            $body .= "
-//if (\$deps = \$reader(\$entity, '$relationName')) {
+        //if (\$deps = \$reader(\$entity, '$relationName')) {
 //    foreach (\$deps as \$dep) {
 //        \$dependencies[] = \$dep;
 //    }
-//}
-//";
+        //}
+        //";
 //        }
 
         $body .= '

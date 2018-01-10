@@ -87,7 +87,7 @@ class QueryBuilderInheritanceTest extends BookstoreTestBase
         $cashier1->save($this->con);
         $cashier2 = new BookstoreCashier();
         $cashier2->save($this->con);
-        BookstoreManagerQuery::create()->update(array('Name' => 'foo'), $this->con);
+        BookstoreManagerQuery::create()->update(['Name' => 'foo'], $this->con);
         $nbMan = BookstoreEmployeeQuery::create()
             ->filterByName('foo')
             ->count($this->con);
@@ -137,14 +137,26 @@ class QueryBuilderInheritanceTest extends BookstoreTestBase
         $cashier2 = new BookstoreCashier();
         $cashier2->save($this->con);
 
-        $this->assertInstanceOf('\Propel\Tests\Bookstore\BookstoreEmployee', BookstoreEmployeeQuery::create()->findPk($employee->getId()),
-            'findPk() return right object : BookstoreEmployee');
-        $this->assertInstanceOf('\Propel\Tests\Bookstore\BookstoreManager', BookstoreEmployeeQuery::create()->findPk($manager->getId()),
-            'findPk() return right object : BookstoreManager');
-        $this->assertInstanceOf('\Propel\Tests\Bookstore\BookstoreCashier', BookstoreEmployeeQuery::create()->findPk($cashier1->getId()),
-            'findPk() return right object : BookstoreCashier');
-        $this->assertInstanceOf('\Propel\Tests\Bookstore\BookstoreCashier', BookstoreEmployeeQuery::create()->findPk($cashier2->getId()),
-            'findPk() return right object : BookstoreCashier');
+        $this->assertInstanceOf(
+            '\Propel\Tests\Bookstore\BookstoreEmployee',
+            BookstoreEmployeeQuery::create()->findPk($employee->getId()),
+            'findPk() return right object : BookstoreEmployee'
+        );
+        $this->assertInstanceOf(
+            '\Propel\Tests\Bookstore\BookstoreManager',
+            BookstoreEmployeeQuery::create()->findPk($manager->getId()),
+            'findPk() return right object : BookstoreManager'
+        );
+        $this->assertInstanceOf(
+            '\Propel\Tests\Bookstore\BookstoreCashier',
+            BookstoreEmployeeQuery::create()->findPk($cashier1->getId()),
+            'findPk() return right object : BookstoreCashier'
+        );
+        $this->assertInstanceOf(
+            '\Propel\Tests\Bookstore\BookstoreCashier',
+            BookstoreEmployeeQuery::create()->findPk($cashier2->getId()),
+            'findPk() return right object : BookstoreCashier'
+        );
 
         Propel::enableInstancePooling();
     }
@@ -165,7 +177,7 @@ class QueryBuilderInheritanceTest extends BookstoreTestBase
         $manager->delete();
     }
 
-    public function  testFindPkSimpleWithAbstractSingleTableInheritanceReturnCorrectClass()
+    public function testFindPkSimpleWithAbstractSingleTableInheritanceReturnCorrectClass()
     {
         Propel::disableInstancePooling();
 
@@ -183,10 +195,16 @@ class QueryBuilderInheritanceTest extends BookstoreTestBase
         $distributionVirtualStore->setDistributionManager($manager);
         $distributionVirtualStore->save();
 
-        $this->assertInstanceOf('Propel\Tests\Bookstore\DistributionStore', DistributionQuery::create()->findPk($distributionStore->getId()),
-            'findPk() return right object : DistributionStore');
-        $this->assertInstanceOf('Propel\Tests\Bookstore\DistributionVirtualStore', DistributionQuery::create()->findPk($distributionVirtualStore->getId()),
-            'findPk() return right object : DistributionVirtualStore');
+        $this->assertInstanceOf(
+            'Propel\Tests\Bookstore\DistributionStore',
+            DistributionQuery::create()->findPk($distributionStore->getId()),
+            'findPk() return right object : DistributionStore'
+        );
+        $this->assertInstanceOf(
+            'Propel\Tests\Bookstore\DistributionVirtualStore',
+            DistributionQuery::create()->findPk($distributionVirtualStore->getId()),
+            'findPk() return right object : DistributionVirtualStore'
+        );
 
         Propel::enableInstancePooling();
     }

@@ -160,7 +160,7 @@ class ModelCriteria extends BaseModelCriteria
     public function filterByArray($conditions)
     {
         foreach ($conditions as $field => $args) {
-            call_user_func_array(array($this, 'filterBy' . $field), is_array($args) ? $args : array($args));
+            call_user_func_array([$this, 'filterBy' . $field], is_array($args) ? $args : [$args]);
         }
 
         return $this;
@@ -397,7 +397,7 @@ class ModelCriteria extends BaseModelCriteria
         }
 
         if ('*' === $fieldArray) {
-            $fieldArray = array();
+            $fieldArray = [];
             foreach ($this->getEntityMap()->getFieldNames(EntityMap::TYPE_PHPNAME) as $field) {
                 $fieldArray []= $this->entityName . '.' . $field;
             }
@@ -490,15 +490,12 @@ class ModelCriteria extends BaseModelCriteria
             if ($leftName === $this->getModelAliasOrName() || $leftName === $this->getModelShortName() || $leftName === $this->getEntityName()) {
                 $previousJoin = $this->getPreviousJoin();
                 $entityMap = $this->getEntityMap();
-
             } elseif (isset($this->joins[$leftName])) {
                 $previousJoin = $this->joins[$leftName];
                 $entityMap = $previousJoin->getEntityMap();
-
             } elseif (isset($this->joins[$leftName])) {
                 $previousJoin = $this->joins[$leftName];
                 $entityMap = $previousJoin->getEntityMap();
-
             } else {
                 throw new PropelException('Unknown entity or alias ' . $leftName);
             }
@@ -708,7 +705,7 @@ class ModelCriteria extends BaseModelCriteria
     public function withField($clause, $name = null)
     {
         if (null === $name) {
-            $name = str_replace(array('.', '(', ')'), '', $clause);
+            $name = str_replace(['.', '(', ')'], '', $clause);
         }
 
         $clause = trim($clause);
@@ -818,7 +815,7 @@ class ModelCriteria extends BaseModelCriteria
     {
         parent::clear();
 
-        $this->with = array();
+        $this->with = [];
         $this->primaryCriteria = null;
         $this->formatter=null;
 
@@ -929,7 +926,7 @@ class ModelCriteria extends BaseModelCriteria
             $class = substr($class, 1);
         }
 
-        return array($class, $alias);
+        return [$class, $alias];
     }
 
     /**
@@ -1048,7 +1045,6 @@ class ModelCriteria extends BaseModelCriteria
         }
 
         if (!$ret = $this->findOne()) {
-
             $array = [];
             foreach ($this->keys() as $key) {
                 $array[NamingTool::fieldName($key)] = $this->getValue($key);
@@ -1070,7 +1066,7 @@ class ModelCriteria extends BaseModelCriteria
      * // composite primary key
      * $bookOpinion = $c->findPk(array(34, 634));
      * </code>
-     * 
+     *
      * @param mixed               $key Primary key to use for the query
      *
      * @return mixed the result, formatted by the current formatter
@@ -1338,7 +1334,6 @@ class ModelCriteria extends BaseModelCriteria
 
         try {
             return $con->transaction(function () use ($con, $criteria, $withEvents) {
-
                 $event = null;
                 if ($this->getEntityMap() && $withEvents) {
                     $eventQuery = clone $this;
@@ -1382,7 +1377,6 @@ class ModelCriteria extends BaseModelCriteria
 
         try {
             return $con->transaction(function () use ($con, $withEvents) {
-
                 $event = null;
                 if ($this->getEntityMap() && $withEvents) {
                     $eventQuery = clone $this;
@@ -1519,7 +1513,6 @@ class ModelCriteria extends BaseModelCriteria
         $criteria = $this->isKeepQuery() ? clone $this : $this;
 
         return $con->transaction(function () use ($con, $values, $criteria, $withEvents) {
-
             $event = null;
             if ($this->getEntityMap()) {
                 $criteria->setPrimaryEntityName($this->getEntityMap()->getFullClassName());
@@ -1767,12 +1760,12 @@ class ModelCriteria extends BaseModelCriteria
             $field = $entityMap->getField($phpName);
             $realColumnName = $field->getFullyQualifierColumnName();
 
-            return array($field, $realColumnName);
+            return [$field, $realColumnName];
         } elseif (isset($this->asFields[$phpName])) {
             // aliased field
-            return array(null, $phpName);
+            return [null, $phpName];
         } elseif ($failSilently) {
-            return array(null, null);
+            return [null, null];
         } else {
             throw new UnknownFieldException(sprintf('Unknown field "%s" on model, alias or entity "%s"', $phpName, $prefix));
         }
@@ -1819,10 +1812,10 @@ class ModelCriteria extends BaseModelCriteria
         }
 
         // clear only the selectFields, clearSelectFields() clears asFields too
-        $this->selectFields = array();
+        $this->selectFields = [];
 
         // Add requested fields which are not withFields
-        $fieldNames = is_array($this->select) ? $this->select : array($this->select);
+        $fieldNames = is_array($this->select) ? $this->select : [$this->select];
 
         foreach ($fieldNames as $fieldName) {
             // check if the field was added by a withField, if not add it
@@ -1849,12 +1842,12 @@ class ModelCriteria extends BaseModelCriteria
             $field = $entityMap->getFieldByPhpName($phpName);
             $realFieldName = $class.'.'.$field->getName();
 
-            return array($field, $realFieldName);
+            return [$field, $realFieldName];
         } elseif (isset($subQueryCriteria->asFields[$phpName])) {
             // aliased field
-            return array(null, $class.'.'.$phpName);
+            return [null, $class.'.'.$phpName];
         } elseif ($failSilently) {
-            return array(null, null);
+            return [null, null];
         } else {
             throw new PropelException(sprintf('Unknown field "%s" in the subQuery with alias "%s".', $phpName, $class));
         }
@@ -1929,11 +1922,10 @@ class ModelCriteria extends BaseModelCriteria
      */
     public function getParams()
     {
-        $params = array();
+        $params = [];
         $dbMap = $this->getConfiguration()->getDatabase($this->getDbName());
 
         foreach ($this->getMap() as $criterion) {
-
             $entity = null;
             foreach ($criterion->getAttachedCriterion() as $attachedCriterion) {
                 $entityName = $attachedCriterion->getEntityName();
@@ -1973,14 +1965,14 @@ class ModelCriteria extends BaseModelCriteria
     public function __call($name, $arguments)
     {
         // Maybe it's a magic call to one of the methods supporting it, e.g. 'findByTitle'
-        static $methods = array('findBy', 'findOneBy', 'filterBy', 'orderBy', 'groupBy');
+        static $methods = ['findBy', 'findOneBy', 'filterBy', 'orderBy', 'groupBy'];
         foreach ($methods as $method) {
             if (0 === strpos($name, $method)) {
                 $fields = substr($name, strlen($method));
-                if (in_array($method, array('findBy', 'findOneBy')) && strpos($fields, 'And') !== false) {
+                if (in_array($method, ['findBy', 'findOneBy']) && strpos($fields, 'And') !== false) {
                     $method = $method . 'Array';
                     $fields = explode('And', $fields);
-                    $conditions = array();
+                    $conditions = [];
                     foreach ($fields as $field) {
                         $conditions[$field] = array_shift($arguments);
                     }
@@ -1989,14 +1981,14 @@ class ModelCriteria extends BaseModelCriteria
                     array_unshift($arguments, $fields);
                 }
 
-                return call_user_func_array(array($this, $method), $arguments);
+                return call_user_func_array([$this, $method], $arguments);
             }
         }
 
         // Maybe it's a magic call to a qualified joinWith method, e.g. 'leftJoinWith' or 'joinWithAuthor'
         if (false !== ($pos = stripos($name, 'joinWith'))) {
             $type = substr($name, 0, $pos);
-            if (in_array($type, array('left', 'right', 'inner'))) {
+            if (in_array($type, ['left', 'right', 'inner'])) {
                 $joinType = strtoupper($type) . ' JOIN';
             } else {
                 $joinType = Criteria::INNER_JOIN;
@@ -2012,7 +2004,7 @@ class ModelCriteria extends BaseModelCriteria
         // Maybe it's a magic call to a qualified join method, e.g. 'leftJoin'
         if (($pos = strpos($name, 'Join')) > 0) {
             $type = substr($name, 0, $pos);
-            if (in_array($type, array('left', 'right', 'inner'))) {
+            if (in_array($type, ['left', 'right', 'inner'])) {
                 $joinType = strtoupper($type) . ' JOIN';
                 // Test if first argument is supplied, else don't provide an alias to joinXXX (default value)
                 if (!isset($arguments[0])) {
@@ -2021,7 +2013,7 @@ class ModelCriteria extends BaseModelCriteria
                 array_push($arguments, $joinType);
                 $method = lcfirst(substr($name, $pos));
 
-                return call_user_func_array(array($this, $method), $arguments);
+                return call_user_func_array([$this, $method], $arguments);
             }
         }
 

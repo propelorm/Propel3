@@ -3,7 +3,6 @@
 
 namespace Propel\Generator\Builder\PhpModel;
 
-
 /**
  *
  *
@@ -11,5 +10,4 @@ namespace Propel\Generator\Builder\PhpModel;
  */
 trait DeclareUseTrait
 {
-
 }

@@ -20,7 +20,6 @@ use Propel\Tests\Helpers\Bookstore\BookstoreTestBase;
  */
 class TypeTest extends BookstoreTestBase
 {
-
     public function testObjectType()
     {
         TypeObjectQuery::create()->deleteAll();
@@ -77,5 +76,4 @@ class TypeTest extends BookstoreTestBase
 
         $this->assertEquals($q, $typeObjectEntity->getDetails());
     }
-
 }

@@ -31,7 +31,7 @@ abstract class AbstractManager
     /**
      * Data models that we collect. One from each XML schema file.
      */
-    protected $dataModels = array();
+    protected $dataModels = [];
 
     /**
      * @var Database[]
@@ -74,7 +74,7 @@ abstract class AbstractManager
      *
      * @var array
      */
-    protected $schemas = array();
+    protected $schemas = [];
 
     /**
      * @var string
@@ -176,7 +176,7 @@ abstract class AbstractManager
     {
         if (null === $this->databases) {
             /** @var DatabaseMap[] $databases */
-            $databases = array();
+            $databases = [];
             foreach ($this->getDataModels() as $dataModel) {
                 foreach ($dataModel->getDatabases() as $database) {
                     if (!isset($databases[$database->getName()])) {
@@ -266,7 +266,7 @@ abstract class AbstractManager
      */
     protected function loadDataModels()
     {
-        $schemas = array();
+        $schemas = [];
         $totalNbEntities   = 0;
         $dataModelFiles  = $this->getSchemas();
 
@@ -334,7 +334,7 @@ abstract class AbstractManager
 
         if (count($schemas) > 1 && $this->getGeneratorConfig()->get()['generator']['packageObjectModel']) {
             $schema = $this->joinDataModels($schemas);
-            $this->dataModels = array($schema);
+            $this->dataModels = [$schema];
         } else {
             $this->dataModels = $schemas;
         }
@@ -449,7 +449,7 @@ abstract class AbstractManager
      */
     protected function getProperties($file)
     {
-        $properties = array();
+        $properties = [];
 
         if (false === $lines = @file($file)) {
             throw new \Exception(sprintf('Unable to parse contents of "%s".', $file));
@@ -458,7 +458,7 @@ abstract class AbstractManager
         foreach ($lines as $line) {
             $line = trim($line);
 
-            if (empty($line) || in_array($line[0], array('#', ';'))) {
+            if (empty($line) || in_array($line[0], ['#', ';'])) {
                 continue;
             }
 

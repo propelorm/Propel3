@@ -14,7 +14,6 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Tests\Bookstore\BookQuery;
 
-
 class myCustomBookQuery extends BookQuery
 {
     public static function create($modelAlias = null, Criteria $criteria = null)
@@ -32,7 +31,6 @@ class myCustomBookQuery extends BookQuery
 
         return $query;
     }
-
 }
 
 class mySecondBookQuery extends BookQuery

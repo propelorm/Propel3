@@ -5,7 +5,8 @@ use Propel\Tests\TestCase;
 
 class SchemaReaderTest extends TestCase
 {
-    public function testBookstore() {
+    public function testBookstore()
+    {
         $reader = new SchemaReader();
         
         $schema = $reader->parse(__DIR__ . '/../../../../Fixtures/bookstore/schema.xml');

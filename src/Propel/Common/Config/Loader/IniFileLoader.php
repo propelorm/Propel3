@@ -172,7 +172,8 @@ class IniFileLoader extends FileLoader
                 }
             } elseif (!is_array($config[$pieces[0]])) {
                 throw new IniParseException(sprintf(
-                    'Cannot create sub-key for "%s", as key already exists', $pieces[0]
+                    'Cannot create sub-key for "%s", as key already exists',
+                    $pieces[0]
                 ));
             }
 

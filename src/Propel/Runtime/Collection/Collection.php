@@ -57,7 +57,7 @@ class Collection implements \ArrayAccess, \IteratorAggregate, \Countable, \Seria
     /**
      * @var array
      */
-    protected $data = array();
+    protected $data = [];
 
     /**
      * @var CollectionIterator
@@ -69,7 +69,7 @@ class Collection implements \ArrayAccess, \IteratorAggregate, \Countable, \Seria
      */
     private $pluralizer;
 
-    public function __construct($data = array())
+    public function __construct($data = [])
     {
         $this->data = $data;
     }
@@ -334,7 +334,7 @@ class Collection implements \ArrayAccess, \IteratorAggregate, \Countable, \Seria
      */
     public function clear()
     {
-        return $this->exchangeArray(array());
+        return $this->exchangeArray([]);
     }
 
     /**
@@ -387,11 +387,11 @@ class Collection implements \ArrayAccess, \IteratorAggregate, \Countable, \Seria
      */
     public function serialize()
     {
-        $repr = array(
+        $repr = [
             'data' => $this->getArrayCopy(),
             'model' => $this->model,
             'fullyQualifiedModel' => $this->fullyQualifiedModel,
-        );
+        ];
 
         return serialize($repr);
     }
@@ -601,7 +601,6 @@ class Collection implements \ArrayAccess, \IteratorAggregate, \Countable, \Seria
         $format = 'YAML';
         if ($this->getEntityMap()) {
             $format = constant(get_class($this->getEntityMap()). '::DEFAULT_STRING_FORMAT');
-
         }
         return (string) $this->exportTo($format, false);
     }

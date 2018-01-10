@@ -60,7 +60,7 @@ EOF;
         $q->setIdentifierQuoting(true);
 
         $q->joinI18n();
-        $params = array();
+        $params = [];
         $sql = $q->createSelectSQL($params);
         $expectedSQL = $this->getSql('SELECT  FROM `i18n_behavior_test11` LEFT JOIN `i18n_behavior_test11_i18n` ON (`i18n_behavior_test11`.`id`=`i18n_behavior_test11_i18n`.`id` AND `i18n_behavior_test11_i18n`.`locale` = :p1)');
         $this->assertEquals($expectedSQL, $sql);
@@ -73,7 +73,7 @@ EOF;
             ->joinI18n('fr_FR');
         $q->setIdentifierQuoting(true);
 
-        $params = array();
+        $params = [];
         $sql = $q->createSelectSQL($params);
         $expectedSQL = $this->getSql('SELECT  FROM `i18n_behavior_test11` LEFT JOIN `i18n_behavior_test11_i18n` ON (`i18n_behavior_test11`.`id`=`i18n_behavior_test11_i18n`.`id` AND `i18n_behavior_test11_i18n`.`locale` = :p1)');
         $this->assertEquals($expectedSQL, $sql);
@@ -86,7 +86,7 @@ EOF;
             ->joinI18n('en_US', 'I18n');
         $q->setIdentifierQuoting(true);
 
-        $params = array();
+        $params = [];
         $sql = $q->createSelectSQL($params);
         $expectedSQL = $this->getSql('SELECT  FROM `i18n_behavior_test11` LEFT JOIN `i18n_behavior_test11_i18n` `I18n` ON (`i18n_behavior_test11`.`id`=`I18n`.`id` AND `I18n`.`locale` = :p1)');
         $this->assertEquals($expectedSQL, $sql);
@@ -98,7 +98,7 @@ EOF;
         $q = \I18nBehaviorTest11Query::create()
             ->joinI18n('en_US', null, Criteria::INNER_JOIN);
         $q->setIdentifierQuoting(true);
-        $params = array();
+        $params = [];
         $sql = $q->createSelectSQL($params);
         $expectedSQL = $this->getSql('SELECT  FROM `i18n_behavior_test11` INNER JOIN `i18n_behavior_test11_i18n` ON (`i18n_behavior_test11`.`id`=`i18n_behavior_test11_i18n`.`id` AND `i18n_behavior_test11_i18n`.`locale` = :p1)');
         $this->assertEquals($expectedSQL, $sql);
@@ -124,7 +124,7 @@ EOF;
         $q = \I18nBehaviorTest11Query::create();
         $q->setIdentifierQuoting(true);
         $q->useI18nQuery('fr_FR')->filterByBar('bar')->endUse();
-        $params = array();
+        $params = [];
         $sql = $q->createSelectSQL($params);
         $expectedSQL = $this->getSql('SELECT  FROM `i18n_behavior_test11` LEFT JOIN `i18n_behavior_test11_i18n` ON (`i18n_behavior_test11`.`id`=`i18n_behavior_test11_i18n`.`id` AND `i18n_behavior_test11_i18n`.`locale` = :p1) WHERE `i18n_behavior_test11_i18n`.`bar`=:p2');
         $this->assertEquals($expectedSQL, $sql);
@@ -139,7 +139,7 @@ EOF;
         $q->useI18nQuery('fr_FR', 'I18n')
                 ->filterByBar('bar')
             ->endUse();
-        $params = array();
+        $params = [];
         $sql = $q->createSelectSQL($params);
         $expectedSQL = $this->getSql('SELECT  FROM `i18n_behavior_test11` LEFT JOIN `i18n_behavior_test11_i18n` `I18n` ON (`i18n_behavior_test11`.`id`=`I18n`.`id` AND `I18n`.`locale` = :p1) WHERE `I18n`.`bar`=:p2');
         $this->assertEquals($expectedSQL, $sql);
@@ -169,7 +169,7 @@ EOF;
         $q = \I18nBehaviorTest11Query::create()
             ->joinWithI18n();
         $q->setIdentifierQuoting(true);
-        $params = array();
+        $params = [];
         $sql = $q->createSelectSQL($params);
         $expectedSQL = $this->getSql('SELECT `i18n_behavior_test11`.`id`, `i18n_behavior_test11`.`foo`, `i18n_behavior_test11_i18n`.`id`, `i18n_behavior_test11_i18n`.`locale`, `i18n_behavior_test11_i18n`.`bar` FROM `i18n_behavior_test11` LEFT JOIN `i18n_behavior_test11_i18n` ON (`i18n_behavior_test11`.`id`=`i18n_behavior_test11_i18n`.`id` AND `i18n_behavior_test11_i18n`.`locale` = :p1)');
         $this->assertEquals($expectedSQL, $sql);

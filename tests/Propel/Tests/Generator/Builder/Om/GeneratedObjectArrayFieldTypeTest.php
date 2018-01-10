@@ -52,19 +52,19 @@ EOF;
     public function testGetterDefaultValue()
     {
         $e = new ComplexFieldTypeEntity2();
-        $this->assertEquals(array(), $e->getTags(), 'array columns return an empty array by default');
+        $this->assertEquals([], $e->getTags(), 'array columns return an empty array by default');
     }
 
     public function testGetterDefaultValueWithData()
     {
         $e = new ComplexFieldTypeEntity2();
-        $this->assertEquals(array('FOO'), $e->getDefaults());
+        $this->assertEquals(['FOO'], $e->getDefaults());
     }
 
     public function testGetterDefaultValueWithMultipleData()
     {
         $e = new ComplexFieldTypeEntity2();
-        $this->assertEquals(array('FOO', 'BAR', 'BAZ'), $e->getMultipleDefaults());
+        $this->assertEquals(['FOO', 'BAR', 'BAZ'], $e->getMultipleDefaults());
     }
 
     public function testDefaultValuesAreWellPersisted()
@@ -74,7 +74,7 @@ EOF;
 
         $e = ComplexFieldTypeEntity2Query::create()->findOne();
 
-        $this->assertEquals(array('FOO'), $e->getDefaults());
+        $this->assertEquals(['FOO'], $e->getDefaults());
     }
 
     public function testMultipleDefaultValuesAreWellPersisted()
@@ -84,13 +84,13 @@ EOF;
 
         $e = ComplexFieldTypeEntity2Query::create()->findOne();
 
-        $this->assertEquals(array('FOO', 'BAR', 'BAZ'), $e->getMultipleDefaults());
+        $this->assertEquals(['FOO', 'BAR', 'BAZ'], $e->getMultipleDefaults());
     }
 
     public function testSetterArrayValue()
     {
         $e = new ComplexFieldTypeEntity2();
-        $value = array('foo', 1234);
+        $value = ['foo', 1234];
         $e->setTags($value);
         $this->assertEquals($value, $e->getTags(), 'array columns can store arrays');
     }
@@ -98,16 +98,16 @@ EOF;
     public function testSetterResetValue()
     {
         $e = new ComplexFieldTypeEntity2();
-        $value = array('foo', 1234);
+        $value = ['foo', 1234];
         $e->setTags($value);
-        $e->setTags(array());
-        $this->assertEquals(array(), $e->getTags(), 'object columns can be reset');
+        $e->setTags([]);
+        $this->assertEquals([], $e->getTags(), 'object columns can be reset');
     }
 
     public function testValueIsPersisted()
     {
         $e = new ComplexFieldTypeEntity2();
-        $value = array('foo', 1234);
+        $value = ['foo', 1234];
         $e->setTags($value);
         $this->getRepository()->save($e);
 
@@ -121,18 +121,18 @@ EOF;
         $repository->deleteAll();
 
         $e = new ComplexFieldTypeEntity2();
-        $e->setTags(array(1,2));
+        $e->setTags([1,2]);
         $repository->save($e);
 
         $e = new ComplexFieldTypeEntity2();
-        $e->setTags(array(3,4));
+        $e->setTags([3,4]);
         $repository->save($e);
 
         $q = $repository->createQuery()
             ->setFormatter(ModelCriteria::FORMAT_ON_DEMAND)
             ->find();
 
-        $tags = array();
+        $tags = [];
         foreach ($q as $e) {
             $tags[] = $e->getTags();
         }
@@ -144,16 +144,16 @@ EOF;
         $repository = $this->getRepository();
 
         $obj = new ComplexFieldTypeEntity2();
-        $this->assertEquals(array('FOO', 'BAR', 'BAZ'), $obj->getMultipleDefaults());
+        $this->assertEquals(['FOO', 'BAR', 'BAZ'], $obj->getMultipleDefaults());
 
-        $obj->setMultipleDefaults(array('baz'));
-        $this->assertEquals(array('baz'), $obj->getMultipleDefaults());
+        $obj->setMultipleDefaults(['baz']);
+        $this->assertEquals(['baz'], $obj->getMultipleDefaults());
 
         $repository->save($obj);
 
         $obj = $repository->createQuery()
             ->findOne();
-        $this->assertEquals(array('baz'), $obj->getMultipleDefaults());
+        $this->assertEquals(['baz'], $obj->getMultipleDefaults());
     }
 
     private function getRepository($entityName = 'MyNameSpace\\ComplexFieldTypeEntity2')

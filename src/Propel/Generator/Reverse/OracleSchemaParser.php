@@ -44,7 +44,7 @@ class OracleSchemaParser extends AbstractSchemaParser
      *
      * @var array
      */
-    private static $oracleTypeMap = array(
+    private static $oracleTypeMap = [
         'BLOB'      => PropelTypes::BLOB,
         'CHAR'      => PropelTypes::CHAR,
         'CLOB'      => PropelTypes::CLOB,
@@ -60,7 +60,7 @@ class OracleSchemaParser extends AbstractSchemaParser
         'NVARCHAR2' => PropelTypes::VARCHAR,
         'TIMESTAMP' => PropelTypes::TIMESTAMP,
         'VARCHAR2'  => PropelTypes::VARCHAR,
-    );
+    ];
 
     /**
      * Gets a type mapping from native types to Propel types
@@ -77,9 +77,9 @@ class OracleSchemaParser extends AbstractSchemaParser
      * @param Database $database The Database model class to add tables to.
      * @param Table[]  $additionalTables
      */
-    public function parse(Database $database, array $additionalTables = array())
+    public function parse(Database $database, array $additionalTables = [])
     {
-        $tables = array();
+        $tables = [];
         $stmt = $this->dbh->query("SELECT OBJECT_NAME FROM USER_OBJECTS WHERE OBJECT_TYPE = 'TABLE'");
 
         $seqPattern = $this->getGeneratorConfig()->get()['database']['adapters']['oracleAutoincrementSequencePattern'];
@@ -185,7 +185,6 @@ class OracleSchemaParser extends AbstractSchemaParser
             $column->setNotNull(!$isNullable);
             $table->addColumn($column);
         }
-
     }
 
     /**
@@ -198,7 +197,7 @@ class OracleSchemaParser extends AbstractSchemaParser
         $stmt = $this->dbh->query("SELECT COLUMN_NAME, INDEX_NAME FROM USER_IND_COLUMNS WHERE TABLE_NAME = '" . $table->getName() . "' ORDER BY COLUMN_NAME");
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        $indices = array();
+        $indices = [];
         foreach ($rows as $row) {
             $indices[$row['INDEX_NAME']][]= $row['COLUMN_NAME'];
         }
@@ -227,7 +226,7 @@ class OracleSchemaParser extends AbstractSchemaParser
     protected function addForeignKeys(Table $table)
     {
         // local store to avoid duplicates
-        $foreignKeys = array();
+        $foreignKeys = [];
 
         /* @var \PDOStatement $stmt */
         $stmt = $this->dbh->query("SELECT CONSTRAINT_NAME, DELETE_RULE, R_CONSTRAINT_NAME FROM USER_CONSTRAINTS WHERE CONSTRAINT_TYPE = 'R' AND TABLE_NAME = '" . $table->getName(). "'");
@@ -247,7 +246,7 @@ class OracleSchemaParser extends AbstractSchemaParser
                 $onDelete = ('NO ACTION' === $row['DELETE_RULE']) ? 'NONE' : $row['DELETE_RULE'];
                 $fk->setOnDelete($onDelete);
                 $fk->setOnUpdate($onDelete);
-                $fk->addReference(array('local' => $localReferenceInfo['COLUMN_NAME'], 'foreign' => $foreignReferenceInfo['COLUMN_NAME']));
+                $fk->addReference(['local' => $localReferenceInfo['COLUMN_NAME'], 'foreign' => $foreignReferenceInfo['COLUMN_NAME']]);
                 $table->addForeignKey($fk);
                 $foreignKeys[$row['CONSTRAINT_NAME']] = $fk;
             }

@@ -46,4 +46,4 @@ class CrossRelationProperties extends BuildComponent
 \$this->{$varName}->setModel('$className');");
         }
     }
-} 
+}

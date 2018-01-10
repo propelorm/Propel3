@@ -722,5 +722,4 @@ ALTER TABLE "foo" DROP CONSTRAINT "foo_bar_fk";
 ";
         $this->assertEquals($expected, $this->getPlatform()->getCommentBlockDDL('foo bar'));
     }
-
 }

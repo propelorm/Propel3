@@ -3,7 +3,6 @@
 
 namespace Propel\Generator\Builder\Om\Component\QueryInheritance;
 
-
 use gossi\codegen\model\PhpParameter;
 use Propel\Generator\Builder\Om\Component\BuildComponent;
 use Propel\Generator\Builder\Om\Component\NamingTrait;

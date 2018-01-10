@@ -487,5 +487,4 @@ ALTER TABLE foo2
 ";
         $this->assertEquals($expected, $this->getPlatform()->getModifyDatabaseDDL($databaseDiff));
     }
-
 }

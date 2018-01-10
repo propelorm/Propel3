@@ -181,7 +181,8 @@ class NamespaceTest extends TestCaseFixturesDatabase
     }
 
     public function testManyToMany()
-    {$this->markTestSkipped();
+    {
+        $this->markTestSkipped();
         \Foo\Bar\NamespacedBookQuery::create()->deleteAll();
         \Baz\NamespacedBookClubQuery::create()->deleteAll();
         \Baz\NamespacedBookListRelQuery::create()->deleteAll();

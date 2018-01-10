@@ -25,7 +25,6 @@ use Propel\Tests\TestCase;
  */
 class DelegateBehaviorTest extends TestCase
 {
-
     public function setUp()
     {
         if (!class_exists('DelegateDelegate')) {
@@ -276,5 +275,4 @@ EOF;
 //        $this->assertEquals('bar', $delegate->getSubtitle());
 //        $this->assertEquals('bar', $main->getSubtitle());
 //    }
-
 }

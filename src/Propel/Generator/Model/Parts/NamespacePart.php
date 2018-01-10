@@ -69,6 +69,4 @@ trait NamespacePart
             return $name;
         }
     }
-
 }
-

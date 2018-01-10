@@ -31,7 +31,7 @@ class ArchivableBehavior extends Behavior
     use ComponentTrait;
 
     // default parameters value
-    protected $parameters = array(
+    protected $parameters = [
         'archive_entity'       => '',
         'archive_table'        => null,
         'log_archived_at'     => 'true',
@@ -39,7 +39,7 @@ class ArchivableBehavior extends Behavior
         'archive_on_insert'   => 'false',
         'archive_on_update'   => 'false',
         'archive_on_delete'   => 'true',
-    );
+    ];
 
     /**
      * @var Entity
@@ -86,14 +86,14 @@ class ArchivableBehavior extends Behavior
         if (!$database->hasEntity($archiveEntityName)) {
             // create the version entity
             $archiveEntity = $database->addEntity(
-                array(
+                [
                     'name' => $archiveEntityName,
                     'tableName' => $this->getParameter('archive_table'),
                     'package' => $entity->getPackage(),
                     'schema' => $entity->getSchema(),
                     'activeRecord' => $entity->getActiveRecord(),
                     'namespace' => $entity->getNamespace() ? '\\' . $entity->getNamespace() : null,
-                )
+                ]
             );
 
             // copy all the fields
@@ -115,10 +115,10 @@ class ArchivableBehavior extends Behavior
 
         // add archived_at field
         if ('true' === $this->getParameter('log_archived_at')) {
-            $archiveEntity->addField(array(
+            $archiveEntity->addField([
                 'name' => $this->getParameter('archived_at_field'),
                 'type' => 'TIMESTAMP'
-            ));
+            ]);
         }
 
         // do not copy foreign keys
@@ -136,9 +136,9 @@ class ArchivableBehavior extends Behavior
             $index->setEntity($entity);
             foreach ($unique->getFields() as $fieldName) {
                 if ($size = $unique->getFieldSize($fieldName)) {
-                    $index->addField(array('name' => $fieldName, 'size' => $size));
+                    $index->addField(['name' => $fieldName, 'size' => $size]);
                 } else {
-                    $index->addField(array('name' => $fieldName));
+                    $index->addField(['name' => $fieldName]);
                 }
             }
 

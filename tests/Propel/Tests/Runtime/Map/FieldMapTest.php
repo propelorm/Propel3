@@ -147,7 +147,6 @@ class FieldMapTest extends TestCaseFixtures
         $bookstoreEntity = BookstoreEmployeeEntityMap::getEntityMap();
         $supervisorField = $bookstoreEntity->getField('supervisorId');
         $this->assertEquals($supervisorField->getRelation(), $supervisorField->getRelation('supervisor'), 'getRelation() returns the RelationMap object even whit ha specific refPhpName');
-
     }
 
     public function testNormalizeName()

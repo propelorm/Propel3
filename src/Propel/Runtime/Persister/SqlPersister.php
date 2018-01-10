@@ -110,7 +110,6 @@ class SqlPersister implements PersisterInterface
         } catch (\Exception $e) {
             throw new RuntimeException(sprintf('Could not execute query %s', $query), 0, $e);
         }
-
     }
 
     /**
@@ -134,7 +133,9 @@ class SqlPersister implements PersisterInterface
         }
 
         $this->getConfiguration()->debug(sprintf(
-            ' COMMIT PERSISTER with %d entities of %s', count($entities), $entityMap->getFullClassName()
+            ' COMMIT PERSISTER with %d entities of %s',
+            count($entities),
+            $entityMap->getFullClassName()
         ), Configuration::LOG_GREEN);
 
         if (!$inserts && !$updates) {
@@ -252,7 +253,7 @@ class SqlPersister implements PersisterInterface
         $paramsReplace = $params;
 
         $paramsReplaceReadable = $paramsReplace;
-        $readable = preg_replace_callback('/\?/', function() use (&$paramsReplaceReadable) {
+        $readable = preg_replace_callback('/\?/', function () use (&$paramsReplaceReadable) {
             $value = array_shift($paramsReplaceReadable);
             if (is_string($value) && strlen($value) > 64) {
                 $value = substr($value, 0, 64) . '...';
@@ -275,7 +276,7 @@ class SqlPersister implements PersisterInterface
                 }
             }
 
-            $paramsReplace = array_map(function($v) {
+            $paramsReplace = array_map(function ($v) {
                 return json_encode($v);
             }, $paramsReplace);
 
@@ -335,7 +336,6 @@ class SqlPersister implements PersisterInterface
         $isset = $entityMap->getPropIsset();
 
         foreach ($inserts as $entity) {
-
             $id = substr(md5(spl_object_hash($entity)), 0, 9);
             $debugName = "{$entityMap->getFullClassName()} #$id {$relation->getName()}";
 
@@ -356,7 +356,6 @@ class SqlPersister implements PersisterInterface
             $query->delete();
 
             if (null !== $foreignItems && count($foreignItems)) {
-
                 $this->getConfiguration()->debug("many-to-many $debugName: update with " . count($foreignItems) . " foreign items.");
 
                 if ($relation->isImplementationDetail()) {
@@ -368,7 +367,6 @@ class SqlPersister implements PersisterInterface
                     $writer = $relation->getMiddleEntity()->getPropWriter();
 
                     foreach ($foreignItems as $foreignItem) {
-
                         $id = [spl_object_hash($entity)];
 
                         if ($relation->isPolymorphic()) {
@@ -401,7 +399,6 @@ class SqlPersister implements PersisterInterface
             } else {
                 $this->getConfiguration()->debug("many-to-many $debugName: no update, since no items.");
             }
-
         }
     }
 
@@ -433,7 +430,7 @@ class SqlPersister implements PersisterInterface
 
         $updateCrossRelations = [];
 
-        foreach($updates as $entity) {
+        foreach ($updates as $entity) {
             //regenerate changeSet since PRE_UPDATE/PRE_SAVE could have changed entities
             $changeSet = $entityMap->buildChangeSet($entity);
             if ($changeSet) {
@@ -483,7 +480,7 @@ class SqlPersister implements PersisterInterface
                 $query = $sqlStart . ' SET ' . implode(', ', $sets) . ' WHERE '. $whereClause;
 
                 $paramsReplace = $params;
-                $readable = preg_replace_callback('/\?/', function() use (&$paramsReplace) {
+                $readable = preg_replace_callback('/\?/', function () use (&$paramsReplace) {
                     $value = array_shift($paramsReplace);
                     if (is_string($value) && strlen($value) > 64) {
                         $value = substr($value, 0, 64) . '...';
@@ -506,7 +503,9 @@ class SqlPersister implements PersisterInterface
                         sprintf(
                             'Could not update entity (%s)',
                             $readable
-                        ), 0, $e
+                        ),
+                        0,
+                        $e
                     );
                 }
             }
@@ -578,7 +577,6 @@ class SqlPersister implements PersisterInterface
                     }
                 }
             }
-
         }
 
         return false;

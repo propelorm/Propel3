@@ -252,7 +252,7 @@ class Database
      */
     public function getEntitiesForSql(): array
     {
-        return $this->entities->filter(function(Entity $entity) {
+        return $this->entities->filter(function (Entity $entity) {
             return !$entity->isSkipSql();
         })->toArray();
     }
@@ -275,7 +275,7 @@ class Database
      */
     public function hasEntityByName($name): bool
     {
-        return $this->entities->search($name, function(Entity $entity, $query) {
+        return $this->entities->search($name, function (Entity $entity, $query) {
             return $entity->getName() === $query;
         });
     }
@@ -287,7 +287,7 @@ class Database
      */
     public function getEntityByName($name): ?Entity
     {
-        return $this->entities->find($name, function(Entity $entity, $query) {
+        return $this->entities->find($name, function (Entity $entity, $query) {
             return $entity->getName() === $query;
         });
     }
@@ -299,8 +299,8 @@ class Database
      */
     public function hasEntityByFullName($fullName): bool
     {
-        return $this->entities->search($fullName, function(Entity $entity, $query) {
-           return $entity->getFullName() === $query;
+        return $this->entities->search($fullName, function (Entity $entity, $query) {
+            return $entity->getFullName() === $query;
         });
     }
 
@@ -311,7 +311,7 @@ class Database
      */
     public function getEntityByFullName($fullName): ?Entity
     {
-        return $this->entities->find($fullName, function(Entity $entity, $query) {
+        return $this->entities->find($fullName, function (Entity $entity, $query) {
             return $entity->getFullName() === $query;
         });
     }
@@ -323,7 +323,7 @@ class Database
      */
     public function hasEntityByTableName($tableName): bool
     {
-        return $this->entities->find($tableName, function(Entity $entity, $query) {
+        return $this->entities->find($tableName, function (Entity $entity, $query) {
             return $entity->getTableName() === $query;
         });
     }
@@ -335,7 +335,7 @@ class Database
      */
     public function getEntityByTableName($tableName): ?Entity
     {
-        return $this->entities->find($tableName, function(Entity $entity, $query) {
+        return $this->entities->find($tableName, function (Entity $entity, $query) {
             return $entity->getTableName() === $query;
         });
     }
@@ -347,7 +347,7 @@ class Database
      */
     public function hasEntityByFullTableName($tableName): bool
     {
-        return $this->entities->find($tableName, function(Entity $entity, $query) {
+        return $this->entities->find($tableName, function (Entity $entity, $query) {
             return $entity->getFullTableName() === $query;
         });
     }
@@ -359,7 +359,7 @@ class Database
      */
     public function getEntityByFullTableName($tableName): ?Entity
     {
-        return $this->entities->find($tableName, function(Entity $entity, $query) {
+        return $this->entities->find($tableName, function (Entity $entity, $query) {
             return $entity->getFullTableName() === $query;
         });
     }
@@ -698,7 +698,8 @@ class Database
         foreach ($this->getEntities() as $entity) {
             $columns = [];
             foreach ($entity->getFields() as $column) {
-                $columns[] = sprintf("      %s %s %s %s %s %s",
+                $columns[] = sprintf(
+                    "      %s %s %s %s %s %s",
                     $column->getName(),
                     $column->getType(),
                     $column->getSize() ? '(' . $column->getSize() . ')' : '',
@@ -711,7 +712,8 @@ class Database
 
             $fks = [];
             foreach ($entity->getRelations() as $fk) {
-                $fks[] = sprintf("      %s to %s.%s (%s => %s)",
+                $fks[] = sprintf(
+                    "      %s to %s.%s (%s => %s)",
                     $fk->getName(),
                     $fk->getForeignSchemaName(),
                     $fk->getForeignEntityCommonName(),
@@ -726,7 +728,8 @@ class Database
                 foreach ($index->getFields() as $indexFieldName) {
                     $indexFields[] = sprintf('%s (%s)', $indexFieldName, $index->getFieldSize($indexFieldName));
                 }
-                $indices[] = sprintf("      %s (%s)",
+                $indices[] = sprintf(
+                    "      %s (%s)",
                     $index->getName(),
                     join(', ', $indexFields)
                 );
@@ -734,13 +737,15 @@ class Database
 
             $unices = [];
             foreach ($entity->getUnices() as $index) {
-                $unices[] = sprintf("      %s (%s)",
+                $unices[] = sprintf(
+                    "      %s (%s)",
                     $index->getName(),
                     join(', ', $index->getFields())
                 );
             }
 
-            $entityDef = sprintf("  %s (%s):\n%s",
+            $entityDef = sprintf(
+                "  %s (%s):\n%s",
                 $entity->getName(),
                 $entity->getCommonName(),
                 implode("\n", $columns)
@@ -761,13 +766,10 @@ class Database
             $entities[] = $entityDef;
         }
 
-        return sprintf("%s:\n%s",
+        return sprintf(
+            "%s:\n%s",
             $this->getName() . ($this->getSchema() ? '.'. $this->getSchema() : ''),
             implode("\n", $entities)
         );
     }
-
-
-
-
 }

@@ -7,7 +7,6 @@ namespace Propel\Tests\Generator\Migration;
  */
 class IndexTest extends MigrationTestCase
 {
-
     public function testAdd()
     {
         $originXml = '
@@ -185,5 +184,4 @@ class IndexTest extends MigrationTestCase
 ';
         $this->migrateAndTest($originXml, $targetXml);
     }
-
 }

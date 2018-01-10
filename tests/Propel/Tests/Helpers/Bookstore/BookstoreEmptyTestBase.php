@@ -25,5 +25,4 @@ abstract class BookstoreEmptyTestBase extends BookstoreTestBase
             BookstoreDataPopulator::depopulate($this->configuration);
         }
     }
-
 }

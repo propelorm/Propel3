@@ -29,14 +29,14 @@ class NestedSetBehavior extends Behavior
     use ComponentTrait;
     
     // default parameters value
-    protected $parameters = array(
+    protected $parameters = [
         'left_field'       => 'tree_left',
         'right_field'      => 'tree_right',
         'level_field'      => 'tree_level',
         'use_scope'         => 'false',
         'scope_field'      => 'tree_scope',
         'method_proxies'    => 'false'
-    );
+    ];
 
     public function __construct()
     {
@@ -53,31 +53,31 @@ class NestedSetBehavior extends Behavior
         $entity = $this->getEntity();
 
         if (!$entity->hasField($this->getParameter('left_field'))) {
-            $entity->addField(array(
+            $entity->addField([
                 'name' => $this->getParameter('left_field'),
                 'type' => 'INTEGER'
-            ));
+            ]);
         }
 
         if (!$entity->hasField($this->getParameter('right_field'))) {
-            $entity->addField(array(
+            $entity->addField([
                 'name' => $this->getParameter('right_field'),
                 'type' => 'INTEGER'
-            ));
+            ]);
         }
 
         if (!$entity->hasField($this->getParameter('level_field'))) {
-            $entity->addField(array(
+            $entity->addField([
                 'name' => $this->getParameter('level_field'),
                 'type' => 'INTEGER'
-            ));
+            ]);
         }
 
         if ('true' === $this->getParameter('use_scope') && !$entity->hasField($this->getParameter('scope_field'))) {
-            $entity->addField(array(
+            $entity->addField([
                 'name' => $this->getParameter('scope_field'),
                 'type' => 'INTEGER'
-            ));
+            ]);
         }
     }
 
@@ -120,7 +120,7 @@ class NestedSetBehavior extends Behavior
         $this->applyComponent('Repository\UpdateLoadedNodesMethod', $builder);
         $this->applyComponent('Repository\UseStatements', $builder);
 
-        if($this->useScope()) {
+        if ($this->useScope()) {
             $this->applyComponent('Repository\SetNegativeScopeMethod', $builder);
         }
     }

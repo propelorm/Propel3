@@ -30,7 +30,8 @@ class BehaviorManager
      */
     private $generatorConfig = null;
     
-    public function __construct(GeneratorConfigInterface $config = null) {
+    public function __construct(GeneratorConfigInterface $config = null)
+    {
         $this->setGeneratorConfig($config);
     }
     
@@ -57,12 +58,17 @@ class BehaviorManager
      * @throws BuildException
      * @return Behavior
      */
-    public function create(string $name): Behavior {
+    public function create(string $name): Behavior
+    {
         $class = $this->getClassname($name);
         $behavior = new $class();
         if (!($behavior instanceof Behavior)) {
-            throw new BuildException(sprintf('Behavior [%s: %s] not instance of %s',
-                $name, $class, '\Propel\Generator\Model\Behavior'));
+            throw new BuildException(sprintf(
+                'Behavior [%s: %s] not instance of %s',
+                $name,
+                $class,
+                '\Propel\Generator\Model\Behavior'
+            ));
         }
         return $behavior;
     }

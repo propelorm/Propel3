@@ -33,6 +33,5 @@ return \$this->{$parentGetter}()->{$methodName}();
             $method = $this->getDefinition()->hasMethod($methodName) ? $this->getDefinition()->getMethod($methodName) : $this->addMethod($methodName);
             $method->setBody($body);
         }
-
     }
 }

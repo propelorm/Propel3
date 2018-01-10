@@ -69,7 +69,7 @@ class CollectionConvertTest extends TestCaseFixtures
 
 EOF;
 
-        return array(array($expected));
+        return [[$expected]];
     }
 
     /**
@@ -109,7 +109,7 @@ Books:
 
 EOF;
 
-        return array(array($expected));
+        return [[$expected]];
     }
 
     /**
@@ -138,7 +138,7 @@ EOF;
 {"Books":[{"id":9012,"title":"Don Juan","ISBN":"0140422161","price":12.99},{"id":58,"title":"Harry Potter and the Order of the Phoenix","ISBN":"043935806X","price":10.99}]}
 EOF;
 
-        return array(array($expected));
+        return [[$expected]];
     }
 
     /**
@@ -165,7 +165,7 @@ EOF;
     {
         $expected = "id,title,ISBN,price\r\n9012,Don Juan,0140422161,12.99\r\n58,Harry Potter and the Order of the Phoenix,043935806X,10.99\r\n";
 
-        return array(array($expected));
+        return [[$expected]];
     }
 
     /**
@@ -216,5 +216,4 @@ EOF;
 EOF;
         $this->assertEquals($expected, (string) $coll);
     }
-
 }

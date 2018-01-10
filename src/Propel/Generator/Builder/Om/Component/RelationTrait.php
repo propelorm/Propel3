@@ -8,7 +8,6 @@
 
 namespace Propel\Generator\Builder\Om\Component;
 
-
 use gossi\codegen\model\PhpConstant;
 use gossi\codegen\model\PhpParameter;
 use Propel\Generator\Builder\Om\AbstractBuilder;
@@ -217,4 +216,4 @@ trait RelationTrait
     {
         return lcfirst($this->getRefRelationPhpName($relation, true));
     }
-} 
+}

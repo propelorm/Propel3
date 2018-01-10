@@ -27,11 +27,11 @@ class DelegateBehavior extends Behavior
     const MANY_TO_ONE = 2;
 
     // default parameters value
-    protected $parameters = array(
+    protected $parameters = [
         'to' => ''
-    );
+    ];
 
-    protected $delegates = array();
+    protected $delegates = [];
 
     use ComponentTrait;
 

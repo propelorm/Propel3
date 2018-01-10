@@ -18,7 +18,7 @@ use Propel\Generator\Builder\Om\Component\NamingTrait;
  */
 class Filters extends BuildComponent
 {
-    Use NamingTrait;
+    use NamingTrait;
 
     public function process()
     {
@@ -32,7 +32,6 @@ class Filters extends BuildComponent
         $this->addSiblingsOf();
         $this->addAncestorsOf();
         $this->addRootsOf();
-
     }
 
     protected function addTreeRoots()

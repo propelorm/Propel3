@@ -51,4 +51,6 @@ class PropelExceptionTest extends TestCase
     }
 }
 
-class FooException extends \Exception {}
+class FooException extends \Exception
+{
+}

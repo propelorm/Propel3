@@ -235,7 +235,6 @@ class Configuration extends GeneratorConfig
         parent::__construct($filename, $extraConf);
 
         if ($filename || $extraConf) {
-
             foreach ($this->getRuntimeConnections() as $name => $connection) {
                 $this->databaseToAdapter[$name] = $connection['adapter'];
                 $connectionManager = $this->buildConnectionManager($name, $connection);

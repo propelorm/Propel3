@@ -408,7 +408,6 @@ class Session
     public function getLastKnownValues($id, $orCurrent = false)
     {
         if (is_object($id)) {
-
             if ($orCurrent && !$this->hasKnownValues($id)) {
                 return $this->getConfiguration()->getEntityMapForEntity($id)->getSnapshot($id);
             }
@@ -536,4 +535,4 @@ class Session
             $this->firstLevelCache = [];
         }
     }
-} 
+}

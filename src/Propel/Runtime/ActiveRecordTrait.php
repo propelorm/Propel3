@@ -2,7 +2,6 @@
 
 namespace Propel\Runtime;
 
-
 use Propel\Runtime\Map\EntityMap;
 
 trait ActiveRecordTrait
@@ -74,7 +73,8 @@ trait ActiveRecordTrait
      * EntityMap::TYPE_COLNAME, EntityMap::TYPE_FIELDNAME, EntityMap::TYPE_NUM.
      * Defaults to EntityMap::TYPE_FIELDNAME.
      */
-    public function fromArray(array $arr, $keyType = EntityMap::TYPE_FIELDNAME) {
+    public function fromArray(array $arr, $keyType = EntityMap::TYPE_FIELDNAME)
+    {
         return Configuration::getCurrentConfiguration()->getEntityMapForEntity($this)->fromArray($arr, $keyType, $this);
     }
 
@@ -88,7 +88,8 @@ trait ActiveRecordTrait
      * Defaults to EntityMap::TYPE_FIELDNAME.
      * @return $this
      */
-    public function getByName($name, $type = EntityMap::TYPE_FIELDNAME) {
+    public function getByName($name, $type = EntityMap::TYPE_FIELDNAME)
+    {
         return Configuration::getCurrentConfiguration()->getEntityMapForEntity($this)->getByName($this, $name, $type);
     }
 
@@ -98,7 +99,8 @@ trait ActiveRecordTrait
      * @param integer $pos position in xml schema
      * @return $this
      */
-    public function getByPosition($pos) {
+    public function getByPosition($pos)
+    {
         return Configuration::getCurrentConfiguration()->getEntityMapForEntity($this)->getByPosition($this, $pos);
     }
 
@@ -114,7 +116,8 @@ trait ActiveRecordTrait
      * Defaults to EntityMap::TYPE_FIELDNAME.
      * @return $this
      */
-    public function setByName($name, $value, $type = EntityMap::TYPE_FIELDNAME) {
+    public function setByName($name, $value, $type = EntityMap::TYPE_FIELDNAME)
+    {
         return Configuration::getCurrentConfiguration()->getEntityMapForEntity($this)->setByName($this, $name, $value, $type);
     }
 
@@ -125,7 +128,8 @@ trait ActiveRecordTrait
      * @param mixed $value field value
      * @return $this
      */
-    public function setByPosition($pos, $value) {
+    public function setByPosition($pos, $value)
+    {
         return Configuration::getCurrentConfiguration()->getEntityMapForEntity($this)->setByPosition($this, $pos, $value);
     }
 
@@ -145,7 +149,8 @@ trait ActiveRecordTrait
      *
      * @return array
      */
-    public function toArray($keyType = EntityMap::TYPE_FIELDNAME, $includeLazyLoadColumns = true, $includeForeignObjects = false, $alreadyDumpedObjectsWatcher = null) {
+    public function toArray($keyType = EntityMap::TYPE_FIELDNAME, $includeLazyLoadColumns = true, $includeForeignObjects = false, $alreadyDumpedObjectsWatcher = null)
+    {
         return Configuration::getCurrentConfiguration()->getEntityMapForEntity($this)->toArray($this, $keyType, $includeLazyLoadColumns, $includeForeignObjects, $alreadyDumpedObjectsWatcher);
     }
 

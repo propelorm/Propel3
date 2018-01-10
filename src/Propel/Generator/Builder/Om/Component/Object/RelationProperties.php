@@ -45,4 +45,4 @@ class RelationProperties extends BuildComponent
             $prop->setTypeDescription("many-to-one related $className object");
         }
     }
-} 
+}

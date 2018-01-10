@@ -102,20 +102,24 @@ class InitCommandTest extends TestCaseFixtures
         $distContent = file_get_contents($this->tempDir . '/propel.xml.dist');
         $this->assertContains('<schemaDir>/tmp/init_command/</schemaDir>', $distContent);
         $this->assertContains('<phpDir>/tmp/init_command/</phpDir>', $distContent);
-        $this->assertContains('<database>
+        $this->assertContains(
+            '<database>
             <connections>
                 <connection id="default">
                     <adapter>mysql</adapter>
                     <dsn>mysql:host=localhost;port=3306;dbname=test</dsn>',
-            $distContent);
-        $this->assertContains('<password></password>
+            $distContent
+        );
+        $this->assertContains(
+            '<password></password>
                     <settings>
                         <charset>utf8</charset>
                     </settings>
                 </connection>
             </connections>
         </database>',
-            $distContent);
+            $distContent
+        );
 
         $stubContent = '<table name="book" phpName="Book">
         <!--

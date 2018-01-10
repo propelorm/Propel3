@@ -269,7 +269,6 @@ class Domain extends MappingModel
      */
     public function getPhpDefaultValue()
     {
-
         if (null === $this->defaultValue) {
             return null;
         }

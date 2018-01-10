@@ -105,9 +105,9 @@ class SortableManagerWithScopeTest extends TestCase
         $this->assertEquals(2, $t->getRank(), 'insertAtRank() sets the position');
         $this->assertTrue($this->getConfiguration()->getSession()->isNew($t), 'insertAtTop() doesn\'t save the object');
         $repository->save($t);
-        $expected = array(1 => 'row1', 2 => 'new', 3 => 'row2', 4 => 'row3', 5 => 'row4');
+        $expected = [1 => 'row1', 2 => 'new', 3 => 'row2', 4 => 'row3', 5 => 'row4'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'insertAtRank() shifts the entire suite');
-        $expected = array(1 => 'row5', 2 => 'row6');
+        $expected = [1 => 'row5', 2 => 'row6'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(2), 'insertAtRank() leaves other suites unchanged');
     }
 
@@ -122,11 +122,11 @@ class SortableManagerWithScopeTest extends TestCase
         $this->assertEquals(2, $t->getRank(), 'insertAtRank() sets the position');
         $this->assertTrue($repository->getConfiguration()->getSession()->isNew($t), 'insertAtRank() doesn\'t save the object');
         $repository->save($t);
-        $expected = array(1 => 'row7', 2 => 'new', 3 => 'row8', 4 => 'row9', 5 => 'row10');
+        $expected = [1 => 'row7', 2 => 'new', 3 => 'row8', 4 => 'row9', 5 => 'row10'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(), 'insertAtRank() shifts the entire suite');
-        $expected = array(1 => 'row1', 2 => 'row2', 3 => 'row3', 4 => 'row4');
+        $expected = [1 => 'row1', 2 => 'row2', 3 => 'row3', 4 => 'row4'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'insertAtRank() leaves other suites unchanged');
-        $expected = array(1 => 'row5', 2 => 'row6');
+        $expected = [1 => 'row5', 2 => 'row6'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(2), 'insertAtRank() leaves other suites unchanged');
     }
 
@@ -162,9 +162,9 @@ class SortableManagerWithScopeTest extends TestCase
         $this->assertEquals(5, $t->getRank(), 'insertAtBottom() sets the position to the last');
         $this->assertTrue($this->getConfiguration()->getSession()->isNew($t), 'insertAtTop() doesn\'t save the object');
         $repository->save($t);
-        $expected = array(1 => 'row1', 2 => 'row2', 3 => 'row3', 4 => 'row4', 5 => 'new');
+        $expected = [1 => 'row1', 2 => 'row2', 3 => 'row3', 4 => 'row4', 5 => 'new'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'insertAtBottom() does not shift the entire suite');
-        $expected = array(1 => 'row5', 2 => 'row6');
+        $expected = [1 => 'row5', 2 => 'row6'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(2), 'insertAtBottom() leaves other suites unchanged');
     }
 
@@ -179,11 +179,11 @@ class SortableManagerWithScopeTest extends TestCase
         $this->assertEquals(5, $t->getRank(), 'insertAtBottom() sets the position to the last');
         $this->assertTrue($this->getConfiguration()->getSession()->isNew($t), 'insertAtTop() doesn\'t save the object');
         $repository->save($t);
-        $expected = array(1 => 'row7', 2 => 'row8', 3 => 'row9', 4 => 'row10', 5 => 'new');
+        $expected = [1 => 'row7', 2 => 'row8', 3 => 'row9', 4 => 'row10', 5 => 'new'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(), 'insertAtBottom() does not shift the entire suite');
-        $expected = array(1 => 'row1', 2 => 'row2', 3 => 'row3', 4 => 'row4');
+        $expected = [1 => 'row1', 2 => 'row2', 3 => 'row3', 4 => 'row4'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'insertAtRank() leaves other suites unchanged');
-        $expected = array(1 => 'row5', 2 => 'row6');
+        $expected = [1 => 'row5', 2 => 'row6'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(2), 'insertAtRank() leaves other suites unchanged');
     }
 
@@ -199,9 +199,9 @@ class SortableManagerWithScopeTest extends TestCase
         $this->assertEquals(1, $t->getRank(), 'insertAtTop() sets the position to 1');
         $this->assertTrue($this->getConfiguration()->getSession()->isNew($t), 'insertAtTop() doesn\'t save the object');
         $repository->save($t);
-        $expected = array(1 => 'new', 2 => 'row1', 3 => 'row2', 4 => 'row3', 5 => 'row4');
+        $expected = [1 => 'new', 2 => 'row1', 3 => 'row2', 4 => 'row3', 5 => 'row4'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'insertAtTop() shifts the entire suite');
-        $expected = array(1 => 'row5', 2 => 'row6');
+        $expected = [1 => 'row5', 2 => 'row6'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(2), 'insertAtTop() leaves other suites unchanged');
     }
 
@@ -216,11 +216,11 @@ class SortableManagerWithScopeTest extends TestCase
         $this->assertEquals(1, $t->getRank(), 'insertAtTop() sets the position to 1');
         $this->assertTrue($this->getConfiguration()->getSession()->isNew($t), 'insertAtTop() doesn\'t save the object');
         $repository->save($t);
-        $expected = array(1 => 'new', 2 => 'row7', 3 => 'row8', 4 => 'row9', 5 => 'row10');
+        $expected = [1 => 'new', 2 => 'row7', 3 => 'row8', 4 => 'row9', 5 => 'row10'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(), 'insertAtTop() shifts the entire suite');
-        $expected = array(1 => 'row1', 2 => 'row2', 3 => 'row3', 4 => 'row4');
+        $expected = [1 => 'row1', 2 => 'row2', 3 => 'row3', 4 => 'row4'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'insertAtRank() leaves other suites unchanged');
-        $expected = array(1 => 'row5', 2 => 'row6');
+        $expected = [1 => 'row5', 2 => 'row6'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(2), 'insertAtRank() leaves other suites unchanged');
     }
 
@@ -231,18 +231,18 @@ class SortableManagerWithScopeTest extends TestCase
 
         $t2 = $repository->createQuery()->findOneByRank(2, 1);
         $manager->moveToRank($t2, 3);
-        $expected = array(1 => 'row1', 2 => 'row3', 3 => 'row2', 4 => 'row4');
+        $expected = [1 => 'row1', 2 => 'row3', 3 => 'row2', 4 => 'row4'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'moveToRank() can move up');
-        $expected = array(1 => 'row5', 2 => 'row6');
+        $expected = [1 => 'row5', 2 => 'row6'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(2), 'moveToRank() leaves other suites unchanged');
         $manager->moveToRank($t2, 1);
-        $expected = array(1 => 'row2', 2 => 'row1', 3 => 'row3', 4 => 'row4');
+        $expected = [1 => 'row2', 2 => 'row1', 3 => 'row3', 4 => 'row4'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'moveToRank() can move to the first rank');
         $manager->moveToRank($t2, 4);
-        $expected = array(1 => 'row1', 2 => 'row3', 3 => 'row4', 4 => 'row2');
+        $expected = [1 => 'row1', 2 => 'row3', 3 => 'row4', 4 => 'row2'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'moveToRank() can move to the last rank');
         $manager->moveToRank($t2, 2);
-        $expected = array(1 => 'row1', 2 => 'row2', 3 => 'row3', 4 => 'row4');
+        $expected = [1 => 'row1', 2 => 'row2', 3 => 'row3', 4 => 'row4'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'moveToRank() can move down');
     }
 
@@ -253,20 +253,20 @@ class SortableManagerWithScopeTest extends TestCase
 
         $t2 = $repository->createQuery()->findOneByRank(2);
         $manager->moveToRank($t2, 3);
-        $expected = array(1 => 'row7', 2 => 'row9', 3 => 'row8', 4 => 'row10');
+        $expected = [1 => 'row7', 2 => 'row9', 3 => 'row8', 4 => 'row10'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(), 'moveToRank() can move up');
-        $expected = array(1 => 'row1', 2 => 'row2', 3 => 'row3', 4 => 'row4');
+        $expected = [1 => 'row1', 2 => 'row2', 3 => 'row3', 4 => 'row4'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'insertAtRank() leaves other suites unchanged');
-        $expected = array(1 => 'row5', 2 => 'row6');
+        $expected = [1 => 'row5', 2 => 'row6'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(2), 'insertAtRank() leaves other suites unchanged');
         $manager->moveToRank($t2, 1);
-        $expected = array(1 => 'row8', 2 => 'row7', 3 => 'row9', 4 => 'row10');
+        $expected = [1 => 'row8', 2 => 'row7', 3 => 'row9', 4 => 'row10'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(), 'moveToRank() can move to the first rank');
         $manager->moveToRank($t2, 4);
-        $expected = array(1 => 'row7', 2 => 'row9', 3 => 'row10', 4 => 'row8');
+        $expected = [1 => 'row7', 2 => 'row9', 3 => 'row10', 4 => 'row8'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(), 'moveToRank() can move to the last rank');
         $manager->moveToRank($t2, 2);
-        $expected = array(1 => 'row7', 2 => 'row8', 3 => 'row9', 4 => 'row10');
+        $expected = [1 => 'row7', 2 => 'row8', 3 => 'row9', 4 => 'row10'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(), 'moveToRank() can move down');
     }
 
@@ -311,9 +311,9 @@ class SortableManagerWithScopeTest extends TestCase
         $t2 = $repository->createQuery()->findOneByRank(2, 1);
         $t4 = $repository->createQuery()->findOneByRank(4, 1);
         $manager->swapWith($t2, $t4);
-        $expected = array(1 => 'row1', 2 => 'row4', 3 => 'row3', 4 => 'row2');
+        $expected = [1 => 'row1', 2 => 'row4', 3 => 'row3', 4 => 'row2'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'swapWith() swaps ranks of the two objects and leaves the other ranks unchanged');
-        $expected = array(1 => 'row5', 2 => 'row6');
+        $expected = [1 => 'row5', 2 => 'row6'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(2), 'swapWith() leaves other suites unchanged');
     }
 
@@ -325,11 +325,11 @@ class SortableManagerWithScopeTest extends TestCase
         $t2 = $repository->createQuery()->findOneByRank(2, 1);
         $t4 = $repository->createQuery()->findOneByRank(4);
         $manager->swapWith($t2, $t4);
-        $expected = array(1 => 'row7', 2 => 'row8', 3 => 'row9', 4 => 'row2');
+        $expected = [1 => 'row7', 2 => 'row8', 3 => 'row9', 4 => 'row2'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(), 'swapWith() swaps ranks of the two objects between scopes and leaves the other ranks unchanged');
-        $expected = array(1 => 'row1', 2 => 'row10', 3 => 'row3', 4 => 'row4');
+        $expected = [1 => 'row1', 2 => 'row10', 3 => 'row3', 4 => 'row4'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'swapWith() swaps ranks of the two objects between scopes and leaves the other ranks unchanged');
-        $expected = array(1 => 'row5', 2 => 'row6');
+        $expected = [1 => 'row5', 2 => 'row6'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(2), 'swapWith() leaves rest of suites unchanged');
     }
 
@@ -340,15 +340,15 @@ class SortableManagerWithScopeTest extends TestCase
 
         $t3 = $repository->createQuery()->findOneByRank(3, 1);
         $manager->moveUp($t3);
-        $expected = array(1 => 'row1', 2 => 'row3', 3 => 'row2', 4 => 'row4');
+        $expected = [1 => 'row1', 2 => 'row3', 3 => 'row2', 4 => 'row4'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'moveUp() swaps ranks with the object of higher rank');
-        $expected = array(1 => 'row5', 2 => 'row6');
+        $expected = [1 => 'row5', 2 => 'row6'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(2), 'moveUp() leaves other suites unchanged');
         $manager->moveUp($t3);
-        $expected = array(1 => 'row3', 2 => 'row1', 3 => 'row2', 4 => 'row4');
+        $expected = [1 => 'row3', 2 => 'row1', 3 => 'row2', 4 => 'row4'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'moveUp() swaps ranks with the object of higher rank');
         $manager->moveUp($t3);
-        $expected = array(1 => 'row3', 2 => 'row1', 3 => 'row2', 4 => 'row4');
+        $expected = [1 => 'row3', 2 => 'row1', 3 => 'row2', 4 => 'row4'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'moveUp() changes nothing when called on the object at the top');
     }
 
@@ -359,15 +359,15 @@ class SortableManagerWithScopeTest extends TestCase
 
         $t2 = $repository->createQuery()->findOneByRank(2, 1);
         $manager->moveDown($t2);
-        $expected = array(1 => 'row1', 2 => 'row3', 3 => 'row2', 4 => 'row4');
+        $expected = [1 => 'row1', 2 => 'row3', 3 => 'row2', 4 => 'row4'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'moveDown() swaps ranks with the object of lower rank');
-        $expected = array(1 => 'row5', 2 => 'row6');
+        $expected = [1 => 'row5', 2 => 'row6'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(2), 'moveDown() leaves other suites unchanged');
         $manager->moveDown($t2);
-        $expected = array(1 => 'row1', 2 => 'row3', 3 => 'row4', 4 => 'row2');
+        $expected = [1 => 'row1', 2 => 'row3', 3 => 'row4', 4 => 'row2'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'moveDown() swaps ranks with the object of lower rank');
         $manager->moveDown($t2);
-        $expected = array(1 => 'row1', 2 => 'row3', 3 => 'row4', 4 => 'row2');
+        $expected = [1 => 'row1', 2 => 'row3', 3 => 'row4', 4 => 'row2'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'moveDown() changes nothing when called on the object at the bottom');
     }
 
@@ -378,12 +378,12 @@ class SortableManagerWithScopeTest extends TestCase
 
         $t3 = $repository->createQuery()->findOneByRank(3, 1);
         $manager->moveToTop($t3);
-        $expected = array(1 => 'row3', 2 => 'row1', 3 => 'row2', 4 => 'row4');
+        $expected = [1 => 'row3', 2 => 'row1', 3 => 'row2', 4 => 'row4'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'moveToTop() moves to the top');
-        $expected = array(1 => 'row5', 2 => 'row6');
+        $expected = [1 => 'row5', 2 => 'row6'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(2), 'moveToTop() leaves other suites unchanged');
         $manager->moveToTop($t3);
-        $expected = array(1 => 'row3', 2 => 'row1', 3 => 'row2', 4 => 'row4');
+        $expected = [1 => 'row3', 2 => 'row1', 3 => 'row2', 4 => 'row4'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'moveToTop() changes nothing when called on the top node');
     }
 
@@ -394,12 +394,12 @@ class SortableManagerWithScopeTest extends TestCase
 
         $t2 = $repository->createQuery()->findOneByRank(2, 1);
         $manager->moveToBottom($t2);
-        $expected = array(1 => 'row1', 2 => 'row3', 3 => 'row4', 4 => 'row2');
+        $expected = [1 => 'row1', 2 => 'row3', 3 => 'row4', 4 => 'row2'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'moveToBottom() moves to the bottom');
-        $expected = array(1 => 'row5', 2 => 'row6');
+        $expected = [1 => 'row5', 2 => 'row6'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(2), 'moveToBottom() leaves other suites unchanged');
         $manager->moveToBottom($t2);
-        $expected = array(1 => 'row1', 2 => 'row3', 3 => 'row4', 4 => 'row2');
+        $expected = [1 => 'row1', 2 => 'row3', 3 => 'row4', 4 => 'row2'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'moveToBottom() changes nothing when called on the bottom node');
     }
 
@@ -410,14 +410,14 @@ class SortableManagerWithScopeTest extends TestCase
         
         $t2 = $repository->createQuery()->findOneByRank(2, 1);
         $manager->removeFromList($t2);
-        $expected = array(1 => 'row1', 2 => 'row2', 3 => 'row3', 4 => 'row4');
+        $expected = [1 => 'row1', 2 => 'row2', 3 => 'row3', 4 => 'row4'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'removeFromList() does not change the list until the object is saved');
         $repository->save($t2);
-        $expected = array(1 => 'row1', 2 => 'row3', 3 => 'row4');
+        $expected = [1 => 'row1', 2 => 'row3', 3 => 'row4'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(1), 'removeFromList() changes the list and moves object to null scope once the object is saved');
-        $expected = array(1 => 'row7', 2 => 'row8', 3 => 'row9', 4 => 'row10', 5 => 'row2');
+        $expected = [1 => 'row7', 2 => 'row8', 3 => 'row9', 4 => 'row10', 5 => 'row2'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(), 'removeFromList() moves object to the end of null scope');
-        $expected = array(1 => 'row5', 2 => 'row6');
+        $expected = [1 => 'row5', 2 => 'row6'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(2), 'removeFromList() leaves other suites unchanged');
     }
 
@@ -441,19 +441,19 @@ class SortableManagerWithScopeTest extends TestCase
         $repository = $this->getRepository('\SortableMultiScopes');
         $repository->deleteAll();
 
-        $items = array(
+        $items = [
             //    cat scat title
-            array(  1,  1,  'item 1'),  //1
-            array(  2,  1,  'item 2'),  //1
-            array(  3,  1,  'item 3'),  //1
-            array(  3,  1,  'item 3.1'),//2
-            array(  1,  1,  'item 1.1'),//2
-            array(  1,  1,  'item 1.2'),//3
-            array(  1,  2,  'item 1.3'),//1
-            array(  1,  2,  'item 1.4'),//2
-        );
+            [  1,  1,  'item 1'],  //1
+            [  2,  1,  'item 2'],  //1
+            [  3,  1,  'item 3'],  //1
+            [  3,  1,  'item 3.1'],//2
+            [  1,  1,  'item 1.1'],//2
+            [  1,  1,  'item 1.2'],//3
+            [  1,  2,  'item 1.3'],//1
+            [  1,  2,  'item 1.4'],//2
+        ];
 
-        $result = array();
+        $result = [];
         foreach ($items as $value) {
             $item = new \SortableMultiScopes();
             $item->setCategoryId($value[0]);
@@ -473,19 +473,19 @@ class SortableManagerWithScopeTest extends TestCase
         $repository = $this->getRepository('\SortableMultiCommaScopes');
         $repository->deleteAll();
 
-        $items = array(
+        $items = [
             //    cat scat title
-            array(  1,  1,  'item 1'),  //1
-            array(  2,  1,  'item 2'),  //1
-            array(  3,  1,  'item 3'),  //1
-            array(  3,  1,  'item 3.1'),//2
-            array(  1,  1,  'item 1.1'),//2
-            array(  1,  1,  'item 1.2'),//3
-            array(  1,  2,  'item 1.3'),//1
-            array(  1,  2,  'item 1.4'),//2
-        );
+            [  1,  1,  'item 1'],  //1
+            [  2,  1,  'item 2'],  //1
+            [  3,  1,  'item 3'],  //1
+            [  3,  1,  'item 3.1'],//2
+            [  1,  1,  'item 1.1'],//2
+            [  1,  1,  'item 1.2'],//3
+            [  1,  2,  'item 1.3'],//1
+            [  1,  2,  'item 1.4'],//2
+        ];
 
-        $result = array();
+        $result = [];
         foreach ($items as $value) {
             $item = new \SortableMultiCommaScopes();
             $item->setCategoryId($value[0]);
@@ -512,7 +512,6 @@ class SortableManagerWithScopeTest extends TestCase
         $this->assertEquals($t1_2->getRank(), 3);
         $this->assertEquals($t1_3->getRank(), 1);
         $this->assertEquals($t1_4->getRank(), 2);
-
     }
 
     public function testMoveMultipleScopes()

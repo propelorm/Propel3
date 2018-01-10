@@ -2,7 +2,6 @@
 
 namespace Propel\Runtime\Session;
 
-
 use Propel\Runtime\Configuration;
 
 class SessionFactory
@@ -17,7 +16,7 @@ class SessionFactory
      */
     protected $configuration;
 
-    function __construct(Configuration $configuration)
+    public function __construct(Configuration $configuration)
     {
         $this->configuration = $configuration;
     }
@@ -41,5 +40,4 @@ class SessionFactory
 
         return $this->currentSession;
     }
-
 }

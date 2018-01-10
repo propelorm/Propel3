@@ -41,8 +41,8 @@ class DatabaseMap
      *
      * @var EntityMap[]
      */
-    protected $entities = array();
-    protected $entitiesByName = array();
+    protected $entities = [];
+    protected $entitiesByName = [];
 
 //    /**
 //     * @var string[]

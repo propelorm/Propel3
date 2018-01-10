@@ -65,7 +65,7 @@ abstract class DataModelBuilder
      *
      * @var array string[]
      */
-    private $warnings = array();
+    private $warnings = [];
 
     /**
      * Object builder class for current entity.

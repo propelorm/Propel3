@@ -175,5 +175,4 @@ abstract class BuildComponent
     {
         return $this->getBuilder()->quoteIdentifier($identifier);
     }
-
 }

@@ -30,7 +30,6 @@ use Propel\Tests\TestCaseFixtures;
  */
 class ModelWithTest extends TestCaseFixtures
 {
-
     public function testModelNameManyToOne()
     {
         $q = BookQuery::create()

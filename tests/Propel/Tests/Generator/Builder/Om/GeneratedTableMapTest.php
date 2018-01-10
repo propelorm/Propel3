@@ -50,14 +50,14 @@ class GeneratedTableMapTest extends BookstoreTestBase
     {
         $c = new Criteria();
         BookTableMap::addSelectColumns($c);
-        $expected = array(
+        $expected = [
             BookTableMap::FIELD_ID,
             BookTableMap::FIELD_TITLE,
             BookTableMap::FIELD_ISBN,
             BookTableMap::FIELD_PRICE,
             BookTableMap::FIELD_PUBLISHER_ID,
             BookTableMap::FIELD_AUTHOR_ID
-        );
+        ];
         $this->assertEquals($expected, $c->getSelectColumns(), 'addSelectColumns() adds the columns of the model to the criteria');
     }
 
@@ -65,10 +65,10 @@ class GeneratedTableMapTest extends BookstoreTestBase
     {
         $c = new Criteria();
         MediaTableMap::addSelectColumns($c);
-        $expected = array(
+        $expected = [
             MediaTableMap::FIELD_ID,
             MediaTableMap::FIELD_BOOK_ID
-        );
+        ];
         $this->assertEquals($expected, $c->getSelectColumns(), 'addSelectColumns() does not add lazy loaded columns');
     }
 
@@ -76,14 +76,14 @@ class GeneratedTableMapTest extends BookstoreTestBase
     {
         $c = new Criteria();
         BookTableMap::addSelectColumns($c, 'foo');
-        $expected = array(
+        $expected = [
             'foo.id',
             'foo.title',
             'foo.isbn',
             'foo.price',
             'foo.publisher_id',
             'foo.author_id'
-        );
+        ];
         $this->assertEquals($expected, $c->getSelectColumns(), 'addSelectColumns() uses the second parameter as a table alias');
     }
 
@@ -91,10 +91,10 @@ class GeneratedTableMapTest extends BookstoreTestBase
     {
         $c = new Criteria();
         MediaTableMap::addSelectColumns($c, 'bar');
-        $expected = array(
+        $expected = [
             'bar.id',
             'bar.book_id'
-        );
+        ];
         $this->assertEquals($expected, $c->getSelectColumns(), 'addSelectColumns() does not add lazy loaded columns but uses the second parameter as an alias');
     }
 
@@ -104,5 +104,4 @@ class GeneratedTableMapTest extends BookstoreTestBase
         $this->assertEquals('YAML', AuthorTableMap::DEFAULT_STRING_FORMAT, 'default string format is YAML by default');
         $this->assertEquals('XML', PublisherTableMap::DEFAULT_STRING_FORMAT, 'default string format can be customized using the defaultStringFormat attribute in the schema');
     }
-
 }

@@ -28,7 +28,7 @@ class UpdateMethod extends BuildComponent
         /** @var AggregateFieldBehavior $behavior */
         $behavior = $this->getBehavior();
 
-        $conditions = array();
+        $conditions = [];
         if ($behavior->getParameter('condition')) {
             $conditions[] = $behavior->getParameter('condition');
         }

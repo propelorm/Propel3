@@ -80,7 +80,7 @@ class SortableBehaviorObjectBuilderModificationTest extends TestCase
         $this->assertEquals($max - 1, $repository->createQuery()->getMaxRank(1), 'Sortable rearrange subsequent rows on delete');
         $t4 = $repository->createQuery()->filterByTitle('row4')->findOne();
         $this->assertEquals(3, $t4->getRank(), 'Sortable rearrange subsequent rows on delete');
-        $expected = array(1 => 'row5', 2 => 'row6');
+        $expected = [1 => 'row5', 2 => 'row6'];
         $this->assertEquals($expected, $this->getFixturesArrayWithScope(2), 'delete() leaves other suites unchanged');
     }
 }

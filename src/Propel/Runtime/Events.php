@@ -10,15 +10,15 @@ class Events
     const PRE_PERSIST = 'propel.pre_persist';
     const PERSIST = 'propel.persist';
 
-    CONST PRE_SAVE = 'propel.pre_save';
-    CONST SAVE = 'propel.save';
+    const PRE_SAVE = 'propel.pre_save';
+    const SAVE = 'propel.save';
 
-    CONST PRE_UPDATE = 'propel.pre_update';
-    CONST UPDATE = 'propel.update';
+    const PRE_UPDATE = 'propel.pre_update';
+    const UPDATE = 'propel.update';
 
-    CONST PRE_INSERT = 'propel.pre_insert';
-    CONST INSERT = 'propel.insert';
+    const PRE_INSERT = 'propel.pre_insert';
+    const INSERT = 'propel.insert';
 
-    CONST PRE_DELETE = 'propel.pre_delete';
-    CONST DELETE = 'propel.delete';
+    const PRE_DELETE = 'propel.pre_delete';
+    const DELETE = 'propel.delete';
 }

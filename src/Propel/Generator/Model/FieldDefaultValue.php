@@ -115,10 +115,9 @@ class FieldDefaultValue
     }
 
     /**
-     * 
+     *
      */
     public function getTypedValue()
     {
-
     }
 }

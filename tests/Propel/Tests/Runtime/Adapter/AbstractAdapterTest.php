@@ -118,5 +118,4 @@ class AbstractAdapterTest extends TestCaseFixtures
         $selectSql = $db->createSelectSqlPart($c, true);
         $this->assertEquals('SELECT Propel\Tests\Bookstore\Book.id AS Propel_Tests_Bookstore_Book_id_1, Propel\Tests\Bookstore\Book.id AS Propel_Tests_Bookstore_Book_id', $selectSql, 'createSelectSqlPart() aliases all columns if passed true as last parameter');
     }
-
 }

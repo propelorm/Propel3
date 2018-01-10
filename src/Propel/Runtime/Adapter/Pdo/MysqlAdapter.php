@@ -108,7 +108,7 @@ class MysqlAdapter extends PdoAdapter
     public function quoteTableIdentifier($entity)
     {
         // e.g. 'database.entity alias' should be escaped as '`database`.`entity` `alias`'
-        return '`' . strtr($entity, array('.' => '`.`', ' ' => '` `')) . '`';
+        return '`' . strtr($entity, ['.' => '`.`', ' ' => '` `']) . '`';
     }
 
     /**

@@ -343,7 +343,7 @@ EOF;
         $this->assertSame($expected, $columnDiff);
     }
 
-public function testGetModifyFieldDDLWithVarcharWithoutSizeAndPlatform()
+    public function testGetModifyFieldDDLWithVarcharWithoutSizeAndPlatform()
     {
         $t1 = new Entity('foo');
         $t1->setIdentifierQuoting(true);
@@ -401,5 +401,4 @@ EOF;
     {
         $this->assertFalse($databaseDiff);
     }
-
 }

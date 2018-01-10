@@ -21,13 +21,13 @@ class FieldDefaultValueTest extends TestCase
 {
     public function equalsProvider()
     {
-        return array(
-            array(new FieldDefaultValue('foo', 'bar'), new FieldDefaultValue('foo', 'bar'), true),
-            array(new FieldDefaultValue('foo', 'bar'), new FieldDefaultValue('foo1', 'bar'), false),
-            array(new FieldDefaultValue('foo', 'bar'), new FieldDefaultValue('foo', 'bar1'), false),
-            array(new FieldDefaultValue('current_timestamp', 'bar'), new FieldDefaultValue('now()', 'bar'), true),
-            array(new FieldDefaultValue('current_timestamp', 'bar'), new FieldDefaultValue('now()', 'bar1'), false),
-        );
+        return [
+            [new FieldDefaultValue('foo', 'bar'), new FieldDefaultValue('foo', 'bar'), true],
+            [new FieldDefaultValue('foo', 'bar'), new FieldDefaultValue('foo1', 'bar'), false],
+            [new FieldDefaultValue('foo', 'bar'), new FieldDefaultValue('foo', 'bar1'), false],
+            [new FieldDefaultValue('current_timestamp', 'bar'), new FieldDefaultValue('now()', 'bar'), true],
+            [new FieldDefaultValue('current_timestamp', 'bar'), new FieldDefaultValue('now()', 'bar1'), false],
+        ];
     }
 
     /**

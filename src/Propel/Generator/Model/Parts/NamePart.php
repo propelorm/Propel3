@@ -1,8 +1,8 @@
 <?php
 namespace Propel\Generator\Model\Parts;
 
-trait NamePart {
-
+trait NamePart
+{
     protected $name;
 
     /**
@@ -25,4 +25,3 @@ trait NamePart {
         return $this;
     }
 }
-

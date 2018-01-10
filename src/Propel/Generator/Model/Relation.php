@@ -879,7 +879,7 @@ class Relation extends MappingModel
             $foreignPKCols[] = $fPKCol->getName();
         }
 
-        $foreignCols = array();
+        $foreignCols = [];
         foreach ($this->localFields as $colName) {
             $foreignCols[] = $foreignEntity->getField($lfmap[$colName])->getName();
         }

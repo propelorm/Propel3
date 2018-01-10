@@ -36,11 +36,11 @@ class SeveralModelCriterion extends AbstractModelCriterion
                 // in order to support null values
                 throw new InvalidValueException('Null values are not supported inside BETWEEN clauses');
             }
-            $params[] = array(
+            $params[] = [
                 'entity'  => $this->realEntity,
                 'field' => $this->field,
                 'value'  => $value
-            );
+            ];
             $clause = self::strReplaceOnce('?', ':p'.count($params), $clause);
         }
         $sb .= $clause;

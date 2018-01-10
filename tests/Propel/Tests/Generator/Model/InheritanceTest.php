@@ -43,11 +43,11 @@ class InheritanceTest extends TestCase
     public function testSetupObject()
     {
         $inheritance = new Inheritance();
-        $inheritance->loadMapping(array(
+        $inheritance->loadMapping([
             'key' => 'baz',
             'extends' => 'BaseObject',
             'class' => 'Foo\Bar'
-        ));
+        ]);
 
         $this->assertSame('BaseObject', $inheritance->getAncestor());
         $this->assertSame('baz', $inheritance->getKey());

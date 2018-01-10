@@ -117,7 +117,6 @@ return \$entity;
             ->setDescription($description)
             ->setBody($body)
         ;
-
     }
     protected function addSetByName()
     {

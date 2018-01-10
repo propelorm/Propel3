@@ -257,7 +257,8 @@ class InitCommand extends AbstractCommand
 
         $validFormats = ['php', 'ini', 'yml', 'xml', 'json'];
         if (!in_array($format, $validFormats)) {
-            throw new \InvalidArgumentException(sprintf('The specified format "%s" is invalid. Use one of %s',
+            throw new \InvalidArgumentException(sprintf(
+                'The specified format "%s" is invalid. Use one of %s',
                 $format,
                 implode(', ', $validFormats)
             ));
@@ -296,10 +297,15 @@ class InitCommand extends AbstractCommand
     {
         $outputDir = sys_get_temp_dir();
         $this->getApplication()->setAutoExit(false);
-        if (0 === $this->getApplication()->find('database:reverse')->run(new StringInput(sprintf(
+        if (0 === $this->getApplication()->find('database:reverse')->run(
+            new StringInput(sprintf(
             'reverse %s --output-dir %s --database-name %s',
-            escapeshellarg($options['dsn'] . ';user=' . $options['user'] . ';password=' . $options['password']), $outputDir, 'default')),
-                $output)) {
+            escapeshellarg($options['dsn'] . ';user=' . $options['user'] . ';password=' . $options['password']),
+            $outputDir,
+            'default'
+        )),
+                $output
+        )) {
             $schema = file_get_contents($outputDir . '/schema.xml');
         } else {
             exit(1);

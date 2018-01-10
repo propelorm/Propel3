@@ -135,5 +135,4 @@ class StatementFormatterTest extends BookstoreEmptyTestBase
 
         $this->assertNull($book, 'StatementFormatter::formatOne() returns null when no result');
     }
-
 }

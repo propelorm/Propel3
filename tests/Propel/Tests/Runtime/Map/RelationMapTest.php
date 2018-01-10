@@ -71,7 +71,7 @@ class RelationMapTest extends TestCase
 
     public function testProperties()
     {
-        $properties = array('type', 'onUpdate', 'onDelete');
+        $properties = ['type', 'onUpdate', 'onDelete'];
         foreach ($properties as $property) {
             $getter = 'get' . ucfirst($property);
             $setter = 'set' . ucfirst($property);
@@ -83,8 +83,8 @@ class RelationMapTest extends TestCase
 
     public function testFields()
     {
-        $this->assertEquals(array(), $this->rmap->getLocalFields(), 'A new relation has no local columns');
-        $this->assertEquals(array(), $this->rmap->getForeignFields(), 'A new relation has no foreign columns');
+        $this->assertEquals([], $this->rmap->getLocalFields(), 'A new relation has no local columns');
+        $this->assertEquals([], $this->rmap->getForeignFields(), 'A new relation has no foreign columns');
         $tmap1 = $this->getMockForAbstractClass(EntityMap::class, ['foo', 'foodb', Configuration::getCurrentConfiguration()]);
         $col1 = $tmap1->addField('FOO1', 'INTEGER');
         
@@ -92,21 +92,30 @@ class RelationMapTest extends TestCase
         $col2 = $tmap2->addField('BAR1', 'INTEGER');
         
         $this->rmap->addFieldMapping($col1, $col2);
-        $this->assertEquals(array($col1), $this->rmap->getLocalFields(), 'addFieldMapping() adds a local table');
-        $this->assertEquals(array($col2), $this->rmap->getForeignFields(), 'addFieldMapping() adds a foreign table');
+        $this->assertEquals([$col1], $this->rmap->getLocalFields(), 'addFieldMapping() adds a local table');
+        $this->assertEquals([$col2], $this->rmap->getForeignFields(), 'addFieldMapping() adds a foreign table');
 
-        $expected = array('foo.FOO1' => 'bar.BAR1');
+        $expected = ['foo.FOO1' => 'bar.BAR1'];
         $this->assertEquals($expected, $this->rmap->getFieldMappings(), 'getFieldMappings() returns an associative array of column mappings');
 
         $col3 = $tmap1->addField('FOOFOO', 'INTEGER');
         $col4 = $tmap2->addField('BARBAR', 'INTEGER');
         $this->rmap->addFieldMapping($col3, $col4);
-        $this->assertEquals(array($col1, $col3), $this->rmap->getLocalFields(),
-            'addFieldMapping() adds a local table');
-        $this->assertEquals(array($col2, $col4), $this->rmap->getForeignFields(),
-            'addFieldMapping() adds a foreign table');
-        $expected = array('foo.FOO1' => 'bar.BAR1', 'foo.FOOFOO' => 'bar.BARBAR');
-        $this->assertEquals($expected, $this->rmap->getFieldMappings(),
-            'getFieldMappings() returns an associative array of column mappings');
+        $this->assertEquals(
+            [$col1, $col3],
+            $this->rmap->getLocalFields(),
+            'addFieldMapping() adds a local table'
+        );
+        $this->assertEquals(
+            [$col2, $col4],
+            $this->rmap->getForeignFields(),
+            'addFieldMapping() adds a foreign table'
+        );
+        $expected = ['foo.FOO1' => 'bar.BAR1', 'foo.FOOFOO' => 'bar.BARBAR'];
+        $this->assertEquals(
+            $expected,
+            $this->rmap->getFieldMappings(),
+            'getFieldMappings() returns an associative array of column mappings'
+        );
     }
 }

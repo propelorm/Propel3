@@ -56,7 +56,6 @@ class MssqlSchemaParserTest extends TestCase
 
         $tested = $parser->cleanDelimitedIdentifiers($expected.'\'');
         $this->assertEquals($expected.'\'', $tested);
-
     }
 }
 

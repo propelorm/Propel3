@@ -91,7 +91,7 @@ class OnDemandFormatterTest extends BookstoreEmptyTestBase
             $books = $formatter->format($stmt);
             $this->fail('OnDemandFormatter::format() trows an exception when called with no valid criteria');
         } catch (PropelException $e) {
-            $this->assertTrue(true,'OnDemandFormatter::format() trows an exception when called with no valid criteria');
+            $this->assertTrue(true, 'OnDemandFormatter::format() trows an exception when called with no valid criteria');
         }
     }
 
@@ -209,5 +209,4 @@ class OnDemandFormatterTest extends BookstoreEmptyTestBase
 
         $this->assertTrue($book instanceof Book, 'OnDemandFormatter::formatOne() returns a model object');
     }
-
 }

@@ -23,7 +23,8 @@ class QueryKeyManipulation extends BuildComponent
     {
         $this->addMethod('setQueryKey')
             ->addSimpleParameter('key')
-            ->setBody("
+            ->setBody(
+                "
 \$this->queryKey = \$key;
 
 return \$this;

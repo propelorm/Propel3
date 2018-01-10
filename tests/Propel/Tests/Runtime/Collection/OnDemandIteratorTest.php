@@ -62,5 +62,4 @@ class OnDemandIteratorTest extends BookstoreEmptyTestBase
         $this->assertFalse(Propel::isInstancePoolingEnabled());
         Propel::enableInstancePooling();
     }
-
 }

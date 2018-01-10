@@ -66,14 +66,14 @@ abstract class AbstractCriterion
      * Other connected criterions
      * @var AbstractCriterion[]
      */
-    protected $clauses = array();
+    protected $clauses = [];
 
     /**
      * Operators for connected criterions
      * Only self::UND and self::ODER are accepted
      * @var string[]
      */
-    protected $conjunctions = array();
+    protected $conjunctions = [];
 
     /**
      * @var Configuration
@@ -369,7 +369,7 @@ abstract class AbstractCriterion
      */
     public function getAllEntities()
     {
-        $entities = array();
+        $entities = [];
         $this->addCriterionEntity($this, $entities);
 
         return $entities;
@@ -395,7 +395,7 @@ abstract class AbstractCriterion
      */
     public function getAttachedCriterion()
     {
-        $criterions = array($this);
+        $criterions = [$this];
         foreach ($this->getClauses() as $criterion) {
             $criterions = array_merge($criterions, $criterion->getAttachedCriterion());
         }

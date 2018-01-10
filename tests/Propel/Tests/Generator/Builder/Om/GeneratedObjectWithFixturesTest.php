@@ -67,7 +67,6 @@ class GeneratedObjectWithFixturesTest extends BookstoreEmptyTestBase
 
         $this->assertEquals($origName, $a->getFirstName());
         $this->assertFalse($a->isModified());
-
     }
 
     /**
@@ -115,12 +114,12 @@ class GeneratedObjectWithFixturesTest extends BookstoreEmptyTestBase
             $book->setTitle("Will Fail");
             $book->save();
             $this->fail("Expect an exception to be thrown when attempting to save() a deleted object.");
-        } catch (PropelException $e) {}
+        } catch (PropelException $e) {
+        }
 
-            // 4) make sure that it doesn't exist in db
-            $book = BookQuery::create()->findPk($bookId);
+        // 4) make sure that it doesn't exist in db
+        $book = BookQuery::create()->findPk($bookId);
         $this->assertNull($book, "Expect NULL from retrieveByPK on deleted Book.");
-
     }
 
     /**
@@ -173,7 +172,6 @@ class GeneratedObjectWithFixturesTest extends BookstoreEmptyTestBase
         $this->assertInstanceOf('\Propel\Tests\Bookstore\Book', $r2->getBook(), "Expected getBook() to return a Book.");
         $this->assertInternalType('float', $r2->getBook()->getPrice(), "Expected Book->getPrice() to return a float.");
         $this->assertInstanceOf('\DateTime', $r2->getReviewDate(null), "Expected Book->getReviewDate() to return a DateTime.");
-
     }
 
     /**
@@ -309,7 +307,7 @@ class GeneratedObjectWithFixturesTest extends BookstoreEmptyTestBase
 
         $diffKeys = array_keys(array_diff($arr1, $arr2));
 
-        $expectedDiff = array(MediaTableMap::FIELD_COVER_IMAGE, MediaTableMap::FIELD_EXCERPT);
+        $expectedDiff = [MediaTableMap::FIELD_COVER_IMAGE, MediaTableMap::FIELD_EXCERPT];
 
         $this->assertEquals($expectedDiff, $diffKeys);
     }
@@ -326,8 +324,8 @@ class GeneratedObjectWithFixturesTest extends BookstoreEmptyTestBase
         $books = BookQuery::create(null, $c)->joinWith('Author')->find();
         $book = $books[0];
 
-        $arr1 = $book->toArray(TableMap::TYPE_PHPNAME, null, array(), true);
-        $expectedKeys = array(
+        $arr1 = $book->toArray(TableMap::TYPE_PHPNAME, null, [], true);
+        $expectedKeys = [
             'Id',
             'Title',
             'ISBN',
@@ -335,7 +333,7 @@ class GeneratedObjectWithFixturesTest extends BookstoreEmptyTestBase
             'PublisherId',
             'AuthorId',
             'Author'
-        );
+        ];
         $this->assertEquals($expectedKeys, array_keys($arr1), 'toArray() can return sub arrays for hydrated related objects');
         $this->assertEquals('George', $arr1['Author']['FirstName'], 'toArray() can return sub arrays for hydrated related objects');
     }
@@ -345,7 +343,7 @@ class GeneratedObjectWithFixturesTest extends BookstoreEmptyTestBase
         $a1 = new Author();
         $a1->setFirstName('Leo');
         $a1->setLastName('Tolstoi');
-        $arr = $a1->toArray(TableMap::TYPE_PHPNAME, null, array(), true);
+        $arr = $a1->toArray(TableMap::TYPE_PHPNAME, null, [], true);
         $this->assertFalse(array_key_exists('Books', $arr));
         $b1 = new Book();
         $b1->setTitle('War and Peace');
@@ -353,12 +351,11 @@ class GeneratedObjectWithFixturesTest extends BookstoreEmptyTestBase
         $b2->setTitle('Anna Karenina');
         $a1->addBook($b1);
         $a1->addBook($b2);
-        $arr = $a1->toArray(TableMap::TYPE_PHPNAME, null, array(), true);
+        $arr = $a1->toArray(TableMap::TYPE_PHPNAME, null, [], true);
         $this->assertTrue(array_key_exists('Books', $arr));
         $this->assertEquals(2, count($arr['Books']));
         $this->assertEquals('War and Peace', $arr['Books'][0]['Title']);
         $this->assertEquals('Anna Karenina', $arr['Books'][1]['Title']);
         $this->assertEquals('*RECURSION*', $arr['Books'][0]['Author']);
     }
-
 }

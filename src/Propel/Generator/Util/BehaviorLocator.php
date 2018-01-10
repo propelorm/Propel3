@@ -16,7 +16,6 @@ use Propel\Generator\Model\NamingTool;
  */
 class BehaviorLocator
 {
-
     const BEHAVIOR_PACKAGE_TYPE = 'propel-behavior';
 
     private $behaviors = null;

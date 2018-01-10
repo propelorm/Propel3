@@ -27,7 +27,6 @@ use Propel\Tests\TestCaseFixturesDatabase;
  */
 class MysqlSchemaParserTest extends TestCaseFixturesDatabase
 {
-
     public function testParse()
     {
         $this->markTestSkipped('Skipped as we now use one database for the whole test suite');

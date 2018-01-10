@@ -143,7 +143,7 @@ EOF;
 </database>
 EOF;
 
-        return array(array($schema1), array($schema1));
+        return [[$schema1], [$schema1]];
     }
 
     /**
@@ -401,7 +401,7 @@ EOF;
 </database>
 EOF;
 
-        return array(array($schema1), array($schema2));
+        return [[$schema1], [$schema2]];
     }
 
     /**

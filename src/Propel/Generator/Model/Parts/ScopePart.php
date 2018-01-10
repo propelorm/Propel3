@@ -1,8 +1,8 @@
 <?php
 namespace Propel\Generator\Model\Parts;
 
-trait ScopePart {
-
+trait ScopePart
+{
     use SuperordinatePart;
 
     private $scope;
@@ -34,4 +34,3 @@ trait ScopePart {
         return null === $scope ? '' : $scope;
     }
 }
-

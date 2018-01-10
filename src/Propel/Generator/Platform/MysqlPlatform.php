@@ -124,7 +124,7 @@ class MysqlPlatform extends SqlDefaultPlatform
             // MySQL needs indices on any columns that serve as foreign keys.
             // These are not auto-created prior to 4.1.2.
 
-            $name = substr_replace($relation->getName(), 'fi_',  strrpos($relation->getName(), 'fk_'), 3);
+            $name = substr_replace($relation->getName(), 'fi_', strrpos($relation->getName(), 'fk_'), 3);
             if ($entity->hasIndex($name)) {
                 // if we already have an index with this name, then it looks like the columns of this index have just
                 // been changed, so remove it and inject it again. This is the case if a referenced entity is handled
@@ -314,7 +314,6 @@ SET FOREIGN_KEY_CHECKS = 1;
     public function getPrimaryKeyDDL(Entity $entity)
     {
         if ($entity->hasPrimaryKey()) {
-
             $keys = $entity->getPrimaryKey();
 
             //MySQL throws an 'Incorrect entity definition; there can be only one auto field and it must be defined as a key'
@@ -335,7 +334,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 
     public function getAddEntityDDL(Entity $entity)
     {
-        $lines = array();
+        $lines = [];
 
         foreach ($entity->getFields() as $field) {
             $lines[] = $this->getFieldDDL($field);
@@ -390,7 +389,8 @@ CREATE TABLE %s
 ) %s=%s%s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($this->getName($entity)),
             implode($sep, $lines),
             $this->getEntityEngineKeyword(),
@@ -404,10 +404,10 @@ CREATE TABLE %s
         $dbVI = $entity->getDatabase()->getVendorInfoForType('mysql');
         $entityVI = $entity->getVendorInfoForType('mysql');
         $vi = $dbVI->getMergedVendorInfo($entityVI);
-        $entityOptions = array();
+        $entityOptions = [];
         // List of supported entity options
         // see http://dev.mysql.com/doc/refman/5.5/en/create-entity.html
-        $supportedOptions = array(
+        $supportedOptions = [
             'AutoIncrement'   => 'AUTO_INCREMENT',
             'AvgRowLength'    => 'AVG_ROW_LENGTH',
             'Charset'         => 'CHARACTER SET',
@@ -426,7 +426,7 @@ CREATE TABLE %s
             'PackKeys'        => 'PACK_KEYS',
             'RowFormat'       => 'ROW_FORMAT',
             'Union'           => 'UNION',
-        );
+        ];
 
         $noQuotedValue = array_flip([
             'InsertMethod',
@@ -491,7 +491,7 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
             }
         }
 
-        $ddl = array($this->quoteIdentifier($this->getName($col)));
+        $ddl = [$this->quoteIdentifier($this->getName($col))];
         if ($this->hasSize($sqlType) && $col->isDefaultSqlType($this)) {
             $ddl[] = $sqlType . $col->getSizeDefinition();
         } else {
@@ -551,7 +551,7 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
      */
     protected function getIndexFieldListDDL(Index $index)
     {
-        $list = array();
+        $list = [];
         foreach ($index->getFieldObjects() as $col) {
             $list[] = $this->quoteIdentifier($this->getName($col)) . ($index->hasFieldSize($col->getName()) ? '(' . $index->getFieldSize($col->getName()) . ')' : '');
         }
@@ -575,7 +575,8 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
 ALTER TABLE %s DROP PRIMARY KEY;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($this->getName($entity))
         );
     }
@@ -592,7 +593,8 @@ ALTER TABLE %s DROP PRIMARY KEY;
 CREATE %sINDEX %s ON %s (%s);
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->getIndexType($index),
             $this->quoteIdentifier($this->getName($index)),
             $this->quoteIdentifier($this->getName($index->getEntity())),
@@ -612,7 +614,8 @@ CREATE %sINDEX %s ON %s (%s);
 DROP INDEX %s ON %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($this->getName($index)),
             $this->quoteIdentifier($this->getName($index->getEntity()))
         );
@@ -624,7 +627,8 @@ DROP INDEX %s ON %s;
      */
     public function getIndexDDL(Index $index)
     {
-        return sprintf('%sINDEX %s (%s)',
+        return sprintf(
+            '%sINDEX %s (%s)',
             $this->getIndexType($index),
             $this->quoteIdentifier($this->getName($index)),
             $this->getIndexFieldListDDL($index)
@@ -646,7 +650,8 @@ DROP INDEX %s ON %s;
 
     public function getUniqueDDL(Unique $unique)
     {
-        return sprintf('UNIQUE INDEX %s (%s)',
+        return sprintf(
+            'UNIQUE INDEX %s (%s)',
             $this->quoteIdentifier($this->getName($unique)),
             $this->getIndexFieldListDDL($unique)
         );
@@ -679,7 +684,9 @@ DROP INDEX %s ON %s;
 
     public function getDropRelationDDL(Relation $relation)
     {
-        if (!$this->supportsRelations($relation->getEntity())) return '';
+        if (!$this->supportsRelations($relation->getEntity())) {
+            return '';
+        }
 
         if ($relation->isSkipSql()) {
             return;
@@ -688,7 +695,8 @@ DROP INDEX %s ON %s;
 ALTER TABLE %s DROP FOREIGN KEY %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($this->getName($relation->getEntity())),
             $this->quoteIdentifier($this->getName($relation))
         );
@@ -713,7 +721,6 @@ ALTER TABLE %s DROP FOREIGN KEY %s;
      */
     public function getModifyDatabaseDDL(DatabaseDiff $databaseDiff)
     {
-
         $ret = '';
 
         foreach ($databaseDiff->getRemovedEntities() as $entity) {
@@ -749,7 +756,8 @@ ALTER TABLE %s DROP FOREIGN KEY %s;
 RENAME TABLE %s TO %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($fromEntityName),
             $this->quoteIdentifier($toEntityName)
         );
@@ -766,7 +774,8 @@ RENAME TABLE %s TO %s;
 ALTER TABLE %s DROP %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($this->getName($field->getEntity())),
             $this->quoteIdentifier($this->getName($field))
         );
@@ -801,7 +810,8 @@ ALTER TABLE %s DROP %s;
 ALTER TABLE %s CHANGE %s %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($this->getName($fromField->getEntity())),
             $this->quoteIdentifier($this->getName($fromField)),
             $this->getFieldDDL($toField)
@@ -832,25 +842,25 @@ ALTER TABLE %s CHANGE %s %s;
 
     public function hasSize($sqlType)
     {
-        return !in_array($sqlType, array(
+        return !in_array($sqlType, [
             'MEDIUMTEXT',
             'LONGTEXT',
             'BLOB',
             'MEDIUMBLOB',
             'LONGBLOB',
-        ));
+        ]);
     }
 
     public function getDefaultTypeSizes()
     {
-        return array(
+        return [
             'char'     => 1,
             'tinyint'  => 4,
             'smallint' => 6,
             'int'      => 11,
             'bigint'   => 20,
             'decimal'  => 10,
-        );
+        ];
     }
 
     /**
@@ -875,7 +885,7 @@ ALTER TABLE %s CHANGE %s %s;
      */
     public function doQuoting($text)
     {
-        return '`' . strtr($text, array('.' => '`.`')) . '`';
+        return '`' . strtr($text, ['.' => '`.`']) . '`';
     }
 
     public function getTimestampFormatter()

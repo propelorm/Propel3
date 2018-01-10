@@ -50,7 +50,6 @@ class ScopeAccessorMethod extends BuildComponent
 return \$onlyNulls && \$returnNulls ? null : \$result;
 ";
         } else {
-
             $body .= "
 
     return \$this->get{$behavior->getFieldForParameter('scope_field')->getMethodName()}();
@@ -76,7 +75,6 @@ return \$onlyNulls && \$returnNulls ? null : \$result;
 
         $body = '';
         if ($behavior->hasMultipleScopes()) {
-
             foreach ($behavior->getScopes() as $idx => $scopeField) {
                 $body .= "
 \$this->set{$behavior->getEntity()->getField($scopeField)->getMethodName()}(null ? null : \$v[$idx]);
