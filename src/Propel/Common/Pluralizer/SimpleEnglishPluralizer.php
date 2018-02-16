@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Common\Pluralizer;
 
 /**
@@ -24,7 +26,7 @@ class SimpleEnglishPluralizer implements PluralizerInterface
      * @param  string $root The root that needs to be pluralized (e.g. Author)
      * @return string The plural form of $root (e.g. Authors).
      */
-    public function getPluralForm($root)
+    public function getPluralForm(string $root): string
     {
         return $root . 's';
     }

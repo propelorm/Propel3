@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Tests\Common\Config;
 
 use Propel\Tests\TestCase;
@@ -25,7 +27,10 @@ class ConfigTestCase extends TestCase
      */
     private $fileSystem = null;
 
-    public function getFilesystem()
+    /**
+     * @return null|Filesystem
+     */
+    public function getFilesystem():? Filesystem
     {
         if (null === $this->fileSystem) {
             $this->fileSystem = new Filesystem();
@@ -40,7 +45,7 @@ class ConfigTestCase extends TestCase
      * @param string $filename File Name
      * @param string $content  File content
      */
-    public function dumpTempFile($filename, $content)
+    public function dumpTempFile(string $filename, string $content): void
     {
         $this->getFilesystem()->dumpFile(sys_get_temp_dir() . '/' . $filename, $content);
     }

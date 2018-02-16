@@ -8,12 +8,14 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Config;
 
 use Propel\Common\Pluralizer\PluralizerInterface;
 use Propel\Common\Types\BuildableFieldTypeInterface;
 use Propel\Common\Types\FieldTypeInterface;
-use Propel\Generator\Builder\Om\AbstractBuilder;
+use Propel\Generator\Builder\DataModelBuilder;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Platform\PlatformInterface;
 use Propel\Runtime\Connection\ConnectionInterface;
@@ -28,16 +30,16 @@ interface GeneratorConfigInterface
      * @param  Entity $entity
      * @param  string $type
      *
-     * @return AbstractBuilder
+     * @return DataModelBuilder
      */
-    public function getConfiguredBuilder(Entity $entity, $type);
+    public function getConfiguredBuilder(Entity $entity, string $type): DataModelBuilder;
 
     /**
      * Returns a configured Pluralizer class.
      *
      * @return PluralizerInterface
      */
-    public function getConfiguredPluralizer();
+    public function getConfiguredPluralizer(): PluralizerInterface;
 
     /**
      * Creates and configures a new Platform class.
@@ -47,7 +49,7 @@ interface GeneratorConfigInterface
      *
      * @return PlatformInterface
      */
-    public function createPlatform($platform, ConnectionInterface $con = null);
+    public function createPlatform(string $platform, ConnectionInterface $con = null): PlatformInterface;
 
     /**
      * @param string|null $name returns default platform if null
@@ -55,21 +57,21 @@ interface GeneratorConfigInterface
      *
      * @return PlatformInterface
      */
-    public function createPlatformForDatabase($name = null, ConnectionInterface $con = null);
+    public function createPlatformForDatabase(string $name = null, ConnectionInterface $con = null): PlatformInterface;
 
     /**
      * Returns the behavior locator.
      *
      * @return BehaviorLocator
      */
-    public function getBehaviorLocator();
+    public function getBehaviorLocator(): BehaviorLocator;
 
     /**
      * @param string $name
      *
      * @return FieldTypeInterface|BuildableFieldTypeInterface
      */
-    public function getFieldType($name);
+    public function getFieldType(string $name);
 
     /**
      * Return a specific configuration property.
@@ -84,5 +86,5 @@ interface GeneratorConfigInterface
      * @throws \Propel\Common\Config\Exception\InvalidArgumentException
      * @return mixed The configuration property
      */
-    public function getConfigProperty($name);
+    public function getConfigProperty(string $name);
 }

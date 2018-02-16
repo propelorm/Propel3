@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Common\Config\Loader;
 
 use Propel\Common\Config\Exception\InputOutputException;
@@ -34,8 +36,9 @@ class PhpFileLoader extends FileLoader
      *
      * @param mixed  $file The resource
      * @param string $type The resource type
+     * @return array
      *
-     * @throws \InvalidArgumentException                               if configuration file not found
+     * @throws \InvalidArgumentException                                if configuration file not found
      * @throws \Propel\Common\Config\Exception\InvalidArgumentException if invalid json file
      * @throws \Propel\Common\Config\Exception\InputOutputException     if configuration file is not readable
      */
@@ -71,7 +74,7 @@ class PhpFileLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, $type = null): bool
     {
         $info = pathinfo($resource);
         $extension = $info['extension'];

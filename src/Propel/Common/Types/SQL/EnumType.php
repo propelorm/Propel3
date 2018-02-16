@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ */
+
+declare(strict_types=1);
+
 namespace Propel\Common\Types\SQL;
 
 use gossi\codegen\model\PhpConstant;
@@ -7,23 +17,49 @@ use Propel\Common\Types\AbstractType;
 use Propel\Common\Types\BuildableFieldTypeInterface;
 use Propel\Generator\Builder\Om\AbstractBuilder;
 use Propel\Generator\Builder\Om\ObjectBuilder;
-use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Field;
 use Propel\Runtime\Map\FieldMap;
 
+/**
+ * Class EnumType
+ *
+ * @author Marc J. Schmidt <marc@marcjschmidt.de>
+ */
 class EnumType extends AbstractType implements BuildableFieldTypeInterface
 {
+    /**
+     * {@inheritdoc}
+     *
+     * @param $value
+     * @param FieldMap $fieldMap
+     *
+     * @return mixed
+     */
     public function databaseToProperty($value, FieldMap $fieldMap)
     {
         return $value;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @param mixed $value
+     * @param FieldMap $fieldMap
+     *
+     * @return mixed
+     */
     public function propertyToDatabase($value, FieldMap $fieldMap)
     {
         return $value;
     }
 
-    public function build(AbstractBuilder $builder, Field $field)
+    /**
+     * {@inheritdoc}
+     *
+     * @param AbstractBuilder $builder
+     * @param Field $field
+     */
+    public function build(AbstractBuilder $builder, Field $field): void
     {
         if ($builder instanceof ObjectBuilder) {
             $types = [];
@@ -45,5 +81,4 @@ class EnumType extends AbstractType implements BuildableFieldTypeInterface
             $builder->getDefinition()->setConstant($constant);
         }
     }
-
 }

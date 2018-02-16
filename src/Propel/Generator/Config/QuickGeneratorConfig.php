@@ -8,18 +8,22 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Config;
 
-use Propel\Common\Config\ConfigurationManager;
 use Propel\Common\Pluralizer\PluralizerInterface;
 use Propel\Common\Pluralizer\StandardEnglishPluralizer;
 use Propel\Generator\Builder\DataModelBuilder;
 use Propel\Generator\Exception\InvalidArgumentException;
 use Propel\Generator\Model\Entity;
-use Propel\Generator\Platform\SqlDefaultPlatform;
-use \Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Generator\Util\BehaviorLocator;
 
+/**
+ * Class QuickGeneratorConfig
+ *
+ * Simple generator config class. It's usually used with QuickBuilder, for testing purpose
+ */
 class QuickGeneratorConfig extends GeneratorConfig implements GeneratorConfigInterface
 {
     /**
@@ -27,36 +31,41 @@ class QuickGeneratorConfig extends GeneratorConfig implements GeneratorConfigInt
      */
     protected $behaviorLocator = null;
 
-    public function __construct($extraConf = array())
+    /**
+     * QuickGeneratorConfig constructor.
+     *
+     * @param array $extraConf
+     */
+    public function __construct(array $extraConf = [])
     {
         if (null === $extraConf) {
-            $extraConf = array();
+            $extraConf = [];
         }
 
         //Creates a GeneratorConfig based on Propel default values plus the following
-        $configs = array(
-            'propel' => array(
-                'database' => array(
-                    'connections' => array(
-                        'default' => array(
+        $configs = [
+            'propel' => [
+                'database' => [
+                    'connections' => [
+                        'default' => [
                             'adapter' => 'sqlite',
                             'classname' => 'Propel\Runtime\Connection\DebugPDO',
                             'dsn' => 'sqlite::memory:',
                             'user' => '',
                             'password' => ''
-                        )
-                    )
-                ),
-                'runtime' => array(
+                        ]
+                    ]
+                ],
+                'runtime' => [
                     'defaultConnection' => 'default',
-                    'connections' => array('default')
-                ),
-                'generator' => array(
+                    'connections' => ['default']
+                ],
+                'generator' => [
                     'defaultConnection' => 'default',
-                    'connections' => array('default')
-                )
-            )
-        );
+                    'connections' => ['default']
+                ]
+            ]
+        ];
 
         $configs = array_replace_recursive($configs, $extraConf);
         $this->process($configs);
@@ -70,7 +79,7 @@ class QuickGeneratorConfig extends GeneratorConfig implements GeneratorConfigInt
      * @param  string $type
      * @return DataModelBuilder
      */
-    public function getConfiguredBuilder(Entity $entity, $type)
+    public function getConfiguredBuilder(Entity $entity, string $type): DataModelBuilder
     {
         $class = $this->getConfigProperty('generator.objectModel.builders.' . $type);
 
@@ -89,12 +98,12 @@ class QuickGeneratorConfig extends GeneratorConfig implements GeneratorConfigInt
      *
      * @return PluralizerInterface
      */
-    public function getConfiguredPluralizer()
+    public function getConfiguredPluralizer(): PluralizerInterface
     {
         return new StandardEnglishPluralizer();
     }
 
-    public function getBehaviorLocator()
+    public function getBehaviorLocator(): BehaviorLocator
     {
         if (!$this->behaviorLocator) {
             $this->behaviorLocator = new BehaviorLocator($this);

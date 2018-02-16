@@ -8,7 +8,10 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Config;
+
 use Propel\Runtime\Propel;
 
 /**
@@ -24,7 +27,7 @@ class ArrayToPhpConverter
      *
      * @return string
      */
-    public static function convert($c)
+    public static function convert(array $c): string
     {
         $runtimeVersion = Propel::VERSION;
 

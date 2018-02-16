@@ -10,6 +10,11 @@
 
 namespace Propel\Common\Config\Exception;
 
+/**
+ * Class IniParseException
+ *
+ * This exception is thrown at runtime, if the parser for ini files encounters an error.
+ */
 class IniParseException extends RuntimeException implements ExceptionInterface
 {
 }

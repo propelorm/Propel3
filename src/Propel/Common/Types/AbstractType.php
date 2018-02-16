@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ */
+
+declare(strict_types=1);
+
 namespace Propel\Common\Types;
 
 use gossi\codegen\model\PhpMethod;
@@ -12,7 +22,11 @@ use Propel\Runtime\Map\FieldMap;
  */
 abstract class AbstractType implements FieldTypeInterface
 {
-    public function decorateGetterMethod(PhpMethod $method, Field $field)
+    /**
+     * @param PhpMethod $method
+     * @param Field $field
+     */
+    public function decorateGetterMethod(PhpMethod $method, Field $field): void
     {
         $varName = $field->getName();
 

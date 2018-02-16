@@ -10,6 +10,11 @@
 
 namespace Propel\Common\Config\Exception;
 
+/**
+ * Interface ExceptionInterface
+ *
+ * Interface to standardize configuration exceptions
+ */
 interface ExceptionInterface
 {
 }

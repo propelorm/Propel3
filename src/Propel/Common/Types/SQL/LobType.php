@@ -1,11 +1,25 @@
 <?php
 
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ */
+
+declare(strict_types=1);
+
 namespace Propel\Common\Types\SQL;
 
 use Propel\Common\Types\AbstractType;
-use Propel\Generator\Model\Field;
 use Propel\Runtime\Map\FieldMap;
 
+/**
+ * Class LobType
+ *
+ * @author Marc J. Schmidt <marc@marcjschmidt.de>
+ */
 class LobType extends AbstractType
 {
 //    public function convertToPHPValue($value, FieldMap $fieldMap)
@@ -22,6 +36,14 @@ class LobType extends AbstractType
 //        return 'resource';
 //    }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @param $value
+     * @param FieldMap $fieldMap
+     *
+     * @return bool|string
+     */
     public function databaseToProperty($value, FieldMap $fieldMap)
     {
         if (is_resource($value)) {
@@ -34,6 +56,14 @@ class LobType extends AbstractType
         return $value;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @param mixed $value
+     * @param FieldMap $fieldMap
+     *
+     * @return mixed
+     */
     public function propertyToDatabase($value, FieldMap $fieldMap)
     {
         return $value;
