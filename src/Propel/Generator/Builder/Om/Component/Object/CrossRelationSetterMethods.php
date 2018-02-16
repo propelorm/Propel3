@@ -59,12 +59,27 @@ class CrossRelationSetterMethods extends BuildComponent
         $collName = $this->getCrossRelationRelationVarName($relation);
 
         $remover = 'remove' . $this->getRelationPhpName($relation);
-        $adder = 'add' . $this->getRelationPhpName($crossRelation->getIncomingRelation(), false);
+        $post = $this->getRelationPhpName($crossRelation->getOutgoingRelation(), false);
 
     $body = "
+if (\$this->$collName === $$collName) {
+    //If `$$collName` passed by reference, and it refers to `\$this->$collName`, update relations only
+    foreach ($$collName as \$obj) {
+        \$this->postRemove$post(\$obj);
+        \$this->postAdd$post(\$obj);
+    }
+    
+    return \$this;
+}
+
 //break relationship with old objects
 foreach (\$this->$collName as \$item) {
     \$this->{$remover}(\$item);
+}
+
+//If the collection is empty, reset index
+if (\$this->{$collName}->isEmpty()) {
+    \$this->{$collName}->exchangeArray([]);
 }
 
 foreach (\$$collName as \$item) {
