@@ -253,4 +253,18 @@ class ObjectCollectionTest extends BookstoreTestBase
         $this->assertTrue(0 === $col->search($b1));
         $this->assertFalse(0 === $col->search($b2));
     }
+
+    public function testObjectCollectionOfObjectCollections()
+    {
+        $col1 = new ObjectCollection();
+        $b1  = new Book();
+        $b1->setTitle('Bar');
+        $b1->setISBN('012345');
+        $col2  = clone $b1;
+
+       $col = new ObjectCollection([$col1]);
+
+       $this->assertTrue($col->contains($col1));
+       $this->assertFalse($col->contains($col2));
+    }
 }

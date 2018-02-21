@@ -173,6 +173,15 @@ class Collection implements \ArrayAccess, \IteratorAggregate, \Countable, \Seria
     }
 
     /**
+     * Return hash representation of collection
+     * @return string
+     */
+    public function hashCode()
+    {
+        return spl_object_hash($this);
+    }
+
+    /**
      * Get the first element in the collection
      *
      * @return mixed
