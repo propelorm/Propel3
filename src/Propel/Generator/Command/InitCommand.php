@@ -217,6 +217,27 @@ class InitCommand extends AbstractCommand
         $this->writeFile($io, sprintf('%s/schema.xml', $options['schemaDir']), $options['schema']);
         $this->writeFile($io, sprintf('%s/propel.%s', getcwd(), $options['format']), $config->render($options));
         $this->writeFile($io, sprintf('%s/propel.%s.dist', getcwd(), $options['format']), $distConfig->render($options));
+
+        $this->buildSqlAndModelsAndConvertConfig();
+    }
+
+    private function buildSqlAndModelsAndConvertConfig()
+    {
+        $this->getApplication()->setAutoExit(false);
+
+        $followUpCommands = [
+            'sql:build',
+            'model:build',
+            'config:convert',
+        ];
+
+        foreach($followUpCommands as $command) {
+            if (0 !== $this->getApplication()->run(new StringInput($command))) {
+                exit(1);
+            }
+        }
+
+        $this->getApplication()->setAutoExit(true);
     }
 
     private function writeFile(StyleInterface $io, $filename, $content)
