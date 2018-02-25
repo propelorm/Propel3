@@ -10,9 +10,10 @@
 
 namespace Propel\Generator\Builder\Om;
 
-use gossi\codegen\generator\CodeGenerator;
 use gossi\codegen\model\PhpMethod;
 use Propel\Common\Types\BuildableFieldTypeInterface;
+use Propel\Generator\Code\CodeGenerator;
+use Propel\Generator\Code\ModelGenerator;
 use Propel\Generator\Builder\DataModelBuilder;
 use Propel\Generator\Builder\Om\Component\BuildComponent;
 use Propel\Generator\Builder\Om\Component\ComponentTrait;
@@ -109,6 +110,8 @@ abstract class AbstractBuilder extends DataModelBuilder
         $this->applyBehaviorModifier();
 
         $generator = new CodeGenerator();
+        $modelGenerator = new ModelGenerator($generator->getConfig());
+        $generator->setModelGenerator($modelGenerator);
 
         $code = "<?php\n\n" . $generator->generate($this->getDefinition());
 
