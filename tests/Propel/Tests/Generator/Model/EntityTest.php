@@ -268,16 +268,16 @@ class EntityTest extends ModelTestCase
 //         $this->assertSame('created_at', $entity->getTableName());
 //     }
 
-//     public function testSetDescription()
-//     {
-//         $entity = new Entity();
+     public function testSetDescription()
+     {
+         $entity = new Entity();
 
-//         $this->assertFalse($entity->hasDescription());
+         $this->assertFalse($entity->hasDescription());
 
-//         $entity->setDescription('Some description');
-//         $this->assertTrue($entity->hasDescription());
-//         $this->assertSame('Some description', $entity->getDescription());
-//     }
+         $entity->setDescription('Some description');
+         $this->assertNotNull($entity->getDescription());
+         $this->assertSame('Some description', $entity->getDescription());
+     }
 
 //     public function testSetInvalidDefaultStringFormat()
 //     {

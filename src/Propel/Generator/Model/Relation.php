@@ -8,10 +8,16 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Model;
 
+use phootwork\collection\Set;
 use Propel\Generator\Exception\BuildException;
-use Propel\Generator\Exception\EngineException;
+use Propel\Generator\Model\Parts\DatabasePart;
+use Propel\Generator\Model\Parts\EntityPart;
+use Propel\Generator\Model\Parts\NamePart;
+use Propel\Generator\Model\Parts\SuperordinatePart;
 use Propel\Generator\Platform\PlatformInterface;
 
 /**
@@ -23,19 +29,9 @@ use Propel\Generator\Platform\PlatformInterface;
  * @author Ulf Hermann <ulfhermann@kulturserver.de>
  * @author Hugo Hamon <webmaster@apprendre-php.com> (Propel)
  */
-class Relation extends MappingModel
+class Relation
 {
-    /**
-     * These constants are the uppercase equivalents of the onDelete / onUpdate
-     * values in the schema definition.
-     *
-     */
-    const NONE = '';           // No 'ON [ DELETE | UPDATE]' behavior
-    const NOACTION = 'NO ACTION';
-    const CASCADE = 'CASCADE';
-    const RESTRICT = 'RESTRICT';
-    const SETDEFAULT = 'SET DEFAULT';
-    const SETNULL = 'SET NULL';
+    use NamePart, DatabasePart, EntityPart, SuperordinatePart;
 
     /**
      * @var string
@@ -57,8 +53,6 @@ class Relation extends MappingModel
     /**
      * @var string
      */
-    private $name;
-
     private $field;
     private $refField;
 
@@ -83,17 +77,12 @@ class Relation extends MappingModel
     private $onDelete = '';
 
     /**
-     * @var Entity
-     */
-    private $parentEntity;
-
-    /**
-     * @var string[]
+     * @var Set
      */
     private $localFields;
 
     /**
-     * @var string[]
+     * @var Set
      */
     private $foreignFields;
 
@@ -119,19 +108,26 @@ class Relation extends MappingModel
      */
     public function __construct($name = null)
     {
-        parent::__construct();
-
         if (null !== $name) {
             $this->setName($name);
         }
 
-        $this->onUpdate = self::NONE;
-        $this->onDelete = self::NONE;
-        $this->localFields = [];
-        $this->foreignFields = [];
+        $this->onUpdate = Model::RELATION_NONE;
+        $this->onDelete = Model::RELATION_NONE;
+        $this->localFields = new Set();
+        $this->foreignFields = new Set();
         $this->skipSql = false;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function getSuperordinate(): Entity
+    {
+        return $this->getEntity();
+    }
+
+    /*
     protected function setupObject()
     {
         $this->foreignEntityName = $this->getAttribute('target') ?: $this->getAttribute('target');
@@ -151,11 +147,12 @@ class Relation extends MappingModel
         $this->onDelete = $this->normalizeFKey($this->getAttribute('onDelete'));
         $this->skipSql = $this->booleanValue($this->getAttribute('skipSql'));
     }
+*/
 
     /**
      * @return string
      */
-    public function getField()
+    public function getField(): string
     {
         $field = $this->field;
 
@@ -171,7 +168,7 @@ class Relation extends MappingModel
     /**
      * @param string $field
      */
-    public function setField($field)
+    public function setField(string $field)
     {
         $this->field = $field;
     }
@@ -179,7 +176,7 @@ class Relation extends MappingModel
     /**
      * @return null|string
      */
-    public function getRefField()
+    public function getRefField(): ?string
     {
         return $this->refField;
     }
@@ -187,7 +184,7 @@ class Relation extends MappingModel
     /**
      * @param string $refField
      */
-    public function setRefField($refField)
+    public function setRefField(string $refField)
     {
         $this->refField = $refField;
     }
@@ -198,20 +195,20 @@ class Relation extends MappingModel
      *
      * @return string
      */
-    public function normalizeFKey($behavior)
+    public function normalizeFKey(string $behavior): string
     {
         if (null === $behavior) {
-            return self::NONE;
+            return Model::RELATION_NONE;
         }
 
         $behavior = strtoupper($behavior);
 
         if ('NONE' === $behavior) {
-            return self::NONE;
+            return Model::RELATION_NONE;
         }
 
         if ('SETNULL' === $behavior) {
-            return self::SETNULL;
+            return Model::RELATION_SETNULL;
         }
 
         return $behavior;
@@ -222,9 +219,9 @@ class Relation extends MappingModel
      *
      * @return boolean
      */
-    public function hasOnUpdate()
+    public function hasOnUpdate(): bool
     {
-        return self::NONE !== $this->onUpdate;
+        return Model::RELATION_NONE !== $this->onUpdate;
     }
 
     /**
@@ -232,15 +229,15 @@ class Relation extends MappingModel
      *
      * @return boolean
      */
-    public function hasOnDelete()
+    public function hasOnDelete(): bool
     {
-        return self::NONE !== $this->onDelete;
+        return Model::RELATION_SETNULL !== $this->onDelete;
     }
 
     /**
      * @return boolean
      */
-    public function isSkipCodeGeneration()
+    public function isSkipCodeGeneration(): bool
     {
         return $this->skipCodeGeneration;
     }
@@ -248,7 +245,7 @@ class Relation extends MappingModel
     /**
      * @param boolean $skipCodeGeneration
      */
-    public function setSkipCodeGeneration($skipCodeGeneration)
+    public function setSkipCodeGeneration(bool $skipCodeGeneration)
     {
         $this->skipCodeGeneration = $skipCodeGeneration;
     }
@@ -260,9 +257,15 @@ class Relation extends MappingModel
      *
      * @return boolean
      */
-    public function hasLocalField(Field $field)
+    public function hasLocalField(Field $field): bool
     {
-        return in_array($field, $this->getLocalFieldObjects(), true);
+        if ($field = $this->getEntity()->getField($field->getName())) {
+            return $this->localFields->search($field->getName(), function($element, $query) {
+                return $element = $query;
+            });
+        }
+
+        return false;
     }
 
     /**
@@ -270,7 +273,7 @@ class Relation extends MappingModel
      *
      * @return string
      */
-    public function getOnUpdate()
+    public function getOnUpdate(): string
     {
         return $this->onUpdate;
     }
@@ -280,7 +283,7 @@ class Relation extends MappingModel
      *
      * @return string
      */
-    public function getOnDelete()
+    public function getOnDelete(): string
     {
         return $this->onDelete;
     }
@@ -290,7 +293,7 @@ class Relation extends MappingModel
      *
      * @param string $behavior
      */
-    public function setOnDelete($behavior)
+    public function setOnDelete(string $behavior)
     {
         $this->onDelete = $this->normalizeFKey($behavior);
     }
@@ -300,7 +303,7 @@ class Relation extends MappingModel
      *
      * @param string $behavior
      */
-    public function setOnUpdate($behavior)
+    public function setOnUpdate(string $behavior)
     {
         $this->onUpdate = $this->normalizeFKey($behavior);
     }
@@ -310,16 +313,17 @@ class Relation extends MappingModel
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         $this->doNaming();
+
         return $this->name;
     }
 
     /**
      * @return bool
      */
-    public function hasName()
+    public function hasName(): bool
     {
         return !!$this->name && !$this->autoNaming;
     }
@@ -329,7 +333,7 @@ class Relation extends MappingModel
      *
      * @param string $name
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->autoNaming = !$name; //if no name we activate autoNaming
         $this->name = $name;
@@ -342,7 +346,7 @@ class Relation extends MappingModel
 
             $hash = [];
             if ($this->getForeignEntity()) {
-                $hash[] = $this->getForeignEntity()->getFQTableName();
+                $hash[] = $this->getForeignEntity()->getFullTableName();
             }
             $hash[] = implode(',', (array)$this->localFields);
             $hash[] = implode(',', (array)$this->foreignFields);
@@ -363,7 +367,7 @@ class Relation extends MappingModel
      *
      * @return string
      */
-    public function getRefName()
+    public function getRefName(): string
     {
         return $this->refName;
     }
@@ -373,7 +377,7 @@ class Relation extends MappingModel
      *
      * @param string $name
      */
-    public function setRefName($name)
+    public function setRefName(string $name)
     {
         $this->refName = $name;
     }
@@ -383,7 +387,7 @@ class Relation extends MappingModel
      *
      * @return string
      */
-    public function getDefaultJoin()
+    public function getDefaultJoin(): string
     {
         return $this->defaultJoin;
     }
@@ -393,40 +397,32 @@ class Relation extends MappingModel
      *
      * @param string $join
      */
-    public function setDefaultJoin($join)
+    public function setDefaultJoin(string $join)
     {
         $this->defaultJoin = $join;
     }
 
+
     /**
+     * Never used: remove?
      * Returns the PlatformInterface instance.
      *
      * @return PlatformInterface
      */
-    private function getPlatform()
+    /*private function getPlatform()
     {
         return $this->parentEntity->getPlatform();
-    }
-
-    /**
-     * Returns the Database object of this Field.
-     *
-     * @return Database
-     */
-    public function getDatabase()
-    {
-        return $this->parentEntity->getDatabase();
-    }
+    }*/
 
     /**
      * Returns the foreign table name of the FK, aka 'target'.
      *
      * @return string
      */
-    public function getForeignEntityName()
+    public function getForeignEntityName(): string
     {
         if (null === $this->foreignEntityName && null !== $this->foreignEntity) {
-            $this->foreignEntity->getFullClassName();
+            $this->foreignEntityName = $this->foreignEntity->getFullName();
         }
 
         return $this->foreignEntityName;
@@ -451,7 +447,7 @@ class Relation extends MappingModel
     /**
      * @param string $foreignEntityName
      */
-    public function setForeignEntityName($foreignEntityName)
+    public function setForeignEntityName(string $foreignEntityName)
     {
         $this->foreignEntityName = $foreignEntityName;
     }
@@ -461,43 +457,23 @@ class Relation extends MappingModel
      *
      * @return Entity|null
      */
-    public function getForeignEntity()
+    public function getForeignEntity(): ?Entity
     {
         if (null !== $this->foreignEntity) {
             return $this->foreignEntity;
         }
 
-        if (($database = $this->parentEntity->getDatabase()) && $this->getForeignEntityName()) {
-            return $database->getEntity($this->getForeignEntityName());
+        if (($database = $this->getEntity()->getDatabase()) && $this->getForeignEntityName()) {
+            return $database->getEntityByName($this->getForeignEntityName());
         }
     }
 
     /**
      * @param null|Entity $foreignEntity
      */
-    public function setForeignEntity($foreignEntity)
+    public function setForeignEntity(Entity $foreignEntity)
     {
         $this->foreignEntity = $foreignEntity;
-    }
-
-    /**
-     * Sets the parent Entity of the foreign key.
-     *
-     * @param Entity $table
-     */
-    public function setEntity(Entity $parent)
-    {
-        $this->parentEntity = $parent;
-    }
-
-    /**
-     * Returns the parent Entity of the foreign key.
-     *
-     * @return Entity
-     */
-    public function getEntity()
-    {
-        return $this->parentEntity;
     }
 
     /**
@@ -505,9 +481,9 @@ class Relation extends MappingModel
      *
      * @return string
      */
-    public function getEntityName()
+    public function getEntityName(): string
     {
-        return $this->parentEntity->getName();
+        return $this->getEntity()->getName();
     }
 
     /**
@@ -515,9 +491,9 @@ class Relation extends MappingModel
      *
      * @return string
      */
-    public function getSchemaName()
+    public function getSchemaName(): string
     {
-        return $this->parentEntity->getSchema();
+        return $this->getEntity()->getDatabase()->getSchema()->getName();
     }
 
     /**
@@ -529,15 +505,15 @@ class Relation extends MappingModel
     public function addReference($ref1, $ref2 = null)
     {
         if (is_array($ref1)) {
-            $this->localFields[] = $ref1['local'] ?? null;
-            $this->foreignFields[] = $ref1['foreign'] ?? null;
+            $this->localFields->add($ref1['local'] ?? null);
+            $this->foreignFields->add($ref1['foreign'] ?? null);
 
             return;
         }
 
         if (is_string($ref1)) {
-            $this->localFields[] = $ref1;
-            $this->foreignFields[] = is_string($ref2) ? $ref2 : null;
+            $this->localFields->add($ref1);
+            $this->foreignFields->add(is_string($ref2) ? $ref2 : null);
 
             return;
         }
@@ -552,8 +528,8 @@ class Relation extends MappingModel
             $foreign = $ref2->getName();
         }
 
-        $this->localFields[] = $local;
-        $this->foreignFields[] = $foreign;
+        $this->localFields->add($local);
+        $this->foreignFields->add($foreign);
     }
 
     /**
@@ -562,16 +538,16 @@ class Relation extends MappingModel
      */
     public function clearReferences()
     {
-        $this->localFields = [];
-        $this->foreignFields = [];
+        $this->localFields->clear();
+        $this->foreignFields->clear();
     }
 
     /**
      * Returns an array of local field names.
      *
-     * @return string[]
+     * @return Set
      */
-    public function getLocalFields()
+    public function getLocalFields(): Set
     {
         return $this->localFields;
     }
@@ -581,11 +557,11 @@ class Relation extends MappingModel
      *
      * @return Field[]
      */
-    public function getLocalFieldObjects()
+    public function getLocalFieldObjects(): array
     {
         $fields = [];
         foreach ($this->getLocalFields() as $fieldName) {
-            $field = $this->parentEntity->getField($fieldName);
+            $field = $this->getEntity()->getField($fieldName);
             if (null === $field) {
                 throw new BuildException(sprintf(
                         'Field `%s` in local reference of relation `%s` from `%s` to `%s` not found.',
@@ -608,7 +584,7 @@ class Relation extends MappingModel
      *
      * @return string
      */
-    public function getLocalFieldName($index = 0)
+    public function getLocalFieldName(int $index = 0): string
     {
         return $this->localFields[$index];
     }
@@ -620,9 +596,9 @@ class Relation extends MappingModel
      *
      * @return Field
      */
-    public function getLocalField($index = 0)
+    public function getLocalField(int $index = 0): Field
     {
-        return $this->parentEntity->getField($this->getLocalFieldName($index));
+        return $this->getEntity()->getField($this->getLocalFieldName($index));
     }
 
     /**
@@ -631,10 +607,10 @@ class Relation extends MappingModel
      *
      * @return array
      */
-    public function getLocalForeignMapping()
+    public function getLocalForeignMapping(): array
     {
         $h = [];
-        for ($i = 0, $size = count($this->localFields); $i < $size; $i++) {
+        for ($i = 0, $size = $this->localFields->size(); $i < $size; $i++) {
             $h[$this->localFields[$i]] = $this->foreignFields[$i];
         }
 
@@ -647,10 +623,10 @@ class Relation extends MappingModel
      *
      * @return array
      */
-    public function getForeignLocalMapping()
+    public function getForeignLocalMapping(): array
     {
         $h = [];
-        for ($i = 0, $size = count($this->localFields); $i < $size; $i++) {
+        for ($i = 0, $size = $this->localFields->size(); $i < $size; $i++) {
             $h[$this->foreignFields[$i]] = $this->localFields[$i];
         }
 
@@ -663,13 +639,13 @@ class Relation extends MappingModel
      *
      * @return Field[][]
      */
-    public function getFieldObjectsMapping()
+    public function getFieldObjectsMapping(): array
     {
         $mapping = [];
         $foreignFields = $this->getForeignFieldObjects();
-        for ($i = 0, $size = count($this->localFields); $i < $size; $i++) {
+        for ($i = 0, $size = $this->localFields->size(); $i < $size; $i++) {
             $mapping[] = [
-                'local' => $this->parentEntity->getField($this->localFields[$i]),
+                'local' => $this->getEntity()->getField($this->localFields[$i]),
                 'foreign' => $foreignFields[$i],
             ];
         }
@@ -689,12 +665,12 @@ class Relation extends MappingModel
      *
      * @return Field[]
      */
-    public function getFieldObjectsMapArray()
+    public function getFieldObjectsMapArray(): array
     {
         $mapping = [];
         $foreignFields = $this->getForeignFieldObjects();
-        for ($i = 0, $size = count($this->localFields); $i < $size; $i++) {
-            $mapping[] = [$this->parentEntity->getField($this->localFields[$i]), $foreignFields[$i]];
+        for ($i = 0, $size = $this->localFields->size(); $i < $size; $i++) {
+            $mapping[] = [$this->getEntity()->getField($this->localFields[$i]), $foreignFields[$i]];
         }
 
         return $mapping;
@@ -707,7 +683,7 @@ class Relation extends MappingModel
      *
      * @return string
      */
-    public function getMappedForeignField($local)
+    public function getMappedForeignField(string $local): ?string
     {
         $m = $this->getLocalForeignMapping();
 
@@ -721,19 +697,19 @@ class Relation extends MappingModel
      *
      * @return string
      */
-    public function getMappedLocalField($foreign)
+    public function getMappedLocalField(string $foreign): ?string
     {
         $mapping = $this->getForeignLocalMapping();
 
-        return isset($mapping[$foreign]) ? $mapping[$foreign] : null;
+        return $mapping[$foreign] ?? null;
     }
 
     /**
      * Returns an array of foreign field names.
      *
-     * @return array
+     * @return Set
      */
-    public function getForeignFields()
+    public function getForeignFields(): Set
     {
         return $this->foreignFields;
     }
@@ -743,7 +719,7 @@ class Relation extends MappingModel
      *
      * @return Field[]
      */
-    public function getForeignFieldObjects()
+    public function getForeignFieldObjects(): array
     {
         $fields = [];
         $foreignEntity = $this->getForeignEntity();
@@ -800,7 +776,7 @@ class Relation extends MappingModel
      *
      * @return string
      */
-    public function getForeignFieldName($index = 0)
+    public function getForeignFieldName(int $index = 0): string
     {
         return $this->foreignFields[$index];
     }
@@ -808,9 +784,11 @@ class Relation extends MappingModel
     /**
      * Returns a foreign field object.
      *
+     * @param integer $index
+     *
      * @return Field
      */
-    public function getForeignField($index = 0)
+    public function getForeignField(int $index = 0): Field
     {
         return $this->getForeignEntity()->getField($this->getForeignFieldName($index));
     }
@@ -820,10 +798,10 @@ class Relation extends MappingModel
      *
      * @return boolean
      */
-    public function isLocalFieldsRequired()
+    public function isLocalFieldsRequired(): bool
     {
         foreach ($this->localFields as $fieldName) {
-            if (!$this->parentEntity->getField($fieldName)->isNotNull()) {
+            if (!$this->getEntity()->getField($fieldName)->isNotNull()) {
                 return false;
             }
         }
@@ -836,10 +814,10 @@ class Relation extends MappingModel
      *
      * @return boolean
      */
-    public function isAtLeastOneLocalFieldRequired()
+    public function isAtLeastOneLocalFieldRequired(): bool
     {
         foreach ($this->localFields as $fieldName) {
-            if ($this->parentEntity->getField($fieldName)->isNotNull()) {
+            if ($this->getEntity()->getField($fieldName)->isNotNull()) {
                 return true;
             }
         }
@@ -852,7 +830,7 @@ class Relation extends MappingModel
      *
      * @return boolean
      */
-    public function isAtLeastOneLocalPrimaryKeyIsRequired()
+    public function isAtLeastOneLocalPrimaryKeyIsRequired():bool
     {
         foreach ($this->getLocalPrimaryKeys() as $pk) {
             if ($pk->isNotNull() && !$pk->hasDefaultValue()) {
@@ -869,7 +847,7 @@ class Relation extends MappingModel
      *
      * @return boolean Returns true if all fields inside this foreign key are primary keys of the foreign table
      */
-    public function isForeignPrimaryKey()
+    public function isForeignPrimaryKey(): bool
     {
         $lfmap = $this->getLocalForeignMapping();
         $foreignEntity = $this->getForeignEntity();
@@ -894,9 +872,9 @@ class Relation extends MappingModel
      *
      * @return boolean
      */
-    public function isComposite()
+    public function isComposite(): bool
     {
-        return count($this->localFields) > 1;
+        return $this->localFields->size() > 1;
     }
 
     /**
@@ -905,14 +883,14 @@ class Relation extends MappingModel
      *
      * @return boolean True if all local fields are at the same time a primary key
      */
-    public function isLocalPrimaryKey()
+    public function isLocalPrimaryKey(): bool
     {
         $localPKCols = [];
-        foreach ($this->parentEntity->getPrimaryKey() as $lPKCol) {
+        foreach ($this->getEntity()->getPrimaryKey() as $lPKCol) {
             $localPKCols[] = $lPKCol->getName();
         }
 
-        return count($localPKCols) === count($this->localFields) && !array_diff($localPKCols, $this->localFields);
+        return count($localPKCols) === $this->localFields->size() && !array_diff($localPKCols, $this->localFields->toArray());
     }
 
     /**
@@ -921,9 +899,9 @@ class Relation extends MappingModel
      *
      * @param boolean $skip
      */
-    public function setSkipSql($skip)
+    public function setSkipSql(bool $skip)
     {
-        $this->skipSql = (Boolean)$skip;
+        $this->skipSql = $skip;
     }
 
     /**
@@ -932,7 +910,7 @@ class Relation extends MappingModel
      *
      * @return boolean
      */
-    public function isSkipSql()
+    public function isSkipSql(): bool
     {
         return $this->skipSql;
     }
@@ -947,7 +925,7 @@ class Relation extends MappingModel
      * @return boolean
      * @link http://propel.phpdb.org/trac/ticket/549
      */
-    public function isMatchedByInverseFK()
+    public function isMatchedByInverseFK(): bool
     {
         return (Boolean)$this->getInverseFK();
     }
@@ -975,7 +953,7 @@ class Relation extends MappingModel
     public function getOtherFks()
     {
         $fks = [];
-        foreach ($this->parentEntity->getRelations() as $fk) {
+        foreach ($this->getEntity()->getRelations() as $fk) {
             if ($fk !== $this) {
                 $fks[] = $fk;
             }
@@ -989,7 +967,7 @@ class Relation extends MappingModel
      *
      * @return boolean True if there is at least one field that is a primary key of the foreign table
      */
-    public function isAtLeastOneForeignPrimaryKey()
+    public function isAtLeastOneForeignPrimaryKey(): bool
     {
         $cols = $this->getForeignPrimaryKeys();
 
@@ -1001,7 +979,7 @@ class Relation extends MappingModel
      *
      * @return array Field[]
      */
-    public function getForeignPrimaryKeys()
+    public function getForeignPrimaryKeys(): array
     {
         $lfmap = $this->getLocalForeignMapping();
         $foreignEntity = $this->getForeignEntity();
@@ -1026,7 +1004,7 @@ class Relation extends MappingModel
      *
      * @return Field[]
      */
-    public function getLocalPrimaryKeys()
+    public function getLocalPrimaryKeys(): array
     {
         $cols = [];
         $localCols = $this->getLocalFieldObjects();
@@ -1045,7 +1023,7 @@ class Relation extends MappingModel
      *
      * @return boolean True if there is at least one field that is a primary key
      */
-    public function isAtLeastOneLocalPrimaryKey()
+    public function isAtLeastOneLocalPrimaryKey(): bool
     {
         $cols = $this->getLocalPrimaryKeys();
 

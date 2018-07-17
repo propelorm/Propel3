@@ -1,8 +1,23 @@
 <?php
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ */
+
+declare(strict_types=1);
+
 namespace Propel\Generator\Model\Parts;
 
 use Propel\Generator\Model\Model;
 
+/**
+ * Trait GeneratorPart
+ *
+ * @author Thomas Gossmann
+ */
 trait GeneratorPart
 {
     use SuperordinatePart;
@@ -33,7 +48,12 @@ trait GeneratorPart
      */
     public function setMutatorVisibility(string $visibility)
     {
+        if (!in_array($visibility, [Model::VISIBILITY_PUBLIC, Model::VISIBILITY_PRIVATE, Model::VISIBILITY_PROTECTED])) {
+            $visibility = Model::VISIBILITY_PUBLIC;
+        }
+
         $this->mutatorVisibility = $visibility;
+
         return $this;
     }
 
@@ -48,11 +68,11 @@ trait GeneratorPart
             return $this->mutatorVisibility;
         }
 
-        if ($this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getMutatorVisibility')) {
+        if ($this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getMutatorVisibility')) {var_dump('eccolo');
             return $this->getSuperordinate()->getMutatorVisibility();
         }
 
-        return Model::DEFAULT_ACCESSOR_ACCESSIBILITY;
+        return Model::DEFAULT_MUTATOR_ACCESSIBILITY;
     }
 
     /**
@@ -63,7 +83,12 @@ trait GeneratorPart
      */
     public function setAccessorVisibility(string $visibility)
     {
+        if (!in_array($visibility, [Model::VISIBILITY_PUBLIC, Model::VISIBILITY_PRIVATE, Model::VISIBILITY_PROTECTED])) {
+            $visibility = Model::VISIBILITY_PUBLIC;
+        }
+
         $this->accessorVisibility = $visibility;
+
         return $this;
     }
 
@@ -81,6 +106,6 @@ trait GeneratorPart
             return $this->getSuperordinate()->getAccessorVisibility();
         }
 
-        return Model::DEFAULT_MUTATOR_ACCESSIBILITY;
+        return Model::DEFAULT_ACCESSOR_ACCESSIBILITY;
     }
 }

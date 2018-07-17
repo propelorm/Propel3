@@ -121,7 +121,10 @@ class Database
 //         $this->entities = $entities;
     }
 
-    protected function getSuperordinate()
+    /**
+     * @return Schema
+     */
+    protected function getSuperordinate(): ?Schema
     {
         return $this->schema;
     }
@@ -319,11 +322,11 @@ class Database
     /**
      * @param string $tableName full qualified table name (with schema)
      *
-     * @return Entity
+     * @return bool
      */
     public function hasEntityByTableName($tableName): bool
     {
-        return $this->entities->find($tableName, function (Entity $entity, $query) {
+        return (bool) $this->entities->find($tableName, function (Entity $entity, $query) {
             return $entity->getTableName() === $query;
         });
     }
@@ -343,11 +346,11 @@ class Database
     /**
      * @param string $tableName full qualified table name (with schema)
      *
-     * @return Entity
+     * @return bool
      */
     public function hasEntityByFullTableName($tableName): bool
     {
-        return $this->entities->find($tableName, function (Entity $entity, $query) {
+        return (bool) $this->entities->find($tableName, function (Entity $entity, $query) {
             return $entity->getFullTableName() === $query;
         });
     }
@@ -563,14 +566,18 @@ class Database
     /**
      * Sets the parent schema
      *
-     * @param Schema $parent The parent schema
-     * @return $this
+     * @param Schema $schema The parent schema
      */
     protected function registerSchema(Schema $schema)
     {
         $schema->addDatabase($this);
     }
 
+    /**
+     * Remove the parent schema
+     *
+     * @param Schema $schema
+     */
     protected function unregisterSchema(Schema $schema)
     {
         $schema->removeDatabase($this);

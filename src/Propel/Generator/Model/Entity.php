@@ -16,6 +16,9 @@ use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Parts\ActiveRecordPart;
 use Propel\Generator\Model\Parts\BehaviorPart;
+use Propel\Generator\Model\Parts\DatabasePart;
+use Propel\Generator\Model\Parts\DescriptionPart;
+use Propel\Generator\Model\Parts\FieldsPart;
 use Propel\Generator\Model\Parts\GeneratorPart;
 use Propel\Generator\Model\Parts\NamespacePart;
 use Propel\Generator\Model\Parts\PlatformAccessorPart;
@@ -54,14 +57,15 @@ class Entity
     use SqlPart;
     use GeneratorPart;
     use VendorPart;
+    use DatabasePart;
+    use DescriptionPart;
+    use FieldsPart;
 
 
     //
     // Model properties
     // ------------------------------------------------------------
     private $tableName;
-    private $description;
-
     private $alias;
 
 
@@ -69,9 +73,6 @@ class Entity
     //
     // References to other models
     // ------------------------------------------------------------
-
-    /** @var Database */
-    private $database;
 
     /** @var bool|string */
     private $repository;
@@ -85,14 +86,11 @@ class Entity
     // Collections to other models
     // ------------------------------------------------------------
 
-    /** @var Set */
-    private $fields;
-
-    /** @var Map */
-    private $fieldsByName;
-
-    /** @var Map */
-    private $fieldsByLowercaseName;
+//    /** @var Map */
+//    private $fieldsByName;
+//
+//    /** @var Map */
+//    private $fieldsByLowercaseName;
 
     /** @var Set */
     private $relations;
@@ -175,8 +173,8 @@ class Entity
 
         // init
         $this->fields = new Set();
-        $this->fieldsByName = new Map();
-        $this->fieldsByLowercaseName = new Map();
+        //$this->fieldsByName = new Map();
+        //$this->fieldsByLowercaseName = new Map();
         $this->relations = new Set();
         $this->foreignEntityNames = new Set();
         $this->indices = new Set();
@@ -205,15 +203,19 @@ class Entity
             foreach ($this->fields as $oldCol) {
                 $col = clone $oldCol;
                 $fields[] = $col;
-                $this->fieldsByName[$col->getName()] = $col;
-                $this->fieldsByLowercaseName[strtolower($col->getName())] = $col;
+          //      $this->fieldsByName[$col->getName()] = $col;
+          //      $this->fieldsByLowercaseName[strtolower($col->getName())] = $col;
                 //            $this->fieldsByPhpName[$col->getName()] = $col;
             }
             $this->fields = $fields;
         }
     }
 
-    protected function getSuperordinate()
+    /**
+     * @inheritdoc
+     * @return Database
+     */
+    protected function getSuperordinate(): ?Database
     {
         return $this->database;
     }
@@ -380,54 +382,6 @@ class Entity
         return $fqTableName;
     }
 
-    /**
-     * @TODO convenient method. remove?
-     *
-     * Returns the camelCase version of PHP name.
-     *
-     * The studly name is the PHP name with the first character lowercase.
-     *
-     * @return string
-     */
-    public function getCamelCaseName(): string
-    {
-        return lcfirst($this->getName());
-    }
-
-    /**
-     * Sets the entity description.
-     *
-     * @param string $description
-     * @return $this
-     */
-    public function setDescription(string $description): Entity
-    {
-        $this->description = $description;
-        return $this;
-    }
-
-    /**
-     * Returns the entity description.
-     *
-     * @return string
-     */
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
-
-    /**
-     * Returns whether or not the entity has a description.
-     *
-     * @return bool
-     */
-    public function hasDescription(): bool
-    {
-        return !empty($this->description);
-    }
-
-
-
     //
     // References to other models
     // ------------------------------------------------------------
@@ -463,16 +417,6 @@ class Entity
         $this->database->addEntity($this);
 
         return $this;
-    }
-
-    /**
-     * Get the database that contains this entity.
-     *
-     * @return Database
-     */
-    public function getDatabase(): ?Database
-    {
-        return $this->database;
     }
 
     /**
@@ -565,16 +509,9 @@ class Entity
      */
     public function addField(Field $field): Entity
     {
-        if ($this->fieldsByName->has($field->getName())) {
-            throw new EngineException(sprintf('Field "%s" declared twice in entity "%s"', $col->getName(), $this->getName()));
-        }
-
-        $this->fields->add($field);
-        $this->fieldsByName->set($field->getName(), $field);
-        $this->fieldsByLowercaseName->set(strtolower($field->getName()), $field);
+        FieldsPart::addField($field);
 
         $field->setPosition($this->fields->size());
-        $field->setEntity($this);
 
         if ($field->requiresTransactionInPostgres()) {
             $this->needsTransactionInPostgres = true;
@@ -587,94 +524,28 @@ class Entity
         return $this;
     }
 
-    /**
-     * Adds several fields at once.
-     *
-     * @param Field[] $fields An array of Field instance
-     * @return $this
-     */
-    public function addFields(array $fields): Entity
-    {
-        foreach ($fields as $field) {
-            $this->addField($field);
-        }
-        return $this;
-    }
-
-    /**
-     * Returns whether or not the entity has a field.
-     *
-     * @param Field|string $field The Field object or its name
-     * @param bool $caseInsensitive Whether the check is case insensitive.
-     *
-     * @return bool
-     */
-    public function hasField($field, bool $caseInsensitive = false): bool
-    {
-        if ($field instanceof Field) {
-            return $this->fields->contains($field);
-        }
-
-        if ($caseInsensitive) {
-            return $this->fieldsByLowercaseName->has(strtolower($field));
-        }
-
-        return $this->fieldsByName->has($field);
-    }
-
-    /**
-     * Returns the Field object with the specified name.
-     *
-     * @param string $name The name of the field (e.g. 'my_field')
-     * @param bool $caseInsensitive Whether the check is case insensitive.
-     *
-     * @return Field
-     */
-    public function getField(string $name, bool $caseInsensitive = false): Field
-    {
-        if (!$this->hasField($name, $caseInsensitive)) {
-            throw new \InvalidArgumentException(sprintf('Field `%s` not found in Entity `%s` [%s]', $name, $this->getName(), implode(',', array_keys($this->fieldsByName))));
-        }
-
-        if ($caseInsensitive) {
-            return $this->fieldsByLowercaseName->get(strtolower($name));
-        }
-
-        return $this->fieldsByName->get($name);
-    }
-
-    /**
-     * Returns an array containing all Field objects in the entity.
-     *
-     * @return Field[]
-     */
-    public function getFields(): array
-    {
-        return $this->fields;
-    }
-
-    /**
-     * @TODO This method has no relevance to the model. Could just be static - what to do with it?
-     *
-     * Returns a delimiter-delimited string list of field names.
-     *
-     * @see SqlDefaultPlatform::getFieldList() if quoting is required
-     *
-     * @param array
-     * @param string $delimiter
-     * @return string
-     */
-    public function getFieldList(array $columns, string $delimiter = ','): string
-    {
-        $list = [];
-        foreach ($columns as $col) {
-            if ($col instanceof Field) {
-                $col = $col->getName();
-            }
-            $list[] = $col;
-        }
-        return implode($delimiter, $list);
-    }
+//    /**
+//     * MOVED into SqlDefaultPlatform class
+//     *
+//     * Returns a delimiter-delimited string list of field names.
+//     *
+//     * @see SqlDefaultPlatform::getFieldList() if quoting is required
+//     *
+//     * @param array
+//     * @param string $delimiter
+//     * @return string
+//     */
+//    public function getFieldList(array $columns, string $delimiter = ','): string
+//    {
+//        $list = [];
+//        foreach ($columns as $col) {
+//            if ($col instanceof Field) {
+//                $col = $col->getName();
+//            }
+//            $list[] = $col;
+//        }
+//        return implode($delimiter, $list);
+//    }
 
     /**
      * @TODO check consistency with naming size/num/count methods
@@ -723,49 +594,12 @@ class Entity
         return false;
     }
 
-    private function getFieldPosition(Field $field): int
-    {
-        return $this->fields->indexOf($field);
-    }
-
-    /**
-     * @TODO: This shouldn't be a method. period. Should automatically managed by add/remove Field
-     */
-    public function adjustFieldPositions()
-    {
-        $nbFields = $this->fields->size();
-        for ($i = 0; $i < $nbFields; $i++) {
-            $this->fields[$i]->setPosition($i + 1);
-        }
-    }
-
-    /**
-     * Removes a field from the entity.
-     *
-     * @param  Field|string $field The Field or its name
-     *
-     * @throws EngineException
-     * @return $this
-     */
-    public function removeField($field): Entity
-    {
-        if (is_string($field)) {
-            $field = $this->getField($field);
-        }
-
-        if (null === $field || !$this->fields->contains($field)) {
-            throw new EngineException(sprintf('No field named %s found in entity %s.', $field->getName(), $this->getName()));
-        }
-
-        $this->fields->remove($field);
-        $this->fieldsByName->remove($field->getName());
-        $this->fieldsByLowercaseName->remove(strtolower($field->getName()));
-
-        $this->adjustFieldPositions();
-        // @FIXME: also remove indexes and validators on this field?
-
-        return $this;
-    }
+//    Never user: remove?
+//
+//    private function getFieldPosition(Field $field): int
+//    {
+//        return $this->fields->indexOf($field);
+//    }
 
 
     // relations

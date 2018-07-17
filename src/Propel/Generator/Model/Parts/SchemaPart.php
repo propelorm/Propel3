@@ -1,15 +1,40 @@
 <?php
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ */
+
+declare(strict_types=1);
+
 namespace Propel\Generator\Model\Parts;
 
 use Propel\Generator\Model\Schema;
 
+/**
+ * Trait SchemaPart
+ *
+ * @author Thomas Gossman
+ */
 trait SchemaPart
 {
-
     /** @var Schema */
     protected $schema;
 
+    /**
+     * @param Schema $schema
+     *
+     * @return mixed
+     */
     abstract protected function registerSchema(Schema $schema);
+
+    /**
+     * @param Schema $schema
+     *
+     * @return mixed
+     */
     abstract protected function unregisterSchema(Schema $schema);
 
     /**
@@ -26,6 +51,7 @@ trait SchemaPart
         } else {
             $this->unregisterSchema($schema);
         }
+
         return $this;
     }
 

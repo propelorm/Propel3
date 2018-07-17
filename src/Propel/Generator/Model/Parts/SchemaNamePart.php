@@ -1,8 +1,26 @@
 <?php
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ */
+
+declare(strict_types=1);
+
 namespace Propel\Generator\Model\Parts;
 
+/**
+ * Trait SchemaNamePart
+ *
+ * @author Thomas Gossmann
+ */
 trait SchemaNamePart
 {
+    /**
+     * @var string
+     */
     protected $schemaName;
 
     /**
@@ -10,7 +28,7 @@ trait SchemaNamePart
      *
      * @return string
      */
-    public function getSchemaName()
+    public function getSchemaName(): string
     {
         return $this->schemaName;
     }
@@ -20,20 +38,12 @@ trait SchemaNamePart
      *
      * @param string $schemaName
      */
-    public function setSchemaName(string $schemaName)
+    public function setSchemaName(string $schemaName): void
     {
         if ($schemaName === $this->schemaName) {
             return;
         }
 
         $this->schemaName = $schemaName;
-//         if ($schemaName && !$this->package && $this->getBuildProperty('schemaAutoPackage')) {
-//             $this->package = $schemaName;
-//             $this->packageOverridden = true;
-//         }
-
-//         if ($schemaName && !$this->namespace && $this->getBuildProperty('schemaAutoNamespace')) {
-//             $this->namespace = $schemaName;
-//         }
     }
 }

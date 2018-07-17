@@ -17,4 +17,11 @@ class Model
     const DEFAULT_MUTATOR_ACCESSIBILITY = Model::VISIBILITY_PUBLIC;
 
     const SUPPORTED_STRING_FORMATS = ['XML', 'YAML', 'JSON', 'CSV'];
+
+    const RELATION_NONE = '';           // No 'ON [ DELETE | UPDATE]' behavior
+    const RELATION_NOACTION = 'NO ACTION';
+    const RELATION_CASCADE = 'CASCADE';
+    const RELATION_RESTRICT = 'RESTRICT';
+    const RELATION_SETDEFAULT = 'SET DEFAULT';
+    const RELATION_SETNULL = 'SET NULL';
 }

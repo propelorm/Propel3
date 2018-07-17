@@ -3,7 +3,6 @@ composer.phar
 composer.lock
 autoload.php
 phpunit.xml
-php-cs-fixer.phar
 
 tests/Fixtures/namespaced/build/
 tests/Fixtures/schemas/build/

@@ -11,6 +11,7 @@
 declare(strict_types=1);
 
 namespace Propel\Generator\Model;
+use Propel\Generator\Model\Parts\EntityPart;
 
 /**
  * A class for information about entity cross relations which are used in many-to-many relations.
@@ -45,12 +46,7 @@ namespace Propel\Generator\Model;
  */
 class CrossRelation
 {
-    /**
-     * The middle-entity.
-     *
-     * @var Entity
-     */
-    protected $entity;
+    use EntityPart;
 
     /**
      * The target entity (which has crossRef=true).
@@ -208,7 +204,7 @@ class CrossRelation
     /**
      * @return string[]
      */
-    public function getUnclassifiedPrimaryKeyNames()
+    public function getUnclassifiedPrimaryKeyNames(): array
     {
         $names = [];
         foreach ($this->getUnclassifiedPrimaryKeys() as $primaryKey) {
@@ -229,7 +225,7 @@ class CrossRelation
     /**
      * @return bool
      */
-    public function hasRelations()
+    public function hasRelations(): bool
     {
         return !!$this->relations;
     }
@@ -247,7 +243,7 @@ class CrossRelation
      *
      * @return Relation[]
      */
-    public function getRelations()
+    public function getRelations(): array
     {
         return $this->relations;
     }
@@ -260,7 +256,7 @@ class CrossRelation
      *
      * @return Relation
      */
-    public function getOutgoingRelation()
+    public function getOutgoingRelation(): Relation
     {
         return $this->relations[0];
     }
@@ -278,26 +274,8 @@ class CrossRelation
      *
      * @return Entity
      */
-    public function getMiddleEntity()
+    public function getMiddleEntity(): Entity
     {
         return $this->middleEntity;
-    }
-
-    /**
-     * @param Entity $entity
-     */
-    public function setEntity(Entity $entity)
-    {
-        $this->entity = $entity;
-    }
-
-    /**
-     * The source entity.
-     *
-     * @return Entity
-     */
-    public function getEntity()
-    {
-        return $this->entity;
     }
 }

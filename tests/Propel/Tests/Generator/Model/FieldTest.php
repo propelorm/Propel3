@@ -7,6 +7,7 @@
  *
  * @license MIT License
  */
+
 namespace Propel\Tests\Generator\Model;
 
 use Propel\Generator\Model\Field;
@@ -22,15 +23,16 @@ class FieldTest extends ModelTestCase
     public function testCreateNewField()
     {
         $field = new Field('title');
+        //$entity = $this->getEntityMock('FakeEntity');
+        //$field->setEntity($entity);
 
         $this->assertSame('title', $field->getName());
         $this->assertEmpty($field->getAutoIncrementString());
         $this->assertSame('FIELD_TITLE', $field->getConstantName());
         $this->assertSame('public', $field->getMutatorVisibility());
         $this->assertSame('public', $field->getAccessorVisibility());
-        $this->assertFalse($field->getSize());
-        $this->assertFalse($field->hasPlatform());
-        $this->assertFalse($field->hasReferrers());
+        $this->assertEquals(0, $field->getSize());
+//        $this->assertTrue($field->getReferrers()->isEmpty());
         $this->assertFalse($field->isAutoIncrement());
         $this->assertFalse($field->isEnumeratedClasses());
         $this->assertFalse($field->isLazyLoad());
@@ -44,147 +46,7 @@ class FieldTest extends ModelTestCase
         $this->assertFalse($field->isTreeScopeKey());
         $this->assertFalse($field->isUnique());
         $this->assertFalse($field->requiresTransactionInPostgres());
-    }
-
-    public function testSetupObjectWithoutPlatformTypeAndDomain()
-    {
-        $database = $this->getDatabaseMock('bookstore');
-
-        $entity = $this->getEntityMock('books', ['database' => $database]);
-
-        $field = new Field();
-        $field->setEntity($entity);
-        $field->loadMapping(['name' => 'title']);
-
-        $this->assertSame('title', $field->getName());
-        $this->assertSame('VARCHAR', $field->getDomain()->getType());
-    }
-
-    public function testSetupObjectWithPlatformOnly()
-    {
-        $database = $this->getDatabaseMock('bookstore');
-        $platform = $this->getPlatformMock();
-        $platform
-            ->expects($this->any())
-            ->method('getDomainForType')
-            ->with($this->equalTo('VARCHAR'))
-            ->will($this->returnValue($this->getDomainMock('VARCHAR')))
-        ;
-        $platform
-            ->expects($this->any())
-            ->method('supportsVarcharWithoutSize')
-            ->will($this->returnValue(false))
-        ;
-
-        $entity = $this->getEntityMock('books', [
-            'database' => $database,
-            'platform' => $platform,
-        ]);
-
-        $domain = $this->getDomainMock('VARCHAR');
-        $domain
-            ->expects($this->any())
-            ->method('getType')
-            ->will($this->returnValue('VARCHAR'))
-        ;
-
-        $field = new Field();
-        $field->setEntity($entity);
-        $field->setDomain($domain);
-        $field->loadMapping(['name' => 'title']);
-
-        $this->assertSame('title', $field->getName());
-    }
-
-    public function testSetupObjectWithPlatformAndType()
-    {
-        $database = $this->getDatabaseMock('bookstore');
-        $platform = $this->getPlatformMock();
-        $platform
-            ->expects($this->once())
-            ->method('getDomainForType')
-            ->with($this->equalTo('DATE'))
-            ->will($this->returnValue($this->getDomainMock('DATE')))
-        ;
-
-        $entity = $this->getEntityMock('books', [
-            'database' => $database,
-            'platform' => $platform,
-        ]);
-
-        $field = new Field();
-        $field->setEntity($entity);
-        $field->setDomain($this->getDomainMock('VARCHAR'));
-        $field->loadMapping([
-            'type'        => 'date',
-            'name'        => 'created_at',
-            'defaultExpr' => 'NOW()',
-        ]);
-
-        $this->assertSame('created_at', $field->getName());
-    }
-
-    public function testSetupObjectWithDomain()
-    {
-        $database = $this->getDatabaseMock('bookstore');
-        $database
-            ->expects($this->once())
-            ->method('getDomain')
-            ->with($this->equalTo('BOOLEAN'))
-            ->will($this->returnValue($this->getDomainMock('INTEGER')))
-        ;
-
-        $entity = $this->getEntityMock('books', ['database' => $database]);
-
-        $field = new Field();
-        $field->setEntity($entity);
-        $field->setDomain($this->getDomainMock('BOOLEAN'));
-        $field->loadMapping([
-            'domain'             => 'BOOLEAN',
-            'name'               => 'isPublished',
-            'columnName'         => 'is_published',
-            'phpType'            => 'boolean',
-            'tableMapName'       => 'IS_PUBLISHED',
-            'prefix'             => 'col_',
-            'accessorVisibility' => 'public',
-            'mutatorVisibility'  => 'public',
-            'primaryString'      => 'false',
-            'primaryKey'         => 'false',
-            'nodeKey'            => 'false',
-            'nestedSetLeftKey'   => 'false',
-            'nestedSetRightKey'  => 'false',
-            'treeScopeKey'       => 'false',
-            'required'           => 'false',
-            'autoIncrement'      => 'false',
-            'lazyLoad'           => 'true',
-            'sqlType'            => 'TINYINT',
-            'size'               => 1,
-            'defaultValue'       => 'true',
-            'valueSet'           => 'FOO, BAR, BAZ',
-        ]);
-
-        $this->assertSame('is_published', $field->getColumnName());
-        $this->assertSame('isPublished', $field->getName());
-        $this->assertSame('boolean', $field->getPhpType());
-        $this->assertSame('IS_PUBLISHED', $field->getEntityMapName());
-        $this->assertSame('public', $field->getAccessorVisibility());
-        $this->assertSame('public', $field->getMutatorVisibility());
-        $this->assertFalse($field->isPrimaryString());
-        $this->assertFalse($field->isPrimaryKey());
-        $this->assertFalse($field->isNodeKey());
-        $this->assertFalse($field->isNestedSetLeftKey());
-        $this->assertFalse($field->isNestedSetRightKey());
-        $this->assertFalse($field->isTreeScopeKey());
-        $this->assertTrue($field->isLazyLoad());
-        $this->assertCount(3, $field->getValueSet());
-    }
-
-    public function testSetPosition()
-    {
-        $field = new Field();
-        $field->setPosition(2);
-
-        $this->assertSame(2, $field->getPosition());
+        $this->assertNull($field->getPlatform());
     }
 
     public function testGetNullDefaultValueString()
@@ -246,7 +108,7 @@ class FieldTest extends ModelTestCase
     public function provideDefaultValues()
     {
         return [
-            ['DOUBLE', 3.14, 3.14],
+            ['DOUBLE', 3.14, '3.14'],
             ['VARCHAR', 'hello', "'hello'"],
             ['VARCHAR', "john's bike", "'john\\'s bike'"],
             ['BOOLEAN', 1, 'true'],
@@ -273,12 +135,15 @@ class FieldTest extends ModelTestCase
         $field->addInheritance($inheritance);
 
         $this->assertTrue($field->isEnumeratedClasses());
-        $this->assertCount(1, $field->getChildren());
+        $this->assertEquals(1, $field->getChildren()->size());
 
         $field->clearInheritanceList();
         $this->assertCount(0, $field->getChildren());
     }
 
+/*
+ * addInheritance accepts only Inheritance objects
+ * remove this test
     public function testAddArrayInheritance()
     {
         $field = new Field();
@@ -299,7 +164,8 @@ class FieldTest extends ModelTestCase
 
         $this->assertCount(2, $field->getChildren());
     }
-
+*/
+/* no more clearRelation method
     public function testClearRelations()
     {
         $fks = [
@@ -317,12 +183,12 @@ class FieldTest extends ModelTestCase
 
         $field = new Field('author_id');
         $field->setEntity($entity);
-        $field->addReferrer($fks[0]);
-        $field->addReferrer($fks[1]);
+        $field->getEntity()->addReferrer($fks[0]);
+        $field->getEntity()->addReferrer($fks[1]);
 
         $this->assertTrue($field->isRelation());
         $this->assertTrue($field->hasMultipleFK());
-        $this->assertTrue($field->hasReferrers());
+        $this->assertTrue($field->getEntity()->hasReferrers());
         $this->assertTrue($field->hasReferrer($fks[0]));
         $this->assertCount(2, $field->getReferrers());
 
@@ -333,7 +199,7 @@ class FieldTest extends ModelTestCase
         $this->assertCount(0, $field->getReferrers());
         $this->assertCount(0, $clone->getReferrers());
     }
-
+*/
     public function testIsDefaultSqlTypeFromDomain()
     {
         $toCopy = $this->getDomainMock();
@@ -720,9 +586,9 @@ class FieldTest extends ModelTestCase
 
         $field = new Field('created_at');
         $field->setEntity($entity);
-        $field->setEntityMapName('created_at');
+        $field->setColumnName('created_at');
 
-        $this->assertSame('created_at', $field->getEntityMapName());
+        $this->assertSame('created_at', $field->getColumnName());
         $this->assertSame('FIELD_CREATED_AT', $field->getConstantName());
         $this->assertSame('ArticleEntityMap::FIELD_CREATED_AT', $field->getFQConstantName());
     }
@@ -827,19 +693,6 @@ class FieldTest extends ModelTestCase
         $this->assertSame('books.TITLE', $field->getFullyQualifiedName());
     }
 
-    public function testHasPlatform()
-    {
-        $entity = $this->getEntityMock('books', [
-            'platform' => $this->getPlatformMock(),
-        ]);
-
-        $field = new Field();
-        $field->setEntity($entity);
-
-        $this->assertTrue($field->hasPlatform());
-        $this->assertInstanceOf('Propel\Generator\Platform\PlatformInterface', $field->getPlatform());
-    }
-
     public function testIsPhpArrayType()
     {
         $field = new Field();
@@ -912,7 +765,7 @@ class FieldTest extends ModelTestCase
         $field->setEntity($this->getEntityMock('books'));
 
         $this->assertInstanceOf('Propel\Generator\Model\Entity', $field->getEntity());
-        $this->assertSame('books', $field->getEntityName());
+        $this->assertSame('books', $field->getEntity()->getName());
     }
 
     public function testSetDomain()

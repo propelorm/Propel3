@@ -1,8 +1,24 @@
 <?php
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ */
+
+declare(strict_types=1);
+
 namespace Propel\Generator\Model;
 
 use Propel\Generator\Config\GeneratorConfigInterface;
+use Propel\Generator\Exception\LogicException;
 
+/**
+ * Class ModelFactory
+ *
+ * @author Thomas Gossmann
+ */
 class ModelFactory
 {
     private $truthy = ['true', 't', 'y', 'yes'];
@@ -60,32 +76,93 @@ class ModelFactory
 
     private $vendor = ['map' => ['type' => 'setType']];
 
+    private $behavior = ['map' => [
+        'name' => 'setName',
+        'id'   => 'setId'
+    ]];
+
     /** @var GeneratorConfigInterface */
     private $config;
 
+    /**
+     * ModelFactory constructor.
+     *
+     * @param null|GeneratorConfigInterface $config
+     */
     public function __construct(?GeneratorConfigInterface $config = null)
     {
         $this->config = $config;
     }
 
-    public function setGeneratorConfig(GeneratorConfigInterface $config)
+    /**
+     * @param GeneratorConfigInterface $config
+     */
+    public function setGeneratorConfig(GeneratorConfigInterface $config): void
     {
         $this->config = $config;
     }
 
-//     public static function createMappingModel($name, $attributes): MappingModelInterface {
-//         $className = NamingTool::toUpperCamelCase($name);
-//         $className = '\\Propel\\Generator\\Model\\' . $className;
+    /**
+     * @param array $attributes
+     *
+     * @return Vendor
+     */
+    public function createVendor(array $attributes): Vendor
+    {
+        return $this->load(new Vendor(), $attributes, $this->vendor);
+    }
 
-//         if (class_exists($className)) {
-//             $instance = new $className();
-//             $instance->loadMapping($attributes);
-//             return $instance;
-//         }
+    /**
+     * @param array $attributes
+     *
+     * @return Database
+     */
+    public function createDatabase(array $attributes): Database
+    {
+        $database = $this->load(new Database(), $attributes, $this->database);
 
-//         return null; // or throw exception?
-//     }
+        if (isset($attributes['platform']) && $this->config) {
+            $platform = $this->config->createPlatform($attributes['platform']);
+            if ($platform) {
+                $database->setPlatform($platform);
+            }
+        }
 
+        return $database;
+    }
+
+    /**
+     * @param array $attributes
+     *
+     * @return Entity
+     */
+    public function createEntity(array $attributes): Entity
+    {
+        return $this->load(new Entity(), $attributes, $this->entity);
+    }
+
+    /**
+     * @param array $attributes
+     *
+     * @return Behavior
+     * @throws LogicException
+     */
+    protected function createBehavior(array $attributes): Behavior
+    {
+        $behavior = $this->load(new Behavior(), $attributes, $this->behavior);
+
+        if (!$behavior->allowMultiple() && $attributes['id']) {
+            throw new LogicException(sprintf('Defining an ID (%s) on a behavior which does not allow multiple instances makes no sense', $id));
+        }
+    }
+
+    /**
+     * @param $model
+     * @param array $attributes
+     * @param array $definition
+     *
+     * @return mixed
+     */
     private function load($model, array $attributes, array $definition)
     {
         if (isset($definition['transform'])) {
@@ -99,7 +176,11 @@ class ModelFactory
         return $model;
     }
 
-    private function transform(array &$attributes, array $transforms)
+    /**
+     * @param array $attributes
+     * @param array $transforms
+     */
+    private function transform(array &$attributes, array $transforms): void
     {
         foreach ($transforms as $key => $type) {
             if (isset($attributes[$key])) {
@@ -108,7 +189,13 @@ class ModelFactory
         }
     }
 
-    private function transformValue($value, $type)
+    /**
+     * @param $value
+     * @param $type
+     *
+     * @return bool
+     */
+    private function transformValue($value, $type): bool
     {
         switch ($type) {
             case 'bool':
@@ -144,6 +231,13 @@ class ModelFactory
         }
     }
 
+    /**
+     * @param $model
+     * @param array $attributes
+     * @param array $map
+     *
+     * @return mixed
+     */
     private function loadMapping($model, array $attributes, array $map)
     {
         foreach ($map as $key => $method) {
@@ -151,30 +245,7 @@ class ModelFactory
                 $model->$method($attributes[$key]);
             }
         }
+
         return $model;
-    }
-
-    public function createVendor(array $attributes): Vendor
-    {
-        return $this->load(new Vendor(), $attributes, $this->vendor);
-    }
-
-    public function createDatabase(array $attributes): Database
-    {
-        $database = $this->load(new Database(), $attributes, $this->database);
-
-        if (isset($attributes['platform']) && $this->config) {
-            $platform = $this->config->createPlatform($attributes['platform']);
-            if ($platform) {
-                $database->setPlatform($platform);
-            }
-        }
-
-        return $database;
-    }
-
-    public function createEntity(array $attributes): Entity
-    {
-        return $this->load(new Entity(), $attrbutes, $this->entity);
     }
 }

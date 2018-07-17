@@ -29,49 +29,6 @@ class DomainTest extends ModelTestCase
         $this->assertSame(2, $domain->getScale());
     }
 
-    /**
-     * @dataProvider provideDomainData
-     *
-     */
-    public function testSetupObject($default, $expression)
-    {
-        $platform = $this->getPlatformMock();
-        $platform
-            ->expects($this->any())
-            ->method('getDomainForType')
-            ->will($this->returnValue(new Domain('BOOLEAN')))
-        ;
-
-        $domain = new Domain();
-        $domain->setDatabase($this->getDatabaseMock('bookstore', [
-            'platform' => $platform
-        ]));
-        $domain->loadMapping([
-            'type' => 'BOOLEAN',
-            'name' => 'foo',
-            'default' => $default,
-            'defaultExpr' => $expression,
-            'size' => 10,
-            'scale' => 2,
-            'description' => 'Some description',
-        ]);
-
-        $this->assertSame('BOOLEAN', $domain->getType());
-        $this->assertSame('foo', $domain->getName());
-        $this->assertInstanceOf('Propel\Generator\Model\FieldDefaultValue', $domain->getDefaultValue());
-        $this->assertSame(10, $domain->getSize());
-        $this->assertSame(2, $domain->getScale());
-        $this->assertSame('Some description', $domain->getDescription());
-    }
-
-    public function provideDomainData()
-    {
-        return [
-            [1, null],
-            [null, 'NOW()'],
-        ];
-    }
-
     public function testSetDatabase()
     {
         $domain = new Domain();

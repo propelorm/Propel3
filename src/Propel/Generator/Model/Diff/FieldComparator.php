@@ -29,12 +29,14 @@ class FieldComparator
     public static function computeDiff(Field $fromField, Field $toField)
     {
         if ($changedProperties = self::compareFields($fromField, $toField)) {
-            if ($fromField->hasPlatform() || $toField->hasPlatform()) {
-                $platform = $fromField->hasPlatform() ? $fromField->getPlatform() : $toField->getPlatform();
+
+            $platform = $fromField->getPlatform() ?? $toField->getPlatform();
+            if (null !== $platform) {
                 if ($platform->getFieldDDL($fromField) == $platform->getFieldDDl($toField)) {
                     return false;
                 }
             }
+
             $columnDiff = new FieldDiff($fromField, $toField);
             $columnDiff->setChangedProperties($changedProperties);
 
