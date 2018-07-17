@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Model;
 
 /**
@@ -17,20 +19,27 @@ namespace Propel\Generator\Model;
  * @author John McNally <jmcnally@collab.net> (Torque)
  * @author Hugo Hamon <webmaster@apprendre-php.com> (Propel)
  */
-class Inheritance extends MappingModel
+class Inheritance
 {
+    /** @var string */
     private $key;
+
+    /** @var string */
     private $className;
 //    private $package;
+
+    /** @var string */
     private $ancestor;
-    private $column;
+
+    /** @var Field */
+    private $field;
 
     /**
      * Returns a key name.
      *
      * @return string
      */
-    public function getKey()
+    public function getKey(): string
     {
         return $this->key;
     }
@@ -40,29 +49,29 @@ class Inheritance extends MappingModel
      *
      * @param string $key
      */
-    public function setKey($key)
+    public function setKey(string $key)
     {
         $this->key = $key;
     }
 
     /**
-     * Returns the parent column.
+     * Returns the parent field.
      *
      * @return Field
      */
-    public function getField()
+    public function getField(): Field
     {
-        return $this->column;
+        return $this->field;
     }
 
     /**
-     * Sets the parent column
+     * Sets the parent field
      *
-     * @param Field $column
+     * @param Field $field
      */
-    public function setField(Field $column)
+    public function setField(Field $field)
     {
-        $this->column = $column;
+        $this->field = $field;
     }
 
     /**
@@ -70,7 +79,7 @@ class Inheritance extends MappingModel
      *
      * @return string
      */
-    public function getClassName()
+    public function getClassName(): string
     {
         return $this->className;
     }
@@ -80,7 +89,7 @@ class Inheritance extends MappingModel
      *
      * @param string $name
      */
-    public function setClassName($name)
+    public function setClassName(string $name)
     {
         $this->className = $name;
     }
@@ -110,7 +119,7 @@ class Inheritance extends MappingModel
      *
      * @return string
      */
-    public function getAncestor()
+    public function getAncestor(): string
     {
         return $this->ancestor;
     }
@@ -120,16 +129,16 @@ class Inheritance extends MappingModel
      *
      * @param string $ancestor
      */
-    public function setAncestor($ancestor)
+    public function setAncestor(string $ancestor)
     {
         $this->ancestor = $ancestor;
     }
 
-    protected function setupObject()
-    {
-        $this->key       = $this->getAttribute('key');
-        $this->className = $this->getAttribute('class');
+//    protected function setupObject()
+//    {
+//        $this->key       = $this->getAttribute('key');
+//        $this->className = $this->getAttribute('class');
 //        $this->package   = $this->getAttribute('package');
-        $this->ancestor  = $this->getAttribute('extends');
-    }
+//        $this->ancestor  = $this->getAttribute('extends');
+//    }
 }

@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Model;
 
 /**
@@ -29,7 +31,7 @@ class Unique extends Index
      *
      * Returns Boolean
      */
-    public function isUnique()
+    public function isUnique(): bool
     {
         return true;
     }

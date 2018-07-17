@@ -27,18 +27,9 @@ class IndexTest extends ModelTestCase
         $this->assertEquals('foo_idx', $index->getName());
         $this->assertFalse($index->isUnique());
         $this->assertInstanceOf('Propel\Generator\Model\Entity', $index->getEntity());
-        $this->assertSame('db_books', $index->getEntityName());
+        $this->assertSame('db_books', $index->getEntity()->getName());
         $this->assertCount(0, $index->getFields());
-        $this->assertFalse($index->hasFields());
-    }
-
-    public function testSetupObject()
-    {
-        $index = new Index();
-        $index->setEntity($this->getEntityMock('books'));
-        $index->loadMapping([ 'name' => 'foo_idx' ]);
-
-        $this->assertEquals('foo_idx', $index->getName());
+        $this->assertTrue($index->getFields()->isEmpty());
     }
 
     /**
@@ -69,63 +60,28 @@ class IndexTest extends ModelTestCase
     public function provideEntitySpecificAttributes()
     {
         return [
-            [ 'books', 64, 'books_i_no_columns' ],
+            [ 'books', 64, 'books_i_no_fields' ],
             [ 'super_long_table_name', 16, 'super_long_table' ],
         ];
     }
 
-    /**
-     * @dataProvider provideFieldDefinitions
-     *
-     */
-    public function testAddIndexedFields($columns)
+    public function testAddIndexedFields()
     {
-        $index = new Index();
-        $index->setFields($columns);
-
-        $this->assertTrue($index->hasFields());
-        $this->assertCount(3, $index->getFields());
-
-        $this->assertSame(100, $index->getFieldSize('foo'));
-        $this->assertTrue($index->hasFieldSize('foo'));
-
-        $this->assertSame(5, $index->getFieldSize('bar'));
-        $this->assertTrue($index->hasFieldSize('bar'));
-
-        $this->assertNull($index->getFieldSize('baz'));
-    }
-
-    public function provideFieldDefinitions()
-    {
-        $dataset[0][] = [
+        $columns = [
             $this->getFieldMock('foo', [ 'size' => 100 ]),
             $this->getFieldMock('bar', [ 'size' => 5   ]),
-            $this->getFieldMock('baz', [ 'size' => 0   ]),
+            $this->getFieldMock('baz', [ 'size' => 0   ])
         ];
-
-        $dataset[1][] = [
-            [ 'name' => 'foo', 'size' => 100 ],
-            [ 'name' => 'bar', 'size' => 5 ],
-            [ 'name' => 'baz', 'size' => 0 ],
-        ];
-
-        return $dataset;
-    }
-
-    public function testResetFieldsSize()
-    {
-        $columns[] = $this->getFieldMock('foo', [ 'size' => 100 ]);
-        $columns[] = $this->getFieldMock('bar', [ 'size' => 5   ]);
 
         $index = new Index();
-        $index->setFields($columns);
+        $index->setEntity($this->getEntityMock('index_entity'));
+        $index->addFields($columns);
 
-        $this->assertTrue($index->hasFieldSize('foo'));
-        $this->assertTrue($index->hasFieldSize('bar'));
-
-        $index->resetFieldsSize();
-        $this->assertFalse($index->hasFieldSize('foo'));
-        $this->assertFalse($index->hasFieldSize('bar'));
+        $this->assertFalse($index->getFields()->isEmpty());
+        $this->assertCount(3, $index->getFields());
+        $this->assertSame(100, $index->getField('foo')->getSize());
+        $this->assertSame(5, $index->getField('bar')->getSize());
+        $this->assertEquals(0, $index->getField('baz')->getSize());
     }
 
     public function testNoFieldAtFirstPosition()
@@ -141,6 +97,7 @@ class IndexTest extends ModelTestCase
     public function testNoFieldAtPositionCaseSensitivity($name, $case)
     {
         $index = new Index();
+        $index->setEntity($this->getEntityMock('db_books'));
         $index->addField($this->getFieldMock('foo', [ 'size' => 5 ]));
 
         $this->assertFalse($index->hasFieldAtPosition(0, $name, 5, $case));
@@ -159,6 +116,7 @@ class IndexTest extends ModelTestCase
         $size = 5;
 
         $index = new Index();
+        $index->setEntity($this->getEntityMock('db_books'));
         $index->addField($this->getFieldMock('foo', [ 'size' => $size ]));
 
         $size++;
@@ -168,6 +126,7 @@ class IndexTest extends ModelTestCase
     public function testHasFieldAtFirstPosition()
     {
         $index = new Index();
+        $index->setEntity($this->getEntityMock('db_books'));
         $index->addField($this->getFieldMock('foo', [ 'size' => 0 ]));
 
         $this->assertTrue($index->hasFieldAtPosition(0, 'foo'));

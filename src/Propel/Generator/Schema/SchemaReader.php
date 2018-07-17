@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Schema;
 
 use Propel\Generator\Config\GeneratorConfigInterface;

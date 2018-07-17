@@ -710,7 +710,8 @@ DROP INDEX %s;
 
         return sprintf(
             $pattern,
-            $this->quoteIdentifier($index->getFQName())
+            //$this->quoteIdentifier($index->getFQName())
+            $this->quoteIdentifier($index->getEntity()->getDatabase()->getSchema() . '.' . $index->getName())
         );
     }
 
@@ -1569,5 +1570,28 @@ if (is_resource($fieldValueAccessor)) {
                 }
             }
         }
+    }
+
+    /**
+     * MOVED HERE FROM Propel\Generator\Model\Entity
+     *
+     * Returns a delimiter-delimited string list of field names.
+     *
+     * @see SqlDefaultPlatform::getFieldList() if quoting is required
+     *
+     * @param array
+     * @param string $delimiter
+     * @return string
+     */
+    public function getFieldList(array $columns, string $delimiter = ','): string
+    {
+        $list = [];
+        foreach ($columns as $col) {
+            if ($col instanceof Field) {
+                $col = $col->getName();
+            }
+            $list[] = $col;
+        }
+        return implode($delimiter, $list);
     }
 }

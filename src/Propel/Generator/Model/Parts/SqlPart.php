@@ -1,12 +1,27 @@
 <?php
+
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ */
+
+declare(strict_types=1);
+
 namespace Propel\Generator\Model\Parts;
 
-use Propel\Generator\Model\Database;
 use Propel\Generator\Model\IdMethodParameter;
 use Propel\Generator\Model\Model;
 use Propel\Generator\Platform\PlatformInterface;
 use phootwork\collection\Set;
 
+/**
+ * Trait SqlPart
+ *
+ * @author Thomas Gossmann
+ */
 trait SqlPart
 {
     use SuperordinatePart;
@@ -31,6 +46,9 @@ trait SqlPart
         $this->idMethodParameters = new Set();
     }
 
+    /**
+     * @return null|PlatformInterface
+     */
     abstract public function getPlatform(): ?PlatformInterface;
 
     /**
@@ -42,6 +60,7 @@ trait SqlPart
     public function setIdMethod(string $idMethod)
     {
         $this->idMethod = $idMethod;
+
         return $this;
     }
 
@@ -134,6 +153,7 @@ trait SqlPart
     public function setIdentifierQuoting(bool $identifierQuoting)
     {
         $this->identifierQuoting = $identifierQuoting;
+
         return $this;
     }
 
@@ -215,6 +235,7 @@ trait SqlPart
         }
 
         $this->stringFormat = $format;
+
         return $this;
     }
 

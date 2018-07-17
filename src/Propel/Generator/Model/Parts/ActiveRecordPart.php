@@ -1,6 +1,21 @@
 <?php
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ */
+
+declare(strict_types=1);
+
 namespace Propel\Generator\Model\Parts;
 
+/**
+ * Trait ActiveRecordPart
+ *
+ * @author Thomas Gossmann
+ */
 trait ActiveRecordPart
 {
     use SuperordinatePart;
@@ -15,16 +30,17 @@ trait ActiveRecordPart
      * @param bool $activeRecord
      * @return $this
      */
-    public function setActiveRecord(bool $activeRecord)
+    public function setActiveRecord(bool $activeRecord): object
     {
         $this->activeRecord = $activeRecord;
+
         return $this;
     }
 
     /**
      * @return bool|null
      */
-    public function isActiveRecord()
+    public function isActiveRecord(): bool
     {
         if (null !== $this->activeRecord) {
             return $this->activeRecord;
@@ -40,7 +56,7 @@ trait ActiveRecordPart
     /**
      * @return bool|null
      */
-    public function getActiveRecord()
+    public function getActiveRecord(): bool
     {
         return $this->activeRecord;
     }

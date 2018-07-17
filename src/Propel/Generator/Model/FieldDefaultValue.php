@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Model;
 
 /**
@@ -49,7 +51,7 @@ class FieldDefaultValue
     /**
      * @return string The type of default value (DefaultValue::TYPE_VALUE or DefaultValue::TYPE_EXPR)
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
@@ -67,7 +69,7 @@ class FieldDefaultValue
      *
      * @return boolean Whether value this object holds is an expression.
      */
-    public function isExpression()
+    public function isExpression(): bool
     {
         return self::TYPE_EXPR === $this->type;
     }
@@ -75,7 +77,7 @@ class FieldDefaultValue
     /**
      * @return string The value, as specified in the schema.
      */
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }
@@ -95,7 +97,7 @@ class FieldDefaultValue
      * @return boolean            Whether this object represents same default value as $other
      * @author     Niklas Närhinen <niklas@narhinen.net>
      */
-    public function equals(FieldDefaultValue $other)
+    public function equals(FieldDefaultValue $other): bool
     {
         if ($this->getType() !== $other->getType()) {
             return false;

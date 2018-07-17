@@ -28,44 +28,10 @@ class BehaviorTest extends TestCase
     private $schemaReader;
     private $appData;
 
-    public function testSetupObject()
-    {
-        $b = new Behavior();
-        $b->loadMapping(['name' => 'foo']);
-        $this->assertEquals($b->getName(), 'foo', 'setupObject() sets the Behavior name from XML attributes');
-    }
-
-    public function testSetupObjectWithMultipleBehaviorWithNoId()
-    {
-        $b = new MultipleBehavior();
-        $b->loadMapping(['name' => 'foo']);
-
-        $this->assertEquals($b->getName(), 'foo', 'setupObject() sets the Behavior name from XML attributes');
-        $this->assertEquals($b->getId(), 'foo', 'setupObject() sets the Behavior id from its name when no explicit id is given');
-    }
-
-    public function testSetupObjectWithMultipleBehaviorWithId()
-    {
-        $b = new MultipleBehavior();
-        $b->loadMapping(['name' => 'foo', 'id' => 'bar']);
-
-        $this->assertEquals($b->getName(), 'foo', 'setupObject() sets the Behavior name from XML attributes');
-        $this->assertEquals($b->getId(), 'bar', 'setupObject() sets the Behavior id from XML attributes');
-    }
-
-    /**
-     * @expectedException Propel\Generator\Exception\LogicException
-     */
-    public function testSetupObjectFailIfIdGivenOnNotMultipleBehavior()
-    {
-        $b = new Behavior();
-        $b->loadMapping(['name' => 'foo', 'id' => 'lala']);
-    }
-
     public function testName()
     {
         $b = new Behavior();
-        $this->assertNull($b->getName(), 'Behavior name is null by default');
+        $this->assertEquals('', $b->getName(), 'Behavior name is null string by default');
         $b->setName('foo');
         $this->assertEquals($b->getName(), 'foo', 'setName() sets the name, and getName() gets it');
     }
@@ -92,6 +58,7 @@ class BehaviorTest extends TestCase
         $this->assertEquals($b->getParameters(), ['foo' => 'bar3', 'foo2' => 'bar2'], 'addParameter() changes a parameter from an associative array');
         $this->assertEquals($b->getParameter('foo'), 'bar3', 'getParameter() retrieves a parameter value by name');
         $b->setParameters(['foo3' => 'bar3', 'foo4' => 'bar4']);
+        var_dump($b->getParameters());
         $this->assertEquals($b->getParameters(), ['foo3' => 'bar3', 'foo4' => 'bar4'], 'setParameters() changes the whole parameter array');
     }
 

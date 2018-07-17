@@ -1,6 +1,22 @@
 <?php
+
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ */
+
+declare(strict_types=1);
+
 namespace Propel\Generator\Model\Parts;
 
+/**
+ * Trait NamespacePart
+ *
+ * @author Thomas Gossmann
+ */
 trait NamespacePart
 {
     use NamePart;
@@ -8,7 +24,12 @@ trait NamespacePart
 
     protected $namespace;
 
-    public function setName($name)
+    /**
+     * @param string $name
+     *
+     * @return $this
+     */
+    public function setName(string $name): object
     {
         if (false !== strpos($name, '\\')) {
             $namespace = explode('\\', trim($name, '\\'));
@@ -26,7 +47,7 @@ trait NamespacePart
      * @param string $namespace
      * @return $this
      */
-    public function setNamespace(string $namespace)
+    public function setNamespace(string $namespace): object
     {
         $this->namespace = rtrim($namespace, '\\');
 

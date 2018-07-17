@@ -33,10 +33,10 @@ class GenericAccessorMethods extends BuildComponent
     public function addHasArrayElement(Field $field)
     {
         $columnType = ($field->isPhpArrayType()) ? 'array' : 'set';
-        $singularName = NamingTool::toUpperCamelCase($field->getSingularName());
+        $singularName = NamingTool::toStudlyCase($field->getSingularName());
 
         $this->addMethod("has$singularName", $field->getAccessorVisibility())
-            ->setDescription("Test the presence of a value in the [{$field->getLowercasedName()}] $columnType column value.")
+            ->setDescription("Test the presence of a value in the [{$field->getColumnName()}] $columnType column value.")
             ->setType('bool')
             ->addSimpleParameter('value')
             ->setBody("return in_array(\$value, \$this->get{$field->getMethodName()}());")

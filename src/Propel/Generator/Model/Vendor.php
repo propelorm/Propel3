@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Model;
 
 use phootwork\collection\Map;
@@ -62,10 +64,8 @@ class Vendor
      * @param string $type       RDBMS type (optional)
      * @param array  $parameters An associative array of vendor's parameters (optional)
      */
-    public function __construct($type = null, array $parameters = [])
+    public function __construct(?string $type = null, array $parameters = [])
     {
-        parent::__construct();
-
         $this->parameters = new Map();
 
         if (null !== $type) {
@@ -86,6 +86,7 @@ class Vendor
     public function setType(string $type): Vendor
     {
         $this->type = $type;
+
         return $this;
     }
 
@@ -109,6 +110,7 @@ class Vendor
     public function setParameter(string $name, $value): Vendor
     {
         $this->parameters->set($name, $value);
+
         return $this;
     }
 
@@ -138,11 +140,11 @@ class Vendor
      * Sets an associative array of parameters for vendor specific information.
      *
      * @param array $parameters Parameter data.
+     *
      */
-    public function setParameters(array $parameters = []): Vendor
+    public function setParameters(array $parameters = [])
     {
         $this->parameters->setAll($parameters);
-        return $this;
     }
 
     /**
