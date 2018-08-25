@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
-<database name="bookstore" defaultIdMethod="native"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          namespace="Propel\Tests\Bookstore" activeRecord="true">
+<database name="bookstore" defaultIdMethod="native" namespace="Propel\Tests\Bookstore" activeRecord="true">
 
     <entity name="Book" description="Book Table">
         <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" description="Book Id"/>
@@ -39,8 +37,7 @@
     <entity name="BookSummary">
         <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER"/>
         <field name="summary" required="true" type="LONGVARCHAR"/>
-        <relation name="summarizedBook" target="Book" onDelete="cascade">
-        </relation>
+        <relation name="summarizedBook" target="Book" onDelete="cascade"/>
     </entity>
 
     <!-- This entity exists to test validators -->
@@ -346,8 +343,8 @@
 
     <entity name="ReleasePool">
         <field name="id" type="INTEGER" primaryKey="true" autoIncrement="true"/>
-        <field name="name" type="VARCHAR"/>
-        <relation target="RecordLabel" onDelete="cascade" required="true"/>
+        <field name="name" type="VARCHAR" required="true"/>
+        <relation target="RecordLabel" onDelete="cascade"/>
     </entity>
 
 </database>

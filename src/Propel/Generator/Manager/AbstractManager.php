@@ -19,7 +19,7 @@ use Propel\Generator\Model\Schema;
 use Propel\Runtime\Map\DatabaseMap;
 
 /**
- * An abstract base Propel manager to perform work related to the XML schema
+ * An abstract base Propel manager to perform work related to the schema
  * file.
  *
  * @author Hans Lellelid <hans@xmpl.org> (Propel)
@@ -29,7 +29,7 @@ use Propel\Runtime\Map\DatabaseMap;
 abstract class AbstractManager
 {
     /**
-     * Data models that we collect. One from each XML schema file.
+     * Data models that we collect. One from each schema file.
      */
     protected $dataModels = [];
 
@@ -52,25 +52,7 @@ abstract class AbstractManager
     protected $dbEncoding = 'UTF-8';
 
     /**
-     * Whether to perform validation (XSD) on the schema.xml file(s).
-     * @var boolean
-     */
-    protected $validate;
-
-    /**
-     * The XSD schema file to use for validation.
-     * @var string
-     */
-    protected $xsd;
-
-    /**
-     * XSL file to use to normalize (or otherwise transform) schema before validation.
-     * @var string
-     */
-    protected $xsl;
-
-    /**
-     * Gets list of all used xml schemas
+     * Gets list of all used schemas
      *
      * @var array
      */
@@ -104,7 +86,7 @@ abstract class AbstractManager
      *
      * @return array
      */
-    public function getSchemas()
+    public function getSchemas(): array
     {
         return $this->schemas;
     }
@@ -114,7 +96,7 @@ abstract class AbstractManager
      *
      * @param array
      */
-    public function setSchemas($schemas)
+    public function setSchemas(array $schemas): void
     {
         $this->schemas = $schemas;
     }
@@ -124,7 +106,7 @@ abstract class AbstractManager
      *
      * @param string $workingDirectory
      */
-    public function setWorkingDirectory($workingDirectory)
+    public function setWorkingDirectory(string $workingDirectory): void
     {
         $this->workingDirectory = $workingDirectory;
     }
@@ -134,7 +116,7 @@ abstract class AbstractManager
      *
      * @return string
      */
-    public function getWorkingDirectory()
+    public function getWorkingDirectory(): string
     {
         return $this->workingDirectory;
     }
@@ -146,7 +128,7 @@ abstract class AbstractManager
      *
      * @return Schema[]
      */
-    public function getDataModels()
+    public function getDataModels(): array
     {
         if (!$this->dataModelsLoaded) {
             $this->loadDataModels();
@@ -160,7 +142,7 @@ abstract class AbstractManager
      *
      * @return array
      */
-    public function getDataModelDbMap()
+    public function getDataModelDbMap(): array
     {
         if (!$this->dataModelsLoaded) {
             $this->loadDataModels();
@@ -172,7 +154,7 @@ abstract class AbstractManager
     /**
      * @return Database[]
      */
-    public function getDatabases()
+    public function getDatabases(): array
     {
         if (null === $this->databases) {
             /** @var DatabaseMap[] $databases */
@@ -202,42 +184,10 @@ abstract class AbstractManager
      * @param  string $name
      * @return Database|null
      */
-    public function getDatabase($name)
+    public function getDatabase($name):? Database
     {
         $dbs = $this->getDatabases();
         return @$dbs[$name];
-    }
-
-    /**
-     * Sets whether to perform validation on the datamodel schema.xml file(s).
-     *
-     * @param boolean $validate
-     */
-    public function setValidate($validate)
-    {
-        $this->validate = (boolean) $validate;
-    }
-
-    /**
-     * Sets the XSD schema to use for validation of any datamodel schema.xml
-     * file(s).
-     *
-     * @param string $xsd
-     */
-    public function setXsd($xsd)
-    {
-        $this->xsd = $xsd;
-    }
-
-    /**
-     * Sets the normalization XSLT to use to transform datamodel schema.xml
-     * file(s) before validation and parsing.
-     *
-     * @param string $xsl
-     */
-    public function setXsl($xsl)
-    {
-        $this->xsl = $xsl;
     }
 
     /**
@@ -245,7 +195,7 @@ abstract class AbstractManager
      *
      * @param string $encoding Target database encoding
      */
-    public function setDbEncoding($encoding)
+    public function setDbEncoding(string $encoding): void
     {
         $this->dbEncoding = $encoding;
     }
@@ -255,7 +205,7 @@ abstract class AbstractManager
      *
      * @param \Closure $logger
      */
-    public function setLoggerClosure(\Closure $logger)
+    public function setLoggerClosure(\Closure $logger): void
     {
         $this->loggerClosure = $logger;
     }
@@ -273,41 +223,15 @@ abstract class AbstractManager
         if (empty($dataModelFiles)) {
             throw new BuildException('No schema files were found (matching your schema fileset definition).');
         }
-
+//Move This to the XMLLoader
         // Make a transaction for each file
         foreach ($dataModelFiles as $schema) {
             $dmFilename = $schema->getPathName();
             $this->log('Processing: ' . $schema->getFileName());
 
-            $dom = new \DOMDocument('1.0', 'UTF-8');
-            $dom->load($dmFilename);
+            //@todo load datamodel
 
             $this->includeExternalSchemas($dom, $schema->getPath());
-
-            // normalize (or transform) the XML document using XSLT
-            if ($this->getGeneratorConfig()->get()['generator']['schema']['transform'] && $this->xsl) {
-                $this->log('Transforming ' . $dmFilename . ' using stylesheet ' . $this->xsl->getPath());
-
-                if (!class_exists('\XSLTProcessor')) {
-                    $this->log('Could not perform XLST transformation. Make sure PHP has been compiled/configured to support XSLT.');
-                } else {
-                    // normalize the document using normalizer stylesheet
-                    $xslDom = new \DOMDocument('1.0', 'UTF-8');
-                    $xslDom->load($this->xsl->getAbsolutePath());
-                    $xsl = new \XsltProcessor();
-                    $xsl->importStyleSheet($xslDom);
-                    $dom = $xsl->transformToDoc($dom);
-                }
-            }
-
-            // validate the XML document using XSD schema
-            if ($this->validate && $this->xsd) {
-                $this->log('  Validating XML using schema ' . $this->xsd->getPath());
-
-                if (!$dom->schemaValidate($this->xsd->getAbsolutePath())) {
-                    throw new EngineException(sprintf("XML schema file (%s) does not validate. See warnings above for reasons validation failed (make sure error_reporting is set to show E_WARNING if you don't see any).", $dmFilename), $this->getLocation());
-                }
-            }
 
             $xmlParser = new SchemaReader($this->dbEncoding);
             $xmlParser->setGeneratorConfig($this->getGeneratorConfig());
@@ -356,6 +280,7 @@ abstract class AbstractManager
      * @param \DOMDocument $dom
      * @param string       $srcDir
      */
+    //@todo move to schemaLoaders
     protected function includeExternalSchemas(\DOMDocument $dom, $srcDir)
     {
         $databaseNode = $dom->getElementsByTagName('database')->item(0);
@@ -409,7 +334,7 @@ abstract class AbstractManager
      *
      * @return GeneratorConfigInterface
      */
-    protected function getGeneratorConfig()
+    protected function getGeneratorConfig(): GeneratorConfigInterface
     {
         return $this->generatorConfig;
     }
@@ -419,18 +344,9 @@ abstract class AbstractManager
      *
      * @param GeneratorConfigInterface $generatorConfig
      */
-    public function setGeneratorConfig(GeneratorConfigInterface $generatorConfig)
+    public function setGeneratorConfig(GeneratorConfigInterface $generatorConfig): void
     {
         $this->generatorConfig = $generatorConfig;
-    }
-
-    protected function validate()
-    {
-        if ($this->validate) {
-            if (!$this->xsd) {
-                throw new BuildException("'validate' set to TRUE, but no XSD specified (use 'xsd' attribute).");
-            }
-        }
     }
 
     protected function log($message)
@@ -439,33 +355,5 @@ abstract class AbstractManager
             $closure = $this->loggerClosure;
             $closure($message);
         }
-    }
-
-    /**
-     * Returns an array of properties as key/value pairs from an input file.
-     *
-     * @param  string $file
-     * @return array
-     */
-    protected function getProperties($file)
-    {
-        $properties = [];
-
-        if (false === $lines = @file($file)) {
-            throw new \Exception(sprintf('Unable to parse contents of "%s".', $file));
-        }
-
-        foreach ($lines as $line) {
-            $line = trim($line);
-
-            if (empty($line) || in_array($line[0], ['#', ';'])) {
-                continue;
-            }
-
-            $pos = strpos($line, '=');
-            $properties[trim(substr($line, 0, $pos))] = trim(substr($line, $pos + 1));
-        }
-
-        return $properties;
     }
 }
