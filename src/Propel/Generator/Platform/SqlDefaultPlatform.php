@@ -264,7 +264,7 @@ class SqlDefaultPlatform implements PlatformInterface
      *
      * See the mysql manual http://www.mysql.com/doc/E/X/EXPLAIN.html
      * for a better description of why heavy indexing is useful for
-     * quickly searchable database entitys.
+     * quickly searchable database entities.
      */
     protected function doHeavyIndexing(Entity $entity)
     {

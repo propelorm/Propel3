@@ -110,7 +110,7 @@ class PropelConfiguration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->scalarNode('project')->defaultValue('')->end()
-                        ->scalarNode('version')->defaultValue('2.0.0-dev')->end()
+                        ->scalarNode('version')->defaultValue('3.0.0-dev')->end()
                     ->end()
                 ->end()
             ->end()

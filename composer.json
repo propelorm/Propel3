@@ -15,25 +15,26 @@
             "email" : "marc@marcjschmidt.de"
         }
     ],
-    "require" : {
-        "php" : ">=7.1",
-        "symfony/yaml" : "^3.0",
-        "symfony/console" : "^3.0",
-        "symfony/finder" : "^3.0",
-        "symfony/filesystem" : "^3.0",
-        "symfony/event-dispatcher" : "^3.0",
-        "symfony/config" : "^3.0",
-        "psr/log" : "~1.0",
-        "gossi/php-code-generator" : "dev-master",
-        "mustache/mustache" : "~2.6",
-        "marcj/topsort" : "1.1.0",
-        "bramus/monolog-colored-line-formatter" : "~2.0",
+    "require": {
+        "php": ">=7.1",
+        "symfony/yaml": "^3.0|^4.0",
+        "symfony/console": "^3.0|^4.0",
+        "symfony/finder": "^3.0|^4.0",
+        "symfony/filesystem": "^3.0|^4.0",
+        "symfony/event-dispatcher": "^3.0|^4.0",
+        "symfony/config": "^3.0|^4.0",
+        "psr/log": "^1.0",
+        "gossi/php-code-generator": "dev-master",
+        "mustache/mustache": "^2.6",
+        "marcj/topsort": "1.1.0",
+        "bramus/monolog-colored-line-formatter": "^2.0",
         "phootwork/xml" : "dev-master"
     },
     "require-dev" : {
         "monolog/monolog" : "~1.3",
-        "phpunit/phpunit" : "^6.0",
-        "behat/behat" : "^3.3"
+        "phpunit/phpunit" : "^6.0|^7.0",
+        "behat/behat" : "^3.3",
+        "mikey179/vfsStream": "^1.6"
     },
     "suggest" : {
         "monolog/monolog" : "The recommended logging library to use with Propel."
