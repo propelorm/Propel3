@@ -20,6 +20,6 @@ abstract class NamespacesTestBase extends TestCaseFixtures
     protected function setUp()
     {
         parent::setUp();
-        require __DIR__ . '/../../../../Fixtures/namespaced/build/conf/bookstore_namespaced-conf.php';
+        require __DIR__ . '/../../../Fixtures/namespaced/build/conf/bookstore_namespaced-conf.php';
     }
 }

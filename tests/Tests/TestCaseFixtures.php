@@ -91,7 +91,7 @@ class TestCaseFixtures extends TestCase
         }
 
         $finder = new Finder();
-        $finder->files()->name('*.php')->in(__DIR__ . '/../../../src/Propel/Generator/Command')->depth(0);
+        $finder->files()->name('*.php')->in(__DIR__ . '/../../src/Generator/Command')->depth(0);
 
         $app = new Application('Propel', Propel::VERSION);
 
@@ -121,7 +121,7 @@ class TestCaseFixtures extends TestCase
         }
 
 
-        $builtInfo = __DIR__ . '/../../Fixtures/fixtures_built';
+        $builtInfo = __DIR__ . '/../Fixtures/fixtures_built';
         file_put_contents($builtInfo,
             "$dsn\n$mode\nFixtures has been created. Delete this file to let the test suite regenerate all fixtures."
         );
@@ -172,7 +172,7 @@ class TestCaseFixtures extends TestCase
         }
 
         $finder = new Finder();
-        $finder->files()->name('*-conf.php')->in(__DIR__.'/../../Fixtures/');
+        $finder->files()->name('*-conf.php')->in(__DIR__ . '/../../Fixtures/');
 
         foreach ($finder as $file) {
             include($file->getPathname());

@@ -12,7 +12,7 @@
 
   <testsuites>
     <testsuite name="Propel2 Test Suite">
-      <directory>tests/Propel/Tests/</directory>
+      <directory>tests/Tests/</directory>
     </testsuite>
   </testsuites>
 
@@ -37,7 +37,7 @@
 
   <filter>
     <whitelist>
-      <directory>src/Propel/</directory>
+      <directory>src/</directory>
     </whitelist>
   </filter>
 </phpunit>

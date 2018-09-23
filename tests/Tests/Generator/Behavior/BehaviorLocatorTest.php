@@ -24,13 +24,13 @@ class BehaviorLocatorTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
-        require_once(__DIR__ . '/../../../../Fixtures/behavior-installer/src/gossi/propel/behavior/l10n/L10nBehavior.php');
-        require_once(__DIR__ . '/../../../../Fixtures/behavior-development/src/CollectionBehavior.php');
+        require_once(__DIR__ . '/../../../Fixtures/behavior-installer/src/gossi/propel/behavior/l10n/L10nBehavior.php');
+        require_once(__DIR__ . '/../../../Fixtures/behavior-development/src/CollectionBehavior.php');
     }
 
     public function testBehaviorLocatorWithComposerLock()
     {
-        $configOptions['propel']['paths']['composerDir'] = __DIR__ . '/../../../../Fixtures/behavior-installer';
+        $configOptions['propel']['paths']['composerDir'] = __DIR__ . '/../../../Fixtures/behavior-installer';
         $config = new QuickGeneratorConfig($configOptions);
         $locator = new BehaviorLocator($config);
         
@@ -47,7 +47,7 @@ class BehaviorLocatorTest extends TestCase
     
     public function testBehaviorLocatorWithComposerJson()
     {
-        $configOptions['propel']['paths']['composerDir'] = __DIR__ . '/../../../../Fixtures/behavior-development';
+        $configOptions['propel']['paths']['composerDir'] = __DIR__ . '/../../../Fixtures/behavior-development';
         $config = new QuickGeneratorConfig($configOptions);
         $locator = new BehaviorLocator($config);
     

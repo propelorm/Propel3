@@ -39,7 +39,7 @@ class MysqlPlatformTest extends PlatformTestProvider
             $platform = new MysqlPlatform();
 
             $configProp['propel']['database']['adapters']['mysql']['tableType'] = 'InnoDB';
-            $config = new GeneratorConfig(__DIR__ . '/../../../../Fixtures/bookstore', $configProp);
+            $config = new GeneratorConfig(__DIR__ . '/../../../Fixtures/bookstore', $configProp);
 
             $platform->setGeneratorConfig($config);
         }

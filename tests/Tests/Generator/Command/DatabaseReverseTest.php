@@ -21,7 +21,7 @@ class DatabaseReverseTest extends TestCaseFixturesDatabase
 	$currentDir = getcwd();
         $outputDir = __DIR__.'/../../../../reversecommand';
 
-	chdir(__DIR__.'/../../../../Fixtures/bookstore');
+	chdir(__DIR__.'/../../../Fixtures/bookstore');
 
         $input = new \Symfony\Component\Console\Input\ArrayInput(array(
             'command' => 'database:reverse',

@@ -16,7 +16,7 @@ class MigrationManagerTest extends TestCase
      */
     private function createMigrationManager(array $migrationTimestamps)
     {
-        $generatorConfig = new GeneratorConfig(__DIR__ . '/../../../../Fixtures/migration/');
+        $generatorConfig = new GeneratorConfig(__DIR__ . '/../../../Fixtures/migration/');
 
         $connections = $generatorConfig->getBuildConnections();
 

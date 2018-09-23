@@ -26,7 +26,7 @@ class MigrationTest extends TestCaseFixturesDatabase
         parent::setUp();
         $this->connectionOption =  ['migration_command=' . $this->getConnectionDsn('bookstore', true)];
         $this->connectionOption = str_replace('dbname=test', 'dbname=migration', $this->connectionOption);
-        $this->inputDir = __DIR__ . '/../../../../Fixtures/migration-command';
+        $this->inputDir = __DIR__ . '/../../../Fixtures/migration-command';
         $this->outputDir = __DIR__ . self::$output;
     }
 

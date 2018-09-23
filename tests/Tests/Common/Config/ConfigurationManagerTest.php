@@ -32,7 +32,7 @@ class ConfigurationManagerTest extends ConfigTestCase
     public function setUp()
     {
         $this->currentDir = getcwd();
-        $this->fixturesDir = realpath( __DIR__ . '/../../../../Fixtures') . '/Configuration';
+        $this->fixturesDir = realpath( __DIR__ . '/../../../Fixtures') . '/Configuration';
 
         $this->getFilesystem()->mkdir($this->fixturesDir);
         chdir($this->fixturesDir);

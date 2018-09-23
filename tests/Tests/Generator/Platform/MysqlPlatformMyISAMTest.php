@@ -40,7 +40,7 @@ class MysqlPlatformMyISAMTest extends PlatformTestProvider
 
             $configProp['propel']['database']['adapters']['mysql']['tableType'] = 'MyISAM';
             $configProp['propel']['paths']['composerDir'] = __DIR__ . '/../../../../../';
-            $config = new GeneratorConfig(__DIR__ . '/../../../../Fixtures/bookstore', $configProp);
+            $config = new GeneratorConfig(__DIR__ . '/../../../Fixtures/bookstore', $configProp);
 
             $platform->setGeneratorConfig($config);
         }
