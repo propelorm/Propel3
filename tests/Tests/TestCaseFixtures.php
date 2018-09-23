@@ -91,7 +91,7 @@ class TestCaseFixtures extends TestCase
         }
 
         $finder = new Finder();
-        $finder->files()->name('*.php')->in(__DIR__.'/../../../src/Propel/Generator/Command')->depth(0);
+        $finder->files()->name('*.php')->in(__DIR__ . '/../../../src/Propel/Generator/Command')->depth(0);
 
         $app = new Application('Propel', Propel::VERSION);
 
