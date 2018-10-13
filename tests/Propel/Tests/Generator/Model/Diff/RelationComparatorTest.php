@@ -1,18 +1,17 @@
 <?php
-
-
-namespace Propel\Tests\Generator\Model\Diff;
-
-/*
- *	$Id: EntityTest.php 1891 2010-08-09 15:03:18Z francois $
+/**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * @license MIT License
+ *
  */
 
+namespace Propel\Tests\Generator\Model\Diff;
+
 use Propel\Generator\Model\Field;
+use Propel\Generator\Model\Model;
 use Propel\Generator\Model\Relation;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Diff\RelationComparator;
@@ -39,23 +38,6 @@ class RelationComparatorTest extends TestCase
         $t2 = new Entity('Baz');
         $t2->addRelation($fk2);
         $this->assertFalse(RelationComparator::computeDiff($fk1, $fk2));
-    }
-
-    public function testCompareCaseInsensitive()
-    {
-        $c1 = new Field('Foo');
-        $c2 = new Field('Bar');
-        $fk1 = new Relation();
-        $fk1->addReference($c1, $c2);
-        $t1 = new Entity('Baz');
-        $t1->addRelation($fk1);
-        $c3 = new Field('fOO');
-        $c4 = new Field('bAR');
-        $fk2 = new Relation();
-        $fk2->addReference($c3, $c4);
-        $t2 = new Entity('bAZ');
-        $t2->addRelation($fk2);
-        $this->assertFalse(RelationComparator::computeDiff($fk1, $fk2, true));
     }
 
     public function testCompareLocalField()
@@ -118,14 +100,14 @@ class RelationComparatorTest extends TestCase
         $c2 = new Field('Bar');
         $fk1 = new Relation();
         $fk1->addReference($c1, $c2);
-        $fk1->setOnUpdate(Relation::SETNULL);
+        $fk1->setOnUpdate(Model::RELATION_SETNULL);
         $t1 = new Entity('Baz');
         $t1->addRelation($fk1);
         $c3 = new Field('Foo');
         $c4 = new Field('Bar');
         $fk2 = new Relation();
         $fk2->addReference($c3, $c4);
-        $fk2->setOnUpdate(Relation::RESTRICT);
+        $fk2->setOnUpdate(Model::RELATION_RESTRICT);
         $t2 = new Entity('Baz');
         $t2->addRelation($fk2);
         $this->assertTrue(RelationComparator::computeDiff($fk1, $fk2));
@@ -137,14 +119,14 @@ class RelationComparatorTest extends TestCase
         $c2 = new Field('Bar');
         $fk1 = new Relation();
         $fk1->addReference($c1, $c2);
-        $fk1->setOnDelete(Relation::SETNULL);
+        $fk1->setOnDelete(Model::RELATION_SETNULL);
         $t1 = new Entity('Baz');
         $t1->addRelation($fk1);
         $c3 = new Field('Foo');
         $c4 = new Field('Bar');
         $fk2 = new Relation();
         $fk2->addReference($c3, $c4);
-        $fk2->setOnDelete(Relation::RESTRICT);
+        $fk2->setOnDelete(Model::RELATION_RESTRICT);
         $t2 = new Entity('Baz');
         $t2->addRelation($fk2);
         $this->assertTrue(RelationComparator::computeDiff($fk1, $fk2));

@@ -24,11 +24,14 @@
         "symfony/event-dispatcher": "^3.0|^4.0",
         "symfony/config": "^3.0|^4.0",
         "psr/log": "^1.0",
-        "gossi/php-code-generator": "dev-master",
+        "gossi/php-code-generator": "0.5",
         "mustache/mustache": "^2.6",
         "marcj/topsort": "1.1.0",
         "bramus/monolog-colored-line-formatter": "^2.0",
-        "phootwork/xml" : "dev-master"
+        "phootwork/lang": "^0.9.0",
+        "phootwork/file": "^0.2.0",
+        "phootwork/collection": "^1.6",
+        "phootwork/json": "^1.2"
     },
     "require-dev" : {
         "monolog/monolog" : "~1.3",

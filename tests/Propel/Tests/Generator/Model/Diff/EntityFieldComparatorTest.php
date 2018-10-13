@@ -47,7 +47,7 @@ class EntityFieldComparatorTest extends TestCase
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t2->addField($c2);
 
-        $this->assertFalse(EntityComparator::computeDiff($t1, $t2));
+        $this->assertNull(EntityComparator::computeDiff($t1, $t2));
     }
 
     public function testCompareNotSameFields()
@@ -61,21 +61,6 @@ class EntityFieldComparatorTest extends TestCase
 
         $diff = EntityComparator::computeDiff($t1, $t2);
         $this->assertTrue($diff instanceof EntityDiff);
-    }
-
-    public function testCompareCaseInsensitive()
-    {
-        $t1 = new Entity();
-        $c1 = new Field('Foo');
-        $t1->addField($c1);
-        $t2 = new Entity();
-        $c2 = new Field('fOO');
-        $t2->addField($c2);
-
-        $diff = EntityComparator::computeDiff($t1, $t2);
-        $this->assertTrue($diff instanceof EntityDiff);
-
-        $this->assertFalse(EntityComparator::computeDiff($t1, $t2, true));
     }
 
     public function testCompareAddedField()
@@ -96,8 +81,8 @@ class EntityFieldComparatorTest extends TestCase
         $nbDiffs = $tc->compareFields();
         $tableDiff = $tc->getEntityDiff();
         $this->assertEquals(1, $nbDiffs);
-        $this->assertEquals(1, count($tableDiff->getAddedFields()));
-        $this->assertEquals(['Foo' => $c2], $tableDiff->getAddedFields());
+        $this->assertEquals(1, $tableDiff->getAddedFields()->size());
+        $this->assertEquals(['Foo' => $c2], $tableDiff->getAddedFields()->toArray());
     }
 
     public function testCompareRemovedField()
@@ -118,8 +103,8 @@ class EntityFieldComparatorTest extends TestCase
         $nbDiffs = $tc->compareFields();
         $tableDiff = $tc->getEntityDiff();
         $this->assertEquals(1, $nbDiffs);
-        $this->assertEquals(1, count($tableDiff->getRemovedFields()));
-        $this->assertEquals(['Bar' => $c1], $tableDiff->getRemovedFields());
+        $this->assertEquals(1, $tableDiff->getRemovedFields()->size());
+        $this->assertEquals(['Bar' => $c1], $tableDiff->getRemovedFields()->toArray());
     }
 
     public function testCompareModifiedField()
@@ -145,9 +130,9 @@ class EntityFieldComparatorTest extends TestCase
         $nbDiffs = $tc->compareFields();
         $tableDiff = $tc->getEntityDiff();
         $this->assertEquals(1, $nbDiffs);
-        $this->assertEquals(1, count($tableDiff->getModifiedFields()));
+        $this->assertEquals(1, $tableDiff->getModifiedFields()->size());
         $columnDiff = FieldComparator::computeDiff($c1, $c2);
-        $this->assertEquals(['Foo' => $columnDiff], $tableDiff->getModifiedFields());
+        $this->assertEquals(['Foo' => $columnDiff], $tableDiff->getModifiedFields()->toArray());
     }
 
     public function testCompareRenamedField()
@@ -175,10 +160,10 @@ class EntityFieldComparatorTest extends TestCase
         $nbDiffs = $tc->compareFields();
         $tableDiff = $tc->getEntityDiff();
         $this->assertEquals(1, $nbDiffs);
-        $this->assertEquals(1, count($tableDiff->getRenamedFields()));
-        $this->assertEquals([[$c1, $c2]], $tableDiff->getRenamedFields());
-        $this->assertEquals([], $tableDiff->getAddedFields());
-        $this->assertEquals([], $tableDiff->getRemovedFields());
+        $this->assertEquals(1, $tableDiff->getRenamedFields()->size());
+        $this->assertEquals([$c1, $c2], $tableDiff->getRenamedFields()->get('Foo'));
+        $this->assertTrue($tableDiff->getAddedFields()->isEmpty());
+        $this->assertTrue($tableDiff->getRemovedFields()->isEmpty());
     }
 
     public function testCompareSeveralFieldDifferences()
@@ -222,11 +207,11 @@ class EntityFieldComparatorTest extends TestCase
         $nbDiffs = $tc->compareFields();
         $tableDiff = $tc->getEntityDiff();
         $this->assertEquals(4, $nbDiffs);
-        $this->assertEquals([[$c2, $c5]], $tableDiff->getRenamedFields());
-        $this->assertEquals(['col4' => $c6], $tableDiff->getAddedFields());
-        $this->assertEquals(['col3' => $c3], $tableDiff->getRemovedFields());
+        $this->assertEquals([$c2, $c5], $tableDiff->getRenamedFields()->get('col2'));
+        $this->assertEquals($c6, $tableDiff->getAddedFields()->get('col4'));
+        $this->assertEquals($c3, $tableDiff->getRemovedFields()->get('col3'));
         $columnDiff = FieldComparator::computeDiff($c1, $c4);
-        $this->assertEquals(['col1' => $columnDiff], $tableDiff->getModifiedFields());
+        $this->assertEquals($columnDiff, $tableDiff->getModifiedFields()->get('col1'));
     }
 
     public function testCompareSeveralRenamedSameFields()
@@ -266,9 +251,9 @@ class EntityFieldComparatorTest extends TestCase
         $nbDiffs = $tc->compareFields();
         $tableDiff = $tc->getEntityDiff();
         $this->assertEquals(2, $nbDiffs);
-        $this->assertEquals([[$c1, $c4], [$c2, $c5]], $tableDiff->getRenamedFields());
-        $this->assertEquals([], $tableDiff->getAddedFields());
-        $this->assertEquals([], $tableDiff->getRemovedFields());
-        $this->assertEquals([], $tableDiff->getModifiedFields());
+        $this->assertEquals(['col1' => [$c1, $c4], 'col2' => [$c2, $c5]], $tableDiff->getRenamedFields()->toArray());
+        $this->assertTrue($tableDiff->getAddedFields()->isEmpty());
+        $this->assertTrue($tableDiff->getRemovedFields()->isEmpty());
+        $this->assertTrue($tableDiff->getModifiedFields()->isEmpty());
     }
 }

@@ -13,76 +13,91 @@ namespace Propel\Generator\Model;
 
 use Propel\Generator\Config\GeneratorConfigInterface;
 use Propel\Generator\Exception\LogicException;
+use Propel\Generator\Manager\BehaviorManager;
 
 /**
  * Class ModelFactory
  *
  * @author Thomas Gossmann
+ * @author Cristiano Cinotti
  */
 class ModelFactory
 {
-    private $truthy = ['true', 't', 'y', 'yes'];
-    private $falsy = ['false', 'f', 'n', 'no'];
+    private $database = ['map' => [
+        'name' => 'setName',
+        'baseClass' => 'setBaseClass',
+        'defaultIdMethod' => 'setDefaultIdMethod',
+        'heavyIndexing' => 'setHeavyIndexing',
+        'identifierQuoting' => 'setIdentifierQuoting',
+        'scope' => 'setScope',
+        'defaultStringFormat' => 'setStringFormat',
+        'activeRecord' => 'setActiveRecord'
+    ]];
 
-    private $database = [
-        'transform' => [
-            'identifierQuoting' => 'bool',
-            'activeRecord' => 'bool'
-        ],
-        'map' => [
-            'name' => 'setName',
-            'baseClass' => 'setBaseClass',
-            'defaultIdMethod' => 'setDefaultIdMethod',
-            'heavyIndexing' => 'setHeavyIndexing',
-            'identifierQuoting' => 'setIdentifierQuoting',
-            'scope' => 'setScope',
-            'defaultStringFormat' => 'setDefaultStringFormat',
-            'activeRecord' => 'setActiveRecord'
-        ]
-    ];
+    private $entity = ['map' => [
+        'name' => 'setName',
+        'description' => 'setDescription',
+        'tableName' => 'setTableName',
+        'activeRecord' => 'setActiveRecord',
+        'allowPkInsert' => 'setAllowPkInsert',
+        'skipSql' => 'setSkipSql',
+        'readOnly' => 'setReadOnly',
+        'abstract' => 'setAbstract',
+        'baseClass' => 'setBaseClass',
+        'alias' => 'setAlias',
+        'repository' => 'setRepository',
+        'identifierQuoting' => 'setIdentifierQuoting',
+        'reloadOnInsert' => 'setReloadOnInsert',
+        'reloadOnUpdate' => 'setReloadOnUpdate',
+        'isCrossRef' => 'setCrossRef',
+        'defaultStringFormat' => 'setStringFormat',
+        'heavyIndexing' => 'setHeavyIndexing'
+    ]];
 
-    private $entity = [
-        'transform' => [
-            'activeRecord' => 'bool',
-            'reloadOnInsert' => 'bool',
-            'reloadOnUpdate' => 'bool',
-            'allowPkInsert' => 'bool',
-            'skipSql' => 'bool',
-            'readOnly' => 'bool',
-            'abstract' => 'bool',
-            'repository' => 'boolsy',
-            'identifierQuoting' => 'bool',
-            'isCrossRef' => 'bool'
-        ],
-        'map' => [
-            'name' => 'setName',
-            'description' => 'setDescription',
-            'tableName' => 'setTableName',
-            'activeRecord' => 'setActiveRecord',
-            'allowPkInsert' => 'setAllowPkInsert',
-            'skipSql' => 'setSkipSql',
-            'readOnly' => 'setReadOnly',
-            'abstract' => 'setAbstract',
-            'baseClass' => 'setBaseClass',
-            'alias' => 'setAlias',
-            'repository' => 'setRepository',
-            'identifierQuoting' => 'setIdentifierQuoting',
-            'reloadOnInsert' => 'setReloadOnInsert',
-            'reloadOnUpdate' => 'setReloadOnUpdate',
-            'isCrossRef' => 'setCrossRef',
-            'defaultStringFormat' => 'setDefaultStringFormat',
-        ]
-    ];
+    private $field = ['map' => [
+        'name' => 'setName',
+        'primaryKey' => 'setPrimaryKey',
+        'type' => 'setType',
+        'description' => 'setDescription',
+        'columnName' => 'setColumnName',
+        'phpType' => 'setPhpType',
+        'sqlType' => 'setSqlType',
+        'size' => 'setSize',
+        'scale' => 'setScale',
+        'defaultValue' => 'setDefaultValue',
+        'autoIncrement' => 'setAutoIncrement',
+        'lazyLoad' => 'setLazyLoad',
+        'primaryString' => 'setPrimaryString',
+        'valueSet' => 'setValueSet',
+        'inheritance' => 'setInheritanceType'
+    ]];
 
     private $vendor = ['map' => ['type' => 'setType']];
 
-    private $behavior = ['map' => [
+    private $inheritance = ['map' => [
+        'key' => 'setKey',
+        'class' => 'setClassName',
+        'package' => 'setPackage',
+        'extends' => 'setAncestor'
+    ]];
+
+    private $relation = ['map'=> [
+        'target' => 'setForeignEntityName',
+        'field' => 'setField',
         'name' => 'setName',
-        'id'   => 'setId'
+        'refField' => 'setRefField',
+        'refName' => 'setRefName',
+        'onUpdate' => 'setOnUpdate',
+        'onDelete' => 'setOnDelete',
+        'defaultJoin' => 'setDefaultJoin',
+        'skipSql' => 'setSkipSql'
     ]];
 
     /** @var GeneratorConfigInterface */
     private $config;
+
+    /** @var BehaviorManager */
+    private $behaviorManager;
 
     /**
      * ModelFactory constructor.
@@ -144,16 +159,97 @@ class ModelFactory
     /**
      * @param array $attributes
      *
-     * @return Behavior
-     * @throws LogicException
+     * @return Field
      */
-    protected function createBehavior(array $attributes): Behavior
+    public function createField(array $attributes): Field
     {
-        $behavior = $this->load(new Behavior(), $attributes, $this->behavior);
+        return $this->load(new Field(), $attributes, $this->field);
+    }
 
-        if (!$behavior->allowMultiple() && $attributes['id']) {
-            throw new LogicException(sprintf('Defining an ID (%s) on a behavior which does not allow multiple instances makes no sense', $id));
+    /**
+     * @param array $attributes
+     *
+     * @return Inheritance
+     */
+    public function createInheritance(array $attributes): Inheritance
+    {
+        return $this->load(new Inheritance(), $attributes, $this->inheritance);
+    }
+
+    public function createRelation(array $attributes): Relation
+    {
+        $relation = $this->load(new Relation(), $attributes, $this->relation);
+
+        if (count($attributes['references']) >0) {
+            foreach ($attributes['references'] as $reference) {
+                $relation->addReference($reference['local'], $reference['foreign']);
+            }
         }
+
+        return $relation;
+    }
+
+    /**
+     * @param array $attributes
+     *
+     * @return Index
+     */
+    public function createIndex(array $attributes): Index
+    {
+        $index = new Index();
+        $index->setName($attributes['name']);
+
+        return $index;
+    }
+
+    /**
+     * @param array $attributes
+     *
+     * @return Unique
+     */
+    public function createUnique(array $attributes): Unique
+    {
+        $unique = new Unique();
+        $unique->setName($attributes['name']);
+
+        return $unique;
+    }
+
+    /**
+     * @param array $attributes
+     *
+     * @return IdMethodParameter
+     */
+    public function createIdMethodParameter(array $attributes): IdMethodParameter
+    {
+        $idMethodParam = new IdMethodParameter();
+        $idMethodParam->setValue($attributes['value']);
+
+        return $idMethodParam;
+    }
+
+    public function createBehavior(array $attributes): Behavior
+    {
+        $behavior = $this->getBehaviorManager()->create($attributes['name']);
+        if (isset($attributes['parameters'])) {
+            foreach ($attributes['parameters'] as $name => $value) {
+                $behavior->setParameter($name, $value);
+            }
+        }
+
+        return $behavior;
+    }
+
+    /**
+     * @return BehaviorManager
+     */
+    protected function getBehaviorManager(): BehaviorManager
+    {
+        if (null === $this->behaviorManager) {
+            $this->behaviorManager = new BehaviorManager($this->config);
+        }
+
+        return $this->behaviorManager;
     }
 
     /**
@@ -165,70 +261,11 @@ class ModelFactory
      */
     private function load($model, array $attributes, array $definition)
     {
-        if (isset($definition['transform'])) {
-            $this->transform($attributes, $definition['transform']);
-        }
-
         if (isset($definition['map'])) {
             $model = $this->loadMapping($model, $attributes, $definition['map']);
         }
 
         return $model;
-    }
-
-    /**
-     * @param array $attributes
-     * @param array $transforms
-     */
-    private function transform(array &$attributes, array $transforms): void
-    {
-        foreach ($transforms as $key => $type) {
-            if (isset($attributes[$key])) {
-                $attributes[$key] = $this->transformValue($attributes[$key], $type);
-            }
-        }
-    }
-
-    /**
-     * @param $value
-     * @param $type
-     *
-     * @return bool
-     */
-    private function transformValue($value, $type): bool
-    {
-        switch ($type) {
-            case 'bool':
-                if (is_bool($value)) {
-                    return $value;
-                }
-
-                if (is_numeric($value)) {
-                    return (Boolean) $value;
-                }
-
-                return in_array(strtolower($value), $this->truthy, true);
-                break;
-
-            case 'boolsy':
-                if (is_bool($value)) {
-                    return $value;
-                }
-
-                if (is_numeric($value)) {
-                    return (bool) $value;
-                }
-
-                if (in_array(strtolower($value), $this->truthy, true)) {
-                    return true;
-                }
-
-                if (in_array(strtolower($value), $this->falsy, true)) {
-                    return false;
-                }
-
-                return $value;
-        }
     }
 
     /**

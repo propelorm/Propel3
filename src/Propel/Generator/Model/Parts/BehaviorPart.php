@@ -34,6 +34,7 @@ trait BehaviorPart
      *
      * @param Behavior $behavior
      * @throws BuildException when the added behavior is not an instance of \Propel\Generator\Model\Behavior
+
      * @return $this
      */
     public function addBehavior(Behavior $behavior)

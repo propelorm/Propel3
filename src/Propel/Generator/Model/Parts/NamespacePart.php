@@ -47,9 +47,12 @@ trait NamespacePart
      * @param string $namespace
      * @return $this
      */
-    public function setNamespace(string $namespace): object
+    public function setNamespace(?string $namespace): object
     {
-        $this->namespace = rtrim($namespace, '\\');
+        if (null !== $namespace) {
+            $namespace = rtrim($namespace, '\\');
+        }
+        $this->namespace = $namespace;
 
         return $this;
     }

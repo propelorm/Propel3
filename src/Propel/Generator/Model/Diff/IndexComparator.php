@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Model\Diff;
 
 use Propel\Generator\Model\Index;
@@ -24,29 +26,28 @@ class IndexComparator
      *
      * @param  Index   $fromIndex
      * @param  Index   $toIndex
-     * @param  boolean $caseInsensitive
      * @return boolean
      */
-    public static function computeDiff(Index $fromIndex, Index $toIndex, $caseInsensitive = false)
+    public static function computeDiff(Index $fromIndex, Index $toIndex): bool
     {
         // Check for removed index columns in $toIndex
         $fromIndexFields = $fromIndex->getFields();
-        $max = count($fromIndexFields);
-        for ($i = 0; $i < $max; $i++) {
-            $indexField = $fromIndexFields[$i];
-            if (!$toIndex->hasFieldAtPosition($i, $indexField, $fromIndex->getFieldSize($indexField), $caseInsensitive)) {
+        $i = 0;
+        foreach ($fromIndexFields as $indexField) {
+            if (!$toIndex->hasFieldAtPosition($i, $indexField->getName(), $indexField->getSize())) {
                 return true;
             }
+            $i++;
         }
 
         // Check for new index columns in $toIndex
         $toIndexFields = $toIndex->getFields();
-        $max = count($toIndexFields);
-        for ($i = 0; $i < $max; $i++) {
-            $indexField = $toIndexFields[$i];
-            if (!$fromIndex->hasFieldAtPosition($i, $indexField, $toIndex->getFieldSize($indexField), $caseInsensitive)) {
+        $i = 0;
+        foreach ($toIndexFields as $indexField) {
+            if (!$fromIndex->hasFieldAtPosition($i, $indexField->getName(), $indexField->getSize())) {
                 return true;
             }
+            $i++;
         }
 
         // Check for difference in unicity

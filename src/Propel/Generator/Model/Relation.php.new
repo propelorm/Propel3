@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Model;
 
-use phootwork\collection\ArrayList;
+use phootwork\collection\Set;
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Model\Parts\DatabasePart;
 use Propel\Generator\Model\Parts\EntityPart;
@@ -20,7 +20,6 @@ use Propel\Generator\Model\Parts\NamePart;
 use Propel\Generator\Model\Parts\SuperordinatePart;
 use Propel\Generator\Model\Parts\VendorPart;
 use Propel\Generator\Platform\PlatformInterface;
-use Propel\Generator\Util\UniqueList;
 
 /**
  * A class for information about table foreign keys.
@@ -46,11 +45,6 @@ class Relation
      * @var Entity|null
      */
     private $foreignEntity;
-//
-//    /**
-//     * @var string
-//     */
-//    private $foreignSchemaName;
 
     /**
      * @var string
@@ -79,14 +73,9 @@ class Relation
     private $onDelete = '';
 
     /**
-     * @var UniqueList
+     * @var Set
      */
-    private $localFields;
-
-    /**
-     * @var ArrayList
-     */
-    private $foreignFields;
+    private $mappedFields;
 
     /**
      * @var bool
@@ -116,8 +105,7 @@ class Relation
 
         $this->onUpdate = Model::RELATION_NONE;
         $this->onDelete = Model::RELATION_NONE;
-        $this->localFields = new UniqueList();
-        $this->foreignFields = new ArrayList();
+        $this->mappedFields = new Set();
         $this->skipSql = false;
     }
 
@@ -175,7 +163,7 @@ class Relation
      *
      * @return string
      */
-    public function normalizeFKey(?string $behavior): string
+    public function normalizeFKey(string $behavior): string
     {
         if (null === $behavior) {
             return Model::RELATION_NONE;
@@ -240,8 +228,8 @@ class Relation
     public function hasLocalField(Field $field): bool
     {
         if ($field = $this->getEntity()->getField($field->getName())) {
-            return $this->localFields->search($field->getName(), function($element, $query) {
-                return $element === $query;
+            return $this->mappedFields->search($field->getName(), function($element, $query) {
+                return $element->getLocal() === $query;
             });
         }
 
@@ -328,8 +316,16 @@ class Relation
             if ($this->getForeignEntity()) {
                 $hash[] = $this->getForeignEntity()->getFullTableName();
             }
-            $hash[] = implode(',', $this->localFields->toArray());
-            $hash[] = implode(',', $this->foreignFields->toArray());
+
+            $mappedFields = $this->mappedFields->toArray();
+            $hash1 = '';
+            $hash2 = '';
+            foreach ($mappedFields as $mappedField) {
+                $hash1 .= $mappedField->getLocal() . ',';
+                $hash2 .= $mappedField->getForeign() . ',';
+            }
+            $hash[] = $hash1;
+            $hash[] = $hash2;
 
             $newName .= substr(md5(strtolower(implode(':', $hash))), 0, 6);
 
@@ -395,11 +391,11 @@ class Relation
     }*/
 
     /**
-     * Returns the foreign table name of the FK, aka 'target'.
+     * Returns the foreign entity name of the FK, aka 'target'.
      *
      * @return string
      */
-    public function getForeignEntityName(): ?string
+    public function getForeignEntityName(): string
     {
         if (null === $this->foreignEntityName && null !== $this->foreignEntity) {
             $this->foreignEntityName = $this->foreignEntity->getFullName();
@@ -446,8 +442,6 @@ class Relation
         if (($database = $this->getEntity()->getDatabase()) && $this->getForeignEntityName()) {
             return $database->getEntityByName($this->getForeignEntityName());
         }
-
-        return null;
     }
 
     /**
@@ -475,7 +469,7 @@ class Relation
      */
     public function getSchemaName(): string
     {
-        return $this->getEntity()->getSchemaName();
+        return $this->getEntity()->getDatabase()->getSchema()->getName();
     }
 
     /**
@@ -484,34 +478,35 @@ class Relation
      * @param mixed $ref1 A Field object or an associative array or a string
      * @param mixed $ref2 A Field object or a single string name
      */
-    public function addReference($ref1, $ref2 = null)
+    public function addReference($ref1, $ref2 = '')
     {
+        $mapField = new MappedField();
+
         if (is_array($ref1)) {
-            $this->localFields->add($ref1['local'] ?? null);
-            $this->foreignFields->add($ref1['foreign'] ?? null);
+            $mapField->setLocal($ref1['local']);
+            $mapField->setForeign($ref1['foreign']);
+            $this->mappedFields->add($mapField);
 
             return;
         }
 
         if (is_string($ref1)) {
-            $this->localFields->add($ref1);
-            $this->foreignFields->add(is_string($ref2) ? $ref2 : null);
+            $mapField->setLocal($ref1);
+            $mapField->setForeign($ref2);
+            $this->mappedFields->add($mapField);
 
             return;
         }
 
-        $local = null;
-        $foreign = null;
         if ($ref1 instanceof Field) {
-            $local = $ref1->getName();
+            $mapField->setLocal($ref1->getName());
         }
 
         if ($ref2 instanceof Field) {
-            $foreign = $ref2->getName();
+            $mapField->setForeign($ref2->getName());
         }
 
-        $this->localFields->add($local);
-        $this->foreignFields->add($foreign);
+        $this->mappedFields->add($mapField);
     }
 
     /**
@@ -520,18 +515,23 @@ class Relation
      */
     public function clearReferences()
     {
-        $this->localFields->clear();
-        $this->foreignFields->clear();
+        $this->mappedFields->clear();
     }
+
 
     /**
      * Returns an array of local field names.
      *
-     * @return UniqueList
+     * @return Set
      */
-    public function getLocalFields(): UniqueList
+    public function getLocalFields(): Set
     {
-        return $this->localFields;
+        $output = [];
+        foreach ($this->mappedFields as $mappedField) {
+            $output[] = $mappedField->getLocal();
+        }
+
+        return $output;
     }
 
     /**
@@ -560,6 +560,20 @@ class Relation
     }
 
     /**
+     * Returns a local field name identified by a position.
+     *
+     * @param  integer $index
+     *
+     * @return string
+     */
+    public function getLocalFieldName(int $index = 0): string
+    {
+        $mappedArray = $this->mappedFields->toArray();
+        
+        return $mappedArray[$index]->getLocal();
+    }
+
+    /**
      * Returns a local Field object identified by a position.
      *
      * @param  integer $index
@@ -568,7 +582,7 @@ class Relation
      */
     public function getLocalField(int $index = 0): Field
     {
-        return $this->getEntity()->getField($this->getLocalFields()->get($index));
+        return $this->getEntity()->getField($this->getLocalFieldName($index));
     }
 
     /**
@@ -580,8 +594,10 @@ class Relation
     public function getLocalForeignMapping(): array
     {
         $h = [];
+        $localFields = $this->localFields->toArray();
+        $foreignFields = $this->foreignFields->toArray();
         for ($i = 0, $size = $this->localFields->size(); $i < $size; $i++) {
-            $h[$this->localFields->get($i)] = $this->foreignFields->get($i);
+            $h[$localFields[$i]] = $foreignFields[$i];
         }
 
         return $h;
@@ -596,8 +612,10 @@ class Relation
     public function getForeignLocalMapping(): array
     {
         $h = [];
+        $localFields = $this->localFields->toArray();
+        $foreignFields = $this->foreignFields->toArray();
         for ($i = 0, $size = $this->localFields->size(); $i < $size; $i++) {
-            $h[$this->foreignFields->get($i)] = $this->localFields->get($i);
+            $h[$foreignFields[$i]] = $localFields[$i];
         }
 
         return $h;
@@ -613,9 +631,10 @@ class Relation
     {
         $mapping = [];
         $foreignFields = $this->getForeignFieldObjects();
+        $localFields = $this->localFields->toArray();
         for ($i = 0, $size = $this->localFields->size(); $i < $size; $i++) {
             $mapping[] = [
-                'local' => $this->getEntity()->getField($this->localFields->get($i)),
+                'local' => $this->getEntity()->getField($localFields[$i]),
                 'foreign' => $foreignFields[$i],
             ];
         }
@@ -639,8 +658,9 @@ class Relation
     {
         $mapping = [];
         $foreignFields = $this->getForeignFieldObjects();
+        $localFields = $this->localFields->toArray();
         for ($i = 0, $size = $this->localFields->size(); $i < $size; $i++) {
-            $mapping[] = [$this->getEntity()->getField($this->localFields->get($i)), $foreignFields[$i]];
+            $mapping[] = [$this->getEntity()->getField($localFields[$i]), $foreignFields[$i]];
         }
 
         return $mapping;
@@ -677,9 +697,9 @@ class Relation
     /**
      * Returns an array of foreign field names.
      *
-     * @return ArrayList
+     * @return Set
      */
-    public function getForeignFields(): ArrayList
+    public function getForeignFields(): Set
     {
         return $this->foreignFields;
     }
@@ -709,17 +729,17 @@ class Relation
                             $this->getForeignEntity()->getName()
                         ));
                 }
-//                foreach ($foreignRelation->getFieldObjectsMapping() as $mapping) {
-//                    /** @var Field $local */
-//                    $local = $mapping['local'];
-//                    /** @var Field $foreign */
-//                    $foreign = $mapping['foreign'];
-//                    if ($foreign->getName() === $foreignFieldName) {
-//                        $field = clone $local;
-//                        $field->foreignRelation = $foreignRelation;
-//                        $field->foreignRelationFieldName = $foreignFieldName;
-//                    }
-//                }
+                foreach ($foreignRelation->getFieldObjectsMapping() as $mapping) {
+                    /** @var Field $local */
+                    $local = $mapping['local'];
+                    /** @var Field $foreign */
+                    $foreign = $mapping['foreign'];
+                    if ($foreign->getName() === $foreignFieldName) {
+                        $field = clone $local;
+                        $field->foreignRelation = $foreignRelation;
+                        $field->foreignRelationFieldName = $foreignFieldName;
+                    }
+                }
             } else {
                 $field = $foreignEntity->getField($fieldName);
             }
@@ -740,6 +760,19 @@ class Relation
     }
 
     /**
+     * Returns a foreign field name.
+     *
+     * @param  integer $index
+     *
+     * @return string
+     */
+    public function getForeignFieldName(int $index = 0): string
+    {
+        $foreignFields = $this->foreignFields->toArray();
+        return $foreignFields[$index];
+    }
+
+    /**
      * Returns a foreign field object.
      *
      * @param integer $index
@@ -748,7 +781,7 @@ class Relation
      */
     public function getForeignField(int $index = 0): Field
     {
-        return $this->getForeignEntity()->getField($this->foreignFields->get($index));
+        return $this->getForeignEntity()->getField($this->getForeignFieldName($index));
     }
 
     /**
@@ -888,7 +921,7 @@ class Relation
         return (Boolean)$this->getInverseFK();
     }
 
-    public function getInverseFK(): ?Relation
+    public function getInverseFK()
     {
         $foreignEntity = $this->getForeignEntity();
         $map = $this->getForeignLocalMapping();
@@ -900,8 +933,6 @@ class Relation
                 return $refFK;
             }
         }
-
-        return null;
     }
 
     /**

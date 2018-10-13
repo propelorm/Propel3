@@ -38,7 +38,7 @@ trait FieldsPart
      */
     public function getFieldByName(string $name): ?Field
     {
-        return $this->fields->find(function($element) use ($name){
+        return $this->fields->find(function(Field $element) use ($name){
             return $element->getName() === $name;
         });
     }
@@ -52,7 +52,7 @@ trait FieldsPart
      */
     public function getFieldByLowercaseName(string $name): ?Field
     {
-        return $this->fields->find(function($element) use ($name){
+        return $this->fields->find(function(Field $element) use ($name){
             return strtolower($element->getName()) === strtolower($name);
         });
     }
@@ -67,16 +67,9 @@ trait FieldsPart
      */
     public function addField(Field $field)
     {
-        if ($this instanceof Entity) {
-            //The field must be unique
-            if (null !== $this->getFieldByName($field->getName())) {
-                throw new EngineException(sprintf('Field "%s" declared twice in entity "%s"', $field->getName(), $this->getName()));
-            }
-
-            $field->setEntity($this);
+        if (null !== $this->getEntity()) {
+            $field->setEntity($this->getEntity());
         }
-
-        $field->setEntity($this->getEntity());
         $this->fields->add($field);
     }
 
@@ -96,18 +89,13 @@ trait FieldsPart
      * Returns whether or not the entity has a field.
      *
      * @param Field|string $field The Field object or its name
-     * @param bool $caseInsensitive Whether the check is case insensitive.
      *
      * @return bool
      */
-    public function hasField($field, bool $caseInsensitive = false): bool
+    public function hasField($field): bool
     {
         if ($field instanceof Field) {
             return $this->fields->contains($field);
-        }
-
-        if ($caseInsensitive) {
-            return (bool) $this->getFieldByLowercaseName($field);
         }
 
         return (bool) $this->getFieldByName($field);
@@ -117,15 +105,14 @@ trait FieldsPart
      * Returns the Field object with the specified name.
      *
      * @param string $name The name of the field (e.g. 'my_field')
-     * @param bool $caseInsensitive Whether the check is case insensitive.
      *
      * @return Field
      */
-    public function getField(string $name, bool $caseInsensitive = false): Field
+    public function getField(string $name): Field
     {
-        if (!$this->hasField($name, $caseInsensitive)) {
+        if (!$this->hasField($name)) {
             $fieldsList = '';
-            $this->fields->each(function ($element) use ($fieldsList) {
+            $this->fields->each(function (Field $element) use ($fieldsList) {
                 $fieldsList .= $element->getName() . ', ';
             });
             $fieldsList = substr($fieldsList, 0, -2);
@@ -137,10 +124,6 @@ trait FieldsPart
                 $this->getName(),
                 $fieldsList)
             );
-        }
-
-        if ($caseInsensitive) {
-            return $this->getFieldByLowercaseName($name);
         }
 
         return $this->getFieldByName($name);
@@ -176,10 +159,12 @@ trait FieldsPart
         $this->fields->remove($field);
 
         if ($this instanceof Entity) {
-            $nbFields = $this->fields->size();
-            for ($i = 0; $i < $nbFields; $i++) {
-                $this->fields[$i]->setPosition($i + 1);
+            $i = 1;
+            foreach ($this->fields as $field) {
+                $field->setPosition($i);
+                $i++;
             }
+
             // @FIXME: also remove indexes on this field?
         }
     }

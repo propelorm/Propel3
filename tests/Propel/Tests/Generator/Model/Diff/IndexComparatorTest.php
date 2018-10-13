@@ -37,17 +37,6 @@ class IndexComparatorTest extends TestCase
         $this->assertFalse(IndexComparator::computeDiff($i1, $i2));
     }
 
-    public function testCompareCaseInsensitive()
-    {
-        $c1 = new Field('Foo');
-        $i1 = new Index('Foo_Index');
-        $i1->addField($c1);
-        $c2 = new Field('fOO');
-        $i2 = new Index('fOO_iNDEX');
-        $i2->addField($c2);
-        $this->assertFalse(IndexComparator::computeDiff($i1, $i2, true));
-    }
-
     public function testCompareType()
     {
         $c1 = new Field('Foo');

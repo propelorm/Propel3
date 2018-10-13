@@ -14,6 +14,9 @@ use \Propel\Tests\TestCase;
  */
 class FieldComparatorTest extends TestCase
 {
+    /** @var MysqlPlatform */
+    private $platform;
+
     public function setUp()
     {
         $this->platform = new MysqlPlatform();
@@ -33,7 +36,7 @@ class FieldComparatorTest extends TestCase
         $c2->getDomain()->replaceSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
-        $this->assertEquals([], FieldComparator::compareFields($c1, $c2));
+        $this->assertTrue(FieldComparator::compareFields($c1, $c2)->isEmpty());
     }
 
     public function testCompareType()
@@ -46,7 +49,7 @@ class FieldComparatorTest extends TestCase
             'type'    => ['VARCHAR', 'LONGVARCHAR'],
             'sqlType' => ['VARCHAR', 'TEXT'],
         ];
-        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
+        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
 
     public function testCompareScale()
@@ -56,7 +59,7 @@ class FieldComparatorTest extends TestCase
         $c2 = new Field();
         $c2->getDomain()->replaceScale(3);
         $expectedChangedProperties = ['scale' => [2, 3]];
-        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
+        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
 
     public function testCompareSize()
@@ -66,7 +69,7 @@ class FieldComparatorTest extends TestCase
         $c2 = new Field();
         $c2->getDomain()->replaceSize(3);
         $expectedChangedProperties = ['size' => [2, 3]];
-        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
+        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
 
     public function testCompareSqlType()
@@ -77,7 +80,7 @@ class FieldComparatorTest extends TestCase
         $c2->getDomain()->copy($this->platform->getDomainForType('INTEGER'));
         $c2->getDomain()->setSqlType('INTEGER(10) UNSIGNED');
         $expectedChangedProperties = ['sqlType' => ['INTEGER', 'INTEGER(10) UNSIGNED']];
-        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
+        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
 
     public function testCompareNotNull()
@@ -87,7 +90,7 @@ class FieldComparatorTest extends TestCase
         $c2 = new Field();
         $c2->setNotNull(false);
         $expectedChangedProperties = ['notNull' => [true, false]];
-        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
+        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
 
     public function testCompareDefaultValueToNull()
@@ -99,7 +102,7 @@ class FieldComparatorTest extends TestCase
             'defaultValueType' => [FieldDefaultValue::TYPE_VALUE, null],
             'defaultValueValue' => [123, null]
         ];
-        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
+        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
 
     public function testCompareDefaultValueFromNull()
@@ -111,7 +114,7 @@ class FieldComparatorTest extends TestCase
             'defaultValueType' => [null, FieldDefaultValue::TYPE_VALUE],
             'defaultValueValue' => [null, 123]
         ];
-        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
+        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
 
     public function testCompareDefaultValueValue()
@@ -123,7 +126,7 @@ class FieldComparatorTest extends TestCase
         $expectedChangedProperties = [
             'defaultValueValue' => [123, 456]
         ];
-        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
+        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
 
     public function testCompareDefaultValueType()
@@ -135,7 +138,7 @@ class FieldComparatorTest extends TestCase
         $expectedChangedProperties = [
             'defaultValueType' => [FieldDefaultValue::TYPE_VALUE, FieldDefaultValue::TYPE_EXPR]
         ];
-        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
+        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
 
     /**
@@ -147,7 +150,7 @@ class FieldComparatorTest extends TestCase
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue("NOW()", FieldDefaultValue::TYPE_EXPR));
         $c2 = new Field();
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue("CURRENT_TIMESTAMP", FieldDefaultValue::TYPE_EXPR));
-        $this->assertEquals([], FieldComparator::compareFields($c1, $c2));
+        $this->assertTrue(FieldComparator::compareFields($c1, $c2)->isEmpty());
     }
 
     public function testCompareAutoincrement()
@@ -157,7 +160,7 @@ class FieldComparatorTest extends TestCase
         $c2 = new Field();
         $c2->setAutoIncrement(false);
         $expectedChangedProperties = ['autoIncrement' => [true, false]];
-        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
+        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
 
     public function testCompareMultipleDifferences()
@@ -180,6 +183,6 @@ class FieldComparatorTest extends TestCase
             'defaultValueType' => [null, FieldDefaultValue::TYPE_VALUE],
             'defaultValueValue' => [null, 123]
         ];
-        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2));
+        $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
 }

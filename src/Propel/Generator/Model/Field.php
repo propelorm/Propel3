@@ -78,7 +78,6 @@ class Field
     // supported later.
 
     private $inheritanceType;
-    private $isInheritance;
     private $isEnumeratedClasses;
 
     /**
@@ -100,13 +99,18 @@ class Field
     protected $valueSet;
 
     /**
+     * @var Set
+     */
+    protected $referrers;
+
+    /**
      * Creates a new column and set the name.
      *
      * @param string $name The column's name
      * @param string $type The column's type
-     * @param string $size The column's size
+     * @param int $size The column's size
      */
-    public function __construct(string $name = null, string $type = PropelTypes::VARCHAR, string $size = null)
+    public function __construct(string $name = null, string $type = PropelTypes::VARCHAR, int $size = null)
     {
         if (null !== $name) {
             $this->setName($name);
@@ -133,6 +137,7 @@ class Field
         $this->needsTransactionInPostgres = false;
         $this->valueSet = new Set();
         $this->inheritanceList = new Set();
+        $this->referrers =  new Set();
     }
 
     /**
@@ -180,6 +185,11 @@ class Field
     public function setColumnName(string $columnName)
     {
         $this->columnName = $columnName;
+    }
+
+    public function setPhpType(string $phptype)
+    {
+        $this->phpType = $phptype;
     }
 
     /**
@@ -264,7 +274,7 @@ class Field
      *
      * @param integer $position
      */
-    public function setPosition($position)
+    public function setPosition(int $position)
     {
         $this->position = (int) $position;
     }
@@ -273,7 +283,7 @@ class Field
      * Adds a new inheritance definition to the inheritance list and sets the
      * parent column of the inheritance to the current column.
      *
-     * @param  Inheritance|array $inheritance
+     * @param  Inheritance $inheritance
      * @return Inheritance
      */
     public function addInheritance(Inheritance $inheritance): Inheritance
@@ -293,6 +303,11 @@ class Field
     public function getInheritanceType(): string
     {
         return $this->inheritanceType;
+    }
+
+    public function setInheritenceType(string $type): void
+    {
+        $this->inheritanceType = $type;
     }
 
     /**
@@ -316,14 +331,14 @@ class Field
     }
 
     /**
-     * Returns whether or not this column is a normal property or specifies a
+     * Returns whether or not this column is a normal property or specifies
      * the classes that are represented in the table containing this column.
      *
      * @return boolean
      */
     public function isInheritance(): bool
     {
-        return $this->isInheritance;
+        return $this->inheritanceType === 'single';
     }
 
     /**
@@ -485,63 +500,62 @@ class Field
     /**
      * @param boolean $implementationDetail
      */
-    public function setImplementationDetail($implementationDetail)
+    public function setImplementationDetail(bool $implementationDetail)
     {
         $this->implementationDetail = $implementationDetail;
     }
 
-//Never used: remove?
-//    /**
-//     * Adds the foreign key from another table that refers to this column.
-//     *
-//     * @param Relation $fk
-//     */
-//    public function addReferrer(Relation $fk)
-//    {
-//       $this->referrers->add($fk);
-//    }
+    /**
+     * Adds the foreign key from another table that refers to this column.
+     *
+     * @param Relation $fk
+     */
+    public function addReferrer(Relation $fk)
+    {
+       $this->referrers->add($fk);
+    }
 
-//    /**
-//     * Returns the list of references to this column.
-//     *
-//     * @return Set
-//     */
-//    public function getReferrers(): Set
-//    {
-//        return $this->referrers;
-//    }
+    /**
+     * Returns the list of references to this column.
+     *
+     * @return Set
+     */
+    public function getReferrers(): Set
+    {
+        return $this->referrers;
+    }
 
-//
-//    /**
-//     * Returns whether or not this column has referrers.
-//     *
-//     * @return boolean
-//     */
-//    public function hasReferrers(): bool
-//    {
-//        return !$this->getReferrers()->isEmpty();
-//    }
-//
-//    /**
-//     * Returns whether or not this column has a specific referrer for a
-//     * specific foreign key object.
-//     *
-//     * @param  Relation $fk
-//     * @return boolean
-//     */
-//    public function hasReferrer(Relation $fk)
-//    {
-//        return $this->getReferrers()->contains($fk);
-//    }
 
-//    /**
-//     * Clears all referrers.
-//     *
-//     */
-//    public function clearReferrers()
-//    {
-//        $this->getReferrers()->clear();
-//    }
+    /**
+     * Returns whether or not this column has referrers.
+     *
+     * @return boolean
+     */
+    public function hasReferrers(): bool
+    {
+        return !$this->getReferrers()->isEmpty();
+    }
+
+    /**
+     * Returns whether or not this column has a specific referrer for a
+     * specific foreign key object.
+     *
+     * @param  Relation $fk
+     * @return boolean
+     */
+    public function hasReferrer(Relation $fk)
+    {
+        return $this->getReferrers()->contains($fk);
+    }
+
+    /**
+     * Clears all referrers.
+     *
+     */
+    public function clearReferrers()
+    {
+        $this->getReferrers()->clear();
+    }
 
     /**
      * Clears all inheritance children.
@@ -560,7 +574,7 @@ class Field
      *
      * @param string $mappingType
      */
-    public function setDomainForType($mappingType)
+    public function setDomainForType(string $mappingType)
     {
         $this->getDomain()->copy($this->getPlatform()->getDomainForType($mappingType));
     }
@@ -571,7 +585,7 @@ class Field
      * @param string $mappingType
      * @see Domain::setType()
      */
-    public function setType($mappingType)
+    public function setType(string $mappingType)
     {
         $this->getDomain()->setType($mappingType);
 
@@ -742,7 +756,7 @@ class Field
      *
      * @param integer $size
      */
-    public function setSize($size)
+    public function setSize(int $size)
     {
         $this->domain->setSize($size);
     }
@@ -880,6 +894,11 @@ class Field
         return $this->isLazyLoad;
     }
 
+    public function setLazyLoad(bool $lazyLoad = false)
+    {
+        $this->isLazyLoad = $lazyLoad;
+    }
+
     /**
      * Returns the auto-increment string.
      *
@@ -909,7 +928,7 @@ class Field
      *
      * @param boolean $flag
      */
-    public function setAutoIncrement($flag = true)
+    public function setAutoIncrement(bool $flag = true)
     {
         $this->isAutoIncrement = (Boolean) $flag;
     }
@@ -925,7 +944,7 @@ class Field
     /**
      * @param boolean $skipCodeGeneration
      */
-    public function setSkipCodeGeneration($skipCodeGeneration)
+    public function setSkipCodeGeneration(bool $skipCodeGeneration)
     {
         $this->skipCodeGeneration = $skipCodeGeneration;
     }

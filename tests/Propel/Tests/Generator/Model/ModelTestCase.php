@@ -8,8 +8,13 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Tests\Generator\Model;
 
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamDirectory;
+use phootwork\collection\Set;
 use Propel\Generator\Model\Behavior;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Domain;
@@ -20,6 +25,7 @@ use Propel\Generator\Model\Relation;
 use Propel\Generator\Model\Schema;
 use Propel\Generator\Model\Unique;
 use Propel\Generator\Platform\PlatformInterface;
+use Propel\Generator\Util\UniqueList;
 use Propel\Tests\TestCase;
 
 /**
@@ -29,14 +35,24 @@ use Propel\Tests\TestCase;
  */
 abstract class ModelTestCase extends TestCase
 {
+    /** @var vfsStreamDirectory */
+    protected $root;
+
+    public function setUp()
+    {
+        $this->root = vfsStream::setup();
+        parent::setUp();
+    }
+
     /**
      * Returns a dummy Behavior object.
      *
      * @param  string   $name    The behavior name
      * @param  array    $options An array of options
+     *
      * @return Behavior
      */
-    protected function getBehaviorMock($name, array $options = [])
+    protected function getBehaviorMock($name, array $options = []): Behavior
     {
         $defaults = [
             'additional_builders' => [],
@@ -141,7 +157,7 @@ abstract class ModelTestCase extends TestCase
         $fk
             ->expects($this->any())
             ->method('getLocalFields')
-            ->will($this->returnValue($options['local_fields']))
+            ->will($this->returnValue(new UniqueList($options['local_fields'])))
         ;
 
         $fk

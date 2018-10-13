@@ -187,7 +187,7 @@ class ReverseManager extends AbstractManager
 
         $database = new Database($this->getDatabaseName());
         $database->setPlatform($config->createPlatformForDatabase($this->getDatabaseName()));
-        $database->setDefaultIdMethod(IdMethod::NATIVE);
+        $database->setDefaultIdMethod(Model::ID_METHOD_NATIVE);
 
         $parser   = $config->getConfiguredSchemaParser($connection);
         $nbTables = $parser->parse($database);

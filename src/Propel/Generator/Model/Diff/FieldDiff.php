@@ -8,8 +8,11 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Model\Diff;
 
+use phootwork\collection\Map;
 use Propel\Generator\Model\Field;
 
 /**
@@ -20,9 +23,9 @@ use Propel\Generator\Model\Field;
 class FieldDiff
 {
     /**
-     * An associative array of modified properties.
+     * A Map of modified properties.
      *
-     * @var array
+     * @var Map
      */
     protected $changedProperties;
 
@@ -56,25 +59,26 @@ class FieldDiff
             $this->setToField($toField);
         }
 
-        $this->changedProperties = [];
+        $this->changedProperties = new Map();
     }
 
     /**
      * Sets for the changed properties.
      *
-     * @param array $properties
+     * @param Map $properties
      */
-    public function setChangedProperties($properties)
+    public function setChangedProperties(Map $properties): void
     {
-        $this->changedProperties = $properties;
+        $this->changedProperties->clear();
+        $this->changedProperties->setAll($properties);
     }
 
     /**
      * Returns the changed properties.
      *
-     * @return array
+     * @return Map
      */
-    public function getChangedProperties()
+    public function getChangedProperties(): Map
     {
         return $this->changedProperties;
     }
@@ -84,7 +88,7 @@ class FieldDiff
      *
      * @param Field $fromField
      */
-    public function setFromField(Field $fromField)
+    public function setFromField(Field $fromField): void
     {
         $this->fromField = $fromField;
     }
@@ -94,7 +98,7 @@ class FieldDiff
      *
      * @return Field
      */
-    public function getFromField()
+    public function getFromField(): Field
     {
         return $this->fromField;
     }
@@ -104,7 +108,7 @@ class FieldDiff
      *
      * @param Field $toField
      */
-    public function setToField(Field $toField)
+    public function setToField(Field $toField): void
     {
         $this->toField = $toField;
     }
@@ -114,7 +118,7 @@ class FieldDiff
      *
      * @return Field
      */
-    public function getToField()
+    public function getToField(): Field
     {
         return $this->toField;
     }
@@ -124,7 +128,7 @@ class FieldDiff
      *
      * @return FieldDiff
      */
-    public function getReverseDiff()
+    public function getReverseDiff(): FieldDiff
     {
         $diff = new self();
 
@@ -137,7 +141,7 @@ class FieldDiff
         foreach ($this->changedProperties as $name => $propertyChange) {
             $changedProperties[$name] = array_reverse($propertyChange);
         }
-        $diff->setChangedProperties($changedProperties);
+        $diff->setChangedProperties(new Map($changedProperties));
 
         return $diff;
     }

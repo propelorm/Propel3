@@ -28,7 +28,7 @@ class JsonSchemaLoaderTest extends ReaderTestCase
     {
         $this->assertTrue($this->loader->supports('foo.json'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($this->loader->supports('foo.bar'), '->supports() returns false if the resource is not loadable');
-        $this->assertFalse($this->loader->supports($this->root), '->supports() returns false if the resource is not a string.');
+        $this->assertFalse($this->loader->supports($this->root->url()), '->supports() returns false if the resource is not a string.');
     }
 
     public function testJsonSchemaCanBeLoaded()
@@ -48,7 +48,8 @@ class JsonSchemaLoaderTest extends ReaderTestCase
     }
 
     /**
-     * @expectedException        Propel\Generator\Schema\Exception\JsonParseException
+     * @expectedException \phootwork\json\JsonException
+     * @expectedExceptionMessage Syntax error
      */
     public function testJsonFileHasInvalidContent()
     {
@@ -63,7 +64,8 @@ EOF;
     }
 
     /**
-     * @expectedException Propel\Generator\Schema\Exception\JsonParseException
+     * @expectedException \phootwork\json\JsonException
+     * @expectedExceptionMessage Syntax error
      */
     public function testJsonFileIsEmpty()
     {
@@ -73,8 +75,8 @@ EOF;
     }
 
     /**
-     * @expectedException Propel\Generator\Schema\Exception\InputOutputException
-     * @expectedExceptionMessage You don't have permissions to access the schema file
+     * @expectedException \phootwork\file\exception\FileException
+     * @expectedExceptionMessage You don't have permissions to access notreadable.json file
      */
     public function testJsonFileNotReadableThrowsException()
     {

@@ -233,13 +233,15 @@ class SortableBehavior extends Behavior
     /**
      * {@inheritdoc}
      */
-    public function addParameter(array $parameter)
+    public function addParameter(array $parameter): Behavior
     {
         if ('scope_field' === $parameter['name']) {
             $this->parameters['scope_field'] .= ($this->parameters['scope_field'] ? ',' : '') . $parameter['value'];
         } else {
             parent::addParameter($parameter);
         }
+
+        return $this;
     }
 
     /**

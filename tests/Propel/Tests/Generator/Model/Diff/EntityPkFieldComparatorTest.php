@@ -47,7 +47,7 @@ class EntityPkFieldComparatorTest extends TestCase
         $c2->setPrimaryKey(true);
         $t2->addField($c2);
 
-        $this->assertFalse(EntityComparator::computeDiff($t1, $t2));
+        $this->assertNull(EntityComparator::computeDiff($t1, $t2));
     }
 
     public function testCompareNotSamePks()
@@ -82,8 +82,8 @@ class EntityPkFieldComparatorTest extends TestCase
         $nbDiffs = $tc->comparePrimaryKeys();
         $tableDiff = $tc->getEntityDiff();
         $this->assertEquals(1, $nbDiffs);
-        $this->assertEquals(1, count($tableDiff->getAddedPkFields()));
-        $this->assertEquals(['Foo' => $c2], $tableDiff->getAddedPkFields());
+        $this->assertEquals(1, $tableDiff->getAddedPkFields()->size());
+        $this->assertEquals(['Foo' => $c2], $tableDiff->getAddedPkFields()->toArray());
     }
 
     public function testCompareRemovedPkField()
@@ -104,8 +104,8 @@ class EntityPkFieldComparatorTest extends TestCase
         $nbDiffs = $tc->comparePrimaryKeys();
         $tableDiff = $tc->getEntityDiff();
         $this->assertEquals(1, $nbDiffs);
-        $this->assertEquals(1, count($tableDiff->getRemovedPkFields()));
-        $this->assertEquals(['Foo' => $c1], $tableDiff->getRemovedPkFields());
+        $this->assertEquals(1, $tableDiff->getRemovedPkFields()->size());
+        $this->assertEquals(['Foo' => $c1], $tableDiff->getRemovedPkFields()->toArray());
     }
 
     public function testCompareRenamedPkField()
@@ -135,10 +135,10 @@ class EntityPkFieldComparatorTest extends TestCase
         $nbDiffs = $tc->comparePrimaryKeys();
         $tableDiff = $tc->getEntityDiff();
         $this->assertEquals(1, $nbDiffs);
-        $this->assertEquals(1, count($tableDiff->getRenamedPkFields()));
-        $this->assertEquals([[$c1, $c2]], $tableDiff->getRenamedPkFields());
-        $this->assertEquals([], $tableDiff->getAddedPkFields());
-        $this->assertEquals([], $tableDiff->getRemovedPkFields());
+        $this->assertEquals(1, $tableDiff->getRenamedPkFields()->size());
+        $this->assertEquals([$c1, $c2], $tableDiff->getRenamedPkFields()->get('Foo'));
+        $this->assertTrue($tableDiff->getAddedPkFields()->isEmpty());
+        $this->assertTrue($tableDiff->getRemovedPkFields()->isEmpty());
     }
 
     public function testCompareSeveralPrimaryKeyDifferences()
@@ -186,9 +186,9 @@ class EntityPkFieldComparatorTest extends TestCase
         $nbDiffs = $tc->comparePrimaryKeys();
         $tableDiff = $tc->getEntityDiff();
         $this->assertEquals(3, $nbDiffs);
-        $this->assertEquals([[$c2, $c5]], $tableDiff->getRenamedPkFields());
-        $this->assertEquals(['col4' => $c6], $tableDiff->getAddedPkFields());
-        $this->assertEquals(['col3' => $c3], $tableDiff->getRemovedPkFields());
+        $this->assertEquals([$c2, $c5], $tableDiff->getRenamedPkFields()->get('col2'));
+        $this->assertEquals(['col4' => $c6], $tableDiff->getAddedPkFields()->toArray());
+        $this->assertEquals(['col3' => $c3], $tableDiff->getRemovedPkFields()->toArray());
     }
 
     public function testCompareSeveralRenamedSamePrimaryKeys()
@@ -234,8 +234,8 @@ class EntityPkFieldComparatorTest extends TestCase
         $nbDiffs = $tc->comparePrimaryKeys();
         $tableDiff = $tc->getEntityDiff();
         $this->assertEquals(2, $nbDiffs);
-        $this->assertEquals([[$c1, $c4], [$c2, $c5]], $tableDiff->getRenamedPkFields());
-        $this->assertEquals([], $tableDiff->getAddedPkFields());
-        $this->assertEquals([], $tableDiff->getRemovedPkFields());
+        $this->assertEquals(['col1' => [$c1, $c4], 'col2' => [$c2, $c5]], $tableDiff->getRenamedPkFields()->toArray());
+        $this->assertTrue($tableDiff->getAddedPkFields()->isEmpty());
+        $this->assertTrue($tableDiff->getRemovedPkFields()->isEmpty());
     }
 }

@@ -11,10 +11,8 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Schema\Loader;
 
-use phootwork\lang\Text;
-use Propel\Generator\Schema\Exception\InputOutputException;
-use Propel\Generator\Schema\Exception\InvalidArgumentException;
-use Propel\Generator\Schema\Exception\JsonParseException;
+use phootwork\file\File;
+use phootwork\json\Json;
 use Symfony\Component\Config\Loader\FileLoader;
 
 /**
@@ -32,30 +30,13 @@ class JsonSchemaLoader extends FileLoader
      * @return array
      *
      * @throws \InvalidArgumentException  if schema file not found
-     * @throws \Propel\Generator\Schema\Exception\InvalidArgumentException   if invalid json file
-     * @throws \Propel\Generator\Schema\Exception\InputOutputException       if schema file is not readable
-     * @throws \Propel\Generator\Schema\Exception\JsonParseException         if error in parsing json schema
+     * @throws \phootwork\json\JsonException   if invalid json file or error in decoding
+     * @throws \phootwork\file\exception\FileException if schema file is not readable or not found
      */
     public function load($file, $type = null): array
     {
-        $path = $this->locator->locate($file);
-
-        if (!is_readable($path)) {
-            throw new InputOutputException("You don't have permissions to access the schema file $file.");
-        }
-
-        $json = file_get_contents($path);
-
-        if (false === $json) {
-            throw new InvalidArgumentException('Error while reading the schema file');
-        }
-
-        $content = json_decode($json, true);
-        $error = json_last_error();
-
-        if (JSON_ERROR_NONE !== $error) {
-            throw new JsonParseException($error);
-        }
+        $file = new File($this->locator->locate($file));
+        $content = Json::decode($file->read());
 
         return $content;
     }
@@ -70,11 +51,8 @@ class JsonSchemaLoader extends FileLoader
      */
     public function supports($resource, $type = null): bool
     {
-        if (!is_string($resource)) {
-            return false;
-        }
-        $text = new Text($resource);
+        $file = new File($resource);
 
-        return $text->endsWith('.json');
+        return 'json' === $file->getExtension();
     }
 }

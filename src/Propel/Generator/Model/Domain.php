@@ -82,33 +82,12 @@ class Domain
         $this->mappingType = $domain->getType();
     }
 
-//    protected function setupObject()
-//   {
-//        $schemaType = strtoupper($this->getAttribute('type'));
-//        $this->copy($this->database->getPlatform()->getDomainForType($schemaType));
-//
-//        // Name
-//        $this->name = $this->getAttribute('name');
-//
-//        // Default value
-//        $defval = $this->getAttribute('defaultValue', $this->getAttribute('default'));
-//        if (null !== $defval) {
-//            $this->setDefaultValue(new FieldDefaultValue($defval, FieldDefaultValue::TYPE_VALUE));
-//        } elseif (null !== $this->getAttribute('defaultExpr')) {
-//            $this->setDefaultValue(new FieldDefaultValue($this->getAttribute('defaultExpr'), FieldDefaultValue::TYPE_EXPR));
-//        }
-//
-//        $this->size = $this->getAttribute('size');
-//        $this->scale = $this->getAttribute('scale');
-//        $this->description = $this->getAttribute('description');
-//    }
-
     /**
      * Returns the domain description.
      *
      * @return string
      */
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -118,7 +97,7 @@ class Domain
      *
      * @param string $description
      */
-    public function setDescription($description)
+    public function setDescription(string $description)
     {
         $this->description = $description;
     }
@@ -128,7 +107,7 @@ class Domain
      *
      * @return integer
      */
-    public function getScale(): int
+    public function getScale(): ?int
     {
         return $this->scale;
     }
@@ -331,43 +310,6 @@ class Domain
     {
         if ($this->defaultValue) {
             $this->defaultValue = clone $this->defaultValue;
-        }
-    }
-
-    /**
-     * @todo Remove? This method is never called.
-     * @param \DOMNode $node
-     */
-    public function appendXml(\DOMNode $node)
-    {
-        $doc = ($node instanceof \DOMDocument) ? $node : $node->ownerDocument;
-
-        $domainNode = $node->appendChild($doc->createElement('domain'));
-        $domainNode->setAttribute('type', $this->getType());
-        $domainNode->setAttribute('name', $this->getName());
-
-        if ($this->getType() !== $this->sqlType) {
-            $domainNode->setAttribute('sqlType', $this->sqlType);
-        }
-
-        if ($def = $this->getDefaultValue()) {
-            if ($def->isExpression()) {
-                $domainNode->setAttribute('defaultExpr', $def->getValue());
-            } else {
-                $domainNode->setAttribute('defaultValue', $def->getValue());
-            }
-        }
-
-        if ($this->size) {
-            $domainNode->setAttribute('size', $this->size);
-        }
-
-        if ($this->scale) {
-            $domainNode->setAttribute('scale', $this->scale);
-        }
-
-        if ($this->description) {
-            $domainNode->setAttribute('description', $this->description);
         }
     }
 }

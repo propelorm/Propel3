@@ -101,7 +101,6 @@ class Database
 
         // default values
         $this->activeRecord = false;
-        $this->heavyIndexing = false;
         $this->identifierQuoting = false;
     }
 
@@ -129,60 +128,6 @@ class Database
         return $this->schema;
     }
 
-//     protected function setupObject()
-//     {
-//         parent::setupObject();
-
-//         $this->name = $this->getAttribute('name');
-//         $this->platformClass = $this->getAttribute('platform');
-//         $this->baseClass = $this->getAttribute('baseClass');
-//         $this->defaultIdMethod = $this->getAttribute('defaultIdMethod', IdMethod::NATIVE);
-//         $this->heavyIndexing = $this->booleanValue($this->getAttribute('heavyIndexing'));
-//         $this->identifierQuoting = $this->getAttribute('identifierQuoting') ? $this->booleanValue($this->getAttribute('identifierQuoting')) : false;
-//         $this->scope = $this->getAttribute('tablePrefix', $this->getBuildProperty('generator.tablePrefix'));
-//         $this->defaultStringFormat = $this->getAttribute('defaultStringFormat', static::DEFAULT_STRING_FORMAT);
-
-//         if ($this->getAttribute('activeRecord')) {
-//             $this->activeRecord = 'true' === $this->getAttribute('activeRecord');
-//         }
-//     }
-
-//     /**
-//      * Returns the PlatformInterface implementation for this database.
-//      *
-//      * @return PlatformInterface
-//      */
-//     public function getPlatform()
-//     {
-//         if (null === $this->platform) {
-//             if ($this->getParentSchema() && $this->getParentSchema()->getPlatform()) {
-//                 return $this->getParentSchema()->getPlatform();
-//             }
-
-//             if ($this->getGeneratorConfig()) {
-//                 if ($this->platformClass) {
-//                     $this->platform = $this->getGeneratorConfig()->createPlatform($this->platformClass);
-//                 } else {
-//                     $this->platform = $this->getGeneratorConfig()->createPlatformForDatabase($this->getName());
-//                 }
-//             }
-//         }
-
-//         return $this->platform;
-//     }
-
-//     /**
-//      * Sets the PlatformInterface implementation for this database.
-//      *
-//      * @param PlatformInterface $platform A Platform implementation
-//      * @return $this
-//      */
-//     public function setPlatform(?PlatformInterface $platform = null): Database
-//     {
-//         $this->platform = $platform;
-//         return $this;
-//     }
-
 //     /**
 //      * @return boolean
 //      */
@@ -202,19 +147,6 @@ class Database
 //     }
 
     /**
-     * @TODO unsave convenient method. Consider removing
-     *
-     * Returns the max column name's length.
-     *
-     * @return int
-     */
-    public function getMaxFieldNameLength(): int
-    {
-        return $this->getPlatform()->getMaxFieldNameLength();
-    }
-
-
-    /**
      * Return the list of all entities.
      *
      * @return Entity[]
@@ -224,6 +156,11 @@ class Database
         return $this->entities->toArray();
     }
 
+    /**
+     * Return the number of entities.
+     *
+     * @return int
+     */
     public function getEntitySize()
     {
         return $this->entities->size();
@@ -268,7 +205,7 @@ class Database
      */
     public function hasEntity(Entity $entity): bool
     {
-        return $this->entities->has($entity);
+        return $this->entities->contains($entity);
     }
 
     /**
@@ -367,38 +304,6 @@ class Database
         });
     }
 
-//     /**
-//      * Returns the entity with the specified name.
-//      *
-//      * @param  string  $name
-//      * @param  boolean $caseInsensitive
-//      * @return Entity
-//      */
-//     public function getEntity($name, $caseInsensitive = false)
-//     {
-//         if ($this->hasEntityByFullClassName($name)) {
-//             return $this->getEntityByFullClassName($name);
-//         }
-
-
-//         if (!$this->hasEntity($name, $caseInsensitive)) {
-//             throw new InvalidArgumentException(
-//                 sprintf(
-//                     'Entity %s in database %s not found [%s]',
-//                     $name,
-//                     $this->getName(),
-//                     $this->getEntityNames()
-//                 )
-//             );
-//         }
-
-//         if ($caseInsensitive) {
-//             return $this->entitiesByLowercaseName[strtolower($name)];
-//         }
-
-//         return $this->entitiesByName[$name];
-//     }
-
     /**
      * @TODO is this needed? -> array_map($db->getEntities(), fn {....});
      * @return string[]
@@ -486,21 +391,6 @@ class Database
     {
         $this->sequences->remove($sequence);
         return $this;
-    }
-
-    /**
-     * @TODO unsave convenient method. Consider removing
-     *
-     * Returns the schema delimiter character.
-     *
-     * For example, the dot character with mysql when
-     * naming entities. For instance: schema.the_entity.
-     *
-     * @return string
-     */
-    public function getSchemaDelimiter(): string
-    {
-        return $this->getPlatform()->getSchemaDelimiter();
     }
 
 //    /**
@@ -610,23 +500,6 @@ class Database
     }
 
     /**
-     * @TODO This is wrong here, about to kill it off here
-     *
-     * Returns the configuration property identified by its name.
-     *
-     * @see \Propel\Common\Config\ConfigurationManager::getConfigProperty() method
-     *
-     * @param  string $name
-     * @return string
-     */
-    public function getBuildProperty($name)
-    {
-        if ($config = $this->getGeneratorConfig()) {
-            return $config->getConfigProperty($name);
-        }
-    }
-
-    /**
      * Returns the next behavior on all entities, ordered by behavior priority,
      * and skipping the ones that were already executed.
      *
@@ -650,29 +523,6 @@ class Database
         }
 
         return $nextBehavior;
-    }
-
-    /**
-     * @TODO Externalize
-     * Finalizes the setup process.
-     *
-     */
-    public function doFinalInitialization()
-    {
-        // execute database behaviors
-        foreach ($this->getBehaviors() as $behavior) {
-            $behavior->modifyDatabase();
-        }
-
-        // execute entity behaviors (may add new entities and new behaviors)
-        while ($behavior = $this->getNextEntityBehavior()) {
-            $behavior->getEntityModifier()->modifyEntity();
-            $behavior->setEntityModified(true);
-        }
-
-        if ($this->getPlatform()) {
-            $this->getPlatform()->finalizeDefinition($this);
-        }
     }
 
     /**

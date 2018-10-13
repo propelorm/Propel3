@@ -62,7 +62,7 @@ EOF;
         $d1 = $this->getDatabaseFromSchema($schema1);
         $d2 = $this->getDatabaseFromSchema($schema2);
 
-        return [[DatabaseComparator::computeDiff($d1, $d2, $caseInsensitive = false, $withRenaming = true)]];
+        return [[DatabaseComparator::computeDiff($d1, $d2, $withRenaming = true)]];
     }
 
     public function providerForTestGetRenameEntityDDL()

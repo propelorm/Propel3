@@ -144,6 +144,12 @@ trait SqlPart
         if (null !== $this->heavyIndexing) {
             return $this->heavyIndexing;
         }
+
+        if ($this->getSuperordinate() && method_exists($this->getSuperordinate(), 'isHeavyIndexing')) {
+            return $this->getSuperordinate()->isHeavyIndexing();
+        }
+
+        return false;
     }
 
     /**

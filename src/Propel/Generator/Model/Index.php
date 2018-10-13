@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Model;
 
-use phootwork\collection\ArrayList;
 use phootwork\collection\Set;
 use Propel\Generator\Model\Parts\EntityPart;
 use Propel\Generator\Model\Parts\FieldsPart;
@@ -40,9 +39,9 @@ class Index
      *
      * @param string $name Name of the index
      */
-    public function __construct($name = null)
+    public function __construct(string $name = null)
     {
-        $this->fields     = new Set();
+        $this->fields = new Set();
 
         if (null !== $name) {
             $this->setName($name);
@@ -79,28 +78,27 @@ class Index
         $this->doNaming();
 
         if ($this->entity && $database = $this->entity->getDatabase()) {
-            return substr($this->name, 0, $database->getMaxFieldNameLength());
+            return substr($this->name, 0, $database->getPlatform()->getMaxFieldNameLength());
         }
 
         return $this->name;
     }
 
-    protected function doNaming()
+    protected function doNaming(): void
     {
         if (!$this->name || $this->autoNaming) {
             $newName = sprintf('%s_', $this instanceof Unique ? 'u' : 'i');
 
             if (!$this->fields->isEmpty()) {
-                $hash = new ArrayList();
-                $this->fields->each(function ($element) use ($hash) {
+                $hash[0] = '';
+                $hash[1] = '';
+                $this->fields->each(function (Field $element) use ($hash) {
                     $hash[0] .= $element->getName() . ', ';
                     $hash[1] .= $element->getSize() . ', ';
                 });
-                $hash->map(function ($element) {
-                    $element = substr($element, 0, -2);
-                });
+                $hash = array_map(function ($element) {return substr($element, 0, -2);}, $hash);
 
-                $newName .= substr(md5(strtolower(implode(':', $hash->toArray()))), 0, 6);
+                $newName .= substr(md5(strtolower(implode(':', $hash))), 0, 6);
             } else {
                 $newName .= 'no_fields';
             }
@@ -135,20 +133,24 @@ class Index
      * @param  integer $pos             Position in the field list
      * @param  string  $name            Field name
      * @param  integer $size            Optional size check
-     * @param  boolean $caseInsensitive Whether or not the comparison is case insensitive (false by default)
      * @return boolean
      */
-    public function hasFieldAtPosition($pos, $name, $size = null, $caseInsensitive = false)
+    public function hasFieldAtPosition(int $pos, string $name, int $size = null): bool
     {
-        if (!isset($this->fields->toArray()[$pos])) {
+        $fieldsArray = $this->getFields()->toArray();
+
+        if (!isset($fieldsArray[$pos])) {
             return false;
         }
 
-        if (!$this->hasField($name)) {
+        /** @var Field $field */
+        $field = $fieldsArray[$pos];
+
+        if ($field->getName() !== $name) {
             return false;
         }
 
-        if ($this->getField($name, $caseInsensitive)->getSize() != $size) {
+        if ($field->getSize() != $size) {
             return false;
         }
 

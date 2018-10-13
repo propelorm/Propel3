@@ -174,7 +174,7 @@ CREATE SEQUENCE %s
         $ret = "
 DROP TABLE " . $this->quoteIdentifier($entity->getName(), $entity) . " CASCADE CONSTRAINTS;
 ";
-        if ($entity->getIdMethod() == IdMethod::NATIVE) {
+        if ($entity->getIdMethod() == Model::ID_METHOD_NATIVE) {
             $ret .= "
 DROP SEQUENCE " . $this->quoteIdentifier($this->getSequenceName($entity)) . ";
 ";

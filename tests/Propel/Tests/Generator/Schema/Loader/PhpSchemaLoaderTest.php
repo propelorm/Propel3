@@ -27,8 +27,9 @@ class PhpSchemaLoaderTest extends ReaderTestCase
     public function testSupports()
     {
         $this->assertTrue($this->loader->supports('foo.php'), '->supports() returns true if the resource is loadable');
+        $this->assertTrue($this->loader->supports('foo.inc'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($this->loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
-        $this->assertFalse($this->loader->supports($this->root), '->supports() returns false if the resource is not a string.');
+        $this->assertFalse($this->loader->supports($this->root->url()), '->supports() returns false if the resource is not a string.');
     }
 
     public function testPhpSchemaCanBeLoaded()

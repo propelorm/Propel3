@@ -61,7 +61,7 @@ class EntityIndexComparatorTest extends TestCase
         $i2->addField($c2);
         $t2->addIndex($i2);
 
-        $this->assertFalse(EntityComparator::computeDiff($t1, $t2));
+        $this->assertNull(EntityComparator::computeDiff($t1, $t2));
     }
 
     public function testCompareNotSameIndices()
@@ -93,36 +93,6 @@ class EntityIndexComparatorTest extends TestCase
         $this->assertTrue($diff instanceof EntityDiff);
     }
 
-    public function testCompareCaseInsensitive()
-    {
-        $t1 = new Entity();
-        $c1 = new Field('Foo');
-        $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
-        $c1->setNotNull(true);
-        $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
-        $t1->addField($c1);
-        $i1 = new Index('Foo_Index');
-        $i1->addField($c1);
-        $t1->addIndex($i1);
-
-        $t2 = new Entity();
-        $c2 = new Field('fOO');
-        $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c2->getDomain()->replaceScale(2);
-        $c2->getDomain()->replaceSize(3);
-        $c2->setNotNull(true);
-        $c2->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
-        $t2->addField($c2);
-        $i2 = new Index('fOO_iNDEX');
-        $i2->addField($c2);
-        $t2->addIndex($i2);
-
-        $this->assertFalse(EntityComparator::computeDiff($t1, $t2, $caseInsensitive = true));
-        $this->assertNotFalse(EntityComparator::computeDiff($t1, $t2, $caseInsensitive = false));
-    }
-
     public function testCompareAddedIndices()
     {
         $t1 = new Entity();
@@ -144,8 +114,8 @@ class EntityIndexComparatorTest extends TestCase
         $nbDiffs = $tc->compareIndices();
         $tableDiff = $tc->getEntityDiff();
         $this->assertEquals(1, $nbDiffs);
-        $this->assertEquals(1, count($tableDiff->getAddedIndices()));
-        $this->assertEquals(['Foo_Index' => $i2], $tableDiff->getAddedIndices());
+        $this->assertEquals(1, $tableDiff->getAddedIndices()->size());
+        $this->assertEquals(['Foo_Index' => $i2], $tableDiff->getAddedIndices()->toArray());
     }
 
     public function testCompareRemovedIndices()
@@ -169,8 +139,8 @@ class EntityIndexComparatorTest extends TestCase
         $nbDiffs = $tc->compareIndices();
         $tableDiff = $tc->getEntityDiff();
         $this->assertEquals(1, $nbDiffs);
-        $this->assertEquals(1, count($tableDiff->getRemovedIndices()));
-        $this->assertEquals(['Bar_Index' => $i1], $tableDiff->getRemovedIndices());
+        $this->assertEquals(1, $tableDiff->getRemovedIndices()->size());
+        $this->assertEquals(['Bar_Index' => $i1], $tableDiff->getRemovedIndices()->toArray());
     }
 
     public function testCompareModifiedIndices()
@@ -202,7 +172,7 @@ class EntityIndexComparatorTest extends TestCase
         $nbDiffs = $tc->compareIndices();
         $tableDiff = $tc->getEntityDiff();
         $this->assertEquals(1, $nbDiffs);
-        $this->assertEquals(1, count($tableDiff->getModifiedIndices()));
-        $this->assertEquals(['Foo_Index' => [$i1, $i2]], $tableDiff->getModifiedIndices());
+        $this->assertEquals(1, $tableDiff->getModifiedIndices()->size());
+        $this->assertEquals(['Foo_Index' => [$i1, $i2]], $tableDiff->getModifiedIndices()->toArray());
     }
 }

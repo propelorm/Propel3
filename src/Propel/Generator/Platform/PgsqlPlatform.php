@@ -114,7 +114,7 @@ class PgsqlPlatform extends SqlDefaultPlatform
     public function getSequenceName(Entity $entity)
     {
         $result = null;
-        if ($entity->getIdMethod() == IdMethod::NATIVE) {
+        if ($entity->getIdMethod() == Model::ID_METHOD_NATIVE) {
             $idMethodParams = $entity->getIdMethodParameters();
             if (empty($idMethodParams)) {
                 $result = null;
@@ -136,7 +136,7 @@ class PgsqlPlatform extends SqlDefaultPlatform
 
     protected function getAddSequenceDDL(Entity $entity)
     {
-        if ($entity->getIdMethod() == IdMethod::NATIVE
+        if ($entity->getIdMethod() == Model::ID_METHOD_NATIVE
          && $entity->getIdMethodParameters() != null) {
             $pattern = "
 CREATE SEQUENCE %s;
@@ -151,7 +151,7 @@ CREATE SEQUENCE %s;
 
     protected function getDropSequenceDDL(Entity $entity)
     {
-        if ($entity->getIdMethod() == IdMethod::NATIVE
+        if ($entity->getIdMethod() == Model::ID_METHOD_NATIVE
          && $entity->getIdMethodParameters() != null) {
             $pattern = "
 DROP SEQUENCE %s;

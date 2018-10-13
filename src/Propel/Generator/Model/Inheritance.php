@@ -26,7 +26,9 @@ class Inheritance
 
     /** @var string */
     private $className;
-//    private $package;
+
+    /** @var string */
+    private $package;
 
     /** @var string */
     private $ancestor;
@@ -49,7 +51,7 @@ class Inheritance
      *
      * @param string $key
      */
-    public function setKey(string $key)
+    public function setKey(string $key): void
     {
         $this->key = $key;
     }
@@ -69,7 +71,7 @@ class Inheritance
      *
      * @param Field $field
      */
-    public function setField(Field $field)
+    public function setField(Field $field): void
     {
         $this->field = $field;
     }
@@ -89,30 +91,30 @@ class Inheritance
      *
      * @param string $name
      */
-    public function setClassName(string $name)
+    public function setClassName(string $name): void
     {
         $this->className = $name;
     }
 
-//    /**
-//     * Returns the package.
-//     *
-//     * @return string
-//     */
-//    public function getPackage()
-//    {
-//        return $this->package;
-//    }
-//
-//    /**
-//     * Sets the package.
-//     *
-//     * @param string $package
-//     */
-//    public function setPackage($package)
-//    {
-//        $this->package = $package;
-//    }
+    /**
+     * Returns the package.
+     *
+     * @return string
+     */
+    public function getPackage(): string
+    {
+        return $this->package;
+    }
+
+    /**
+     * Sets the package.
+     *
+     * @param string $package
+     */
+    public function setPackage(string $package): void
+    {
+        $this->package = $package;
+    }
 
     /**
      * Returns the ancestor value.
@@ -129,16 +131,8 @@ class Inheritance
      *
      * @param string $ancestor
      */
-    public function setAncestor(string $ancestor)
+    public function setAncestor(string $ancestor): void
     {
         $this->ancestor = $ancestor;
     }
-
-//    protected function setupObject()
-//    {
-//        $this->key       = $this->getAttribute('key');
-//        $this->className = $this->getAttribute('class');
-//        $this->package   = $this->getAttribute('package');
-//        $this->ancestor  = $this->getAttribute('extends');
-//    }
 }

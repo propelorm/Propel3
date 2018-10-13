@@ -23,7 +23,7 @@ class VendorInfoTest extends TestCase
     public function testSetupObject()
     {
         $info = new Vendor();
-        $info->loadMapping(['type' => 'foo']);
+        $info->setType('foo');
 
         $this->assertSame('foo', $info->getType());
     }
@@ -66,7 +66,7 @@ class VendorInfoTest extends TestCase
 
         $merged = $current->getMergedVendorInfo($toMerge);
 
-        $this->assertInstanceOf('Propel\Generator\Model\VendorInfo', $merged);
+        $this->assertInstanceOf('Propel\Generator\Model\Vendor', $merged);
 
         $this->assertSame('wat', $merged->getParameter('foo'));
         $this->assertSame('bat', $merged->getParameter('baz'));

@@ -97,10 +97,10 @@ class Schema
      *
      * @return string
      */
-    public function getShortName(): string
-    {
-        return str_replace('-schema', '', $this->name);
-    }
+    //public function getShortName(): string
+    //{
+    //    return str_replace('-schema', '', $this->name);
+    //}
 
     protected function registerSchema(Schema $schema)
     {
@@ -345,16 +345,16 @@ class Schema
     public function joinSchemas(array $schemas)
     {
         foreach ($schemas as $schema) {
-            foreach ($schema->getDatabases(false) as $addDb) {
+            foreach ($schema->getDatabases() as $addDb) {
                 $addDbName = $addDb->getName();
                 if ($this->hasDatabase($addDbName)) {
-                    $db = $this->getDatabase($addDbName, false);
+                    $db = $this->getDatabase($addDbName);
                     // temporarily reset database namespace to avoid double namespace decoration (see ticket #1355)
                     $namespace = $db->getNamespace();
                     $db->setNamespace(null);
                     // join tables
                     foreach ($addDb->getEntities() as $addEntity) {
-                        if ($db->hasEntityByFullClassName($addEntity->getFullClassName())) {
+                        if ($db->hasEntityByFullName($addEntity->getFullName())) {
                             throw new EngineException(sprintf('Duplicate entity found: %s.', $addEntity->getName()));
                         }
                         $db->addEntity($addEntity);

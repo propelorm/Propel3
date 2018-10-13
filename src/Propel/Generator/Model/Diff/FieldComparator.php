@@ -8,8 +8,11 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Model\Diff;
 
+use phootwork\collection\Map;
 use Propel\Generator\Model\Field;
 
 /**
@@ -26,14 +29,14 @@ class FieldComparator
      * @param  Field             $toField
      * @return FieldDiff|boolean return false if the two columns are similar
      */
-    public static function computeDiff(Field $fromField, Field $toField)
+    public static function computeDiff(Field $fromField, Field $toField): ?FieldDiff
     {
-        if ($changedProperties = self::compareFields($fromField, $toField)) {
-
+        $changedProperties = self::compareFields($fromField, $toField);
+        if (!$changedProperties->isEmpty()) {
             $platform = $fromField->getPlatform() ?? $toField->getPlatform();
             if (null !== $platform) {
                 if ($platform->getFieldDDL($fromField) == $platform->getFieldDDl($toField)) {
-                    return false;
+                    return null;
                 }
             }
 
@@ -43,58 +46,64 @@ class FieldComparator
             return $columnDiff;
         }
 
-        return false;
+        return null;
     }
 
-    public static function compareFields(Field $fromField, Field $toField)
+    /**
+     * @param Field $fromField
+     * @param Field $toField
+     *
+     * @return Map
+     */
+    public static function compareFields(Field $fromField, Field $toField): Map
     {
-        $changedProperties = [];
+        $changedProperties = new Map();
 
         // compare column types
         $fromDomain = $fromField->getDomain();
         $toDomain = $toField->getDomain();
 
         if ($fromDomain->getScale() !== $toDomain->getScale()) {
-            $changedProperties['scale'] = [ $fromDomain->getScale(), $toDomain->getScale() ];
+            $changedProperties->set('scale', [$fromDomain->getScale(), $toDomain->getScale()]);
         }
         if ($fromDomain->getSize() !== $toDomain->getSize()) {
-            $changedProperties['size'] = [ $fromDomain->getSize(), $toDomain->getSize() ];
+            $changedProperties->set('size', [$fromDomain->getSize(), $toDomain->getSize()]);
         }
 
-        if (strtoupper($fromDomain->getSqlType()) !== strtoupper($toDomain->getSqlType())) {
-            $changedProperties['sqlType'] = [ $fromDomain->getSqlType(), $toDomain->getSqlType() ];
+        if (strtoupper($fromDomain->getSqlType() ?? '') !== strtoupper($toDomain->getSqlType() ?? '')) {
+            $changedProperties->set('sqlType', [$fromDomain->getSqlType(), $toDomain->getSqlType()]);
 
             if ($fromDomain->getType() !== $toDomain->getType()) {
-                $changedProperties['type'] = [ $fromDomain->getType(), $toDomain->getType() ];
+                $changedProperties->set('type', [$fromDomain->getType(), $toDomain->getType()]);
             }
         }
 
         if ($fromField->isNotNull() !== $toField->isNotNull()) {
-            $changedProperties['notNull'] = [ $fromField->isNotNull(), $toField->isNotNull() ];
+            $changedProperties->set('notNull', [$fromField->isNotNull(), $toField->isNotNull()]);
         }
 
         // compare column default value
         $fromDefaultValue = $fromField->getDefaultValue();
         $toDefaultValue = $toField->getDefaultValue();
         if ($fromDefaultValue && !$toDefaultValue) {
-            $changedProperties['defaultValueType'] = [ $fromDefaultValue->getType(), null ];
-            $changedProperties['defaultValueValue'] = [ $fromDefaultValue->getValue(), null ];
+            $changedProperties->set('defaultValueType', [$fromDefaultValue->getType(), null]);
+            $changedProperties->set('defaultValueValue', [$fromDefaultValue->getValue(), null]);
         } elseif (!$fromDefaultValue && $toDefaultValue) {
-            $changedProperties['defaultValueType'] = [ null, $toDefaultValue->getType() ];
-            $changedProperties['defaultValueValue'] = [ null, $toDefaultValue->getValue() ];
+            $changedProperties->set('defaultValueType', [null, $toDefaultValue->getType()]);
+            $changedProperties->set('defaultValueValue', [null, $toDefaultValue->getValue()]);
         } elseif ($fromDefaultValue && $toDefaultValue) {
             if (!$fromDefaultValue->equals($toDefaultValue)) {
                 if ($fromDefaultValue->getType() !== $toDefaultValue->getType()) {
-                    $changedProperties['defaultValueType'] = [ $fromDefaultValue->getType(), $toDefaultValue->getType() ];
+                    $changedProperties->set('defaultValueType', [$fromDefaultValue->getType(), $toDefaultValue->getType()]);
                 }
                 if ($fromDefaultValue->getValue() !== $toDefaultValue->getValue()) {
-                    $changedProperties['defaultValueValue'] = [ $fromDefaultValue->getValue(), $toDefaultValue->getValue() ];
+                    $changedProperties->set('defaultValueValue', [$fromDefaultValue->getValue(), $toDefaultValue->getValue()]);
                 }
             }
         }
 
         if ($fromField->isAutoIncrement() !== $toField->isAutoIncrement()) {
-            $changedProperties['autoIncrement'] = [ $fromField->isAutoIncrement(), $toField->isAutoIncrement() ];
+            $changedProperties->set('autoIncrement', [$fromField->isAutoIncrement(), $toField->isAutoIncrement()]);
         }
 
         return $changedProperties;

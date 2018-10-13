@@ -5,6 +5,7 @@
  * file that was distributed with this source code.
  *
  * @license MIT License
+ *
  */
 
 namespace Propel\Generator\Schema\Exception;
@@ -14,6 +15,6 @@ namespace Propel\Generator\Schema\Exception;
  *
  * This exception is thrown at runtime, if the schema file doesn't exists or not readable.
  */
-class InputOutputException extends RuntimeException implements ExceptionInterface
+class InputOutputException extends \RuntimeException
 {
 }
