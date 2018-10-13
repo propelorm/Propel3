@@ -46,7 +46,7 @@ class RelationTest extends ModelTestCase
 
         $database
             ->expects($this->any())
-            ->method('getEntity')
+            ->method('getEntityByName')
             ->with($this->equalTo('authors'))
             ->will($this->returnValue($foreignEntity))
         ;
@@ -146,7 +146,7 @@ class RelationTest extends ModelTestCase
 
         $database
             ->expects($this->any())
-            ->method('getEntity')
+            ->method('getEntityByName')
             ->with($this->equalTo('authors'))
             ->will($this->returnValue($foreignEntity))
         ;
@@ -184,7 +184,7 @@ class RelationTest extends ModelTestCase
 
         $database
             ->expects($this->any())
-            ->method('getEntity')
+            ->method('getEntityByName')
             ->with($this->equalTo('authors'))
             ->will($this->returnValue($foreignEntity))
         ;
@@ -311,12 +311,12 @@ class RelationTest extends ModelTestCase
         $this->assertCount(2, $fk->getLocalFields());
         $this->assertCount(2, $fk->getForeignFields());
 
-        $this->assertSame('book_id', $fk->getLocalFieldName(0));
-        $this->assertSame('id', $fk->getForeignFieldName(0));
+        $this->assertSame('book_id', $fk->getLocalFields()->get(0));
+        $this->assertSame('id', $fk->getForeignFields()->get(0));
         $this->assertSame('id', $fk->getMappedForeignField('book_id'));
 
-        $this->assertSame('author_id', $fk->getLocalFieldName(1));
-        $this->assertSame('id', $fk->getForeignFieldName(1));
+        $this->assertSame('author_id', $fk->getLocalFields()->get(1));
+        $this->assertSame('id', $fk->getForeignFields()->get(1));
         $this->assertSame('id', $fk->getMappedForeignField('author_id'));
     }
 
@@ -366,7 +366,7 @@ class RelationTest extends ModelTestCase
         $table = $this->getEntityMock('book');
         $table
             ->expects($this->once())
-            ->method('getSchema')
+            ->method('getSchemaName')
             ->will($this->returnValue('books'))
         ;
 

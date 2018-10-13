@@ -15,6 +15,7 @@ use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Domain;
+use Propel\Generator\Model\Model;
 use Propel\Generator\Model\NamingTool;
 use Propel\Generator\Model\Relation;
 use Propel\Generator\Model\IdMethod;
@@ -36,6 +37,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
  */
 class SqlDefaultPlatform implements PlatformInterface
 {
+    use FinalizationTrait;
 
     /**
      * Mapping from Propel types to Domain objects.
@@ -88,7 +90,7 @@ class SqlDefaultPlatform implements PlatformInterface
 
     protected function toUnderscore($v)
     {
-        return NamingTool::toUnderscore($v);
+        return NamingTool::toSnakeCase($v);
     }
 
     public function getRepositoryBuilder(Entity $entity)
@@ -159,129 +161,6 @@ class SqlDefaultPlatform implements PlatformInterface
     }
 
     /**
-     * Finalize this entity.
-     *
-     * @param Database $database
-     */
-    public function finalizeDefinition(Database $database)
-    {
-        foreach ($database->getEntities() as $entity) {
-            // Heavy indexing must wait until after all columns composing
-            // a entity's primary key have been parsed.
-            if ($entity->isHeavyIndexing()) {
-                $this->doHeavyIndexing($entity);
-            }
-
-            // if idMethod is "native" and in fact there are no autoIncrement
-            // columns in the entity, then change it to "none"
-            $anyAutoInc = false;
-            foreach ($entity->getFields() as $column) {
-                if ($column->isAutoIncrement()) {
-                    $anyAutoInc = true;
-                }
-            }
-            if (IdMethod::NATIVE === $entity->getIdMethod() && !$anyAutoInc) {
-                $entity->setIdMethod(IdMethod::NO_ID_METHOD);
-            }
-
-            $entity->finalizeDefinition();
-            $this->setupRelationReferences($entity);
-        }
-    }
-
-    /**
-     * @param Entity $entity
-     */
-    protected function setupRelationReferences(Entity $entity)
-    {
-        foreach ($entity->getRelations() as $relation) {
-            if ($relation->getField()) {
-                $relationName = $relation->getField();
-            } else {
-                $relationName = $relation->getForeignEntity()->getName();
-            }
-
-            if (!$relation->getLocalFieldObjects()) {
-                //no references defined: set it
-                $pks = $relation->getForeignEntity()->getPrimaryKey();
-                if (!$pks) {
-                    throw new BuildException(sprintf(
-                        'Can not set up relation references since target entity `%s` has no primary keys.',
-                        $relation->getForeignEntity()->getName()
-                    ));
-                }
-
-                foreach ($pks as $pk) {
-                    $localFieldName = lcfirst($relationName) . ucfirst($pk->getName());
-                    $field = new Field();
-                    $field->setName($localFieldName);
-                    $field->setType($pk->getType());
-                    $field->setDomain($pk->getDomain());
-                    $field->setImplementationDetail(true);
-
-                    if ($entity->hasField($localFieldName, true)) {
-                        throw new BuildException(sprintf(
-                            'Unable to setup automatic relation from %s to %s due to no unique field name. Please specify <relation field="here"> a name'
-                        ), $entity->getName(), $relation->getForeignEntity()->getName());
-                    }
-                    $entity->addField($field);
-
-                    $relation->addReference($localFieldName, $pk->getName());
-                }
-            } else {
-                //we have references, make sure all those columns are marked as implementationDetail
-//                if ($relation->isLocalPrimaryKey()) {
-//                    //one-to-one relation are not marked as implementation detail
-//                    continue;
-//                }
-//                foreach ($relation->getFieldObjectsMapArray() as $fields) {
-//                    /** @var Field $local */
-//                    /** @var Field $foreign */
-//                    list($local, $foreign) = $fields;
-//                    if ($local->isPrimaryKey()) {
-//                        $foreign->setImplementationDetail(true);
-//                    }
-//                }
-                foreach ($relation->getLocalFieldObjects() as $field) {
-                    $field->setImplementationDetail(true);
-                }
-            }
-        }
-    }
-
-    /**
-     * Adds extra indices for multi-part primary key columns.
-     *
-     * For databases like MySQL, values in a where clause much
-     * match key part order from the left to right. So, in the key
-     * definition <code>PRIMARY KEY (FOO_ID, BAR_ID)</code>,
-     * <code>FOO_ID</code> <i>must</i> be the first element used in
-     * the <code>where</code> clause of the SQL query used against
-     * this entity for the primary key index to be used. This feature
-     * could cause problems under MySQL with heavily indexed entitys,
-     * as MySQL currently only supports 16 indices per entity (i.e. it
-     * might cause too many indices to be created).
-     *
-     * See the mysql manual http://www.mysql.com/doc/E/X/EXPLAIN.html
-     * for a better description of why heavy indexing is useful for
-     * quickly searchable database entities.
-     */
-    protected function doHeavyIndexing(Entity $entity)
-    {
-        $pk = $entity->getPrimaryKey();
-        $size = count($pk);
-
-        // We start at an offset of 1 because the entire column
-        // list is generally implicitly indexed by the fact that
-        // it's a primary key.
-        for ($i = 1; $i < $size; $i++) {
-            $idx = new Index();
-            $idx->setFields(array_slice($pk, $i, $size));
-            $entity->addIndex($idx);
-        }
-    }
-
-    /**
      * Adds a mapping entry for specified Domain.
      * @param Domain $domain
      */
@@ -293,7 +172,9 @@ class SqlDefaultPlatform implements PlatformInterface
     /**
      * Returns the short name of the database type that this platform represents.
      * For example MysqlPlatform->getDatabaseType() returns 'mysql'.
+     *
      * @return string
+     * @throws \ReflectionException
      */
     public function getDatabaseType()
     {
@@ -386,7 +267,7 @@ class SqlDefaultPlatform implements PlatformInterface
     {
         static $longNamesMap = [];
         $result = null;
-        if (IdMethod::NATIVE === $entity->getIdMethod()) {
+        if (Model::ID_METHOD_NATIVE === $entity->getIdMethod()) {
             $idMethodParams = $entity->getIdMethodParameters();
             $maxIdentifierLength = $this->getMaxFieldNameLength();
             $entityName = $this->getName($entity);

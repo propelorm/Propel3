@@ -4,7 +4,6 @@
 namespace Propel\Generator\Platform\Builder;
 
 use Propel\Generator\Builder\Om\AbstractBuilder;
-use Propel\Generator\Builder\PhpModel\ClassDefinition;
 
 class Repository extends AbstractBuilder
 {

@@ -10,6 +10,7 @@
 
 namespace Propel\Generator\Command;
 
+use Propel\Generator\Model\Model;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -140,7 +141,7 @@ class MigrationDiffCommand extends AbstractCommand
             $database = new Database($name);
             $database->setPlatform($platform);
             $database->setSchema($appDatabase->getSchema());
-            $database->setDefaultIdMethod(IdMethod::NATIVE);
+            $database->setDefaultIdMethod(Model::ID_METHOD_NATIVE);
 
             $parser   = $generatorConfig->getConfiguredSchemaParser($conn);
             $nbTables = $parser->parse($database, $additionalEntities);

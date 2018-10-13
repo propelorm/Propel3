@@ -10,20 +10,19 @@
 
 namespace Propel\Tests\Generator\Model;
 
-use Propel\Generator\Builder\Util\SchemaReader;
-use Propel\Generator\Exception\BehaviorNotFoundException;
+use org\bovigo\vfs\vfsStream;
 use Propel\Generator\Exception\SchemaException;
 use Propel\Generator\Model\Behavior;
 use Propel\Generator\Model\Entity;
+use Propel\Generator\Schema\SchemaReader;
 use Propel\Tests\Helpers\MultipleBehavior;
-use Propel\Tests\TestCase;
 
 /**
  * Tests for Behavior class
  *
  * @author Martin Poeschl <mpoeschl@marmot.at>
  */
-class BehaviorTest extends TestCase
+class BehaviorTest extends ModelTestCase
 {
     private $schemaReader;
     private $appData;
@@ -58,7 +57,6 @@ class BehaviorTest extends TestCase
         $this->assertEquals($b->getParameters(), ['foo' => 'bar3', 'foo2' => 'bar2'], 'addParameter() changes a parameter from an associative array');
         $this->assertEquals($b->getParameter('foo'), 'bar3', 'getParameter() retrieves a parameter value by name');
         $b->setParameters(['foo3' => 'bar3', 'foo4' => 'bar4']);
-        var_dump($b->getParameters());
         $this->assertEquals($b->getParameters(), ['foo3' => 'bar3', 'foo4' => 'bar4'], 'setParameters() changes the whole parameter array');
     }
 
@@ -69,9 +67,9 @@ class BehaviorTest extends TestCase
     public function testSchemaReader()
     {
         $schemaReader = new SchemaReader();
-        $schema = <<<EOF
+        $content = <<<EOF
 <database name="test1">
-  <entity name="table1">
+  <entity name="entity1">
     <field name="id" type="INTEGER" primaryKey="true" />
     <field name="title" type="VARCHAR" size="100" primaryString="true" />
     <field name="created_on" type="TIMESTAMP" />
@@ -83,23 +81,27 @@ class BehaviorTest extends TestCase
   </entity>
 </database>
 EOF;
-        $appData = $schemaReader->parseString($schema);
-        $entity = $appData->getDatabase('test1')->getEntity('table1');
+        $schema = vfsStream::newFile('schema.xml')->at($this->root)->setContent($content);
+        $appData = $schemaReader->parse($schema->url());
+        $entity = $appData->getDatabase('test1')->getEntityByName('Entity1');
         $behaviors = $entity->getBehaviors();
         $this->assertEquals(1, count($behaviors), 'SchemaReader ads as many behaviors as there are behaviors tags');
         $behavior = $entity->getBehavior('timestampable');
-        $this->assertEquals('table1', $behavior->getEntity()->getName(), 'SchemaReader sets the behavior table correctly');
+        $this->assertEquals('Entity1', $behavior->getEntity()->getName(), 'SchemaReader sets the behavior entity correctly');
         $this->assertEquals(
-            ['create_field' => 'created_on', 'update_field' => 'updated_on', 'disable_created_at' => 'false', 'disable_updated_at' => 'false'],
+            ['create_field' => 'created_on', 'update_field' => 'updated_on', 'disable_created_at' => false, 'disable_updated_at' => false],
             $behavior->getParameters(),
             'SchemaReader sets the behavior parameters correctly'
         );
     }
 
+    /**
+     * @expectedException \Propel\Generator\Exception\BehaviorNotFoundException
+     */
     public function testUnknownBehavior()
     {
         $schemaReader = new SchemaReader();
-        $schema = <<<EOF
+        $content = <<<EOF
 <database name="test1">
   <entity name="table1">
     <field name="id" type="INTEGER" primaryKey="true" />
@@ -107,18 +109,14 @@ EOF;
   </entity>
 </database>
 EOF;
-        try {
-            $appData = $schemaReader->parseString($schema);
-            $this->fail('No exception thrown');
-        } catch (SchemaException $e) {
-            $this->assertInstanceOf(BehaviorNotFoundException::class, $e->getPrevious());
-        }
+        $schema = vfsStream::newFile('schema.xml')->at($this->root)->setContent($content);
+        $appData = $schemaReader->parse($schema->url());
     }
 
     public function testModifyEntity()
     {
         $schemaReader = new SchemaReader();
-        $schema = <<<EOF
+        $content = <<<EOF
 <database name="test1">
   <entity name="table2">
     <field name="id" type="INTEGER" primaryKey="true" />
@@ -127,15 +125,16 @@ EOF;
   </entity>
 </database>
 EOF;
-        $appData = $schemaReader->parseString($schema);
-        $entity = $appData->getDatabase('test1')->getEntity('table2');
-        $this->assertEquals(count($entity->getFields()), 4, 'A behavior can modify its table by implementing modifyEntity()');
+        $schema = vfsStream::newFile('schema.xml')->at($this->root)->setContent($content);
+        $appData = $schemaReader->parse($schema->url());
+        $entity = $appData->getDatabase('test1')->getEntityByName('Table2');
+        $this->assertEquals($entity->getFields()->size(), 4, 'A behavior can modify its table by implementing modifyEntity()');
     }
 
     public function testModifyDatabase()
     {
         $schemaReader = new SchemaReader();
-        $schema = <<<EOF
+        $content = <<<EOF
 <database name="test1">
   <behavior name="timestampable" />
   <entity name="table1">
@@ -143,15 +142,16 @@ EOF;
   </entity>
 </database>
 EOF;
-        $appData = $schemaReader->parseString($schema);
-        $entity = $appData->getDatabase('test1')->getEntity('table1');
+        $schema = vfsStream::newFile('schema.xml')->at($this->root)->setContent($content);
+        $appData = $schemaReader->parse($schema->url());
+        $entity = $appData->getDatabase('test1')->getEntityByName('Table1');
         $this->assertTrue(array_key_exists('timestampable', $entity->getBehaviors()), 'A database behavior is automatically copied to all its table');
     }
 
     public function testGetColumnForParameter()
     {
         $schemaReader = new SchemaReader();
-        $schema = <<<EOF
+        $content = <<<EOF
 <database name="test1">
   <entity name="table1">
     <field name="id" type="INTEGER" primaryKey="true" />
@@ -165,8 +165,9 @@ EOF;
   </entity>
 </database>
 EOF;
-        $appData = $schemaReader->parseString($schema);
-        $entity = $appData->getDatabase('test1')->getEntity('table1');
+        $schema = vfsStream::newFile('schema.xml')->at($this->root)->setContent($content);
+        $appData = $schemaReader->parse($schema->url());
+        $entity = $appData->getDatabase('test1')->getEntityByName('Table1');
         $behavior = $entity->getBehavior('timestampable');
         $this->assertEquals($entity->getField('created_on'), $behavior->getFieldForParameter('create_field'), 'getFieldForParameter() returns the configured field for behavior based on a parameter name');
     }

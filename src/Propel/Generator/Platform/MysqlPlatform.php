@@ -173,7 +173,7 @@ class MysqlPlatform extends SqlDefaultPlatform
      * @param  string $delimiter
      * @return string
      */
-    public function getFieldList($columns, $delimiter = ',')
+    public function getFieldList($columns, $delimiter = ','): string
     {
         $list = [];
         foreach ($columns as $col) {

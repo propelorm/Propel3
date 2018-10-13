@@ -24,7 +24,7 @@ class FieldDefaultValue
     const TYPE_EXPR  = 'expr';
 
     /**
-     * @var string The default value, as specified in the schema.
+     * @var mixed The default value, as specified in the schema.
      */
     private $value;
 
@@ -75,15 +75,15 @@ class FieldDefaultValue
     }
 
     /**
-     * @return string The value, as specified in the schema.
+     * @return mixed The value, as specified in the schema.
      */
-    public function getValue(): string
+    public function getValue()
     {
         return $this->value;
     }
 
     /**
-     * @param string $value The value, as specified in the schema.
+     * @param mixed $value The value, as specified in the schema.
      */
     public function setValue($value)
     {
@@ -107,19 +107,14 @@ class FieldDefaultValue
             return true;
         }
 
-        // special case for current timestamp
-        $equivalents = [ 'CURRENT_TIMESTAMP', 'NOW()' ];
-        if (in_array(strtoupper($this->getValue()), $equivalents) && in_array(strtoupper($other->getValue()), $equivalents)) {
-            return true;
+        if (is_string($this->getValue())) {
+            // special case for current timestamp
+            $equivalents = ['CURRENT_TIMESTAMP', 'NOW()'];
+            if (in_array(strtoupper($this->getValue()), $equivalents) && in_array(strtoupper($other->getValue()), $equivalents)) {
+                return true;
+            }
         }
 
         return false; // Can't help, they are different
-    }
-
-    /**
-     *
-     */
-    public function getTypedValue()
-    {
     }
 }

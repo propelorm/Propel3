@@ -11,9 +11,8 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Schema\Loader;
 
-use phootwork\lang\Text;
+use phootwork\file\File;
 use Propel\Common\Config\Loader\FileLoader;
-use Propel\Generator\Schema\Exception\InputOutputException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -31,19 +30,15 @@ class YamlSchemaLoader extends FileLoader
      * @param string $type The resource type
      * @return array
      *
-     * @throws \InvalidArgumentException                               if schema file not found
-     * @throws \Symfony\Component\Yaml\Exception\ParseException        if something goes wrong in parsing file
-     * @throws \Propel\Generator\Schema\Exception\InputOutputException if schema file is not readable
+     * @throws \InvalidArgumentException                         if schema file not found
+     * @throws \Symfony\Component\Yaml\Exception\ParseException  if something goes wrong in parsing file
+     * @throws \phootwork\file\Exception\FileException           if schema file is not readable
      */
     public function load($file, $type = null): array
     {
-        $path = $this->locator->locate($file);
+        $file =new File($this->locator->locate($file));
 
-        if (!is_readable($path)) {
-            throw new InputOutputException("You don't have permissions to access schema file $file.");
-        }
-
-        $content = Yaml::parse(file_get_contents($path));
+        $content = Yaml::parse($file->read());
 
         if (!is_array($content)) {
             throw new ParseException('The content is not valid yaml.');
@@ -63,11 +58,9 @@ class YamlSchemaLoader extends FileLoader
      */
     public function supports($resource, $type = null): bool
     {
-        if (!is_string($resource)) {
-            return false;
-        }
-        $path = new Text($resource);
+        $file = new File($resource);
+        $extension = $file->getExtension();
 
-        return $path->endsWith('.yaml') || $path->endsWith('.yml');
+        return ('yaml' === $extension) || ('yml' === $extension);
     }
 }

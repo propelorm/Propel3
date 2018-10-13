@@ -2,6 +2,7 @@
 
 namespace Propel\Tests\Generator\Model\Diff;
 
+use phootwork\collection\Map;
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Diff\FieldDiff;
@@ -44,22 +45,11 @@ class EntityDiffTest extends TestCase
         $column = new Field('is_published', 'boolean');
 
         $diff = $this->createEntityDiff();
-        $diff->setAddedFields([ $column ]);
+        $diff->setAddedFields(new Map(['is_published' => $column]));
 
         $this->assertCount(1, $diff->getAddedFields());
-        $this->assertSame($column, $diff->getAddedField('is_published'));
+        $this->assertSame($column, $diff->getAddedFields()->get('is_published'));
         $this->assertTrue($diff->hasAddedFields());
-    }
-
-    public function testRemoveAddedField()
-    {
-        $diff = $this->createEntityDiff();
-        $diff->addAddedField('is_published', new Field('is_published'));
-        $diff->removeAddedField('is_published');
-
-        $this->assertEmpty($diff->getAddedFields());
-        $this->assertNull($diff->getAddedField('is_published'));
-        $this->assertFalse($diff->hasAddedFields());
     }
 
     public function testSetRemovedFields()
@@ -67,23 +57,11 @@ class EntityDiffTest extends TestCase
         $column = new Field('is_active');
 
         $diff = $this->createEntityDiff();
-        $diff->setRemovedFields([ $column ]);
+        $diff->setRemovedFields(new Map(['is_active' => $column]));
 
-        $this->assertCount(1, $diff->getRemovedFields());
-        $this->assertSame($column, $diff->getRemovedField('is_active'));
+        $this->assertEquals(1, $diff->getRemovedFields()->size());
+        $this->assertSame($column, $diff->getRemovedFields()->get('is_active'));
         $this->assertTrue($diff->hasRemovedFields());
-    }
-
-    public function testSetRemoveRemovedField()
-    {
-        $diff = $this->createEntityDiff();
-
-        $this->assertNull($diff->getRemovedField('is_active'));
-
-        $diff->addRemovedField('is_active', new Field('is_active'));
-        $diff->removeRemovedField('is_active');
-
-        $this->assertFalse($diff->hasRemovedFields());
     }
 
     public function testSetModifiedFields()
@@ -91,9 +69,9 @@ class EntityDiffTest extends TestCase
         $columnDiff = new FieldDiff();
 
         $diff = $this->createEntityDiff();
-        $diff->setModifiedFields([ 'title' => $columnDiff ]);
+        $diff->setModifiedFields(new Map(['title' => $columnDiff]));
 
-        $this->assertCount(1, $diff->getModifiedFields());
+        $this->assertEquals(1, $diff->getModifiedFields()->size());
         $this->assertTrue($diff->hasModifiedFields());
     }
 
@@ -103,9 +81,9 @@ class EntityDiffTest extends TestCase
         $toField   = new Field('is_active', 'boolean');
 
         $diff = $this->createEntityDiff();
-        $diff->setRenamedFields([ [ $fromField, $toField ] ]);
+        $diff->setRenamedFields(new Map(['is_published' => [$fromField, $toField]]));
 
-        $this->assertCount(1, $diff->getRenamedFields());
+        $this->assertEquals(1, $diff->getRenamedFields()->size());
         $this->assertTrue($diff->hasRenamedFields());
     }
 
@@ -115,33 +93,11 @@ class EntityDiffTest extends TestCase
         $column->setPrimaryKey();
 
         $diff = $this->createEntityDiff();
-        $diff->setAddedPkFields([ $column ]);
+        $diff->setAddedPkFields(new Map(['id' => [$column]]));
 
-        $this->assertCount(1, $diff->getAddedPkFields());
+        $this->assertEquals(1, $diff->getAddedPkFields()->size());
         $this->assertTrue($diff->hasAddedPkFields());
         $this->assertTrue($diff->hasModifiedPk());
-    }
-
-    public function testRemoveAddedPkField()
-    {
-        $column = new Field('id', 'integer', 7);
-        $column->setPrimaryKey();
-
-        $diff = $this->createEntityDiff();
-        $diff->setAddedPkFields([ $column ]);
-        $diff->removeAddedPkField('id');
-
-        $this->assertEmpty($diff->getRemovedPkFields());
-        $this->assertFalse($diff->hasAddedPkFields());
-    }
-
-    /**
-     * @expectedException \Propel\Generator\Exception\DiffException
-     */
-    public function testCantAddNonPrimaryKeyField()
-    {
-        $diff = $this->createEntityDiff();
-        $diff->addAddedPkField('id', new Field('id', 'integer'));
     }
 
     public function testSetRemovedPkFields()
@@ -150,25 +106,16 @@ class EntityDiffTest extends TestCase
         $column->setPrimaryKey();
 
         $diff = $this->createEntityDiff();
-        $diff->setRemovedPkFields([ $column ]);
+        $diff->setRemovedPkFields(new Map(['id' => [$column]]));
 
         $this->assertCount(1, $diff->getRemovedPkFields());
         $this->assertTrue($diff->hasModifiedPk());
     }
 
-    public function testRemoveRemovedPkField()
-    {
-        $diff = $this->createEntityDiff();
-        $diff->addRemovedPkField('id', new Field('id', 'integer'));
-        $diff->removeRemovedPkField('id');
-
-        $this->assertEmpty($diff->getRemovedPkFields());
-    }
-
     public function testSetRenamedPkFields()
     {
         $diff = $this->createEntityDiff();
-        $diff->setRenamedPkFields([ [ new Field('id', 'integer'), new Field('post_id', 'integer') ] ]);
+        $diff->setRenamedPkFields(new Map(['id' => [new Field('id', 'integer'), new Field('post_id', 'integer')]]));
 
         $this->assertCount(1, $diff->getRenamedPkFields());
         $this->assertTrue($diff->hasModifiedPk());
@@ -183,7 +130,7 @@ class EntityDiffTest extends TestCase
         $index->setEntity($table);
 
         $diff = $this->createEntityDiff();
-        $diff->setAddedIndices([ $index ]);
+        $diff->setAddedIndices(new Map(['username_unique_idx' => $index]));
 
         $this->assertCount(1, $diff->getAddedIndices());
         $this->assertTrue($diff->hasAddedIndices());
@@ -198,7 +145,7 @@ class EntityDiffTest extends TestCase
         $index->setEntity($table);
 
         $diff = $this->createEntityDiff();
-        $diff->setRemovedIndices([ $index ]);
+        $diff->setRemovedIndices(new Map(['username_unique_idx' => $index]));
 
         $this->assertCount(1, $diff->getRemovedIndices());
         $this->assertTrue($diff->hasRemovedIndices());
@@ -211,16 +158,16 @@ class EntityDiffTest extends TestCase
 
         $fromIndex = new Index('username_unique_idx');
         $fromIndex->setEntity($table);
-        $fromIndex->setFields([ new Field('username') ]);
+        $fromIndex->addFields([new Field('username')]);
 
         $toIndex = new Index('username_unique_idx');
         $toIndex->setEntity($table);
-        $toIndex->setFields([ new Field('client_id'), new Field('username') ]);
+        $toIndex->addFields([new Field('client_id'), new Field('username')]);
 
         $diff = $this->createEntityDiff();
-        $diff->setModifiedIndices([ [ $fromIndex, $toIndex ]]);
+        $diff->setModifiedIndices(new Map(['username_unique_idx' => [$fromIndex, $toIndex]]));
 
-        $this->assertCount(1, $diff->getModifiedIndices());
+        $this->assertEquals(1, $diff->getModifiedIndices()->size());
         $this->assertTrue($diff->hasModifiedIndices());
     }
 
@@ -229,47 +176,27 @@ class EntityDiffTest extends TestCase
         $fk = new Relation('fk_blog_author');
 
         $diff = $this->createEntityDiff();
-        $diff->setAddedFks([ $fk ]);
+        $diff->setAddedFks(new Map(['fk_blog_author' => $fk]));
 
-        $this->assertCount(1, $diff->getAddedFks());
+        $this->assertEquals(1, $diff->getAddedFks()->size());
         $this->assertTrue($diff->hasAddedFks());
-    }
-
-    public function testRemoveAddedFk()
-    {
-        $diff = $this->createEntityDiff();
-        $diff->addAddedFk('fk_blog_author', new Relation('fk_blog_author'));
-        $diff->removeAddedFk('fk_blog_author');
-
-        $this->assertEmpty($diff->getAddedFks());
-        $this->assertFalse($diff->hasAddedFks());
     }
 
     public function testSetRemovedFk()
     {
         $diff = $this->createEntityDiff();
-        $diff->setRemovedFks([ new Relation('fk_blog_post_author') ]);
+        $diff->setRemovedFks(new Map(['fk_blog_post_author' => new Relation('fk_blog_post_author')]));
 
-        $this->assertCount(1, $diff->getRemovedFks());
+        $this->assertEquals(1, $diff->getRemovedFks()->size());
         $this->assertTrue($diff->hasRemovedFks());
-    }
-
-    public function testRemoveRemovedFk()
-    {
-        $diff = $this->createEntityDiff();
-        $diff->addRemovedFk('blog_post_author', new Relation('blog_post_author'));
-        $diff->removeRemovedFk('blog_post_author');
-
-        $this->assertEmpty($diff->getRemovedFks());
-        $this->assertFalse($diff->hasRemovedFks());
     }
 
     public function testSetModifiedFks()
     {
         $diff = $this->createEntityDiff();
-        $diff->setModifiedFks([ [ new Relation('blog_post_author'), new Relation('blog_post_has_author') ] ]);
+        $diff->setModifiedFks(new Map(['blog_post_author' => [new Relation('blog_post_author'), new Relation('blog_post_has_author')]]));
 
-        $this->assertCount(1, $diff->getModifiedFks());
+        $this->assertEquals(1, $diff->getModifiedFks()->size());
         $this->assertTrue($diff->hasModifiedFks());
     }
 
@@ -295,11 +222,11 @@ class EntityDiffTest extends TestCase
         $reverseFieldDiff = $columnDiff->getReverseDiff();
 
         $diff = $this->createEntityDiff();
-        $diff->addModifiedField('title', $columnDiff);
+        $diff->getModifiedFields()->set('title', $columnDiff);
         
         $reverseDiff = $diff->getReverseDiff();
         $this->assertTrue($reverseDiff->hasModifiedFields());
-        $this->assertEquals([ 'title' => $reverseFieldDiff ], $reverseDiff->getModifiedFields());
+        $this->assertEquals(['title' => $reverseFieldDiff], $reverseDiff->getModifiedFields()->toArray());
     }
 
     public function testReverseDiffHasRemovedFields()
@@ -307,11 +234,11 @@ class EntityDiffTest extends TestCase
         $column = new Field('slug', 'varchar', 100);
 
         $diff = $this->createEntityDiff();
-        $diff->addAddedField('slug', $column);
+        $diff->getAddedFields()->set('slug', $column);
 
         $reverseDiff = $diff->getReverseDiff();
-        $this->assertSame([ 'slug' => $column], $reverseDiff->getRemovedFields());
-        $this->assertSame($column, $reverseDiff->getRemovedField('slug'));
+        $this->assertSame(['slug' => $column], $reverseDiff->getRemovedFields()->toArray());
+        $this->assertSame($column, $reverseDiff->getRemovedFields()->get('slug'));
     }
 
     public function testReverseDiffHasAddedFields()
@@ -319,11 +246,11 @@ class EntityDiffTest extends TestCase
         $column = new Field('slug', 'varchar', 100);
 
         $diff = $this->createEntityDiff();
-        $diff->addRemovedField('slug', $column);
+        $diff->getRemovedFields()->set('slug', $column);
 
         $reverseDiff = $diff->getReverseDiff();
-        $this->assertSame([ 'slug' => $column], $reverseDiff->getAddedFields());
-        $this->assertSame($column, $reverseDiff->getAddedField('slug'));
+        $this->assertSame(['slug' => $column], $reverseDiff->getAddedFields()->toArray());
+        $this->assertSame($column, $reverseDiff->getAddedFields()->get('slug'));
     }
 
     public function testReverseDiffHasRenamedFields()
@@ -332,10 +259,10 @@ class EntityDiffTest extends TestCase
         $columnB = new Field('username', 'varchar', 15);
 
         $diff = $this->createEntityDiff();
-        $diff->addRenamedField($columnA, $columnB);
+        $diff->getRenamedFields()->set('login', [$columnA, $columnB]);
 
         $reverseDiff = $diff->getReverseDiff();
-        $this->assertSame([ [ $columnB, $columnA ] ], $reverseDiff->getRenamedFields());
+        $this->assertSame([$columnB, $columnA], $reverseDiff->getRenamedFields()->get('username'));
     }
 
     public function testReverseDiffHasAddedPkFields()
@@ -344,10 +271,10 @@ class EntityDiffTest extends TestCase
         $column->setPrimaryKey();
 
         $diff = $this->createEntityDiff();
-        $diff->addRemovedPkField('client_id', $column);
+        $diff->getRemovedPkFields()->set('client_id', $column);
 
         $reverseDiff = $diff->getReverseDiff();
-        $this->assertCount(1, $reverseDiff->getAddedPkFields());
+        $this->assertEquals(1, $reverseDiff->getAddedPkFields()->size());
         $this->assertTrue($reverseDiff->hasAddedPkFields());
     }
 
@@ -357,10 +284,10 @@ class EntityDiffTest extends TestCase
         $column->setPrimaryKey();
 
         $diff = $this->createEntityDiff();
-        $diff->addAddedPkField('client_id', $column);
+        $diff->getAddedPkFields()->set('client_id', $column);
 
         $reverseDiff = $diff->getReverseDiff();
-        $this->assertCount(1, $reverseDiff->getRemovedPkFields());
+        $this->assertEquals(1, $reverseDiff->getRemovedPkFields()->size());
         $this->assertTrue($reverseDiff->hasRemovedPkFields());
     }
 
@@ -373,11 +300,11 @@ class EntityDiffTest extends TestCase
         $toField->setPrimaryKey();
 
         $diff = $this->createEntityDiff();
-        $diff->addRenamedPkField($fromField, $toField);
+        $diff->getRenamedPkFields()->set('post_id', [$fromField, $toField]);
 
         $reverseDiff = $diff->getReverseDiff();
         $this->assertTrue($reverseDiff->hasRenamedPkFields());
-        $this->assertSame([[ $toField, $fromField ]], $reverseDiff->getRenamedPkFields());
+        $this->assertEquals([$toField, $fromField], $reverseDiff->getRenamedPkFields()->get('id'));
     }
 
     public function testReverseDiffHasAddedIndices()
@@ -389,7 +316,7 @@ class EntityDiffTest extends TestCase
         $index->setEntity($table);
 
         $diff = $this->createEntityDiff();
-        $diff->addRemovedIndex('username_unique_idx', $index);
+        $diff->getRemovedIndices()->set('username_unique_idx', $index);
 
         $reverseDiff = $diff->getReverseDiff();
         $this->assertTrue($reverseDiff->hasAddedIndices());
@@ -405,7 +332,7 @@ class EntityDiffTest extends TestCase
         $index->setEntity($table);
 
         $diff = $this->createEntityDiff();
-        $diff->addAddedIndex('username_unique_idx', $index);
+        $diff->getAddedIndices()->set('username_unique_idx', $index);
 
         $reverseDiff = $diff->getReverseDiff();
         $this->assertTrue($reverseDiff->hasRemovedIndices());
@@ -424,18 +351,18 @@ class EntityDiffTest extends TestCase
         $toIndex->setEntity($table);
 
         $diff = $this->createEntityDiff();
-        $diff->addModifiedIndex('i1', $fromIndex, $toIndex);
+        $diff->getModifiedIndices()->set('i1', [$fromIndex, $toIndex]);
 
         $reverseDiff = $diff->getReverseDiff();
 
         $this->assertTrue($reverseDiff->hasModifiedIndices());
-        $this->assertSame([ 'i1' => [ $toIndex, $fromIndex ]], $reverseDiff->getModifiedIndices());
+        $this->assertSame(['i1' => [$toIndex, $fromIndex]], $reverseDiff->getModifiedIndices()->toArray());
     }
 
     public function testReverseDiffHasRemovedFks()
     {
         $diff = $this->createEntityDiff();
-        $diff->addAddedFk('fk_post_author', new Relation('fk_post_author'));
+        $diff->getAddedFks()->set('fk_post_author', new Relation('fk_post_author'));
 
         $reverseDiff = $diff->getReverseDiff();
         $this->assertTrue($reverseDiff->hasRemovedFks());
@@ -445,7 +372,7 @@ class EntityDiffTest extends TestCase
     public function testReverseDiffHasAddedFks()
     {
         $diff = $this->createEntityDiff();
-        $diff->addRemovedFk('fk_post_author', new Relation('fk_post_author'));
+        $diff->getRemovedFks()->set('fk_post_author', new Relation('fk_post_author'));
 
         $reverseDiff = $diff->getReverseDiff();
         $this->assertTrue($reverseDiff->hasAddedFks());
@@ -458,11 +385,11 @@ class EntityDiffTest extends TestCase
         $toFk = new Relation('fk_1');
 
         $diff = $this->createEntityDiff();
-        $diff->addModifiedFk('fk_1', $fromFk, $toFk);
+        $diff->getModifiedFks()->set('fk_1', [$fromFk, $toFk]);
 
         $reverseDiff = $diff->getReverseDiff();
         $this->assertTrue($reverseDiff->hasModifiedFks());
-        $this->assertSame([ 'fk_1' => [ $toFk, $fromFk ]], $reverseDiff->getModifiedFks());
+        $this->assertSame(['fk_1' => [$toFk, $fromFk]], $reverseDiff->getModifiedFks()->toArray());
     }
     
     private function createEntityDiff(Entity $fromEntity = null, Entity $toEntity = null)
@@ -484,42 +411,47 @@ class EntityDiffTest extends TestCase
         $tableB = new Entity('B');
 
         $diff = new EntityDiff($tableA, $tableB);
-        $diff->addAddedField('id', new Field('id', 'integer'));
-        $diff->addRemovedField('category_id', new Field('category_id', 'integer'));
+        $diff->getAddedFields()->set('id', new Field('id', 'integer'));
+        $diff->getRemovedFields()->set('category_id', new Field('category_id', 'integer'));
 
         $colFoo = new Field('foo', 'integer');
         $colBar = new Field('bar', 'integer');
         $tableA->addField($colFoo);
         $tableA->addField($colBar);
 
-        $diff->addRenamedField($colFoo, $colBar);
+        $diff->getRenamedFields()->set('foo', [$colFoo, $colBar]);
         $columnDiff = new FieldDiff($colFoo, $colBar);
-        $diff->addModifiedField('foo', $columnDiff);
+        $diff->getModifiedFields()->set('foo', $columnDiff);
 
         $fk = new Relation('category');
         $fk->setEntity($tableA);
         $fk->setForeignEntityName('B');
         $fk->addReference('category_id', 'id');
-        $fkChanged = clone $fk;
+
+        //Clone doesn't work by now
+        $fkChanged = new Relation('category');
+        $fkChanged->setEntity($tableA);
+        $fkChanged->setForeignEntityName('B');
+        $fkChanged->addReference('category_id', 'id');
         $fkChanged->setForeignEntityName('C');
         $fkChanged->addReference('bla', 'id2');
         $fkChanged->setOnDelete('cascade');
         $fkChanged->setOnUpdate('cascade');
 
-        $diff->addAddedFk('category', $fk);
-        $diff->addModifiedFk('category', $fk, $fkChanged);
-        $diff->addRemovedFk('category', $fk);
+        $diff->getAddedFks()->set('category', $fk);
+        $diff->getModifiedFks()->set('category', [$fk, $fkChanged]);
+        $diff->getRemovedFks()->set('category', $fk);
 
         $index = new Index('test_index');
         $index->setEntity($tableA);
-        $index->setFields([$colFoo]);
+        $index->addFields([$colFoo]);
 
         $indexChanged = clone $index;
-        $indexChanged->setFields([$colBar]);
+        $indexChanged->addFields([$colBar]);
 
-        $diff->addAddedIndex('test_index', $index);
-        $diff->addModifiedIndex('test_index', $index, $indexChanged);
-        $diff->addRemovedIndex('test_index', $index);
+        $diff->getAddedIndices()->set('test_index', $index);
+        $diff->getModifiedIndices()->set('test_index', [$index, $indexChanged]);
+        $diff->getRemovedIndices()->set('test_index', $index);
 
         $string = (string) $diff;
 

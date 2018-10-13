@@ -15,6 +15,6 @@ namespace Propel\Generator\Schema\Exception;
  *
  * Specialized schema reading exception, thrown when an invalid argument is passed to a method.
  */
-class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
+class InvalidArgumentException extends \InvalidArgumentException
 {
 }

@@ -8,9 +8,12 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Model\Diff;
 
 use Propel\Generator\Model\Entity;
+use Propel\Generator\Model\Index;
 
 /**
  * Service class for comparing Entity objects
@@ -41,7 +44,7 @@ class EntityComparator
      *
      * @return EntityDiff
      */
-    public function getEntityDiff()
+    public function getEntityDiff(): EntityDiff
     {
         return $this->tableDiff;
     }
@@ -51,7 +54,7 @@ class EntityComparator
      *
      * @param Entity $fromEntity
      */
-    public function setFromEntity(Entity $fromEntity)
+    public function setFromEntity(Entity $fromEntity): void
     {
         $this->tableDiff->setFromEntity($fromEntity);
     }
@@ -61,7 +64,7 @@ class EntityComparator
      *
      * @return Entity
      */
-    public function getFromEntity()
+    public function getFromEntity(): Entity
     {
         return $this->tableDiff->getFromEntity();
     }
@@ -71,7 +74,7 @@ class EntityComparator
      *
      * @param Entity $toEntity
      */
-    public function setToEntity(Entity $toEntity)
+    public function setToEntity(Entity $toEntity): void
     {
         $this->tableDiff->setToEntity($toEntity);
     }
@@ -81,7 +84,7 @@ class EntityComparator
      *
      * @return Entity
      */
-    public function getToEntity()
+    public function getToEntity(): Entity
     {
         return $this->tableDiff->getToEntity();
     }
@@ -91,10 +94,9 @@ class EntityComparator
      *
      * @param  Entity             $fromEntity
      * @param  Entity             $toEntity
-     * @param  boolean           $caseInsensitive
-     * @return EntityDiff|Boolean
+     * @return EntityDiff
      */
-    public static function computeDiff(Entity $fromEntity, Entity $toEntity, $caseInsensitive = false)
+    public static function computeDiff(Entity $fromEntity, Entity $toEntity): ?EntityDiff
     {
         $tc = new self();
 
@@ -102,12 +104,11 @@ class EntityComparator
         $tc->setToEntity($toEntity);
 
         $differences = 0;
-        $differences += $tc->compareFields($caseInsensitive);
-        $differences += $tc->comparePrimaryKeys($caseInsensitive);
-        $differences += $tc->compareIndices($caseInsensitive);
-        $differences += $tc->compareRelations($caseInsensitive);
-
-        return ($differences > 0) ? $tc->getEntityDiff() : false;
+        $differences += $tc->compareFields();
+        $differences += $tc->comparePrimaryKeys();
+        $differences += $tc->compareIndices();
+        $differences += $tc->compareRelations();
+        return ($differences > 0) ? $tc->getEntityDiff() : null;
     }
 
     /**
@@ -116,10 +117,9 @@ class EntityComparator
      * Compares the columns of the fromEntity and the toEntity,
      * and modifies the inner tableDiff if necessary.
      *
-     * @param  boolean $caseInsensitive
      * @return integer
      */
-    public function compareFields($caseInsensitive = false)
+    public function compareFields(): int
     {
         $fromEntityFields = $this->getFromEntity()->getFields();
         $toEntityFields = $this->getToEntity()->getFields();
@@ -127,40 +127,40 @@ class EntityComparator
 
         // check for new columns in $toEntity
         foreach ($toEntityFields as $column) {
-            if (!$this->getFromEntity()->hasField($column->getName(), $caseInsensitive)) {
-                $this->tableDiff->addAddedField($column->getName(), $column);
+            if (!$this->getFromEntity()->hasField($column->getName())) {
+                $this->tableDiff->getAddedFields()->set($column->getName(), $column);
                 $columnDifferences++;
             }
         }
 
         // check for removed columns in $toEntity
         foreach ($fromEntityFields as $column) {
-            if (!$this->getToEntity()->hasField($column->getName(), $caseInsensitive)) {
-                $this->tableDiff->addRemovedField($column->getName(), $column);
+            if (!$this->getToEntity()->hasField($column->getName())) {
+                $this->tableDiff->getRemovedFields()->set($column->getName(), $column);
                 $columnDifferences++;
             }
         }
 
         // check for column differences
         foreach ($fromEntityFields as $fromField) {
-            if ($this->getToEntity()->hasField($fromField->getName(), $caseInsensitive)) {
-                $toField = $this->getToEntity()->getField($fromField->getName(), $caseInsensitive);
-                $columnDiff = FieldComparator::computeDiff($fromField, $toField, $caseInsensitive);
-                if ($columnDiff) {
-                    $this->tableDiff->addModifiedField($fromField->getName(), $columnDiff);
+            if ($this->getToEntity()->hasField($fromField->getName())) {
+                $toField = $this->getToEntity()->getField($fromField->getName());
+                $columnDiff = FieldComparator::computeDiff($fromField, $toField);
+                if (null !== $columnDiff) {
+                    $this->tableDiff->getModifiedFields()->set($fromField->getName(), $columnDiff);
                     $columnDifferences++;
                 }
             }
         }
 
         // check for column renamings
-        foreach ($this->tableDiff->getAddedFields() as $addedFieldName => $addedField) {
+        foreach ($this->tableDiff->getAddedFields()->toArray() as $addedFieldName => $addedField) {
             foreach ($this->tableDiff->getRemovedFields() as $removedFieldName => $removedField) {
-                if (!FieldComparator::computeDiff($addedField, $removedField, $caseInsensitive)) {
+                if (null === FieldComparator::computeDiff($addedField, $removedField)) {
                     // no difference except the name, that's probably a renaming
-                    $this->tableDiff->addRenamedField($removedField, $addedField);
-                    $this->tableDiff->removeAddedField($addedFieldName);
-                    $this->tableDiff->removeRemovedField($removedFieldName);
+                    $this->tableDiff->getRenamedFields()->set($removedFieldName, [$removedField, $addedField]);
+                    $this->tableDiff->getAddedFields()->remove($addedFieldName);
+                    $this->tableDiff->getRemovedFields()->remove($removedFieldName);
                     $columnDifferences--;
                     // skip to the next added column
                     break;
@@ -177,10 +177,9 @@ class EntityComparator
      * Compares the primary keys of the fromEntity and the toEntity,
      * and modifies the inner tableDiff if necessary.
      *
-     * @param  boolean $caseInsensitive
      * @return integer
      */
-    public function comparePrimaryKeys($caseInsensitive = false)
+    public function comparePrimaryKeys(): int
     {
         $pkDifferences = 0;
         $fromEntityPk = $this->getFromEntity()->getPrimaryKey();
@@ -188,30 +187,30 @@ class EntityComparator
 
         // check for new pk columns in $toEntity
         foreach ($toEntityPk as $column) {
-            if (!$this->getFromEntity()->hasField($column->getName(), $caseInsensitive) ||
-                !$this->getFromEntity()->getField($column->getName(), $caseInsensitive)->isPrimaryKey()) {
-                $this->tableDiff->addAddedPkField($column->getName(), $column);
+            if (!$this->getFromEntity()->hasField($column->getName()) ||
+                !$this->getFromEntity()->getField($column->getName())->isPrimaryKey()) {
+                $this->tableDiff->getAddedPkFields()->set($column->getName(), $column);
                 $pkDifferences++;
             }
         }
 
         // check for removed pk columns in $toEntity
         foreach ($fromEntityPk as $column) {
-            if (!$this->getToEntity()->hasField($column->getName(), $caseInsensitive) ||
-                !$this->getToEntity()->getField($column->getName(), $caseInsensitive)->isPrimaryKey()) {
-                $this->tableDiff->addRemovedPkField($column->getName(), $column);
+            if (!$this->getToEntity()->hasField($column->getName()) ||
+                !$this->getToEntity()->getField($column->getName())->isPrimaryKey()) {
+                $this->tableDiff->getRemovedPkFields()->set($column->getName(), $column);
                 $pkDifferences++;
             }
         }
 
         // check for column renamings
-        foreach ($this->tableDiff->getAddedPkFields() as $addedFieldName => $addedField) {
+        foreach ($this->tableDiff->getAddedPkFields()->toArray() as $addedFieldName => $addedField) {
             foreach ($this->tableDiff->getRemovedPkFields() as $removedFieldName => $removedField) {
-                if (!FieldComparator::computeDiff($addedField, $removedField, $caseInsensitive)) {
+                if (null === FieldComparator::computeDiff($addedField, $removedField)) {
                     // no difference except the name, that's probably a renaming
-                    $this->tableDiff->addRenamedPkField($removedField, $addedField);
-                    $this->tableDiff->removeAddedPkField($addedFieldName);
-                    $this->tableDiff->removeRemovedPkField($removedFieldName);
+                    $this->tableDiff->getRenamedPkFields()->set($removedFieldName, [$removedField, $addedField]);
+                    $this->tableDiff->getAddedPkFields()->remove($addedFieldName);
+                    $this->tableDiff->getRemovedPkFields()->remove($removedFieldName);
                     $pkDifferences--;
                     // skip to the next added column
                     break;
@@ -228,28 +227,26 @@ class EntityComparator
      * Compare the indices and unique indices of the fromEntity and the toEntity,
      * and modifies the inner tableDiff if necessary.
      *
-     * @param  boolean $caseInsensitive
      * @return integer
      */
-    public function compareIndices($caseInsensitive = false)
+    public function compareIndices(): int
     {
         $indexDifferences = 0;
         $fromEntityIndices = array_merge($this->getFromEntity()->getIndices(), $this->getFromEntity()->getUnices());
         $toEntityIndices = array_merge($this->getToEntity()->getIndices(), $this->getToEntity()->getUnices());
 
+        /** @var  Index $fromEntityIndex */
         foreach ($fromEntityIndices as $fromEntityIndexPos => $fromEntityIndex) {
+            /** @var  Index $toEntityIndex */
             foreach ($toEntityIndices as $toEntityIndexPos => $toEntityIndex) {
-                $sameName = $caseInsensitive ?
-                    strtolower($fromEntityIndex->getName()) == strtolower($toEntityIndex->getName()) :
-                    $fromEntityIndex->getName() == $toEntityIndex->getName();
-                if ($sameName) {
-                    if (false === IndexComparator::computeDiff($fromEntityIndex, $toEntityIndex, $caseInsensitive)) {
+                if ($fromEntityIndex->getName() === $toEntityIndex->getName()) {
+                    if (false === IndexComparator::computeDiff($fromEntityIndex, $toEntityIndex)) {
                         //no changes
                         unset($fromEntityIndices[$fromEntityIndexPos]);
                         unset($toEntityIndices[$toEntityIndexPos]);
                     } else {
                         // same name, but different columns
-                        $this->tableDiff->addModifiedIndex($fromEntityIndex->getName(), $fromEntityIndex, $toEntityIndex);
+                        $this->tableDiff->getModifiedIndices()->set($fromEntityIndex->getName(), [$fromEntityIndex, $toEntityIndex]);
                         unset($fromEntityIndices[$fromEntityIndexPos]);
                         unset($toEntityIndices[$toEntityIndexPos]);
                         $indexDifferences++;
@@ -259,12 +256,12 @@ class EntityComparator
         }
 
         foreach ($fromEntityIndices as $fromEntityIndex) {
-            $this->tableDiff->addRemovedIndex($fromEntityIndex->getName(), $fromEntityIndex);
+            $this->tableDiff->getRemovedIndices()->set($fromEntityIndex->getName(), $fromEntityIndex);
             $indexDifferences++;
         }
 
         foreach ($toEntityIndices as $toEntityIndex) {
-            $this->tableDiff->addAddedIndex($toEntityIndex->getName(), $toEntityIndex);
+            $this->tableDiff->getAddedIndices()->set($toEntityIndex->getName(), $toEntityIndex);
             $indexDifferences++;
         }
 
@@ -277,10 +274,9 @@ class EntityComparator
      * Compare the foreign keys of the fromEntity and the toEntity,
      * and modifies the inner tableDiff if necessary.
      *
-     * @param  boolean $caseInsensitive
      * @return integer
      */
-    public function compareRelations($caseInsensitive = false)
+    public function compareRelations(): int
     {
         $fkDifferences = 0;
         $fromEntityFks = $this->getFromEntity()->getRelations();
@@ -288,16 +284,13 @@ class EntityComparator
 
         foreach ($fromEntityFks as $fromEntityFkPos => $fromEntityFk) {
             foreach ($toEntityFks as $toEntityFkPos => $toEntityFk) {
-                $sameName = $caseInsensitive ?
-                    strtolower($fromEntityFk->getName()) == strtolower($toEntityFk->getName()) :
-                    $fromEntityFk->getName() == $toEntityFk->getName();
-                if ($sameName) {
-                    if (false === RelationComparator::computeDiff($fromEntityFk, $toEntityFk, $caseInsensitive)) {
+                if ($fromEntityFk->getName() === $toEntityFk->getName()) {
+                    if (false === RelationComparator::computeDiff($fromEntityFk, $toEntityFk)) {
                         unset($fromEntityFks[$fromEntityFkPos]);
                         unset($toEntityFks[$toEntityFkPos]);
                     } else {
                         // same name, but different columns
-                        $this->tableDiff->addModifiedFk($fromEntityFk->getName(), $fromEntityFk, $toEntityFk);
+                        $this->tableDiff->getModifiedFks()->set($fromEntityFk->getName(), [$fromEntityFk, $toEntityFk]);
                         unset($fromEntityFks[$fromEntityFkPos]);
                         unset($toEntityFks[$toEntityFkPos]);
                         $fkDifferences++;
@@ -308,14 +301,14 @@ class EntityComparator
 
         foreach ($fromEntityFks as $fromEntityFk) {
             if (!$fromEntityFk->isSkipSql() && !in_array($fromEntityFk, $toEntityFks)) {
-                $this->tableDiff->addRemovedFk($fromEntityFk->getName(), $fromEntityFk);
+                $this->tableDiff->getRemovedFks()->set($fromEntityFk->getName(), $fromEntityFk);
                 $fkDifferences++;
             }
         }
 
         foreach ($toEntityFks as $toEntityFk) {
             if (!$toEntityFk->isSkipSql() && !in_array($toEntityFk, $fromEntityFks)) {
-                $this->tableDiff->addAddedFk($toEntityFk->getName(), $toEntityFk);
+                $this->tableDiff->getAddedFks()->set($toEntityFk->getName(), $toEntityFk);
                 $fkDifferences++;
             }
         }

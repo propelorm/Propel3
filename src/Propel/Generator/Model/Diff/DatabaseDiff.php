@@ -8,10 +8,12 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Model\Diff;
 
-use Propel\Generator\Model\IdMethod;
-use Propel\Generator\Model\Entity;
+use phootwork\collection\Map;
+use Propel\Generator\Model\Model;
 
 /**
  * Value object for storing Database object diffs
@@ -20,244 +22,120 @@ use Propel\Generator\Model\Entity;
  */
 class DatabaseDiff
 {
+    /** @var Map */
     protected $addedEntities;
+
+    /** @var Map */
     protected $removedEntities;
+
+    /** @var Map */
     protected $modifiedEntities;
+
+    /** @var Map  */
     protected $renamedEntities;
+
+    /** @var Map  */
     protected $possibleRenamedEntities;
 
     public function __construct()
     {
-        $this->addedEntities    = [];
-        $this->removedEntities  = [];
-        $this->modifiedEntities = [];
-        $this->renamedEntities  = [];
-        $this->possibleRenamedEntities  = [];
+        $this->addedEntities    = new Map();
+        $this->removedEntities  = new Map();
+        $this->modifiedEntities = new Map();
+        $this->renamedEntities  = new Map();
+        $this->possibleRenamedEntities  = new Map();
     }
 
     /**
-     * Sets the added tables.
-     *
-     * @param array $tables
+     * @return Map
      */
-    public function setAddedEntities($tables)
-    {
-        $this->addedEntities = $tables;
-    }
-
-    /**
-     * Adds an added table.
-     *
-     * @param string $name
-     * @param Entity  $table
-     */
-    public function addAddedEntity($name, Entity $table)
-    {
-        $this->addedEntities[$name] = $table;
-    }
-
-    /**
-     * Removes an added table.
-     *
-     * @param string $name
-     */
-    public function removeAddedEntity($name)
-    {
-        unset($this->addedEntities[$name]);
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getPossibleRenamedEntities()
+    public function getPossibleRenamedEntities(): Map
     {
         return $this->possibleRenamedEntities;
     }
 
     /**
-     * Adds a possible renamed table.
-     *
-     * @param string $fromName
-     * @param string $toName
-     */
-    public function addPossibleRenamedEntity($fromName, $toName)
-    {
-        $this->possibleRenamedEntities[$fromName] = $toName;
-    }
-
-    /**
      * Returns the list of added tables.
      *
-     * @return Entity[]
+     * @return Map
      */
-    public function getAddedEntities()
+    public function getAddedEntities(): Map
     {
         return $this->addedEntities;
     }
 
     /**
-     * Returns the number of added tables.
+     * Set the addedEntities collection: all data will be overridden.
      *
-     * @return integer
+     * @param Map $tables
      */
-    public function countAddedEntities()
+    public function setAddedEntities(Map $tables)
     {
-        return count($this->addedEntities);
-    }
-
-    /**
-     * Returns an added table by its name.
-     *
-     * @param string $name
-     * @param Entity
-     */
-    public function getAddedEntity($name)
-    {
-        return $this->addedEntities[$name];
-    }
-
-    /**
-     * Sets the removes tables.
-     *
-     * @param array $tables
-     */
-    public function setRemovedEntities($tables)
-    {
-        $this->removedEntities = $tables;
-    }
-
-    /**
-     * Adds a table to remove.
-     *
-     * @param string $name
-     * @param Entity  $table
-     */
-    public function addRemovedEntity($name, Entity $table)
-    {
-        $this->removedEntities[$name] = $table;
-    }
-
-    /**
-     * Removes a removed table.
-     *
-     * @param string $name
-     */
-    public function removeRemovedEntity($name)
-    {
-        unset($this->removedEntities[$name]);
+        $this->addedEntities->clear();
+        $this->addedEntities->setAll($tables);
     }
 
     /**
      * Returns the list of removed tables.
      *
-     * @return Entity[]
+     * @return Map
      */
-    public function getRemovedEntities()
+    public function getRemovedEntities(): Map
     {
         return $this->removedEntities;
     }
 
     /**
-     * Returns the number of removed tables.
+     * Set the removedEntities collection: all data will be overridden.
      *
-     * @return integer
+     * @param Map $tables
      */
-    public function countRemovedEntities()
+    public function setRemovedEntities(Map $tables)
     {
-        return count($this->removedEntities);
-    }
-
-    /**
-     * Returns a removed table.
-     *
-     * @param string $name
-     * @param Entity
-     */
-    public function getRemovedEntity($name)
-    {
-        return $this->removedEntities[$name];
-    }
-
-    /**
-     * Sets the modified tables
-     *
-     * @param array $tables
-     */
-    public function setModifiedEntities($tables)
-    {
-        $this->modifiedEntities = $tables;
-    }
-
-    /**
-     * Adds a table difference.
-     *
-     * @param string    $name
-     * @param EntityDiff $difference
-     */
-    public function addModifiedEntity($name, EntityDiff $difference)
-    {
-        $this->modifiedEntities[$name] = $difference;
-    }
-
-    /**
-     * Returns the number of modified tables.
-     *
-     * @return integer
-     */
-    public function countModifiedEntities()
-    {
-        return count($this->modifiedEntities);
+        $this->removedEntities->clear();
+        $this->removedEntities->setAll($tables);
     }
 
     /**
      * Returns the modified tables.
      *
-     * @return EntityDiff[]
+     * @return Map
      */
-    public function getModifiedEntities()
+    public function getModifiedEntities(): Map
     {
         return $this->modifiedEntities;
     }
 
     /**
-     * Sets the renamed tables.
+     * Set the modifiedEntities collection: all data will be overridden.
      *
-     * @param array $tables
+     * @param Map $tables
      */
-    public function setRenamedEntities($tables)
+    public function setModifiedEntities(Map $tables)
     {
-        $this->renamedEntities = $tables;
-    }
-
-    /**
-     * Adds a renamed table.
-     *
-     * @param string $fromName
-     * @param string $toName
-     */
-    public function addRenamedEntity($fromName, $toName)
-    {
-        $this->renamedEntities[$fromName] = $toName;
+        $this->modifiedEntities->clear();
+        $this->modifiedEntities->setAll($tables);
     }
 
     /**
      * Returns the list of renamed tables.
      *
-     * @return array
+     * @return Map
      */
-    public function getRenamedEntities()
+    public function getRenamedEntities(): Map
     {
         return $this->renamedEntities;
     }
 
     /**
-     * Returns the number of renamed tables.
+     * Set the renamedEntities collection: all data will be overridden.
      *
-     * @return integer
+     * @param Map $table
      */
-    public function countRenamedEntities()
+    public function setRenamedEntities(Map $table)
     {
-        return count($this->renamedEntities);
+        $this->renamedEntities->clear();
+        $this->renamedEntities->setAll($table);
     }
 
     /**
@@ -265,22 +143,22 @@ class DatabaseDiff
      *
      * @return DatabaseDiff
      */
-    public function getReverseDiff()
+    public function getReverseDiff(): DatabaseDiff
     {
         $diff = new self();
         $diff->setAddedEntities($this->getRemovedEntities());
         // idMethod is not set for tables build from reverse engineering
         // FIXME: this should be handled by reverse classes
         foreach ($diff->getAddedEntities() as $table) {
-            if ($table->getIdMethod() == IdMethod::NO_ID_METHOD) {
-                $table->setIdMethod(IdMethod::NATIVE);
+            if ($table->getIdMethod() == Model::ID_METHOD_NONE) {
+                $table->setIdMethod(Model::ID_METHOD_NATIVE);
             }
         }
         $diff->setRemovedEntities($this->getAddedEntities());
-        $diff->setRenamedEntities(array_flip($this->getRenamedEntities()));
-        $tableDiffs = [];
+        $diff->setRenamedEntities(new Map(array_flip($this->getRenamedEntities()->toArray())));
+        $tableDiffs = new Map();
         foreach ($this->getModifiedEntities() as $name => $tableDiff) {
-            $tableDiffs[$name] = $tableDiff->getReverseDiff();
+            $tableDiffs->set($name, $tableDiff->getReverseDiff());
         }
         $diff->setModifiedEntities($tableDiffs);
 
@@ -292,19 +170,19 @@ class DatabaseDiff
      *
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         $changes = [];
-        if ($count = $this->countAddedEntities()) {
+        if ($count = $this->getAddedEntities()->size()) {
             $changes[] = sprintf('%d added tables', $count);
         }
-        if ($count = $this->countRemovedEntities()) {
+        if ($count = $this->getRemovedEntities()->size()) {
             $changes[] = sprintf('%d removed tables', $count);
         }
-        if ($count = $this->countModifiedEntities()) {
+        if ($count = $this->getModifiedEntities()->size()) {
             $changes[] = sprintf('%d modified tables', $count);
         }
-        if ($count = $this->countRenamedEntities()) {
+        if ($count = $this->getRenamedEntities()->size()) {
             $changes[] = sprintf('%d renamed tables', $count);
         }
 

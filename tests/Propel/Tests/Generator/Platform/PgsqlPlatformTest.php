@@ -37,7 +37,7 @@ class PgsqlPlatformTest extends PlatformTestProvider
     public function testGetSequenceNameDefault()
     {
         $table = new Entity('foo');
-        $table->setIdMethod(IdMethod::NATIVE);
+        $table->setIdMethod(Model::ID_METHOD_NATIVE);
         $col = new Field('bar');
         $col->getDomain()->copy($this->getPlatform()->getDomainForType('INTEGER'));
         $col->setAutoIncrement(true);
@@ -49,11 +49,11 @@ class PgsqlPlatformTest extends PlatformTestProvider
     public function testGetSequenceNameCustom()
     {
         $table = new Entity('foo');
-        $table->setIdMethod(IdMethod::NATIVE);
+        $table->setIdMethod(Model::ID_METHOD_NATIVE);
         $idMethodParameter = new IdMethodParameter();
         $idMethodParameter->setValue('foo_sequence');
         $table->addIdMethodParameter($idMethodParameter);
-        $table->setIdMethod(IdMethod::NATIVE);
+        $table->setIdMethod(Model::ID_METHOD_NATIVE);
         $col = new Field('bar');
         $col->getDomain()->copy($this->getPlatform()->getDomainForType('INTEGER'));
         $col->setAutoIncrement(true);
@@ -483,7 +483,7 @@ EOF;
         $idMethodParameter = new IdMethodParameter();
         $idMethodParameter->setValue('foo_sequence');
         $table->addIdMethodParameter($idMethodParameter);
-        $table->setIdMethod(IdMethod::NATIVE);
+        $table->setIdMethod(Model::ID_METHOD_NATIVE);
         $expected = '
 DROP TABLE IF EXISTS "foo" CASCADE;
 
@@ -509,7 +509,7 @@ DROP SEQUENCE "foo_sequence";
         $database = new Database();
         $database->setPlatform($this->getPlatform());
         $table = new Entity('foo_table');
-        $table->setIdMethod(IdMethod::NATIVE);
+        $table->setIdMethod(Model::ID_METHOD_NATIVE);
         $database->addEntity($table);
         $column = new Field('foo');
         $column->getDomain()->copy($this->getPlatform()->getDomainForType(PropelTypes::BIGINT));

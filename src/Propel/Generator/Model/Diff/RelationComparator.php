@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Model\Diff;
 
 use Propel\Generator\Model\Relation;
@@ -26,45 +28,50 @@ class RelationComparator
      * @param Relation $fromFk
      * @param Relation $toFk
      *
-     * @param boolean $caseInsensitive Whether the comparison is case insensitive.
-     *                                 False by default.
-     *
      * @return boolean false if the two fks are similar, true if they have differences
      */
-    public static function computeDiff(Relation $fromFk, Relation $toFk, $caseInsensitive = false)
+    public static function computeDiff(Relation $fromFk, Relation $toFk): bool
     {
-        // Check for differences in local and remote table
-        $test = $caseInsensitive ?
-            strtolower($fromFk->getEntityName()) !== strtolower($toFk->getEntityName()) :
-            $fromFk->getEntityName() !== $toFk->getEntityName()
-        ;
-
-        if ($test) {
+        if ($fromFk->getEntityName() !== $toFk->getEntityName()) {
             return true;
         }
 
-        $test = $caseInsensitive ?
-            strtolower($fromFk->getForeignEntityName()) !== strtolower($toFk->getForeignEntityName()) :
-            $fromFk->getForeignEntityName() !== $toFk->getForeignEntityName()
-        ;
-
-        if ($test) {
+        if ($fromFk->getForeignEntityName() !== $toFk->getForeignEntityName()) {
             return true;
         }
 
         // compare columns
         $fromFkLocalFields = $fromFk->getLocalFields();
-        sort($fromFkLocalFields);
+        $fromFkLocalFields = $fromFkLocalFields->sort();
         $toFkLocalFields = $toFk->getLocalFields();
-        sort($toFkLocalFields);
-        if (array_map('strtolower', $fromFkLocalFields) !== array_map('strtolower', $toFkLocalFields)) {
+        $toFkLocalFields = $toFkLocalFields->sort();
+        //Why case insensitive comparison?
+        $fromFkLocalFields = $fromFkLocalFields->map(function(string $element){
+            return strtolower($element);
+        });
+        $toFkLocalFields = $toFkLocalFields->map(function(string $element){
+            return strtolower($element);
+        });
+
+        if ($fromFkLocalFields != $toFkLocalFields) {
             return true;
         }
+
         $fromFkForeignFields = $fromFk->getForeignFields();
-        sort($fromFkForeignFields);
+        $fromFkForeignFields = $fromFkForeignFields->sort();
         $toFkForeignFields = $toFk->getForeignFields();
-        sort($toFkForeignFields);
-        if (array_map('strtolower', $fromFkForeignFields) !== array_map('strtolower', $toFkForeignFields)) {
+        $toFkForeignFields = $toFkForeignFields->sort();
+        //Why case insensitive comparison?
+        $fromFkForeignFields = $fromFkForeignFields->map(function(string $element){
+            return strtolower($element);
+        });
+        $toFkForeignFields = $toFkForeignFields->map(function(string $element){
+            return strtolower($element);
+        });
+
+
+
+        if ($fromFkForeignFields != $toFkForeignFields) {
             return true;
         }
 

@@ -23,14 +23,10 @@ class UniqueTest extends ModelTestCase
      * @dataProvider provideEntitySpecificAttributes
      *
      */
-    public function testCreateDefaultUniqueIndexName($entityName, $maxColumnNameLength, $indexName)
+    public function testCreateDefaultUniqueIndexName($entityName, $maxFieldNameLength, $indexName)
     {
-        $database = $this->getDatabaseMock('bookstore');
-        $database
-            ->expects($this->any())
-            ->method('getMaxFieldNameLength')
-            ->will($this->returnValue($maxColumnNameLength))
-        ;
+        $platform = $this->getPlatformMock(true, ['max_field_name_length' => $maxFieldNameLength]);
+        $database = $this->getDatabaseMock('bookstore', ['platform' => $platform]);
 
         $entity = $this->getEntityMock($entityName, [
             'name' => $entityName,
@@ -48,7 +44,7 @@ class UniqueTest extends ModelTestCase
     public function provideEntitySpecificAttributes()
     {
         return [
-            [ 'books', 64, 'books_u_no_columns' ],
+            [ 'books', 64, 'books_u_no_fields' ],
             [ 'super_long_entity_name', 17, 'super_long_entity' ],
         ];
     }

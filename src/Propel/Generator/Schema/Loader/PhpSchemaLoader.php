@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Schema\Loader;
 
-use phootwork\lang\Text;
+use phootwork\file\File;
 use Propel\Generator\Schema\Exception\InputOutputException;
 use Propel\Generator\Schema\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Loader\FileLoader;
@@ -75,11 +75,9 @@ class PhpSchemaLoader extends FileLoader
      */
     public function supports($resource, $type = null): bool
     {
-        if (!is_string($resource)) {
-            return false;
-        }
-        $text = new Text($resource);
+        $file = new File($resource);
+        $extension = $file->getExtension();
 
-        return $text->endsWith('.php');
+        return ('php' === $extension) || ('inc') === $extension;
     }
 }

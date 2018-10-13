@@ -38,12 +38,8 @@ class IndexTest extends ModelTestCase
      */
     public function testCreateDefaultIndexName($tableName, $maxFieldNameLength, $indexName)
     {
-        $database = $this->getDatabaseMock('bookstore');
-        $database
-            ->expects($this->any())
-            ->method('getMaxFieldNameLength')
-            ->will($this->returnValue($maxFieldNameLength))
-        ;
+        $platform = $this->getPlatformMock(true, ['max_field_name_length' => $maxFieldNameLength]);
+        $database = $this->getDatabaseMock('bookstore', ['platform' => $platform]);
 
         $table = $this->getEntityMock($tableName, [
             'common_name' => $tableName,

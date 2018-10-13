@@ -35,7 +35,7 @@ class MssqlPlatformTest extends PlatformTestProvider
     public function testGetSequenceNameDefault()
     {
         $table = new Entity('foo');
-        $table->setIdMethod(IdMethod::NATIVE);
+        $table->setIdMethod(Model::ID_METHOD_NATIVE);
         $expected = 'foo_SEQ';
         $this->assertEquals($expected, $this->getPlatform()->getSequenceName($table));
     }
@@ -43,11 +43,11 @@ class MssqlPlatformTest extends PlatformTestProvider
     public function testGetSequenceNameCustom()
     {
         $table = new Entity('foo');
-        $table->setIdMethod(IdMethod::NATIVE);
+        $table->setIdMethod(Model::ID_METHOD_NATIVE);
         $idMethodParameter = new IdMethodParameter();
         $idMethodParameter->setValue('foo_sequence');
         $table->addIdMethodParameter($idMethodParameter);
-        $table->setIdMethod(IdMethod::NATIVE);
+        $table->setIdMethod(Model::ID_METHOD_NATIVE);
         $expected = 'foo_sequence';
         $this->assertEquals($expected, $this->getPlatform()->getSequenceName($table));
     }

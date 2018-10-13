@@ -15,6 +15,7 @@ use Propel\Generator\Model\FieldDefaultValue;
 use Propel\Generator\Model\IdMethod;
 use Propel\Generator\Model\IdMethodParameter;
 use Propel\Generator\Model\Entity;
+use Propel\Generator\Model\Model;
 use Propel\Generator\Platform\OraclePlatform;
 
 /**
@@ -35,7 +36,7 @@ class OraclePlatformTest extends PlatformTestProvider
     public function testGetSequenceNameDefault()
     {
         $entity = new Entity('foo');
-        $entity->setIdMethod(IdMethod::NATIVE);
+        $entity->setIdMethod(Model::ID_METHOD_NATIVE);
         $expected = 'foo_SEQ';
         $this->assertEquals($expected, $this->getPlatform()->getSequenceName($entity));
     }
@@ -43,11 +44,11 @@ class OraclePlatformTest extends PlatformTestProvider
     public function testGetSequenceNameCustom()
     {
         $entity = new Entity('foo');
-        $entity->setIdMethod(IdMethod::NATIVE);
+        $entity->setIdMethod(Model::ID_METHOD_NATIVE);
         $idMethodParameter = new IdMethodParameter();
         $idMethodParameter->setValue('foo_sequence');
         $entity->addIdMethodParameter($idMethodParameter);
-        $entity->setIdMethod(IdMethod::NATIVE);
+        $entity->setIdMethod(Model::ID_METHOD_NATIVE);
         $expected = 'foo_sequence';
         $this->assertEquals($expected, $this->getPlatform()->getSequenceName($entity));
     }
@@ -207,7 +208,7 @@ DROP TABLE foo CASCADE CONSTRAINTS;
         $idMethodParameter = new IdMethodParameter();
         $idMethodParameter->setValue('foo_sequence');
         $entity->addIdMethodParameter($idMethodParameter);
-        $entity->setIdMethod(IdMethod::NATIVE);
+        $entity->setIdMethod(Model::ID_METHOD_NATIVE);
         $expected = "
 DROP TABLE foo CASCADE CONSTRAINTS;
 

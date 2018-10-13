@@ -39,18 +39,4 @@ class InheritanceTest extends TestCase
         $this->assertSame('baz', $inheritance->getKey());
         $this->assertSame('Foo\Bar', $inheritance->getClassName());
     }
-
-    public function testSetupObject()
-    {
-        $inheritance = new Inheritance();
-        $inheritance->loadMapping([
-            'key' => 'baz',
-            'extends' => 'BaseObject',
-            'class' => 'Foo\Bar'
-        ]);
-
-        $this->assertSame('BaseObject', $inheritance->getAncestor());
-        $this->assertSame('baz', $inheritance->getKey());
-        $this->assertSame('Foo\Bar', $inheritance->getClassName());
-    }
 }

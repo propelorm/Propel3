@@ -205,7 +205,7 @@ class BehaviorManager
      */
     private function getCoreBehavior($name)
     {
-        $phpName = NamingTool::toUpperCamelCase($name);
+        $phpName = NamingTool::toStudlyCase($name);
         
         return sprintf('\\Propel\\Generator\\Behavior\\%s\\%sBehavior', $phpName, $phpName);
     }

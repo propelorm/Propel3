@@ -8,8 +8,13 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Model\Diff;
 
+use phootwork\collection\Map;
+use phootwork\collection\Set;
+use phootwork\json\Json;
 use Propel\Generator\Exception\DiffException;
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\Relation;
@@ -38,93 +43,133 @@ class EntityDiff
     protected $toEntity;
 
     /**
-     * The list of added columns.
+     * The list of added fields.
      *
-     * @var array
+     * Map format:
+     *  key   => The name of added field
+     *  value => The added Field object
+     *
+     * @var Map
      */
     protected $addedFields;
 
     /**
-     * The list of removed columns.
+     * The list of removed fields.
      *
-     * @var array
+     * Map format:
+     *  key  => The name of the removed field
+     *  value => The removed Field object
+     *
+     * @var Map
      */
     protected $removedFields;
 
     /**
-     * The list of modified columns.
+     * The list of modified fields.
      *
-     * @var array
+     * Map format:
+     *  key   => The name of modified field
+     *  value => The FieldDiff object, mapping the modification
+     *
+     * @var Map
      */
     protected $modifiedFields;
 
     /**
-     * The list of renamed columns.
+     * The list of renamed fields.
      *
-     * @var array
+     * Map format:
+     *  key   => The name of the field
+     *  value => Array of Field objects [$fromField, $toField]
+     *
+     * @var Map
      */
     protected $renamedFields;
 
     /**
      * The list of added primary key columns.
      *
-     * @var array
+     * @var Map
      */
     protected $addedPkFields;
 
     /**
      * The list of removed primary key columns.
      *
-     * @var array
+     * @var Map
      */
     protected $removedPkFields;
 
     /**
      * The list of renamed primary key columns.
      *
-     * @var array
+     * @var Map
      */
     protected $renamedPkFields;
 
     /**
      * The list of added indices.
      *
-     * @var array
+     * Map format:
+     *  key   => The name of the index
+     *  value => The Index object
+     *
+     * @var Map
      */
     protected $addedIndices;
 
     /**
      * The list of removed indices.
      *
-     * @var array
+     * Map format:
+     *  key   => The name of the index
+     *  value => The Index object
+     *
+     * @var Map
      */
     protected $removedIndices;
 
     /**
      * The list of modified indices.
      *
-     * @var array
+     * Map format:
+     *  key   => The name of the modified index
+     *  value => array of Index objects [$fromIndex, $toIndex]
+     *
+     * @var Map
      */
     protected $modifiedIndices;
 
     /**
-     * The list of added foreign keys.
+     * The list of added relations.
      *
-     * @var array
+     * Map format:
+     *  key   => The name of added relation
+     *  value => The Relation object
+     *
+     * @var Map
      */
     protected $addedFks;
 
     /**
      * The list of removed foreign keys.
      *
-     * @var array
+     * Map format:
+     *  key   => The name of added relation
+     *  value => The Relation object
+     *
+     * @var Map
      */
     protected $removedFks;
 
     /**
      * The list of modified columns.
      *
-     * @var array
+     * Map format:
+     *  key   => The name of the modified relation
+     *  value => array of Relation objects [$fromRelation, $toRelation]
+     *
+     * @var Map
      */
     protected $modifiedFks;
 
@@ -144,19 +189,19 @@ class EntityDiff
             $this->setToEntity($toEntity);
         }
 
-        $this->addedFields     = [];
-        $this->removedFields   = [];
-        $this->modifiedFields  = [];
-        $this->renamedFields   = [];
-        $this->addedPkFields   = [];
-        $this->removedPkFields = [];
-        $this->renamedPkFields = [];
-        $this->addedIndices     = [];
-        $this->modifiedIndices  = [];
-        $this->removedIndices   = [];
-        $this->addedFks         = [];
-        $this->modifiedFks      = [];
-        $this->removedFks       = [];
+        $this->addedFields     = new Map();
+        $this->removedFields   = new Map();
+        $this->modifiedFields  = new Map();
+        $this->renamedFields   = new Map();
+        $this->addedPkFields   = new Map();
+        $this->removedPkFields = new Map();
+        $this->renamedPkFields = new Map();
+        $this->addedIndices     = new Map();
+        $this->modifiedIndices  = new Map();
+        $this->removedIndices   = new Map();
+        $this->addedFks         = new Map();
+        $this->modifiedFks      = new Map();
+        $this->removedFks       = new Map();
     }
 
     /**
@@ -164,7 +209,7 @@ class EntityDiff
      *
      * @param Entity $fromEntity
      */
-    public function setFromEntity(Entity $fromEntity)
+    public function setFromEntity(Entity $fromEntity): void
     {
         $this->fromEntity = $fromEntity;
     }
@@ -174,7 +219,7 @@ class EntityDiff
      *
      * @return Entity
      */
-    public function getFromEntity()
+    public function getFromEntity(): Entity
     {
         return $this->fromEntity;
     }
@@ -194,7 +239,7 @@ class EntityDiff
      *
      * @return Entity
      */
-    public function getToEntity()
+    public function getToEntity(): Entity
     {
         return $this->toEntity;
     }
@@ -202,150 +247,62 @@ class EntityDiff
     /**
      * Sets the added columns.
      *
-     * @param Field[] $columns
+     * @param Map $columns
      */
-    public function setAddedFields(array $columns)
+    public function setAddedFields(Map $columns): void
     {
-        $this->addedFields = [];
-        foreach ($columns as $column) {
-            $this->addAddedField($column->getName(), $column);
-        }
-    }
-
-    /**
-     * Adds an added column.
-     *
-     * @param string $name
-     * @param Field $column
-     */
-    public function addAddedField($name, Field $column)
-    {
-        $this->addedFields[$name] = $column;
-    }
-
-    /**
-     * Removes an added column.
-     *
-     * @param string $columnName
-     */
-    public function removeAddedField($columnName)
-    {
-        if (isset($this->addedFields[$columnName])) {
-            unset($this->addedFields[$columnName]);
-        }
+        $this->addedFields->clear();
+        $this->addedFields->setAll($columns);
     }
 
     /**
      * Returns the list of added columns
      *
-     * @return Field[]
+     * @return Map
      */
-    public function getAddedFields()
+    public function getAddedFields(): Map
     {
         return $this->addedFields;
     }
 
     /**
-     * Returns an added column by its name.
-     *
-     * @param  string      $columnName
-     * @return Field|null
-     */
-    public function getAddedField($columnName)
-    {
-        if (isset($this->addedFields[$columnName])) {
-            return $this->addedFields[$columnName];
-        }
-    }
-
-    /**
      * Setter for the removedFields property
      *
-     * @param Field[] $removedFields
+     * @param Map $removedFields
      */
-    public function setRemovedFields(array $removedFields)
+    public function setRemovedFields(Map $removedFields): void
     {
-        $this->removedFields = [];
-        foreach ($removedFields as $removedField) {
-            $this->addRemovedField($removedField->getName(), $removedField);
-        }
-    }
-
-    /**
-     * Adds a removed column.
-     *
-     * @param string $columnName
-     * @param Field $removedField
-     */
-    public function addRemovedField($columnName, Field $removedField)
-    {
-        $this->removedFields[$columnName] = $removedField;
-    }
-
-    /**
-     * Removes a removed column.
-     *
-     * @param string $columnName
-     */
-    public function removeRemovedField($columnName)
-    {
-        unset($this->removedFields[$columnName]);
+        $this->removedFields->clear();
+        $this->removedFields->setAll($removedFields);
     }
 
     /**
      * Getter for the removedFields property.
      *
-     * @return Field[]
+     * @return Map
      */
-    public function getRemovedFields()
+    public function getRemovedFields(): Map
     {
         return $this->removedFields;
     }
 
     /**
-     * Get a removed column
-     *
-     * @param string $columnName
-     *
-     * @param Field
-     */
-    public function getRemovedField($columnName)
-    {
-        if (isset($this->removedFields[$columnName])) {
-            return $this->removedFields[$columnName];
-        }
-    }
-
-    /**
      * Sets the list of modified columns.
      *
-     * @param FieldDiff[] $modifiedFields An associative array of FieldDiff objects
+     * @param Map $modifiedFields An associative array of FieldDiff objects
      */
-    public function setModifiedFields(array $modifiedFields)
+    public function setModifiedFields(Map $modifiedFields): void
     {
-        $this->modifiedFields = [];
-        foreach ($modifiedFields as $columnName => $modifiedField) {
-            $this->addModifiedField($columnName, $modifiedField);
-        }
-    }
-
-    /**
-     * Add a column difference
-     *
-     * @param string     $columnName
-     * @param FieldDiff $modifiedField
-     */
-    public function addModifiedField($columnName, FieldDiff $modifiedField)
-    {
-        $this->modifiedFields[$columnName] = $modifiedField;
+        $this->modifiedFields->clear();
+        $this->modifiedFields->setAll($modifiedFields);
     }
 
     /**
      * Getter for the modifiedFields property
      *
-     * @return FieldDiff[]
+     * @return Map
      */
-    public function getModifiedFields()
+    public function getModifiedFields(): Map
     {
         return $this->modifiedFields;
     }
@@ -353,34 +310,20 @@ class EntityDiff
     /**
      * Sets the list of renamed columns.
      *
-     * @param array $renamedFields
+     * @param Map $renamedFields
      */
-    public function setRenamedFields(array $renamedFields)
+    public function setRenamedFields(Map $renamedFields): void
     {
-        $this->renamedFields = [];
-        foreach ($renamedFields as $columns) {
-            list($fromField, $toField) = $columns;
-            $this->addRenamedField($fromField, $toField);
-        }
-    }
-
-    /**
-     * Add a renamed column
-     *
-     * @param Field $fromField
-     * @param Field $toField
-     */
-    public function addRenamedField(Field $fromField, Field $toField)
-    {
-        $this->renamedFields[] = [ $fromField, $toField ];
+        $this->renamedFields->clear();
+        $this->renamedFields->setAll($renamedFields);
     }
 
     /**
      * Getter for the renamedFields property
      *
-     * @return array
+     * @return Map
      */
-    public function getRenamedFields()
+    public function getRenamedFields(): Map
     {
         return $this->renamedFields;
     }
@@ -388,49 +331,20 @@ class EntityDiff
     /**
      * Sets the list of added primary key columns.
      *
-     * @param Field[] $addedPkFields
+     * @param Map $addedPkFields
      */
-    public function setAddedPkFields(array $addedPkFields)
+    public function setAddedPkFields(Map $addedPkFields)
     {
-        $this->addedPkFields = [];
-        foreach ($addedPkFields as $addedPkField) {
-            $this->addAddedPkField($addedPkField->getName(), $addedPkField);
-        }
-    }
-
-    /**
-     * Add an added Pk column
-     *
-     * @param string $columnName
-     * @param Field $addedPkField
-     */
-    public function addAddedPkField($columnName, Field $addedPkField)
-    {
-        if (!$addedPkField->isPrimaryKey()) {
-            throw new DiffException(sprintf('Field %s is not a valid primary key column.', $columnName));
-        }
-
-        $this->addedPkFields[$columnName] = $addedPkField;
-    }
-
-    /**
-     * Removes an added primary key column.
-     *
-     * @param string $columnName
-     */
-    public function removeAddedPkField($columnName)
-    {
-        if (isset($this->addedPkFields[$columnName])) {
-            unset($this->addedPkFields[$columnName]);
-        }
+        $this->addedPkFields->clear();
+        $this->addedPkFields->setAll($addedPkFields);
     }
 
     /**
      * Getter for the addedPkFields property
      *
-     * @return array
+     * @return Map
      */
-    public function getAddedPkFields()
+    public function getAddedPkFields(): Map
     {
         return $this->addedPkFields;
     }
@@ -438,45 +352,20 @@ class EntityDiff
     /**
      * Sets the list of removed primary key columns.
      *
-     * @param Field[] $removedPkFields
+     * @param Map $removedPkFields
      */
-    public function setRemovedPkFields(array $removedPkFields)
+    public function setRemovedPkFields(Map $removedPkFields): void
     {
-        $this->removedPkFields = [];
-        foreach ($removedPkFields as $removedPkField) {
-            $this->addRemovedPkField($removedPkField->getName(), $removedPkField);
-        }
-    }
-
-    /**
-     * Add a removed Pk column
-     *
-     * @param string $columnName
-     * @param Field $removedField
-     */
-    public function addRemovedPkField($columnName, Field $removedPkField)
-    {
-        $this->removedPkFields[$columnName] = $removedPkField;
-    }
-
-    /**
-     * Removes a removed primary key column.
-     *
-     * @param string $columnName
-     */
-    public function removeRemovedPkField($columnName)
-    {
-        if (isset($this->removedPkFields[$columnName])) {
-            unset($this->removedPkFields[$columnName]);
-        }
+        $this->removedPkFields->clear();
+        $this->removedPkFields->setAll($removedPkFields);
     }
 
     /**
      * Getter for the removedPkFields property
      *
-     * @return array
+     * @return Map
      */
-    public function getRemovedPkFields()
+    public function getRemovedPkFields(): Map
     {
         return $this->removedPkFields;
     }
@@ -484,34 +373,20 @@ class EntityDiff
     /**
      * Sets the list of all renamed primary key columns.
      *
-     * @param Field[] $renamedPkFields
+     * @param Map $renamedPkFields
      */
-    public function setRenamedPkFields(array $renamedPkFields)
+    public function setRenamedPkFields(Map $renamedPkFields)
     {
-        $this->renamedPkFields = [];
-        foreach ($renamedPkFields as $columns) {
-            list($fromField, $toField) = $columns;
-            $this->addRenamedPkField($fromField, $toField);
-        }
-    }
-
-    /**
-     * Adds a renamed primary key column.
-     *
-     * @param Field $fromField The original column
-     * @param Field $toField   The renamed column
-     */
-    public function addRenamedPkField(Field $fromField, Field $toField)
-    {
-        $this->renamedPkFields[] = [ $fromField, $toField ];
+        $this->renamedPkFields->clear();
+        $this->renamedPkFields->setAll($renamedPkFields);
     }
 
     /**
      * Getter for the renamedPkFields property
      *
-     * @return array
+     * @return Map
      */
-    public function getRenamedPkFields()
+    public function getRenamedPkFields(): Map
     {
         return $this->renamedPkFields;
     }
@@ -523,73 +398,51 @@ class EntityDiff
      */
     public function hasModifiedPk()
     {
-        return $this->renamedPkFields || $this->removedPkFields || $this->addedPkFields;
+        return
+            !$this->renamedPkFields->isEmpty() ||
+            !$this->removedPkFields->isEmpty() ||
+            !$this->addedPkFields->isEmpty()
+        ;
     }
 
     /**
      * Sets the list of new added indices.
      *
-     * @param Index[] $addedIndices
+     * @param Map $addedIndices
      */
-    public function setAddedIndices(array $addedIndices)
+    public function setAddedIndices(Map $addedIndices): void
     {
-        $this->addedIndices = [];
-        foreach ($addedIndices as $addedIndex) {
-            $this->addAddedIndex($addedIndex->getName(), $addedIndex);
-        }
-    }
-
-    /**
-     * Add an added index.
-     *
-     * @param string $indexName
-     * @param Index  $addedIndex
-     */
-    public function addAddedIndex($indexName, Index $addedIndex)
-    {
-        $this->addedIndices[$indexName] = $addedIndex;
+        $this->addedIndices->clear();
+        $this->addedIndices->setAll($addedIndices);
     }
 
     /**
      * Getter for the addedIndices property
      *
-     * @return Index[]
+     * @return Map
      */
-    public function getAddedIndices()
+    public function getAddedIndices(): Map
     {
         return $this->addedIndices;
     }
 
     /**
-     * Sets the list of removed indices.
+     * Set the list of removed indices.
      *
-     * @param Index[] $removedIndices
+     * @param Map $removedIndices
      */
-    public function setRemovedIndices(array $removedIndices)
+    public function setRemovedIndices(Map $removedIndices): void
     {
-        $this->removedIndices = [];
-        foreach ($removedIndices as $removedIndex) {
-            $this->addRemovedIndex($removedIndex->getName(), $removedIndex);
-        }
-    }
-
-    /**
-     * Adds a removed index.
-     *
-     * @param string $indexName
-     * @param Index  $removedIndex
-     */
-    public function addRemovedIndex($indexName, Index $removedIndex)
-    {
-        $this->removedIndices[$indexName] = $removedIndex;
+       $this->removedIndices->clear();
+       $this->removedIndices->setAll($removedIndices);
     }
 
     /**
      * Getter for the removedIndices property
      *
-     * @return Index[]
+     * @return Map
      */
-    public function getRemovedIndices()
+    public function getRemovedIndices(): Map
     {
         return $this->removedIndices;
     }
@@ -599,35 +452,20 @@ class EntityDiff
      *
      * Array must be [ [ Index $fromIndex, Index $toIndex ], [ ... ] ]
      *
-     * @param Index[] $modifiedIndices An aray of modified indices
+     * @param Map $modifiedIndices A set of modified indices
      */
-    public function setModifiedIndices(array $modifiedIndices)
+    public function setModifiedIndices(Map $modifiedIndices)
     {
-        $this->modifiedIndices = [];
-        foreach ($modifiedIndices as $indices) {
-            list($fromIndex, $toIndex) = $indices;
-            $this->addModifiedIndex($fromIndex->getName(), $fromIndex, $toIndex);
-        }
-    }
-
-    /**
-     * Add a modified index.
-     *
-     * @param string $indexName
-     * @param Index  $fromIndex
-     * @param Index  $toIndex
-     */
-    public function addModifiedIndex($indexName, Index $fromIndex, Index $toIndex)
-    {
-        $this->modifiedIndices[$indexName] = [ $fromIndex, $toIndex ];
+        $this->modifiedIndices->clear();
+        $this->modifiedIndices->setAll($modifiedIndices);
     }
 
     /**
      * Getter for the modifiedIndices property
      *
-     * @return array
+     * @return Map
      */
-    public function getModifiedIndices()
+    public function getModifiedIndices(): Map
     {
         return $this->modifiedIndices;
     }
@@ -635,45 +473,20 @@ class EntityDiff
     /**
      * Sets the list of added foreign keys.
      *
-     * @param Relation[] $addedFks
+     * @param Map $addedFks
      */
-    public function setAddedFks(array $addedFks)
+    public function setAddedFks(Map $addedFks)
     {
-        $this->addedFks = [];
-        foreach ($addedFks as $addedFk) {
-            $this->addAddedFk($addedFk->getName(), $addedFk);
-        }
-    }
-
-    /**
-     * Adds an added foreign key.
-     *
-     * @param string     $fkName
-     * @param Relation $addedFk
-     */
-    public function addAddedFk($fkName, Relation $addedFk)
-    {
-        $this->addedFks[$fkName] = $addedFk;
-    }
-
-    /**
-     * Remove an added Fk column
-     *
-     * @param string $fkName
-     */
-    public function removeAddedFk($fkName)
-    {
-        if (isset($this->addedFks[$fkName])) {
-            unset($this->addedFks[$fkName]);
-        }
+        $this->addedFks->clear();
+        $this->addedFks->setAll($addedFks);
     }
 
     /**
      * Getter for the addedFks property
      *
-     * @return Relation[]
+     * @return Map
      */
-    public function getAddedFks()
+    public function getAddedFks(): Map
     {
         return $this->addedFks;
     }
@@ -681,43 +494,20 @@ class EntityDiff
     /**
      * Sets the list of removed foreign keys.
      *
-     * @param Relation[] $removedFks
+     * @param Map $removedFks
      */
-    public function setRemovedFks(array $removedFks)
+    public function setRemovedFks(Map $removedFks)
     {
-        $this->removedFks = [];
-        foreach ($removedFks as $removedFk) {
-            $this->addRemovedFk($removedFk->getName(), $removedFk);
-        }
-    }
-
-    /**
-     * Adds a removed foreign key column.
-     *
-     * @param string     $fkName
-     * @param Relation $removedField
-     */
-    public function addRemovedFk($fkName, Relation $removedFk)
-    {
-        $this->removedFks[$fkName] = $removedFk;
-    }
-
-    /**
-     * Removes a removed foreign key.
-     *
-     * @param string $fkName
-     */
-    public function removeRemovedFk($fkName)
-    {
-        unset($this->removedFks[$fkName]);
+        $this->removedFks->clear();
+        $this->removedFks->setAll($removedFks);
     }
 
     /**
      * Returns the list of removed foreign keys.
      *
-     * @return Relation[]
+     * @return Map
      */
-    public function getRemovedFks()
+    public function getRemovedFks(): Map
     {
         return $this->removedFks;
     }
@@ -727,35 +517,20 @@ class EntityDiff
      *
      * Array must be [ [ Relation $fromFk, Relation $toFk ], [ ... ] ]
      *
-     * @param Relation[] $modifiedFks
+     * @param Map $modifiedFks
      */
-    public function setModifiedFks(array $modifiedFks)
+    public function setModifiedFks(Map $modifiedFks)
     {
-        $this->modifiedFks = [];
-        foreach ($modifiedFks as $relations) {
-            list($fromRelation, $toRelation) = $relations;
-            $this->addModifiedFk($fromRelation->getName(), $fromRelation, $toRelation);
-        }
-    }
-
-    /**
-     * Adds a modified foreign key.
-     *
-     * @param string     $fkName
-     * @param Relation $fromFk
-     * @param Relation $toFk
-     */
-    public function addModifiedFk($fkName, Relation $fromFk, Relation $toFk)
-    {
-        $this->modifiedFks[$fkName] = [ $fromFk, $toFk ];
+        $this->modifiedFks->clear();
+        $this->modifiedFks->setAll($modifiedFks);
     }
 
     /**
      * Returns the list of modified foreign keys.
      *
-     * @return array
+     * @return Map
      */
-    public function getModifiedFks()
+    public function getModifiedFks(): Map
     {
         return $this->modifiedFks;
     }
@@ -766,9 +541,9 @@ class EntityDiff
      *
      * @return boolean
      */
-    public function hasModifiedFks()
+    public function hasModifiedFks(): bool
     {
-        return !empty($this->modifiedFks);
+        return !$this->modifiedFks->isEmpty();
     }
 
     /**
@@ -777,9 +552,9 @@ class EntityDiff
      *
      * @return boolean
      */
-    public function hasModifiedIndices()
+    public function hasModifiedIndices(): bool
     {
-        return !empty($this->modifiedIndices);
+        return !$this->modifiedIndices->isEmpty();
     }
 
     /**
@@ -788,9 +563,9 @@ class EntityDiff
      *
      * @return boolean
      */
-    public function hasModifiedFields()
+    public function hasModifiedFields(): bool
     {
-        return !empty($this->modifiedFields);
+        return !$this->modifiedFields->isEmpty();
     }
 
     /**
@@ -799,9 +574,9 @@ class EntityDiff
      *
      * @return boolean
      */
-    public function hasRemovedFks()
+    public function hasRemovedFks(): bool
     {
-        return !empty($this->removedFks);
+        return !$this->removedFks->isEmpty();
     }
 
     /**
@@ -810,9 +585,9 @@ class EntityDiff
      *
      * @return boolean
      */
-    public function hasRemovedIndices()
+    public function hasRemovedIndices(): bool
     {
-        return !empty($this->removedIndices);
+        return !$this->removedIndices->isEmpty();
     }
 
     /**
@@ -821,9 +596,9 @@ class EntityDiff
      *
      * @return boolean
      */
-    public function hasRenamedFields()
+    public function hasRenamedFields(): bool
     {
-        return !empty($this->renamedFields);
+        return !$this->renamedFields->isEmpty();
     }
 
     /**
@@ -832,9 +607,9 @@ class EntityDiff
      *
      * @return boolean
      */
-    public function hasRemovedFields()
+    public function hasRemovedFields(): bool
     {
-        return !empty($this->removedFields);
+        return !$this->removedFields->isEmpty();
     }
 
     /**
@@ -843,9 +618,9 @@ class EntityDiff
      *
      * @return boolean
      */
-    public function hasAddedFields()
+    public function hasAddedFields(): bool
     {
-        return !empty($this->addedFields);
+        return !$this->addedFields->isEmpty();
     }
 
     /**
@@ -854,9 +629,9 @@ class EntityDiff
      *
      * @return boolean
      */
-    public function hasAddedIndices()
+    public function hasAddedIndices(): bool
     {
-        return !empty($this->addedIndices);
+        return !$this->addedIndices->isEmpty();
     }
 
     /**
@@ -865,9 +640,9 @@ class EntityDiff
      *
      * @return boolean
      */
-    public function hasAddedFks()
+    public function hasAddedFks(): bool
     {
-        return !empty($this->addedFks);
+        return !$this->addedFks->isEmpty();
     }
 
     /**
@@ -876,9 +651,9 @@ class EntityDiff
      *
      * @return boolean
      */
-    public function hasAddedPkFields()
+    public function hasAddedPkFields(): bool
     {
-        return !empty($this->addedPkFields);
+        return !$this->addedPkFields->isEmpty();
     }
 
     /**
@@ -887,9 +662,9 @@ class EntityDiff
      *
      * @return boolean
      */
-    public function hasRemovedPkFields()
+    public function hasRemovedPkFields(): bool
     {
-        return !empty($this->removedPkFields);
+        return !$this->removedPkFields->isEmpty();
     }
 
     /**
@@ -898,9 +673,9 @@ class EntityDiff
      *
      * @return boolean
      */
-    public function hasRenamedPkFields()
+    public function hasRenamedPkFields(): bool
     {
-        return !empty($this->renamedPkFields);
+        return !$this->renamedPkFields->isEmpty();
     }
 
     /**
@@ -908,7 +683,7 @@ class EntityDiff
      *
      * @return EntityDiff
      */
-    public function getReverseDiff()
+    public function getReverseDiff(): EntityDiff
     {
         $diff = new self();
 
@@ -928,9 +703,9 @@ class EntityDiff
         if ($this->hasRenamedFields()) {
             $renamedFields = [];
             foreach ($this->renamedFields as $columnRenaming) {
-                $renamedFields[] = array_reverse($columnRenaming);
+                $renamedFields[$columnRenaming[1]->getName()] = array_reverse($columnRenaming);
             }
-            $diff->setRenamedFields($renamedFields);
+            $diff->setRenamedFields(new Map($renamedFields));
         }
 
         if ($this->hasModifiedFields()) {
@@ -938,7 +713,7 @@ class EntityDiff
             foreach ($this->modifiedFields as $name => $columnDiff) {
                 $columnDiffs[$name] = $columnDiff->getReverseDiff();
             }
-            $diff->setModifiedFields($columnDiffs);
+            $diff->setModifiedFields(new Map($columnDiffs));
         }
 
         // pks
@@ -953,9 +728,9 @@ class EntityDiff
         if ($this->hasRenamedPkFields()) {
             $renamedPkFields = [];
             foreach ($this->renamedPkFields as $columnRenaming) {
-                $renamedPkFields[] = array_reverse($columnRenaming);
+                $renamedPkFields[$columnRenaming[1]->getName()] = array_reverse($columnRenaming);
             }
-            $diff->setRenamedPkFields($renamedPkFields);
+            $diff->setRenamedPkFields(new Map($renamedPkFields));
         }
 
         // indices
@@ -972,7 +747,7 @@ class EntityDiff
             foreach ($this->modifiedIndices as $name => $indexDiff) {
                 $indexDiffs[$name] = array_reverse($indexDiff);
             }
-            $diff->setModifiedIndices($indexDiffs);
+            $diff->setModifiedIndices(new Map($indexDiffs));
         }
 
         // fks
@@ -989,7 +764,7 @@ class EntityDiff
             foreach ($this->modifiedFks as $name => $fkDiff) {
                 $fkDiffs[$name] = array_reverse($fkDiff);
             }
-            $diff->setModifiedFks($fkDiffs);
+            $diff->setModifiedFks(new Map($fkDiffs));
         }
 
         return $diff;
@@ -1077,14 +852,19 @@ class EntityDiff
             $ret .= "    modifiedFks:\n";
             foreach ($modifiedFks as $fkName => $fkFromTo) {
                 $ret .= sprintf("      %s:\n", $fkName);
+                /**
+                 * @var Relation $fromFk
+                 * @var Relation $toFk
+                 */
                 list($fromFk, $toFk) = $fkFromTo;
-                $fromLocalFields = json_encode($fromFk->getLocalFields());
-                $toLocalFields = json_encode($toFk->getLocalFields());
+                $fromLocalFields = Json::encode($fromFk->getLocalFields()->toArray());
+                $toLocalFields = Json::encode($toFk->getLocalFields()->toArray());
+
                 if ($fromLocalFields != $toLocalFields) {
                     $ret .= sprintf("          localFields: from %s to %s\n", $fromLocalFields, $toLocalFields);
                 }
-                $fromForeignFields = json_encode($fromFk->getForeignFields());
-                $toForeignFields = json_encode($toFk->getForeignFields());
+                $fromForeignFields = Json::encode($fromFk->getForeignFields()->toArray());
+                $toForeignFields = Json::encode($toFk->getForeignFields()->toArray());
                 if ($fromForeignFields != $toForeignFields) {
                     $ret .= sprintf("          foreignFields: from %s to %s\n", $fromForeignFields, $toForeignFields);
                 }

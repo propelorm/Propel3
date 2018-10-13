@@ -13,8 +13,8 @@ namespace Propel\Generator\Schema\Dumper;
 use Propel\Generator\Model\Behavior;
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\Database;
+use Propel\Generator\Model\Model;
 use Propel\Generator\Model\Relation;
-use Propel\Generator\Model\IdMethod;
 use Propel\Generator\Model\IdMethodParameter;
 use Propel\Generator\Model\Index;
 use Propel\Generator\Model\Inheritance;
@@ -185,7 +185,7 @@ class XmlDumper implements DumperInterface
             $entityNode->setAttribute('schema', $schema);
         }
 
-        if (IdMethod::NO_ID_METHOD !== ($idMethod = $entity->getIdMethod())) {
+        if (Model::ID_METHOD_NONE !== ($idMethod = $entity->getIdMethod())) {
             $entityNode->setAttribute('idMethod', $idMethod);
         }
 
@@ -424,7 +424,7 @@ class XmlDumper implements DumperInterface
         for ($i = 0, $size = count($relation->getLocalFields()); $i < $size; $i++) {
             $refNode = $relationNode->appendChild($this->document->createElement('reference'));
             $refNode->setAttribute('local', $relation->getLocalFieldName($i));
-            $refNode->setAttribute('foreign', $relation->getForeignFieldName($i));
+            $refNode->setAttribute('foreign', $relation->getForeignFields()->get($i));
         }
 
         foreach ($relation->getVendorInformation() as $vendorInformation) {

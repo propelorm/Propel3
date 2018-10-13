@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Model;
 
-use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Parts\ActiveRecordPart;
 use Propel\Generator\Model\Parts\BehaviorPart;
@@ -29,7 +28,6 @@ use Propel\Generator\Model\Parts\SuperordinatePart;
 use Propel\Generator\Model\Parts\VendorPart;
 use Propel\Generator\Platform\PlatformInterface;
 use Propel\Runtime\Exception\RuntimeException;
-use phootwork\collection\Map;
 use phootwork\collection\Set;
 
 /**
@@ -61,7 +59,6 @@ class Entity
     use DescriptionPart;
     use FieldsPart;
 
-
     //
     // Model properties
     // ------------------------------------------------------------
@@ -85,12 +82,6 @@ class Entity
     //
     // Collections to other models
     // ------------------------------------------------------------
-
-//    /** @var Map */
-//    private $fieldsByName;
-//
-//    /** @var Map */
-//    private $fieldsByLowercaseName;
 
     /** @var Set */
     private $relations;
@@ -220,109 +211,6 @@ class Entity
         return $this->database;
     }
 
-    /**
-     * @TODO externalize !
-     * @param bool $throwErrors
-     */
-    public function finalizeDefinition($throwErrors = false)
-    {
-        $this->setupReferrers($throwErrors);
-    }
-
-    /**
-     * @TODO externalize ?
-     * Browses the foreign keys and creates referrers for the foreign entity.
-     * This method can be called several times on the same entity. It only
-     * adds the missing referrers and is non-destructive.
-     * Warning: only use when all the entitys were created.
-     *
-     * @param  bool $throwErrors
-     *
-     * @throws BuildException
-     */
-    protected function setupReferrers($throwErrors = false)
-    {
-        foreach ($this->getRelations() as $relation) {
-            $this->setupReferrer($relation, $throwErrors);
-        }
-    }
-
-    /**
-     * @TODO externalize ?
-     * @param Relation $relation
-     * @param bool     $throwErrors
-     */
-    protected function setupReferrer(Relation $relation, $throwErrors = false)
-    {
-        $entity = $relation->getEntity();
-        // entity referrers
-        $hasEntity = $entity->getDatabase()->hasEntity($relation->getForeignEntityName());
-        if (!$hasEntity) {
-            throw new BuildException(
-                sprintf(
-                    'Entity "%s" contains a relation to nonexistent entity "%s". [%s]',
-                    $entity->getName(),
-                    $relation->getForeignEntityName(),
-                    $entity->getDatabase()->getEntityNames()
-                )
-            );
-        }
-
-        $foreignEntity = $entity->getDatabase()->getEntity($relation->getForeignEntityName());
-        $referrers = $foreignEntity->getReferrers();
-        if (null === $referrers || !in_array($relation, $referrers, true)) {
-            $foreignEntity->addReferrer($relation);
-        }
-
-        // foreign pk's
-        $localFieldNames = $relation->getLocalFields();
-        foreach ($localFieldNames as $localFieldName) {
-            $localField = $entity->getField($localFieldName);
-            if (null !== $localField) {
-                if ($localField->isPrimaryKey() && !$entity->getContainsForeignPK()) {
-                    $entity->setContainsForeignPK(true);
-                }
-            } elseif ($throwErrors) {
-                // give notice of a schema inconsistency.
-                // note we do not prevent the npe as there is nothing
-                // that we can do, if it is to occur.
-                throw new BuildException(
-                    sprintf(
-                        'Entity "%s" contains a foreign key with nonexistent local field "%s"',
-                        $entity->getName(),
-                        $localFieldName
-                    )
-                );
-            }
-        }
-
-        // foreign field references
-        $foreignFields = $relation->getForeignFieldObjects();
-        foreach ($foreignFields as $foreignField) {
-            if (null === $foreignEntity) {
-                continue;
-            }
-            if (null !== $foreignField) {
-                if (!$foreignField->hasReferrer($relation)) {
-                    $foreignField->addReferrer($relation);
-                }
-            } elseif ($throwErrors) {
-                // if the foreign field does not exist, we may have an
-                // external reference or a misspelling
-                throw new BuildException(
-                    sprintf(
-                        'Entity "%s" contains a foreign key to entity "%s" with nonexistent field "%s"',
-                        $entity->getName(),
-                        $foreignEntity->getName(),
-                        $foreignField->getName()
-                    )
-                );
-            }
-        }
-    }
-
-
-
     //
     // Model properties
     // ------------------------------------------------------------
@@ -433,9 +321,9 @@ class Entity
      * Returns the field that subclasses the class representing this
      * entity can be produced from.
      *
-     * @return Field
+     * @return null|Field
      */
-    public function getChildrenField(): Field
+    public function getChildrenField(): ?Field
     {
         return $this->inheritanceField;
     }
@@ -443,7 +331,7 @@ class Entity
     /**
      * Returns the subclasses that can be created from this entity.
      *
-     * @return array
+     * @return string[] Array of subclasses  names
      */
     public function getChildrenNames(): array
     {
@@ -509,7 +397,13 @@ class Entity
      */
     public function addField(Field $field): Entity
     {
-        FieldsPart::addField($field);
+        //The field must be unique
+        if (null !== $this->getFieldByName($field->getName())) {
+            throw new EngineException(sprintf('Field "%s" declared twice in entity "%s"', $field->getName(), $this->getName()));
+        }
+
+        $field->setEntity($this);
+        $this->fields->add($field);
 
         $field->setPosition($this->fields->size());
 
@@ -594,7 +488,7 @@ class Entity
         return false;
     }
 
-//    Never user: remove?
+//    Never used: remove?
 //
 //    private function getFieldPosition(Field $field): int
 //    {
@@ -725,7 +619,7 @@ class Entity
     public function getFieldRelations(string $fieldName): array
     {
         return $this->relations->filter(function (Relation $relation) use ($fieldName) {
-            return in_array($fieldName, $relation->getLocalFields());
+            return in_array($fieldName, $relation->getLocalFields()->toArray());
         })->toArray();
     }
 
@@ -755,11 +649,11 @@ class Entity
     }
 
     /**
-     * Returns the list of entitys referenced by foreign keys in this entity.
+     * Returns the list of entities referenced by foreign keys in this entity.
      *
-     * @return array
+     * @return Set
      */
-    public function getForeignEntityNames()
+    public function getForeignEntityNames(): Set
     {
         return $this->foreignEntityNames;
     }
@@ -785,7 +679,7 @@ class Entity
      *
      * @return Relation[]
      */
-    public function getReferrers()
+    public function getReferrers(): array
     {
         return $this->referrers->toArray();
     }
@@ -829,7 +723,7 @@ class Entity
             throw new \InvalidArgumentException(sprintf('Index "%s" already exist.', $index->getName()));
         }
 
-        if (!$index->getFields()) {
+        if ($index->getFields()->size() === 0) {
             throw new \InvalidArgumentException(sprintf('Index "%s" has no fields.', $index->getName()));
         }
 
@@ -854,7 +748,7 @@ class Entity
      *
      * @return bool
      */
-    public function hasIndex($name)
+    public function hasIndex($name): bool
     {
         foreach ($this->indices as $idx) {
             if ($idx->getName() == $name) {
@@ -874,7 +768,7 @@ class Entity
     public function isIndex(array $keys): bool
     {
         foreach ($this->indices as $index) {
-            if (count($keys) === $index->fields->size()) {
+            if (count($keys) === $index->getFields()->size()) {
                 $allAvailable = true;
                 foreach ($keys as $key) {
                     if (!$index->hasField($key instanceof Field ? $key->getName() : $key)) {
@@ -1064,17 +958,9 @@ class Entity
      *
      * @return bool
      */
-    public function requiresTransactionInPostgres()
+    public function requiresTransactionInPostgres(): bool
     {
         return $this->needsTransactionInPostgres;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isHeavyIndexing(): bool
-    {
-        return $this->heavyIndexing;
     }
 
     /**
@@ -1129,7 +1015,7 @@ class Entity
     /**
      * @return bool|null
      */
-    public function getIdentifierQuoting()
+    public function getIdentifierQuoting(): ?bool
     {
         return $this->identifierQuoting;
     }
@@ -1140,7 +1026,7 @@ class Entity
      * @param bool $flag True by default
      * @return $this
      */
-    public function setReloadOnInsert(bool $flag = true)
+    public function setReloadOnInsert(bool $flag = true): Entity
     {
         $this->reloadOnInsert = $flag;
         return $this;
@@ -1165,6 +1051,8 @@ class Entity
     public function setReloadOnUpdate(bool $flag = true): Entity
     {
         $this->reloadOnUpdate = $flag;
+
+        return $this;
     }
 
     /**
@@ -1287,6 +1175,8 @@ class Entity
                 return $field;
             }
         }
+
+        return null;
     }
 
     /**
@@ -1362,13 +1252,15 @@ class Entity
      */
     public function getAutoIncrementPrimaryKey(): ?Field
     {
-        if (IdMethod::NO_ID_METHOD !== $this->getIdMethod()) {
+        if (Model::ID_METHOD_NONE !== $this->getIdMethod()) {
             foreach ($this->getPrimaryKey() as $pk) {
                 if ($pk->isAutoIncrement()) {
                     return $pk;
                 }
             }
         }
+
+        return null;
     }
 
     /**
@@ -1498,7 +1390,7 @@ class Entity
      *
      * @return bool
      */
-    public function hasAdditionalBuilders()
+    public function hasAdditionalBuilders(): bool
     {
         foreach ($this->behaviors as $behavior) {
             if ($behavior->hasAdditionalBuilders()) {
@@ -1514,7 +1406,7 @@ class Entity
      *
      * @return array
      */
-    public function getAdditionalBuilders()
+    public function getAdditionalBuilders(): array
     {
         $additionalBuilders = [];
         foreach ($this->behaviors as $behavior) {
@@ -1529,7 +1421,7 @@ class Entity
      *
      * @return Array of Behavior objects
      */
-    public function getEarlyBehaviors()
+    public function getEarlyBehaviors(): array
     {
         $behaviors = [];
         foreach ($this->behaviors as $name => $behavior) {
@@ -1556,13 +1448,13 @@ class Entity
      *
      * @return string
      */
-    public function guessSchemaName()
+    public function guessSchemaName(): string
     {
-        if (!$this->schema && $this->database) {
-            return $this->database->getSchema();
+        if (null === $this->schemaName) {
+            return $this->database->getSchema()->getName();
         }
 
-        return $this->schema;
+        return $this->schemaName;
     }
 
     /**
@@ -1570,10 +1462,10 @@ class Entity
      *
      * @return bool
      */
-    public function hasSchema()
+    public function hasSchema(): bool
     {
         return $this->database
-        && ($this->schema ?: $this->database->getSchema())
+        && ($this->database->getSchema() ?: $this->database->getSchema())
         && ($platform = $this->getPlatform())
         && $platform->supportsSchemas();
     }
@@ -1610,18 +1502,5 @@ class Entity
     {
         $this->alias = $alias;
         return $this;
-    }
-
-    /**
-     * @TODO not model related. remove? move to possible parent as helper?
-     *
-     * Returns a build property value for the database this entity belongs to.
-     *
-     * @param  string $key
-     * @return string
-     */
-    public function getBuildProperty(string $key): string
-    {
-        return $this->database ? $this->database->getBuildProperty($key) : '';
     }
 }

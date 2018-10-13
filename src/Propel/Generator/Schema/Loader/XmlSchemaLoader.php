@@ -11,8 +11,7 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Schema\Loader;
 
-use phootwork\lang\Text;
-use Propel\Generator\Schema\Exception\InputOutputException;
+use phootwork\file\File;
 use Propel\Common\Config\XmlToArrayConverter;
 use Propel\Generator\Schema\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Loader\FileLoader;
@@ -32,23 +31,16 @@ class XmlSchemaLoader extends FileLoader
      * @return array
      *
      * @throws \InvalidArgumentException                                   if schema file not found
-     * @throws \Propel\Generator\Schema\Exception\InputOutputException     if schema file is not readable
+     * @throws \phootwork\file\exception\FileException                     if schema file is not readable
      * @throws \Propel\Generator\Schema\Exception\InvalidArgumentException if invalid xml file
      */
     public function load($file, $type = null): array
     {
-        $path = $this->locator->locate($file);
-
-        if (!is_readable($path)) {
-            throw new InputOutputException("You don't have permissions to access schema file $file.");
-        }
-
-        $xmlContent = file_get_contents($path);
-
-        $content = XmlToArrayConverter::convert($this->normalize($xmlContent, $path));
+        $file = new File($this->locator->locate($file));
+        $content = XmlToArrayConverter::convert($this->normalize($file));
 
         if ([] === $content) {
-            throw new InvalidArgumentException("The schema file '$path' has invalid content.");
+            throw new InvalidArgumentException("The schema file '{$file->getPathname()}' has invalid content.");
         }
 
         return $content;
@@ -64,21 +56,26 @@ class XmlSchemaLoader extends FileLoader
      */
     public function supports($resource, $type = null): bool
     {
-        if (!is_string($resource)) {
-            return false;
-        }
-        $text = new Text($resource);
+        $file = new File($resource);
 
-        return $text->endsWith('.xml');
+        return 'xml' === $file->getExtension();
     }
 
-    private function normalize(string $xmlContent, string $path): string
+    /**
+     * Add a root tag, needed to `XmlToArrayConverter` works properly.
+     *
+     * @param File $file
+     *
+     * @return string
+     * @throws \phootwork\file\exception\FileException
+     */
+    private function normalize(File $file): string
     {
+        $xmlContent = $file->read();
         if ('' === $xmlContent || $xmlContent[0] !== '<') {
-            throw new InvalidArgumentException("The schema file '$path' has invalid content.");
+            throw new InvalidArgumentException("The schema file '{$file->getPathname()}' has invalid content.");
         }
 
         return '<propel-schema>' . substr($xmlContent, strpos($xmlContent, '<database')) . '</propel-schema>';
-
     }
 }

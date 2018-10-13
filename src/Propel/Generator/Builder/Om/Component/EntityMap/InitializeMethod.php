@@ -8,6 +8,7 @@ use Propel\Generator\Builder\Om\Component\BuildComponent;
 use Propel\Generator\Builder\Om\Component\NamingTrait;
 use Propel\Generator\Builder\Om\Component\RelationTrait;
 use Propel\Generator\Model\IdMethod;
+use Propel\Generator\Model\Model;
 use Propel\Generator\Platform\PlatformInterface;
 
 /**
@@ -52,7 +53,7 @@ class InitializeMethod extends BuildComponent
             $imp = $params[0];
             $body .= "
         \$this->setPrimaryKeyMethodInfo('" . $imp->getValue() . "');";
-        } elseif ($entity->getIdMethod() == IdMethod::NATIVE && ($platform->getNativeIdMethod(
+        } elseif ($entity->getIdMethod() == Model::ID_METHOD_NATIVE && ($platform->getNativeIdMethod(
                 ) == PlatformInterface::SEQUENCE || $platform->getNativeIdMethod() == PlatformInterface::SERIAL)
         ) {
             $body .= "
