@@ -296,8 +296,8 @@ PRAGMA foreign_keys = ON;
             $pkUniqueExist = false;
             foreach ($entity->getUnices() as $unique) {
                 $coversAllPrimaryKeys = true;
-                foreach ($unique->getFields() as $fieldName) {
-                    if (!$entity->getField($fieldName)->isPrimaryKey()) {
+                foreach ($unique->getFields() as $field) {
+                    if (!$entity->getField($field->getName())->isPrimaryKey()) {
                         $coversAllPrimaryKeys = false;
                         break;
                     }

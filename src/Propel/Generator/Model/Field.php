@@ -401,7 +401,7 @@ class Field
      */
     public function getNotNullString(): string
     {
-        return $this->getPlatform()->getNullString($this->isNotNull);
+        return $this->getPlatform()->getNotNullString();
     }
 
     /**

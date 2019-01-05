@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Behavior\Archivable;
 
 use gossi\codegen\model\PhpConstant;
@@ -115,7 +117,7 @@ class ArchivableBehavior extends Behavior
         $archiveEntity->isArchiveEntity = true;
 
         // add archived_at field
-        if ('true' === $this->getParameter('log_archived_at')) {
+        if ($this->getParameter('log_archived_at')) {
             $archiveField = $modelFactory->createField([
                 'name' => $this->getParameter('archived_at_field'),
                 'type' => 'TIMESTAMP'
@@ -137,11 +139,11 @@ class ArchivableBehavior extends Behavior
         foreach ($entity->getUnices() as $unique) {
             $index = new Index();
             $index->setEntity($entity);
-            foreach ($unique->getFields() as $fieldName) {
-                if ($size = $unique->getFieldSize($fieldName)) {
-                    $index->addField($modelFactory->createField(['name' => $fieldName, 'size' => $size]));
+            foreach ($unique->getFields() as $field) {
+                if ($size = $unique->getField($field->getName())->getSize()) {
+                    $index->addField($modelFactory->createField(['name' => $field->getName(), 'size' => $size]));
                 } else {
-                    $index->addField($modelFactory->createField(['name' => $fieldName]));
+                    $index->addField($modelFactory->createField(['name' => $field->getName()]));
                 }
             }
 
@@ -254,23 +256,23 @@ foreach(\$event->getEntities() as \$entity) {
      */
     public function getArchivedAtField()
     {
-        if ($this->getArchiveEntity() && 'true' === $this->getParameter('log_archived_at')) {
+        if ($this->getArchiveEntity() && $this->getParameter('log_archived_at')) {
             return $this->getArchiveEntity()->getField($this->getParameter('archived_at_field'));
         }
     }
 
     public function isArchiveOnInsert()
     {
-        return 'true' === $this->getParameter('archive_on_insert');
+        return $this->getParameter('archive_on_insert');
     }
 
     public function isArchiveOnUpdate()
     {
-        return 'true' === $this->getParameter('archive_on_update');
+        return $this->getParameter('archive_on_update');
     }
 
     public function isArchiveOnDelete()
     {
-        return 'true' === $this->getParameter('archive_on_delete');
+        return $this->getParameter('archive_on_delete');
     }
 }
