@@ -54,7 +54,7 @@ class CrossRelationSetterMethods extends BuildComponent
         $relation = $crossRelation->getOutgoingRelation();
 
         $relatedName = $this->getRelationPhpName($relation, true);
-        $relatedObjectClassName = $this->useClass($relation->getForeignEntity()->getFullClassName());
+        $relatedObjectClassName = $this->useClass($relation->getForeignEntity()->getFullName());
 
         $collName = $this->getCrossRelationRelationVarName($relation);
 

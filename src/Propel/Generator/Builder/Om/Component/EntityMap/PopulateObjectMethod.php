@@ -1,5 +1,14 @@
 <?php
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ *
+ */
 
+declare(strict_types=1);
 
 namespace Propel\Generator\Builder\Om\Component\EntityMap;
 
@@ -10,6 +19,7 @@ use Propel\Generator\Builder\Om\Component\BuildComponent;
 use Propel\Generator\Builder\Om\Component\NamingTrait;
 use Propel\Generator\Builder\Om\Component\RelationTrait;
 use Propel\Generator\Model\Field;
+use Propel\Generator\Model\NamingTool;
 
 /**
  * Adds populateObject method.
@@ -25,11 +35,12 @@ class PopulateObjectMethod extends BuildComponent
     {
         $this->getDefinition()->declareUse('Propel\Runtime\Map\EntityMap');
 
-        $fields = array_filter($this->getEntity()->getFields(), function ($field) {
+        $fields = $this->getEntity()->getFields();
+        $fields->filter(function(Field $field) {
             return !$field->isLazyLoad();
         });
 
-        $fieldCount = count($fields);
+        $fieldCount = $fields->size();
 
         $body = "
 ";
@@ -49,7 +60,7 @@ class PopulateObjectMethod extends BuildComponent
 
             $fieldNames[$idx] = $field->getName();
             $fieldTypes[$idx] = $field->getType();
-            $camelNames[$idx] = $field->getCamelCaseName();
+            $camelNames[$idx] = NamingTool::toCamelCase($field->getName());
             $columnNames[$idx] = $field->getColumnName();
             $fullColumnNames[$idx] = $field->getEntity()->getName(). '.' .$field->getColumnName();
         }
@@ -105,7 +116,7 @@ if (EntityMap::TYPE_NUM === \$indexType) {
 
         $body .= "
 \$hashcode = json_encode(\$pk);
-if (null === \$entity && \$object = \$this->getConfiguration()->getSession()->getInstanceFromFirstLevelCache('{$this->getEntity()->getFullClassName()}', \$hashcode)) {
+if (null === \$entity && \$object = \$this->getConfiguration()->getSession()->getInstanceFromFirstLevelCache('{$this->getEntity()->getFullName()}', \$hashcode)) {
     \$offset += $fieldCount;
     return \$object;
 }
@@ -135,7 +146,7 @@ if (\$entity) {
 
             $fieldNames[] = $field->getName();
             $fieldTypes[] = $field->getType();
-            $camelNames[] = $field->getCamelCaseName();
+            $camelNames[] = NamingTool::toCamelCase($field->getName());
             $columnNames[] = $field->getColumnName();
             $fullColumnNames[] = $field->getEntity()->getName(). '.' .$field->getColumnName();
         }
@@ -202,7 +213,7 @@ if (EntityMap::TYPE_NUM === \$indexType) {
 
         foreach ($this->getEntity()->getRelations() as $relation) {
             $relationName = $this->getRelationVarName($relation);
-            $className = $relation->getForeignEntity()->getFullClassName();
+            $className = $relation->getForeignEntity()->getFullName();
 
             $body .= "
 //relation $relationName

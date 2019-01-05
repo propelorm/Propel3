@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Model\Diff;
 
-use phootwork\collection\Map;
+use Propel\Common\Collection\Map;
 use Propel\Generator\Model\Model;
 
 /**

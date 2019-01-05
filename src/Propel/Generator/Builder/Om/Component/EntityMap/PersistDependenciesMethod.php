@@ -28,9 +28,9 @@ $lastValues = $this->hasKnownValues($entity) ? $this->getLastKnownValues($entity
         foreach ($this->getEntity()->getRelations() as $relation) {
             $relationName = $this->getRelationVarName($relation);
             if ($relation->isLocalPrimaryKey()) {
-                $body .= "// one-to-one {$relation->getForeignEntity()->getFullClassName()}\n";
+                $body .= "// one-to-one {$relation->getForeignEntity()->getFullName()}\n";
             } else {
-                $body .= "// many-to-one {$relation->getForeignEntity()->getFullClassName()}\n";
+                $body .= "// many-to-one {$relation->getForeignEntity()->getFullName()}\n";
             }
 
             $body .= "
@@ -47,7 +47,7 @@ if (\$isset(\$entity, '$relationName') && \$relationEntity = \$reader(\$entity, 
             $relationName = $this->getRefRelationVarName($relation);
 
             if ($relation->isLocalPrimaryKey()) {
-                $body .= "//ref one-to-one {$relation->getEntity()->getFullClassName()}
+                $body .= "//ref one-to-one {$relation->getEntity()->getFullName()}
 if (\$isset(\$entity, '$relationName') && \$relationEntity = \$reader(\$entity, '$relationName')) {
     \$session->persist(\$relationEntity, \$deep);
 }
@@ -58,7 +58,7 @@ if (\$isset(\$entity, '$relationName') && \$relationEntity = \$reader(\$entity, 
 
                 if (!in_array($relationName, $alreadyAdded)) {
                     $body .= "
-//ref one-to-many {$relation->getEntity()->getFullClassName()}
+//ref one-to-many {$relation->getEntity()->getFullName()}
 if (\$isset(\$entity, '$relationName') && \$relationEntities = \$reader(\$entity, '$relationName')) {
     foreach (\$relationEntities as \$relationEntity) {
         \$session->persist(\$relationEntity, \$deep);
@@ -80,16 +80,16 @@ if (isset(\$lastValues['$relationName'])) {
         foreach ($this->getEntity()->getCrossRelations() as $crossRelation) {
             $varName = $this->getRelationVarName($crossRelation->getOutgoingRelation(), true);
 
-            $to = $crossRelation->getOutgoingRelation()->getForeignEntity()->getFullClassName();
+            $to = $crossRelation->getOutgoingRelation()->getForeignEntity()->getFullName();
 
             $body .= "
-// cross relation {$crossRelation->getMiddleEntity()->getFullClassName()} (to $to)
+// cross relation {$crossRelation->getMiddleEntity()->getFullName()} (to $to)
 if (\$isset(\$entity, '$varName') && \$relationEntities = \$reader(\$entity, '$varName')) {
     foreach (\$relationEntities as \$relationEntity) {
 ";
             if ($crossRelation->isPolymorphic()) {
                 foreach ($crossRelation->getRelations() as $idx => $relation) {
-                    $class = '\\' . $relation->getForeignEntity()->getFullClassName();
+                    $class = '\\' . $relation->getForeignEntity()->getFullName();
                     $body .= "
         //$idx is from type $class
         if (!isset(\$relationEntity[$idx]) || !(\$relationEntity[$idx] instanceof $class)) {

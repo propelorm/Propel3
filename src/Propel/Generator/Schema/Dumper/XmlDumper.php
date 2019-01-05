@@ -118,7 +118,7 @@ class XmlDumper implements DumperInterface
             $databaseNode->setAttribute('defaultMutatorVisibility', $defaultMutatorVisibility);
         }
 
-        $defaultStringFormat = $database->getDefaultStringFormat();
+        $defaultStringFormat = $database->getStringFormat();
         if (Database::DEFAULT_STRING_FORMAT !== $defaultStringFormat) {
             $databaseNode->setAttribute('defaultStringFormat', $defaultStringFormat);
         }
@@ -234,7 +234,7 @@ class XmlDumper implements DumperInterface
             $entityNode->setAttribute('description', $description);
         }
 
-        $defaultStringFormat = $entity->getDefaultStringFormat();
+        $defaultStringFormat = $entity->getStringFormat();
         if (Entity::DEFAULT_STRING_FORMAT !== $defaultStringFormat) {
             $entityNode->setAttribute('defaultStringFormat', $defaultStringFormat);
         }

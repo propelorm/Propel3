@@ -162,7 +162,7 @@ class ModelJoin extends Join
             $this->joinCondition->appendPsTo($joinCondition, $params);
         }
 
-        $rightEntityName = $this->getEntityMap()->getFQTableName();
+        $rightEntityName = $this->getEntityMap()->getFullTableName();
 
         if ($this->hasRightTableAlias()) {
             $rightEntityName .= ' ' . $this->getRightTableAlias();

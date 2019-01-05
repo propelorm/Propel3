@@ -40,7 +40,7 @@ class ReferrerRelationSetMethods extends BuildComponent
     {
         $varName = $this->getRefRelationVarName($relation);
         $setter =  'set' . $this->getRelationPhpName($relation);
-        $foreignClassName = $this->useClass($relation->getEntity()->getFullClassName());
+        $foreignClassName = $this->useClass($relation->getEntity()->getFullName());
 
         $body = "
 if (\$this->$varName !== \$$varName) {
@@ -49,7 +49,7 @@ if (\$this->$varName !== \$$varName) {
 }
 ";
 
-        $internal = "\nMapped by fields " . implode(', ', $relation->getForeignFields());
+        $internal = "\nMapped by fields " . implode(', ', $relation->getForeignFields()->toArray());
 
         $methodName = 'set' . $this->getRefRelationPhpName($relation, false);
         $this->addMethod($methodName)
@@ -66,7 +66,7 @@ if (\$this->$varName !== \$$varName) {
     protected function addRefGetCollectionMethod(Relation $relation)
     {
         $varName = $this->getRefRelationCollVarName($relation);
-        $foreignClassName = $this->useClass($relation->getEntity()->getFullClassName());
+        $foreignClassName = $this->useClass($relation->getEntity()->getFullName());
         $setter = 'set' . $this->getRelationPhpName($relation);
 
         $body = "
@@ -83,7 +83,7 @@ foreach (\$this->$varName as \$item) {
 }
 ";
 
-        $internal = "\nMapped by fields " . implode(', ', $relation->getForeignFields());
+        $internal = "\nMapped by fields " . implode(', ', $relation->getForeignFields()->toArray());
 
         $methodName = 'set' . $this->getRefRelationPhpName($relation, true);
         $this->addMethod($methodName)

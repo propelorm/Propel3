@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Model\Diff;
 
-use phootwork\collection\Map;
-use phootwork\collection\Set;
+use Propel\Common\Collection\Map;
+use Propel\Common\Collection\Set;
 use phootwork\json\Json;
 use Propel\Generator\Exception\DiffException;
 use Propel\Generator\Model\Field;
@@ -229,7 +229,7 @@ class EntityDiff
      *
      * @param Entity $toEntity
      */
-    public function setToEntity(Entity $toEntity)
+    public function setToEntity(Entity $toEntity): void
     {
         $this->toEntity = $toEntity;
     }
@@ -333,7 +333,7 @@ class EntityDiff
      *
      * @param Map $addedPkFields
      */
-    public function setAddedPkFields(Map $addedPkFields)
+    public function setAddedPkFields(Map $addedPkFields): void
     {
         $this->addedPkFields->clear();
         $this->addedPkFields->setAll($addedPkFields);
@@ -375,7 +375,7 @@ class EntityDiff
      *
      * @param Map $renamedPkFields
      */
-    public function setRenamedPkFields(Map $renamedPkFields)
+    public function setRenamedPkFields(Map $renamedPkFields): void
     {
         $this->renamedPkFields->clear();
         $this->renamedPkFields->setAll($renamedPkFields);
@@ -396,7 +396,7 @@ class EntityDiff
      *
      * @return boolean
      */
-    public function hasModifiedPk()
+    public function hasModifiedPk(): bool
     {
         return
             !$this->renamedPkFields->isEmpty() ||
@@ -454,7 +454,7 @@ class EntityDiff
      *
      * @param Map $modifiedIndices A set of modified indices
      */
-    public function setModifiedIndices(Map $modifiedIndices)
+    public function setModifiedIndices(Map $modifiedIndices): void
     {
         $this->modifiedIndices->clear();
         $this->modifiedIndices->setAll($modifiedIndices);
@@ -475,7 +475,7 @@ class EntityDiff
      *
      * @param Map $addedFks
      */
-    public function setAddedFks(Map $addedFks)
+    public function setAddedFks(Map $addedFks): void
     {
         $this->addedFks->clear();
         $this->addedFks->setAll($addedFks);
@@ -496,7 +496,7 @@ class EntityDiff
      *
      * @param Map $removedFks
      */
-    public function setRemovedFks(Map $removedFks)
+    public function setRemovedFks(Map $removedFks): void
     {
         $this->removedFks->clear();
         $this->removedFks->setAll($removedFks);
@@ -519,7 +519,7 @@ class EntityDiff
      *
      * @param Map $modifiedFks
      */
-    public function setModifiedFks(Map $modifiedFks)
+    public function setModifiedFks(Map $modifiedFks): void
     {
         $this->modifiedFks->clear();
         $this->modifiedFks->setAll($modifiedFks);
@@ -789,7 +789,7 @@ class EntityDiff
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $ret = '';
         $ret .= sprintf("  %s:\n", $this->fromEntity->getName());

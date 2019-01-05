@@ -12,11 +12,12 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Model;
 
-use phootwork\collection\Set;
+use Propel\Common\Collection\Set;
 use Propel\Generator\Model\Parts\EntityPart;
 use Propel\Generator\Model\Parts\FieldsPart;
 use Propel\Generator\Model\Parts\NamePart;
 use Propel\Generator\Model\Parts\SuperordinatePart;
+use Propel\Generator\Model\Parts\VendorPart;
 
 /**
  * Information about indices of a entity.
@@ -27,7 +28,7 @@ use Propel\Generator\Model\Parts\SuperordinatePart;
  */
 class Index
 {
-    use NamePart, EntityPart, FieldsPart, SuperordinatePart;
+    use NamePart, EntityPart, FieldsPart, SuperordinatePart, VendorPart;
 
     /**
      * @var bool

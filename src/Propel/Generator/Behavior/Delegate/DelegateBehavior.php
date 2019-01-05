@@ -8,12 +8,15 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Behavior\Delegate;
 
 use Propel\Generator\Builder\Om\Component\ComponentTrait;
 use Propel\Generator\Builder\Om\ObjectBuilder;
 use Propel\Generator\Model\Behavior;
 use Propel\Generator\Model\Entity;
+use Propel\Generator\Model\Model;
 use Propel\Generator\Model\Relation;
 
 /**
@@ -27,7 +30,7 @@ class DelegateBehavior extends Behavior
     const MANY_TO_ONE = 2;
 
     // default parameters value
-    protected $parameters = [
+    protected $defaultParameters = [
         'to' => ''
     ];
 
@@ -46,22 +49,22 @@ class DelegateBehavior extends Behavior
         $delegates = explode(',', $this->parameters['to']);
         foreach ($delegates as $delegate) {
             $delegate = trim($delegate);
-            if (!$database->hasEntity($delegate)) {
+            if (!$database->hasEntityByName($delegate)) {
                 throw new \InvalidArgumentException(sprintf(
                     'No delegate table "%s" found for table "%s"',
                     $delegate,
                     $table->getName()
                 ));
             }
-            if (in_array($delegate, $table->getForeignEntityNames())) {
+            if ($table->getForeignEntityNames()->contains($delegate)) {
                 // existing many-to-one relationship
                 $type = self::MANY_TO_ONE;
             } else {
                 // one_to_one relationship
                 $delegateEntity = $this->getDelegateEntity($delegate);
-                if (in_array($table->getName(), $delegateEntity->getForeignEntityNames())) {
+                if ($delegateEntity->getForeignEntityNames()->contains($table->getName())) {
                     // existing one-to-one relationship
-                    $fks = $delegateEntity->getForeignKeysReferencingEntity($this->getEntity()->getName());
+                    $fks = $delegateEntity->getRelationsReferencingEntity($this->getEntity()->getName());
                     $fk = $fks[0];
                     if (!$fk->isLocalPrimaryKey()) {
                         throw new \InvalidArgumentException(sprintf(
@@ -107,8 +110,8 @@ class DelegateBehavior extends Behavior
         $relation = new Relation();
         $relation->setForeignEntityName($mainEntity->getName());
         $relation->setDefaultJoin('LEFT JOIN');
-        $relation->setOnDelete(Relation::CASCADE);
-        $relation->setOnUpdate(Relation::CASCADE);
+        $relation->setOnDelete(Model::RELATION_CASCADE);
+        $relation->setOnUpdate(Model::RELATION_CASCADE);
         foreach ($pks as $field) {
             $relation->addReference($field->getName(), $field->getName());
         }
@@ -122,7 +125,7 @@ class DelegateBehavior extends Behavior
      */
     public function getDelegateEntity($delegateEntityName)
     {
-        return $this->getEntity()->getDatabase()->getEntity($delegateEntityName);
+        return $this->getEntity()->getDatabase()->getEntityByName($delegateEntityName);
     }
 
     /**

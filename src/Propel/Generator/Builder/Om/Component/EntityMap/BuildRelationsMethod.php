@@ -26,7 +26,7 @@ class BuildRelationsMethod extends BuildComponent
 
         foreach ($this->getEntity()->getRelations() as $relation) {
             $relationName = var_export($this->getRelationVarName($relation), true);
-            $target = var_export($relation->getForeignEntity()->getFullClassName(), true);
+            $target = var_export($relation->getForeignEntity()->getFullName(), true);
             $columnMapping = var_export($relation->getLocalForeignMapping(), true);
 
             $onDelete = $relation->hasOnDelete() ? "'" . $relation->getOnDelete() . "'" : 'null';
@@ -44,7 +44,7 @@ class BuildRelationsMethod extends BuildComponent
 
         foreach ($this->getEntity()->getReferrers() as $relation) {
             $relationName = var_export($this->getRefRelationCollVarName($relation), true);
-            $target = var_export($relation->getEntity()->getFullClassName(), true);
+            $target = var_export($relation->getEntity()->getFullName(), true);
             $columnMapping = var_export($relation->getLocalForeignMapping(), true);
 
             $onDelete = $relation->hasOnDelete() ? "'" . $relation->getOnDelete() . "'" : 'null';
@@ -64,7 +64,7 @@ class BuildRelationsMethod extends BuildComponent
             $relationName = var_export($this->getRelationVarName($relation, true), true);
             $refName = $relationName;
 
-            $target = var_export($crossRelation->getForeignEntity()->getFullClassName(), true);
+            $target = var_export($crossRelation->getForeignEntity()->getFullName(), true);
             
             $onDelete = $crossRelation->getIncomingRelation()->hasOnDelete() ? "'" . $crossRelation->getIncomingRelation()->getOnDelete() . "'" : 'null';
             $onUpdate = $crossRelation->getIncomingRelation()->hasOnUpdate() ? "'" . $crossRelation->getIncomingRelation()->getOnUpdate() . "'" : 'null';
@@ -75,8 +75,8 @@ class BuildRelationsMethod extends BuildComponent
             }
 
             $mapping = [
-                'via' => $crossRelation->getMiddleEntity()->getFullClassName(),
-                'viaTable' => $crossRelation->getMiddleEntity()->getFQTableName(),
+                'via' => $crossRelation->getMiddleEntity()->getFullName(),
+                'viaTable' => $crossRelation->getMiddleEntity()->getFullTableName(),
                 'isImplementationDetail' => $crossRelation->getMiddleEntity()->isImplementationDetail(),
                 'fieldMappingIncomingName' => $crossRelation->getIncomingRelation()->getField(),
                 'fieldMappingIncoming' => $crossRelation->getIncomingRelation()->getLocalForeignMapping(),

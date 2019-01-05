@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Propel\Tests\Common\Config;
 
-use Propel\Tests\TestCase;
+use Propel\Tests\VfsTestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -20,7 +20,7 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * @author Cristiano Cinotti
  */
-class ConfigTestCase extends TestCase
+class ConfigTestCase extends VfsTestCase
 {
     /**
      * Symfony\Component\Filesystem\Filesystem instance

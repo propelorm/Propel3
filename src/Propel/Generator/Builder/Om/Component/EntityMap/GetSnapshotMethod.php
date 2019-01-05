@@ -48,7 +48,7 @@ if (\$isset(\$entity, '$fieldName')){
 
         foreach ($this->getEntity()->getRelations() as $relation) {
             $fieldName = $this->getRelationVarName($relation);
-            $foreignEntityClass = $relation->getForeignEntity()->getFullClassName();
+            $foreignEntityClass = $relation->getForeignEntity()->getFullName();
             $body .= "
 if (\$isset(\$entity, '$fieldName') && \$foreignEntity = \$reader(\$entity, '$fieldName')) {
     \$foreignEntityReader = \$this->getConfiguration()->getEntityMap('$foreignEntityClass')->getPropReader();
@@ -69,8 +69,8 @@ if (\$isset(\$entity, '$fieldName') && \$foreignEntity = \$reader(\$entity, '$fi
                     //read the value from the related entity primary key
 
                     foreach ($foreignEntity->getRelations() as $rel) {
-                        if ($rel->getLocalFieldName() == $foreignFieldName) {
-                            $relationEntityName = $rel->getForeignEntity()->getFullClassName();
+                        if ($rel->getLocalField()->getName() == $foreignFieldName) {
+                            $relationEntityName = $rel->getForeignEntity()->getFullName();
                             $body .= "
     \$foreignForeignEntityReader = \$this->getClassPropReader('$relationEntityName');
     \$foreignForeignEntity = \$foreignEntityReader(\$foreignEntity, '{$this->getRelationVarName($rel)}');
@@ -102,7 +102,7 @@ if (\$isset(\$entity, '$fieldName') && \$foreignEntity = \$reader(\$entity, '$fi
                 $varName = $this->getCrossRelationRelationVarName($relation);
 
                 $body .= "
-// cross relation to {$crossRelation->getForeignEntity()->getFullClassName()} via {$crossRelation->getMiddleEntity()->getFullClassName()}
+// cross relation to {$crossRelation->getForeignEntity()->getFullName()} via {$crossRelation->getMiddleEntity()->getFullName()}
 if (\$isset(\$entity, '$varName')) {
     \$foreignEntities = \$reader(\$entity, '$varName') ?: [];
     if (\$foreignEntities instanceof \\Propel\\Runtime\\Collection\\Collection) {
@@ -119,7 +119,7 @@ if (\$isset(\$entity, '$varName')) {
             $varName = $this->getRefRelationCollVarName($relation);
 
             $body .= "
-// ref relation to {$relation->getForeignEntity()->getFullClassName()}
+// ref relation to {$relation->getForeignEntity()->getFullName()}
 if (\$isset(\$entity, '$varName')) {
     \$foreignEntities = \$reader(\$entity, '$varName') ?: [];
     if (\$foreignEntities instanceof \\Propel\\Runtime\\Collection\\Collection) {

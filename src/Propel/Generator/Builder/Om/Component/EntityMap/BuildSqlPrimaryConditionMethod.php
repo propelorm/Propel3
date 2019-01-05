@@ -50,7 +50,7 @@ $entityReader = $this->getPropReader();
                         }
                     }
 
-                    $relationEntityName = $relation->getForeignEntity()->getFullClassName();
+                    $relationEntityName = $relation->getForeignEntity()->getFullName();
                     $propertyName = $this->getRelationVarName($relation);
                     $body .= "
 if (null === \$foreignEntity) {

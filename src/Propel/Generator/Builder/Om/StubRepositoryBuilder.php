@@ -23,7 +23,7 @@ class StubRepositoryBuilder extends AbstractBuilder
     /**
      * @return string
      */
-    public function getFullClassName($fullClassName = '', $classPrefix = '')
+    public function getFullClassName(string $fullClassName = '', string $classPrefix = ''): string
     {
         if (true === $this->getEntity()->getRepository()) {
             $fullClassName = parent::getFullClassName('');

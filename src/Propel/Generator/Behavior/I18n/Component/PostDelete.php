@@ -32,12 +32,12 @@ class PostDelete extends BuildComponent
         $code = "
 // emulate delete cascade
 /** @var {$this->getRepositoryClassNameForEntity($i18nEntity, true)} \$i18nRepository */
-\$i18nRepository = \$this->getConfiguration()->getRepository('{$i18nEntity->getFullClassName()}');
+\$i18nRepository = \$this->getConfiguration()->getRepository('{$i18nEntity->getFullName()}');
 
 foreach (\$event->getEntities() as \$entity) {
-    if (\$entity instanceof {$i18nEntity->getFullClassName()}) {
+    if (\$entity instanceof {$i18nEntity->getFullName()}) {
         \$i18nRepository->createQuery()
-            ->filterBy{$this->getObjectClassName($behavior->getEntity()->getFullClassName())}(\$entity)
+            ->filterBy{$this->getObjectClassName($behavior->getEntity()->getFullName())}(\$entity)
             ->delete(\$con);
     }
 }

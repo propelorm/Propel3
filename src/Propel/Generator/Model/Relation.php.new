@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Model;
 
-use phootwork\collection\Set;
+use Propel\Common\Collection\Set;
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Model\Parts\DatabasePart;
 use Propel\Generator\Model\Parts\EntityPart;

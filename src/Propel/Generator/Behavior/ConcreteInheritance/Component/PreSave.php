@@ -24,7 +24,7 @@ class PreSave extends BuildComponent
         $behavior = $this->getBehavior();
         $parentEntity = $behavior->getParentEntity();
 
-        $entityClass = $parentEntity->getFullClassName();
+        $entityClass = $parentEntity->getFullName();
         $getter = 'get' . $parentEntity->getName();
         $setter = 'set' . $parentEntity->getName();
 
@@ -40,7 +40,7 @@ class PreSave extends BuildComponent
 \$parentRepository = \$this->getConfiguration()->getRepository('$entityClass');
 \$reader = \$this->getEntityMap()->getPropReader();
 
-/** @var \\{$this->getEntity()->getFullClassName()} \$entity */
+/** @var \\{$this->getEntity()->getFullName()} \$entity */
 foreach (\$event->getEntities() as \$entity) {
 
     if (!\$entity->$getter()) {
@@ -73,7 +73,7 @@ EOF;
 
         $code .= <<<EOF
     \$parentRepository->getEntityMap()->copyInto(\$entity, \$parent, \$excludeFields);
-    \$parent->set{$parentEntity->getField($behavior->getParameter('descendant_field'))->getMethodName()}('{$behavior->getEntity()->getFullClassName()}');
+    \$parent->set{$parentEntity->getField($behavior->getParameter('descendant_field'))->getMethodName()}('{$behavior->getEntity()->getFullName()}');
     \$session->persist(\$parent);
 }
 EOF;

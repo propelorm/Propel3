@@ -30,7 +30,7 @@ class CrossRelationRemoverMethods extends BuildComponent
         $collName = $this->getRelationVarName($relation, true);
 
         $relatedObjectClassName = $this->getRelationPhpName($relation, false);
-        $crossObjectClassName = $relation->getForeignEntity()->getFullClassName();
+        $crossObjectClassName = $relation->getForeignEntity()->getFullName();
 
         list($signature, , $normalizedShortSignature, $phpDoc) = $this->getCrossRelationAddMethodInformation($crossRelation, $relation);
 
@@ -47,7 +47,7 @@ EOF;
 
         $description = <<<EOF
 Dissociate a $crossObjectClassName from this object
-through the {$crossRelation->getMiddleEntity()->getFullClassName()} cross reference entity.
+through the {$crossRelation->getMiddleEntity()->getFullName()} cross reference entity.
 $phpDoc
 EOF;
 

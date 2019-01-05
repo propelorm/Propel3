@@ -18,6 +18,7 @@ use Propel\Generator\Builder\Om\ObjectBuilder;
 use Propel\Generator\Builder\Om\QueryBuilder;
 use Propel\Generator\Builder\Om\RepositoryBuilder;
 use Propel\Generator\Model\Behavior;
+use Propel\Generator\Model\ModelFactory;
 
 /**
  * Gives a model class the ability to be ordered
@@ -31,9 +32,9 @@ class SortableBehavior extends Behavior
     use ComponentTrait;
 
     // default parameters value
-    protected $parameters = [
+    protected $defaultParameters = [
         'rank_field'  => 'sortable_rank',
-        'use_scope'    => 'false',
+        'use_scope'    => false,
         'scope_field' => '',
     ];
 
@@ -50,23 +51,24 @@ class SortableBehavior extends Behavior
     public function modifyEntity()
     {
         $entity = $this->getEntity();
+        $modelFactory = new ModelFactory();
 
         if (!$entity->hasField($this->getParameter('rank_field'))) {
-            $entity->addField([
+            $entity->addField($modelFactory->createField([
                 'name' => $this->getParameter('rank_field'),
                 'type' => 'INTEGER'
-            ]);
+            ]));
         }
 
         if ($this->useScope()) {
             foreach ($this->getScopes() as $scopeFieldName) {
                 if (!$entity->hasField($scopeFieldName)) {
-                    $entity->addField(
+                    $entity->addField($modelFactory->createField(
                         [
                             'name' => $scopeFieldName,
                             'type' => 'INTEGER'
                         ]
-                    );
+                    ));
                 }
             }
 
@@ -206,7 +208,7 @@ class SortableBehavior extends Behavior
                     ->setDescription("Scope value for Field `{$field->getName()}`");
 
                 if (!$field->isNotNull()) {
-                    $param->setDefaultValue(null);
+                    $param->setValue(null);
                 }
 
                 $methodSignature[] = $param;
@@ -222,7 +224,7 @@ class SortableBehavior extends Behavior
                 ->setDescription("Scope to determine which objects node to return");
 
             if (!$field->isNotNull()) {
-                $paramName->setDefaultValue(null);
+                $paramName->setValue(null);
             }
             $methodSignature[] = $paramName;
         }

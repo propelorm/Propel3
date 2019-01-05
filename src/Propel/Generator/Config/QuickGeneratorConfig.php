@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Propel\Generator\Config;
 
 use Propel\Common\Pluralizer\StandardEnglishPluralizer;
+use Propel\Generator\Builder\Om\AbstractBuilder;
 use Propel\Generator\Exception\InvalidArgumentException;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Manager\BehaviorManager;
@@ -79,7 +80,7 @@ class QuickGeneratorConfig extends GeneratorConfig implements GeneratorConfigInt
      * @param  string $type
      * @return DataModelBuilder
      */
-    public function getConfiguredBuilder(Entity $entity, string $type): DataModelBuilder
+    public function getConfiguredBuilder(Entity $entity, string $type): AbstractBuilder
     {
         $class = $this->getConfigProperty('generator.objectModel.builders.' . $type);
 
@@ -103,7 +104,7 @@ class QuickGeneratorConfig extends GeneratorConfig implements GeneratorConfigInt
         return new StandardEnglishPluralizer();
     }
 
-    public function getBehaviorManager()
+    public function getBehaviorManager(): BehaviorManager
     {
         if (!$this->behaviorManager) {
             $this->behaviorManager = new BehaviorManager($this);

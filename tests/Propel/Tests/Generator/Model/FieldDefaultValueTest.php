@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Tests\Generator\Model;
 
 use Propel\Generator\Model\FieldDefaultValue;
@@ -40,5 +42,11 @@ class FieldDefaultValueTest extends TestCase
         } else {
             $this->assertFalse($def1->equals($def2));
         }
+    }
+
+    public function testIsExpression()
+    {
+        $default = new FieldDefaultValue('SUM', FieldDefaultValue::TYPE_EXPR);
+        $this->assertTrue($default->isExpression());
     }
 }

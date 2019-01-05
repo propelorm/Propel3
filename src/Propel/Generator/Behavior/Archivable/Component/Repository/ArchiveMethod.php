@@ -28,7 +28,7 @@ class ArchiveMethod extends BuildComponent
     {
         /** @var ArchivableBehavior $behavior */
         $behavior = $this->getBehavior();
-        $archiveClassName = $behavior->getArchiveEntity()->getFullClassName();
+        $archiveClassName = $behavior->getArchiveEntity()->getFullName();
         $archiveRepositoryName = $this->getRepositoryClassNameForEntity($behavior->getArchiveEntity(), true);
 
         $body = "
@@ -40,7 +40,7 @@ if (\$session->isNew(\$entity)) {
 if (!\$archive = \$this->getArchive(\$entity)) {
     \$archive = new \\$archiveClassName();
 }
-\$entityMap = \$this->getConfiguration()->getEntityMap('{$behavior->getEntity()->getFullClassName()}');
+\$entityMap = \$this->getConfiguration()->getEntityMap('{$behavior->getEntity()->getFullName()}');
 \$entityMap->copyInto(\$entity, \$archive);
 ";
 
@@ -58,7 +58,7 @@ return \$archive;
 
         $this->addMethod('archive')
             ->setDescription('[Archivable] Archives this object and persists it (without commit())')
-            ->addSimpleDescParameter('entity', $this->getEntity()->getFullClassName())
+            ->addSimpleDescParameter('entity', $this->getEntity()->getFullName())
             ->setBody($body);
     }
 }

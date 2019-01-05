@@ -26,15 +26,15 @@ class MagicCallMethod extends BuildComponent
                 $relations = $delegateEntity->getRelationsReferencingEntity($this->getEntity()->getName());
                 /** @var Relation $relation */
                 $relation = $relations[0];
-                $ARClassName = '\\' . $relation->getEntity()->getFullClassName();
-                $ARFQCN = $relation->getEntity()->getFullClassName(); //$builder->getNewStubObjectBuilder($entity->getEntity())->getFullyQualifiedClassName();
+                $ARClassName = '\\' . $relation->getEntity()->getFullName();
+                $ARFQCN = $relation->getEntity()->getFullName(); //$builder->getNewStubObjectBuilder($entity->getEntity())->getFullyQualifiedClassName();
                 $relationName = $this->getRefRelationPhpName($relation);
             } else {
                 $relations = $this->getEntity()->getRelationsReferencingEntity($delegate);
                 /** @var Relation $relation */
                 $relation = $relations[0];
-                $ARClassName = '\\' . $delegateEntity->getFullClassName(); // $builder->getClassNameFromBuilder($builder->getNewStubObjectBuilder($delegateEntity));
-                $ARFQCN = $delegateEntity->getFullClassName(); //$builder->getNewStubObjectBuilder($delegateEntity)->getFullyQualifiedClassName();
+                $ARClassName = '\\' . $delegateEntity->getFullName(); // $builder->getClassNameFromBuilder($builder->getNewStubObjectBuilder($delegateEntity));
+                $ARFQCN = $delegateEntity->getFullName(); //$builder->getNewStubObjectBuilder($delegateEntity)->getFullyQualifiedClassName();
                 $relationName = $this->getRelationPhpName($relation);
             }
 

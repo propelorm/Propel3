@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Platform;
 
 use Propel\Generator\Exception\EngineException;
@@ -61,27 +63,27 @@ class OraclePlatform extends SqlDefaultPlatform
         $this->setSchemaDomainMapping(new Domain(PropelTypes::ENUM, 'NVARCHAR2'));
     }
 
-    public function getMaxFieldNameLength()
+    public function getMaxFieldNameLength(): int
     {
         return 30;
     }
 
-    public function getNativeIdMethod()
+    public function getNativeIdMethod(): string
     {
         return PlatformInterface::SEQUENCE;
     }
 
-    public function getAutoIncrement()
+    public function getAutoIncrement(): string
     {
         return '';
     }
 
-    public function supportsNativeDeleteTrigger()
+    public function supportsNativeDeleteTrigger(): bool
     {
         return true;
     }
 
-    public function getBeginDDL()
+    public function getBeginDDL(): string
     {
         return "
 ALTER SESSION SET NLS_DATE_FORMAT='YYYY-MM-DD';
@@ -89,7 +91,7 @@ ALTER SESSION SET NLS_TIMESTAMP_FORMAT='YYYY-MM-DD HH24:MI:SS';
 ";
     }
 
-    public function getAddEntitiesDDL(Database $database)
+    public function getAddEntitiesDDL(Database $database): string
     {
         $ret = $this->getBeginDDL();
         foreach ($database->getEntitiesForSql() as $entity) {
@@ -110,7 +112,7 @@ ALTER SESSION SET NLS_TIMESTAMP_FORMAT='YYYY-MM-DD HH24:MI:SS';
         return $ret;
     }
 
-    public function getAddEntityDDL(Entity $entity)
+    public function getAddEntityDDL(Entity $entity): string
     {
         $entityDescription = $entity->hasDescription() ? $this->getCommentLineDDL($entity->getDescription()) : '';
 
@@ -147,14 +149,14 @@ ALTER SESSION SET NLS_TIMESTAMP_FORMAT='YYYY-MM-DD HH24:MI:SS';
         return $ret;
     }
 
-    public function getAddPrimaryKeyDDL(Entity $entity)
+    public function getAddPrimaryKeyDDL(Entity $entity): string
     {
         if (is_array($entity->getPrimaryKey()) && count($entity->getPrimaryKey())) {
             return parent::getAddPrimaryKeyDDL($entity);
         }
     }
 
-    public function getAddSequencesDDL(Entity $entity)
+    public function getAddSequencesDDL(Entity $entity): string
     {
         if ('native' === $entity->getIdMethod()) {
             $pattern = "
@@ -169,7 +171,7 @@ CREATE SEQUENCE %s
         }
     }
 
-    public function getDropEntityDDL(Entity $entity)
+    public function getDropEntityDDL(Entity $entity): string
     {
         $ret = "
 DROP TABLE " . $this->quoteIdentifier($entity->getName(), $entity) . " CASCADE CONSTRAINTS;
@@ -183,7 +185,7 @@ DROP SEQUENCE " . $this->quoteIdentifier($this->getSequenceName($entity)) . ";
         return $ret;
     }
 
-    public function getPrimaryKeyName(Entity $entity)
+    public function getPrimaryKeyName(Entity $entity): string
     {
         $entityName = $entity->getName();
         // pk constraint name must be 30 chars at most
@@ -192,7 +194,7 @@ DROP SEQUENCE " . $this->quoteIdentifier($this->getSequenceName($entity)) . ";
         return $entityName . '_pk';
     }
 
-    public function getPrimaryKeyDDL(Entity $entity)
+    public function getPrimaryKeyDDL(Entity $entity): string
     {
         if ($entity->hasPrimaryKey()) {
             $pattern = 'CONSTRAINT %s PRIMARY KEY (%s)%s';
@@ -206,7 +208,7 @@ DROP SEQUENCE " . $this->quoteIdentifier($this->getSequenceName($entity)) . ";
         }
     }
 
-    public function getUniqueDDL(Unique $unique)
+    public function getUniqueDDL(Unique $unique): string
     {
         return sprintf(
             'CONSTRAINT %s UNIQUE (%s)',
@@ -215,10 +217,10 @@ DROP SEQUENCE " . $this->quoteIdentifier($this->getSequenceName($entity)) . ";
         );
     }
 
-    public function getRelationDDL(Relation $relation)
+    public function getRelationDDL(Relation $relation): string
     {
         if ($relation->isSkipSql()) {
-            return;
+            return '';
         }
         $pattern = "CONSTRAINT %s
     FOREIGN KEY (%s) REFERENCES %s (%s)";
@@ -226,7 +228,7 @@ DROP SEQUENCE " . $this->quoteIdentifier($this->getSequenceName($entity)) . ";
             $pattern,
             $this->quoteIdentifier($relation->getName()),
             $this->getFieldListDDL($relation->getLocalFieldObjects()),
-            $this->quoteIdentifier($relation->getForeignEntity()->getFQTableName()),
+            $this->quoteIdentifier($relation->getForeignEntity()->getFullTableName()),
             $this->getFieldListDDL($relation->getForeignFieldObjects())
         );
         if ($relation->hasOnDelete()) {
@@ -241,7 +243,7 @@ DROP SEQUENCE " . $this->quoteIdentifier($this->getSequenceName($entity)) . ";
      * Whether the underlying PDO driver for this platform returns BLOB fields as streams (instead of strings).
      * @return boolean
      */
-    public function hasStreamBlobImpl()
+    public function hasStreamBlobImpl(): bool
     {
         return true;
     }
@@ -249,12 +251,12 @@ DROP SEQUENCE " . $this->quoteIdentifier($this->getSequenceName($entity)) . ";
     /**
      * {@inheritdoc}
      */
-    public function doQuoting($text)
+    public function doQuoting(string $text): string
     {
         return $text;
     }
 
-    public function getTimestampFormatter()
+    public function getTimestampFormatter(): string
     {
         return 'Y-m-d H:i:s';
     }
@@ -265,7 +267,7 @@ DROP SEQUENCE " . $this->quoteIdentifier($this->getSequenceName($entity)) . ";
      *             one fell swoop.
      * @see Platform::supportsSchemas()
      */
-    public function supportsSchemas()
+    public function supportsSchemas(): bool
     {
         return false;
     }
@@ -278,9 +280,9 @@ DROP SEQUENCE " . $this->quoteIdentifier($this->getSequenceName($entity)) . ";
      *
      * @return string oracle vendor sql part
      */
-    public function generateBlockStorage($object, $isPrimaryKey = false)
+    public function generateBlockStorage($object, $isPrimaryKey = false): string
     {
-        $vendorSpecific = $object->getVendorInfoForType('oracle');
+        $vendorSpecific = $object->getVendorByType('oracle');
         if ($vendorSpecific->isEmpty()) {
             return '';
         }
@@ -335,7 +337,7 @@ USING INDEX
      * @param  Index  $index
      * @return string
      */
-    public function getAddIndexDDL(Index $index)
+    public function getAddIndexDDL(Index $index): string
     {
         // don't create index form primary key
         if ($this->getPrimaryKeyName($index->getEntity()) == $this->quoteIdentifier($index->getName())) {
@@ -351,7 +353,7 @@ CREATE %sINDEX %s ON %s (%s)%s;
             $index->isUnique() ? 'UNIQUE ' : '',
             $this->quoteIdentifier($index->getName()),
             $this->quoteIdentifier($index->getEntity()->getName()),
-            $this->getFieldListDDL($index->getFieldObjects()),
+            $this->getFieldListDDL($index->getFields()->toArray()),
             $this->generateBlockStorage($index)
         );
     }

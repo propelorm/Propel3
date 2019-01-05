@@ -11,6 +11,7 @@ namespace Propel\Generator\Builder\Om\Component\ActiveRecordTrait;
 
 use Propel\Generator\Builder\Om\Component\BuildComponent;
 use Propel\Generator\Model\Field;
+use Propel\Generator\Model\NamingTool;
 
 /**
  * Add boolean accessors (`isXxx` or `hasXxx`) to ActiveRecord trait.
@@ -41,7 +42,7 @@ class BooleanAccessorMethods extends BuildComponent
      */
     protected function getBooleanAccessorName(Field $field)
     {
-        $name = $field->getCamelCaseName();
+        $name = NamingTool::toCamelCase($field->getName());
         if (!preg_match('/^(?:is|has)(?=[A-Z])/', $name)) {
             $name = 'is' . ucfirst($name);
         }

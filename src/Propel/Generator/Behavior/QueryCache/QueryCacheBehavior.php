@@ -24,7 +24,7 @@ class QueryCacheBehavior extends Behavior
     use ComponentTrait;
 
     // default parameters value
-    protected $parameters = [
+    protected $defaultParameters = [
         'backend'     => 'apc',
         'lifetime'    => 3600,
     ];

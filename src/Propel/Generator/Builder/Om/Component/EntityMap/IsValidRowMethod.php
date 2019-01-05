@@ -8,6 +8,7 @@ use gossi\codegen\model\PhpParameter;
 use gossi\docblock\tags\TagFactory;
 use Propel\Generator\Builder\Om\Component\BuildComponent;
 use Propel\Generator\Builder\Om\Component\NamingTrait;
+use Propel\Generator\Model\NamingTool;
 
 /**
  * Adds isValidRow method.
@@ -36,7 +37,7 @@ class IsValidRowMethod extends BuildComponent
 
             $fieldCount++;
             $fieldNames[] = $field->getName();
-            $camelNames[] = $field->getCamelCaseName();
+            $camelNames[] = NamingTool::toCamelCase($field->getName());
             $phpNames[] = $field->getName();
             $colName[] = $field->getEntity()->getName(). '.' .$field->getName();
         }

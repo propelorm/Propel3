@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Platform;
 
 use Propel\Generator\Config\GeneratorConfigInterface;
@@ -70,12 +72,12 @@ class SqlitePlatform extends SqlDefaultPlatform
         $this->setSchemaDomainMapping(new Domain(PropelTypes::ENUM, 'TEXT'));
     }
 
-    public function getSchemaDelimiter()
+    public function getSchemaDelimiter(): string
     {
         return '§';
     }
 
-    public function getDefaultTypeSizes()
+    public function getDefaultTypeSizes(): array
     {
         return [
             'char'      => 1,
@@ -111,7 +113,7 @@ class SqlitePlatform extends SqlDefaultPlatform
      * @param  Field[] $fields
      * @return string
      */
-    public function getAddFieldsDDL($fields)
+    public function getAddFieldsDDL(array $fields): string
     {
         $ret = '';
         $pattern = "
@@ -120,7 +122,7 @@ ALTER TABLE %s ADD %s;
         foreach ($fields as $field) {
             $ret .= sprintf(
                 $pattern,
-                $this->quoteIdentifier($field->getEntity()->getFQTableName()),
+                $this->quoteIdentifier($field->getEntity()->getFullTableName()),
                 $this->getFieldDDL($field)
             );
         }
@@ -131,7 +133,7 @@ ALTER TABLE %s ADD %s;
     /**
      * {@inheritdoc}
      */
-    public function getModifyEntityDDL(EntityDiff $entityDiff)
+    public function getModifyEntityDDL(EntityDiff $entityDiff): string
     {
         $changedNotEdientityThroughDirectDDL = $this->entityAlteringWorkaround && (
             false
@@ -191,7 +193,7 @@ ALTER TABLE %s ADD %s;
      * @param  EntityDiff $entityDiff
      * @return string
      */
-    public function getMigrationEntityDDL(EntityDiff $entityDiff)
+    public function getMigrationEntityDDL(EntityDiff $entityDiff): string
     {
         $pattern = "
 CREATE TEMPORARY TABLE %s AS SELECT %s FROM %s;
@@ -206,7 +208,7 @@ DROP TABLE %s;
 
         $tempEntityName   = $newEntity->getTableName().'__temp__'.uniqid();
 
-        $originEntityFields = $this->getFieldListDDL($originEntity->getFields());
+        $originEntityFields = $this->getFieldListDDL($originEntity->getFields()->toArray());
 
         $fieldMap = []; /** struct: [<oldCol> => <newCol>] */
         //start with modified fields
@@ -234,10 +236,10 @@ DROP TABLE %s;
             $pattern,
             $this->quoteIdentifier($tempEntityName), //CREATE TEMPORARY TABLE %s
             $originEntityFields, //select %s
-            $this->quoteIdentifier($originEntity->getFQTableName()), //from %s
-            $this->quoteIdentifier($originEntity->getFQTableName()), //drop entity %s
+            $this->quoteIdentifier($originEntity->getFullTableName()), //from %s
+            $this->quoteIdentifier($originEntity->getFullTableName()), //drop entity %s
             $createEntity, //[create entity] %s
-            $this->quoteIdentifier($originEntity->getFQTableName()), //insert into %s
+            $this->quoteIdentifier($originEntity->getFullTableName()), //insert into %s
             implode(', ', $fieldMap), //(%s)
             implode(', ', array_keys($fieldMap)), //select %s
             $this->quoteIdentifier($tempEntityName), //from %s
@@ -247,14 +249,14 @@ DROP TABLE %s;
         return $sql;
     }
 
-    public function getBeginDDL()
+    public function getBeginDDL(): string
     {
         return '
 PRAGMA foreign_keys = OFF;
 ';
     }
 
-    public function getEndDDL()
+    public function getEndDDL(): string
     {
         return '
 PRAGMA foreign_keys = ON;
@@ -264,14 +266,14 @@ PRAGMA foreign_keys = ON;
     /**
      * {@inheritdoc}
      */
-    public function getAddEntitiesDDL(Database $database)
+    public function getAddEntitiesDDL(Database $database): string
     {
         $ret = '';
         foreach ($database->getEntitiesForSql() as $entity) {
             $this->normalizeEntity($entity);
         }
         foreach ($database->getEntitiesForSql() as $entity) {
-            $ret .= $this->getCommentBlockDDL($entity->getFQTableName());
+            $ret .= $this->getCommentBlockDDL($entity->getFullTableName());
             $ret .= $this->getDropEntityDDL($entity);
             $ret .= $this->getAddEntityDDL($entity);
             $ret .= $this->getAddIndicesDDL($entity);
@@ -336,7 +338,7 @@ PRAGMA foreign_keys = ON;
      * Returns the SQL for the primary key of a Entity object
      * @return string
      */
-    public function getPrimaryKeyDDL(Entity $entity)
+    public function getPrimaryKeyDDL(Entity $entity): string
     {
         if ($entity->hasPrimaryKey() && !$entity->hasAutoIncrementPrimaryKey()) {
             return 'PRIMARY KEY (' . $this->getFieldListDDL($entity->getPrimaryKey()) . ')';
@@ -348,7 +350,7 @@ PRAGMA foreign_keys = ON;
     /**
      * {@inheritdoc}
      */
-    public function getRemoveFieldDDL(Field $field)
+    public function getRemoveFieldDDL(Field $field): string
     {
         //not supported
         return '';
@@ -357,7 +359,7 @@ PRAGMA foreign_keys = ON;
     /**
      * {@inheritdoc}
      */
-    public function getRenameFieldDDL(Field $fromField, Field $toField)
+    public function getRenameFieldDDL(Field $fromField, Field $toField): string
     {
         //not supported
         return '';
@@ -366,7 +368,7 @@ PRAGMA foreign_keys = ON;
     /**
      * {@inheritdoc}
      */
-    public function getModifyFieldDDL(FieldDiff $fieldDiff)
+    public function getModifyFieldDDL(FieldDiff $fieldDiff): string
     {
         //not supported
         return '';
@@ -375,7 +377,7 @@ PRAGMA foreign_keys = ON;
     /**
      * {@inheritdoc}
      */
-    public function getModifyFieldsDDL($fieldDiffs)
+    public function getModifyFieldsDDL($fieldDiffs): string
     {
         //not supported
         return '';
@@ -384,7 +386,7 @@ PRAGMA foreign_keys = ON;
     /**
      * {@inheritdoc}
      */
-    public function getDropPrimaryKeyDDL(Entity $entity)
+    public function getDropPrimaryKeyDDL(Entity $entity): string
     {
         //not supported
         return '';
@@ -393,7 +395,7 @@ PRAGMA foreign_keys = ON;
     /**
      * {@inheritdoc}
      */
-    public function getAddPrimaryKeyDDL(Entity $entity)
+    public function getAddPrimaryKeyDDL(Entity $entity): string
     {
         //not supported
         return '';
@@ -402,7 +404,7 @@ PRAGMA foreign_keys = ON;
     /**
      * {@inheritdoc}
      */
-    public function getAddRelationDDL(Relation $relation)
+    public function getAddRelationDDL(Relation $relation): string
     {
         //not supported
         return '';
@@ -411,7 +413,7 @@ PRAGMA foreign_keys = ON;
     /**
      * {@inheritdoc}
      */
-    public function getDropRelationDDL(Relation $relation)
+    public function getDropRelationDDL(Relation $relation): string
     {
         //not supported
         return '';
@@ -420,17 +422,17 @@ PRAGMA foreign_keys = ON;
     /**
      * @link       http://www.sqlite.org/autoinc.html
      */
-    public function getAutoIncrement()
+    public function getAutoIncrement(): string
     {
         return 'PRIMARY KEY AUTOINCREMENT';
     }
 
-    public function getMaxFieldNameLength()
+    public function getMaxFieldNameLength(): int
     {
         return 1024;
     }
 
-    public function getFieldDDL(Field $col)
+    public function getFieldDDL(Field $col): string
     {
         if ($col->isAutoIncrement()) {
             $col->setType('INTEGER');
@@ -450,7 +452,7 @@ PRAGMA foreign_keys = ON;
         return parent::getFieldDDL($col);
     }
 
-    public function getAddEntityDDL(Entity $entity)
+    public function getAddEntityDDL(Entity $entity): string
     {
         $entity = clone $entity;
         $entityDescription = $entity->hasDescription() ? $this->getCommentLineDDL($entity->getDescription()) : '';
@@ -493,15 +495,15 @@ PRAGMA foreign_keys = ON;
         return sprintf(
             $pattern,
             $entityDescription,
-            $this->quoteIdentifier($entity->getFQTableName()),
+            $this->quoteIdentifier($entity->getFullTableName()),
             implode($sep, $lines)
         );
     }
 
-    public function getRelationDDL(Relation $relation)
+    public function getRelationDDL(Relation $relation): string
     {
         if ($relation->isSkipSql() || !$this->relationSupport) {
-            return;
+            return '';
         }
 
         $pattern = "FOREIGN KEY (%s) REFERENCES %s (%s)";
@@ -509,7 +511,7 @@ PRAGMA foreign_keys = ON;
         $script = sprintf(
             $pattern,
             $this->getFieldListDDL($relation->getLocalFieldObjects()),
-            $this->quoteIdentifier($relation->getForeignEntity()->getFQTableName()),
+            $this->quoteIdentifier($relation->getForeignEntity()->getFullTableName()),
             $this->getFieldListDDL($relation->getForeignFieldObjects())
         );
 
@@ -525,7 +527,7 @@ PRAGMA foreign_keys = ON;
         return $script;
     }
 
-    public function hasSize($sqlType)
+    public function hasSize(string $sqlType): bool
     {
         return !in_array($sqlType, [
             'MEDIUMTEXT',
@@ -539,17 +541,17 @@ PRAGMA foreign_keys = ON;
     /**
      * {@inheritdoc}
      */
-    public function doQuoting($text)
+    public function doQuoting(string $text): string
     {
         return '[' . strtr($text, ['.' => '].[']) . ']';
     }
 
-    public function supportsSchemas()
+    public function supportsSchemas(): bool
     {
         return true;
     }
 
-    public function supportsNativeDeleteTrigger()
+    public function supportsNativeDeleteTrigger(): bool
     {
         return true;
     }

@@ -11,27 +11,10 @@
 namespace Propel\Tests\Generator\Schema;
 
 use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\vfsStreamDirectory;
-use Propel\Generator\Schema\Loader\SchemaLoader;
-use Propel\Tests\TestCase;
+use Propel\Tests\VfsTestCase;
 
-class ReaderTestCase extends TestCase
+class ReaderTestCase extends VfsTestCase
 {
-    /**
-     * @var vfsStreamDirectory
-     */
-    protected $root;
-
-    /**
-     * @var SchemaLoader
-     */
-    protected $loader;
-
-    public function setUp()
-    {
-        $this->root = vfsStream::setup('schema_dir');
-    }
-
     protected function addJsonSchema(): void
     {
         $content = <<<EOF
@@ -135,7 +118,7 @@ class ReaderTestCase extends TestCase
   }
 }
 EOF;
-        vfsStream::newFile('schema.json')->at($this->root)->setContent($content);
+        vfsStream::newFile('schema.json')->at($this->getRoot())->setContent($content);
     }
 
     protected function addPhpSchema(): void
@@ -243,7 +226,7 @@ return [
   ]
 ];
 EOF;
-        vfsStream::newFile('schema.php')->at($this->root)->setContent($content);
+        vfsStream::newFile('schema.php')->at($this->getRoot())->setContent($content);
     }
 
     protected function addXmlSchema(): void
@@ -274,7 +257,7 @@ EOF;
 </database>
 XML;
 
-        vfsStream::newFile('schema.xml')->at($this->root)->setContent($content);
+        vfsStream::newFile('schema.xml')->at($this->getRoot())->setContent($content);
     }
 
     protected function addYamlSchema()
@@ -355,6 +338,48 @@ database:
                     size: 128
 YML;
 
-        vfsStream::newFile('schema.yaml')->at($this->root)->setContent($content);
+        vfsStream::newFile('schema.yaml')->at($this->getRoot())->setContent($content);
+    }
+
+    public function addExternalSchemas()
+    {
+        $content = <<<XML
+<database name="bookstore">
+  <external-schema filename="external/author.schema.xml" />
+  <external-schema filename="external/publisher.schema.xml" />
+  <entity name="Book">
+      <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
+      <field name="title" type="VARCHAR" required="true" primaryString="true" />
+      <field name="ISBN" required="true" type="VARCHAR" primaryString="false" />
+      <field name="price" required="false" type="FLOAT" />
+      <relation target="Publisher" onDelete="setnull"/>
+      <relation target="Author" onDelete="setnull" onUpdate="cascade"/>
+  </entity>
+</database>
+XML;
+        vfsStream::newFile('book.schema.xml')->at($this->getRoot())->setContent($content);
+        $dir = vfsStream::newDirectory('external')->at($this->getRoot());
+
+        $externalAuthor = <<<XML
+<database name="bookstore">
+  <entity name="Author">
+    <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
+    <field name="firstName" required="true" type="VARCHAR" size="128" />
+    <field name="lastName" required="true" type="VARCHAR" size="128" />
+    <field name="email" type="VARCHAR" />
+   </entity>
+</database>
+XML;
+        vfsStream::newFile('author.schema.xml')->at($dir)->setContent($externalAuthor);
+
+        $externalPublisher = <<<XML
+<database name="bookstore">
+  <entity name="Publisher">
+    <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
+    <field name="name" required="true" type="VARCHAR" default="Penguin" description="Publisher Name"/>
+  </entity>
+</database>
+XML;
+        vfsStream::newFile('publisher.schema.xml')->at($dir)->setContent($externalPublisher);
     }
 }

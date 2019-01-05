@@ -10,16 +10,19 @@
 
 namespace Propel\Tests\Common\Config\Loader;
 
+use org\bovigo\vfs\vfsStream;
 use Propel\Common\Config\Loader\PhpFileLoader;
 use Propel\Common\Config\FileLocator;
 use Propel\Tests\Common\Config\ConfigTestCase;
 
 class PhpFileLoaderTest extends ConfigTestCase
 {
+    /** @var PhpFileLoader */
     protected $loader;
 
-    protected function setUp()
+    public function setUp()
     {
+        parent::setUp();
         $this->loader = new PhpFileLoader(new FileLocator([sys_get_temp_dir()]));
     }
 
@@ -41,8 +44,8 @@ class PhpFileLoaderTest extends ConfigTestCase
     return array('foo' => 'bar', 'bar' => 'baz');
 
 EOF;
-        $this->dumpTempFile('parameters.php', $content);
-        $test = $this->loader->load('parameters.php');
+        $file = vfsStream::newFile('parameters.php')->at($this->getRoot())->setContent($content);
+        $test = $this->loader->load($file->url());
         $this->assertEquals('bar', $test['foo']);
         $this->assertEquals('baz', $test['bar']);
     }
@@ -58,7 +61,7 @@ EOF;
 
     /**
     * @expectedException        Propel\Common\Config\Exception\InvalidArgumentException
-    * @expectedExceptionMessage The configuration file 'nonvalid.php' has invalid content.
+    * @expectedExceptionMessage The configuration file 'vfs://root/nonvalid.php' has invalid content.
     */
     public function testPhpFileHasInvalidContent()
     {
@@ -67,25 +70,24 @@ not php content
 only plain
 text
 EOF;
-        $this->dumpTempFile('nonvalid.php', $content);
-        $this->loader->load('nonvalid.php');
+        $file = vfsStream::newFile('nonvalid.php')->at($this->getRoot())->setContent($content);
+        $this->loader->load($file->url());
     }
 
     /**
      * @expectedException        Propel\Common\Config\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The configuration file 'empty.php' has invalid content.
+     * @expectedExceptionMessage The configuration file 'vfs://root/empty.php' has invalid content.
      */
     public function testPhpFileIsEmpty()
     {
-        $content = '';
-        $this->dumpTempFile('empty.php', $content);
+        $file = vfsStream::newFile('empty.php')->at($this->getRoot())->setContent('');
 
-        $this->loader->load('empty.php');
+        $this->loader->load($file->url());
     }
 
     /**
      * @expectedException Propel\Common\Config\Exception\InputOutputException
-     * @expectedExceptionMessage You don't have permissions to access configuration file notreadable.php.
+     * @expectedExceptionMessage You don't have permissions to access configuration file vfs://root/notreadable.php.
      */
     public function testConfigFileNotReadableThrowsException()
     {
@@ -95,11 +97,9 @@ EOF;
     return array('foo' => 'bar', 'bar' => 'baz');
 
 EOF;
+        $file = vfsStream::newFile('notreadable.php', 200)->at($this->getRoot())->setContent($content);
 
-        $this->dumpTempFile('notreadable.php', $content);
-        $this->getFilesystem()->chmod(sys_get_temp_dir() . '/notreadable.php', 0200);
-
-        $actual = $this->loader->load('notreadable.php');
+        $actual = $this->loader->load($file->url());
         $this->assertEquals('bar', $actual['foo']);
         $this->assertEquals('baz', $actual['bar']);
     }

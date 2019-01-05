@@ -12,9 +12,6 @@ declare(strict_types=1);
 
 namespace Propel\Tests\Generator\Model;
 
-use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\vfsStreamDirectory;
-use phootwork\collection\Set;
 use Propel\Generator\Model\Behavior;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Domain;
@@ -25,25 +22,16 @@ use Propel\Generator\Model\Relation;
 use Propel\Generator\Model\Schema;
 use Propel\Generator\Model\Unique;
 use Propel\Generator\Platform\PlatformInterface;
-use Propel\Generator\Util\UniqueList;
-use Propel\Tests\TestCase;
+use Propel\Common\Collection\UniqueList;
+use Propel\Tests\VfsTestCase;
 
 /**
  * This class provides methods for mocking Entity, Database and Platform objects.
  *
  * @author Hugo Hamon <webmaster@apprendre-php.com>
  */
-abstract class ModelTestCase extends TestCase
+abstract class ModelTestCase extends VfsTestCase
 {
-    /** @var vfsStreamDirectory */
-    protected $root;
-
-    public function setUp()
-    {
-        $this->root = vfsStream::setup();
-        parent::setUp();
-    }
-
     /**
      * Returns a dummy Behavior object.
      *
@@ -179,6 +167,7 @@ abstract class ModelTestCase extends TestCase
     protected function getIndexMock($name = null, array $options = [])
     {
         $defaults = [
+            'entity' => null
         ];
 
         $options = array_merge($defaults, $options);
@@ -189,13 +178,18 @@ abstract class ModelTestCase extends TestCase
             ->getMock()
         ;
         $index
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('setEntity')
         ;
         $index
             ->expects($this->any())
             ->method('getName')
             ->will($this->returnValue($name))
+        ;
+        $index
+            ->expects($this->any())
+            ->method('getEntity')
+            ->will($this->returnValue($options['entity']))
         ;
 
         return $index;
@@ -210,19 +204,30 @@ abstract class ModelTestCase extends TestCase
      */
     protected function getUniqueIndexMock($name = null, array $options = [])
     {
+        $defaults = [
+            'entity' => null
+        ];
+
+        $options = array_merge($defaults, $options);
+
         $unique = $this
             ->getMockBuilder('Propel\Generator\Model\Unique')
             ->disableOriginalConstructor()
             ->getMock()
         ;
         $unique
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('setEntity')
         ;
         $unique
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getName')
             ->will($this->returnValue($name))
+        ;
+        $unique
+            ->expects($this->any())
+            ->method('getEntity')
+            ->will($this->returnValue($options['entity']))
         ;
 
         return $unique;
@@ -357,7 +362,6 @@ abstract class ModelTestCase extends TestCase
 
         $entity = $this
             ->getMockBuilder('Propel\Generator\Model\Entity')
-            ->disableOriginalConstructor()
             ->getMock()
         ;
 
@@ -370,7 +374,7 @@ abstract class ModelTestCase extends TestCase
         $entity
             ->expects($this->any())
             ->method('getFullName')
-            ->will($this->returnValue($name))
+            ->will($this->returnValue($options['namespace'] . '\\' . $name))
         ;
 
         $entity
@@ -462,7 +466,8 @@ abstract class ModelTestCase extends TestCase
     protected function getFieldMock($name, array $options = [])
     {
         $defaults = [
-            'size' => null,
+            'size'       => null,
+            'entity'     => null
         ];
 
         $options = array_merge($defaults, $options);
@@ -483,6 +488,11 @@ abstract class ModelTestCase extends TestCase
             ->expects($this->any())
             ->method('getSize')
             ->will($this->returnValue($options['size']))
+        ;
+        $field
+            ->expects($this->any())
+            ->method('getEntity')
+            ->will($this->returnValue($options['entity']))
         ;
 
         return $field;

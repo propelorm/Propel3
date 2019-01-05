@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Tests\Generator\Model;
 
 use Propel\Generator\Model\Index;
@@ -126,5 +128,14 @@ class IndexTest extends ModelTestCase
         $index->addField($this->getFieldMock('foo', [ 'size' => 0 ]));
 
         $this->assertTrue($index->hasFieldAtPosition(0, 'foo'));
+    }
+
+    public function testGetSuperordinate()
+    {
+        $entity = $this->getEntityMock('db_books');
+        $index = new Index();
+        $index->setEntity($entity);
+
+        $this->assertSame($entity,$index->getSuperordinate());
     }
 }

@@ -40,7 +40,7 @@ if (!\$archive = \$this->getArchive(\$entity)) {
         $this->addMethod('restoreFromArchive')
             ->setDescription('[Archivable] Revert the the current object to the state it had when it was last archived.
 The object must be saved afterwards if the changes must persist.')
-            ->addSimpleDescParameter('entity', $this->getEntity()->getFullClassName())
+            ->addSimpleDescParameter('entity', $this->getEntity()->getFullName())
             ->setBody($body);
     }
 }

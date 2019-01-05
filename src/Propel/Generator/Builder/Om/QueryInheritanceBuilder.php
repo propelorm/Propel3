@@ -37,7 +37,7 @@ class QueryInheritanceBuilder extends AbstractBuilder
     /**
      * @return string
      */
-    public function getFullClassName($injectNamespace = '', $classPrefix = '')
+    public function getFullClassName(string $injectNamespace = '', string $classPrefix = ''): string
     {
         $fullClassName = $this->getChild()->getClassName();
         $namespace = explode('\\', $fullClassName);

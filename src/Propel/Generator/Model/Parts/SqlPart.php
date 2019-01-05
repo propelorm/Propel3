@@ -15,7 +15,7 @@ namespace Propel\Generator\Model\Parts;
 use Propel\Generator\Model\IdMethodParameter;
 use Propel\Generator\Model\Model;
 use Propel\Generator\Platform\PlatformInterface;
-use phootwork\collection\Set;
+use Propel\Common\Collection\Set;
 
 /**
  * Trait SqlPart

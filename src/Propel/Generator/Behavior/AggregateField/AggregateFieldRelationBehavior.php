@@ -12,6 +12,7 @@ namespace Propel\Generator\Behavior\AggregateField;
 
 use Propel\Generator\Builder\Om\Component\ComponentTrait;
 use Propel\Generator\Builder\Om\Component\RelationTrait;
+use Propel\Generator\Builder\Om\ObjectBuilder;
 use Propel\Generator\Builder\Om\RepositoryBuilder;
 use Propel\Generator\Model\Behavior;
 use Propel\Generator\Model\Entity;
@@ -28,7 +29,7 @@ class AggregateFieldRelationBehavior extends Behavior
     use ComponentTrait;
 
     // default parameters value
-    protected $parameters = [
+    protected $defaultParameters = [
         'foreign_entity' => '',
         'update_method' => '',
         'aggregate_name' => '',
@@ -36,12 +37,12 @@ class AggregateFieldRelationBehavior extends Behavior
 
     protected $builder;
 
-    public function getBuilder()
+    public function getBuilder(): ObjectBuilder
     {
         return $this->builder;
     }
 
-    public function allowMultiple()
+    public function allowMultiple(): bool
     {
         return true;
     }
@@ -83,15 +84,15 @@ class AggregateFieldRelationBehavior extends Behavior
     /**
      * @return Entity
      */
-    public function getForeignEntity()
+    public function getForeignEntity(): Entity
     {
-        return $this->getEntity()->getDatabase()->getEntity($this->getParameter('foreign_entity'));
+        return $this->getEntity()->getDatabase()->getEntityByName($this->getParameter('foreign_entity'));
     }
 
     /**
      * @return Relation
      */
-    public function getRelation()
+    public function getRelation(): Relation
     {
         $foreignEntity = $this->getForeignEntity();
         // let's infer the relation from the foreign table

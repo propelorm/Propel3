@@ -23,9 +23,9 @@ use Propel\Generator\Model\Parts\SqlPart;
 use Propel\Generator\Model\Parts\SuperordinatePart;
 use Propel\Generator\Model\Parts\VendorPart;
 use Propel\Generator\Platform\PlatformInterface;
-use phootwork\collection\ArrayList;
-use phootwork\collection\Map;
-use phootwork\collection\Set;
+use Propel\Common\Collection\ArrayList;
+use Propel\Common\Collection\Map;
+use Propel\Common\Collection\Set;
 use Propel\Generator\Model\Parts\SchemaPart;
 
 /**
@@ -98,26 +98,32 @@ class Database
 //         $this->entitiesByFullName = new Map();
         $this->initBehaviors();
         $this->initSql();
+        $this->initVendor();
 
         // default values
         $this->activeRecord = false;
         $this->identifierQuoting = false;
     }
 
-    /**
-     * @TODO
-     */
     public function __clone()
     {
-//         $entities = [];
-//         foreach ($this->entities as $oldEntity) {
-//             $entity = clone $oldEntity;
-//             $entities[] = $entity;
-//             $this->entitiesByName[$entity->getName()] = $entity;
-//             $this->entitiesByLowercaseName[strtolower($entity->getName())] = $entity;
-//             //            $this->entitiesByPhpName[$entity->getName()] = $entity;
-//         }
-//         $this->entities = $entities;
+        $this->domains = clone $this->domains;
+        $this->entities = clone $this->entities;
+        $this->sequences = clone $this->sequences;
+        if (null !== $this->generatorConfig) {
+            $this->generatorConfig = clone $this->generatorConfig;
+        }
+        if (null !== $this->platform) {
+            $this->platform = clone $this->platform;
+        }
+        $this->idMethodParameters = clone $this->idMethodParameters;
+        $this->behaviors = clone $this->behaviors;
+        if (null !== $this->schema) {
+            $this->schema = clone $this->schema;
+        }
+        if (null !== $this->vendor) {
+            $this->vendor = clone $this->vendor;
+        }
     }
 
     /**
@@ -127,24 +133,6 @@ class Database
     {
         return $this->schema;
     }
-
-//     /**
-//      * @return boolean
-//      */
-//     public function isActiveRecord(): bool
-//     {
-//         return $this->activeRecord;
-//     }
-
-//     /**
-//      * @param boolean $activeRecord
-//      * @return $this
-//      */
-//     public function setActiveRecord(bool $activeRecord): Database
-//     {
-//         $this->activeRecord = $activeRecord;
-//         return $this;
-//     }
 
     /**
      * Return the list of all entities.
@@ -327,6 +315,13 @@ class Database
             $this->entities->add($entity);
             $entity->setDatabase($this);
         }
+
+        return $this;
+    }
+
+    public function removeEntity(Entity $entity): Database
+    {
+        $this->entities->remove($entity);
 
         return $this;
     }

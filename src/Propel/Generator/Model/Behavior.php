@@ -17,8 +17,7 @@ use Propel\Generator\Builder\Om\EntityMapBuilder;
 use Propel\Generator\Builder\Om\ObjectBuilder;
 use Propel\Generator\Builder\Om\QueryBuilder;
 use Propel\Generator\Builder\Om\RepositoryBuilder;
-use Propel\Generator\Exception\LogicException;
-use phootwork\collection\Map;
+use Propel\Common\Collection\Map;
 use Propel\Generator\Model\Parts\DatabasePart;
 use Propel\Generator\Model\Parts\EntityPart;
 use Propel\Generator\Model\Parts\NamePart;
@@ -47,6 +46,14 @@ class Behavior
      * @var Map
      */
     protected $parameters;
+
+    /**
+     * Array of default parameters.
+     * Usually override by subclasses.
+     *
+     * @var array
+     */
+    protected $defaultParameters = [];
 
     /**
      * Whether or not the entity has been
@@ -82,7 +89,8 @@ class Behavior
 
     public function __construct()
     {
-        $this->parameters = new Map();
+        //Add the subclasses default parameters
+        $this->parameters = new Map($this->defaultParameters);
     }
 
     /**
@@ -195,12 +203,13 @@ class Behavior
     /**
      * Returns a single parameter by its name.
      *
-     * @param string $name
-     * @return string
+     * @param string   $name
+     *
+     * @return mixed
      */
-    public function getParameter($name)
+    public function getParameter(string $name)
     {
-        return $this->parameters[$name];
+        return $this->parameters->get($name);
     }
 
     /**

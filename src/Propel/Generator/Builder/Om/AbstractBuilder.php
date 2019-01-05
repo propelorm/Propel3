@@ -8,9 +8,12 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Builder\Om;
 
 use gossi\codegen\generator\CodeGenerator;
+use gossi\codegen\model\GenerateableInterface;
 use gossi\codegen\model\PhpMethod;
 use Propel\Common\Types\BuildableFieldTypeInterface;
 use Propel\Generator\Builder\DataModelBuilder;
@@ -56,21 +59,22 @@ abstract class AbstractBuilder extends DataModelBuilder
      * this is not the case.
      *
      * @return null|string The resulting PHP sourcecode.
+     * @throws PropelException If the entity has no primary key
      */
-    public function build()
+    public function build(): string
     {
         $this->validateModel();
         $this->definition = new ClassDefinition($this->getFullClassName());
 
-        if (!$this->getTable()->getPrimaryKey()) {
-            throw new PropelException(sprintf('The table %s does not have a primary key.', $this->getTable()->getFullClassName()));
+        if (!$this->getEntity()->getPrimaryKey()) {
+            throw new PropelException(sprintf('The table %s does not have a primary key.', $this->getFullClassName()));
         }
 
         if (false === $this->buildClass()) {
-            return null;
+            return '';
         }
 
-        foreach ($this->getTable()->getFields() as $field) {
+        foreach ($this->getEntity()->getFields() as $field) {
             if ($field->getFieldType() instanceof BuildableFieldTypeInterface) {
                 $field->getFieldType()->build($this, $field);
             }
@@ -88,7 +92,7 @@ abstract class AbstractBuilder extends DataModelBuilder
     /**
      * @return ClassDefinition
      */
-    public function getDefinition()
+    public function getDefinition(): GenerateableInterface
     {
         return $this->definition;
     }
@@ -96,7 +100,7 @@ abstract class AbstractBuilder extends DataModelBuilder
     /**
      * @param ClassDefinition $definition
      */
-    public function setDefinition($definition)
+    public function setDefinition(ClassDefinition $definition): void
     {
         $this->definition = $definition;
     }
@@ -106,9 +110,9 @@ abstract class AbstractBuilder extends DataModelBuilder
      *
      * @return string
      */
-    public function quoteIdentifier($identifier)
+    public function quoteIdentifier(string $identifier): string
     {
-        if ($this->getTable()->isIdentifierQuotingEnabled()) {
+        if ($this->getEntity()->isIdentifierQuotingEnabled()) {
             return $this->getPlatform()->doQuoting($identifier);
         }
 
@@ -116,11 +120,38 @@ abstract class AbstractBuilder extends DataModelBuilder
     }
 
     /**
+     * Returns the full class name with namespace. Overwrite this method if you need
+     * to have a different class name.
+     *
+     * @param string $injectNamespace will be inject in the namespace between namespace and className
+     * @param string $classPrefix     will be inject in the class name between namespace and className
+     *
+     * @return string
+     */
+    public function getFullClassName(string $injectNamespace = '', string $classPrefix = ''): string
+    {
+        $fullClassName = $this->getEntity()->getFullName();
+        $namespace = explode('\\', $fullClassName);
+        $className = array_pop($namespace);
+        if ($injectNamespace) {
+            $namespace[] = trim($injectNamespace, '\\');
+        }
+        if ($classPrefix) {
+            $className = $classPrefix . $className;
+        }
+        if ($namespace) {
+            return trim(implode('\\', $namespace) . '\\' . $className, '\\');
+        } else {
+            return $fullClassName;
+        }
+    }
+
+    /**
      * Gets the full path to the file for the current class.
      *
      * @return string
      */
-    public function getClassFilePath()
+    public function getClassFilePath(): string
     {
         return strtr($this->getFullClassName(), '\\', '/') . '.php';
     }
@@ -129,52 +160,60 @@ abstract class AbstractBuilder extends DataModelBuilder
      * Whether to add the generic mutator methods (setByName(), setByPosition(), fromArray()).
      * This is based on the build property propel.addGenericMutators, and also whether the
      * table is read-only or an alias.
+     *
+     * @return bool
      */
-    protected function isAddGenericMutators()
+    protected function isAddGenericMutators(): bool
     {
-        $table = $this->getTable();
+        $entity = $this->getEntity();
 
         return
-            !$table->isAlias() &&
+            !$entity->isAlias() &&
             $this->getBuildProperty('generator.objectModel.addGenericMutators') &&
-            !$table->isReadOnly();
+            !$entity->isReadOnly();
     }
 
     /**
      * Whether to add the mutator methods.
+     *
+     * @return bool
      */
-    protected function isAddMutators()
+    protected function isAddMutators(): bool
     {
-        $table = $this->getTable();
+        $entity = $this->getEntity();
 
         return
-            !$table->isAlias() &&
-            !$table->isReadOnly();
+            !$entity->isAlias() &&
+            !$entity->isReadOnly();
     }
 
     /**
      * Whether to add the accessor methods.
+     *
+     * @return bool
      */
-    protected function isAddAccessors()
+    protected function isAddAccessors(): bool
     {
-        $table = $this->getTable();
+        $entity = $this->getEntity();
 
         return
-            !$table->isAlias() &&
-            !$table->isReadOnly();
+            !$entity->isAlias() &&
+            !$entity->isReadOnly();
     }
 
     /**
      * Whether to add the generic accessor methods (getByName(), getByPosition(), toArray()).
      * This is based on the build property propel.addGenericAccessors, and also whether the
      * table is an alias.
+     *
+     * @return bool
      */
-    protected function isAddGenericAccessors()
+    protected function isAddGenericAccessors(): bool
     {
-        $table = $this->getTable();
+        $entity = $this->getEntity();
 
         return
-            !$table->isAlias() &&
+            !$entity->isAlias() &&
             $this->getBuildProperty('generator.objectModel.addGenericAccessors');
     }
 
@@ -185,7 +224,7 @@ abstract class AbstractBuilder extends DataModelBuilder
      *
      * @return string
      */
-    public function getDefaultKeyType()
+    public function getDefaultKeyType(): string
     {
         $defaultKeyType = $this->getBuilder()->getBuildProperty('generator.objectModel.defaultKeyType')
             ? $this->getBuilder()->getBuildProperty('generator.objectModel.defaultKeyType')
@@ -199,7 +238,7 @@ abstract class AbstractBuilder extends DataModelBuilder
      *
      * @return string
      */
-    public function getClassName()
+    public function getClassName(): string
     {
         $fullClassName = $this->getFullClassName();
         $namespaces = explode('\\', $fullClassName);
@@ -208,7 +247,7 @@ abstract class AbstractBuilder extends DataModelBuilder
     }
 
     /**
-     * Validates the current table to make sure that it won't
+     * Validates the current entity to make sure that it won't
      * result in generated code that will not parse.
      *
      * This method may emit warnings for code which may cause problems
@@ -221,9 +260,9 @@ abstract class AbstractBuilder extends DataModelBuilder
     }
 
     /**
-     * Checks whether any registered behavior on that table has a modifier for a hook
+     * Checks whether any registered behavior on that entity has a modifier for a hook
      */
-    public function applyBehaviorModifier()
+    public function applyBehaviorModifier(): void
     {
         $className = explode('\\', get_called_class());
         $className = array_pop($className);
@@ -231,7 +270,7 @@ abstract class AbstractBuilder extends DataModelBuilder
 
         $hookName = lcfirst($className) . 'Modification';
 
-        foreach ($this->getTable()->getBehaviors() as $behavior) {
+        foreach ($this->getEntity()->getBehaviors() as $behavior) {
             if (method_exists($behavior, $modifierGetter)) {
                 $modifier = $behavior->$modifierGetter();
             } else {
@@ -248,10 +287,10 @@ abstract class AbstractBuilder extends DataModelBuilder
      *
      * @return string
      */
-    public function applyBehaviorHooks($hookName)
+    public function applyBehaviorHooks(string $hookName): string
     {
         $body = '';
-        foreach ($this->getTable()->getBehaviors() as $behavior) {
+        foreach ($this->getEntity()->getBehaviors() as $behavior) {
             if (method_exists($behavior, $hookName)) {
                 $code = $behavior->$hookName($this);
 
@@ -284,7 +323,7 @@ if (false === \$this->$hookBehaviorMethodName(\$event)) {
     }
 
 //    /**
-//     * Checks whether any registered behavior content creator on that table exists a contentName
+//     * Checks whether any registered behavior content creator on that entity exists a contentName
 //     *
 //     * @param string $contentName The name of the content as called from one of this class methods, e.g.
 //     *                            "parentClassName"
@@ -293,7 +332,7 @@ if (false === \$this->$hookBehaviorMethodName(\$event)) {
 //    public function getBehaviorContentBase($contentName, $modifier)
 //    {
 //        $modifierGetter = 'get' . ucfirst($modifier);
-//        foreach ($this->getTable()->getBehaviors() as $behavior) {
+//        foreach ($this->getEntity()->getBehaviors() as $behavior) {
 //            $modifier = $behavior->$modifierGetter();
 //            if (method_exists($modifier, $contentName)) {
 //                return $modifier->$contentName($this);

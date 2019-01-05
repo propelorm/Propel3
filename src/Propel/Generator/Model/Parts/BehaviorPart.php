@@ -13,7 +13,7 @@ namespace Propel\Generator\Model\Parts;
 
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Model\Behavior;
-use phootwork\collection\Map;
+use Propel\Common\Collection\Map;
 
 /**
  * BehaviorableTrait use it on every model that can hold behaviors

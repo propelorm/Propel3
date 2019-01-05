@@ -10,6 +10,7 @@
 
 namespace Propel\Tests\Common\Config\Loader;
 
+use org\bovigo\vfs\vfsStream;
 use Propel\Common\Config\Loader\YamlFileLoader;
 use Propel\Common\Config\FileLocator;
 use Propel\Tests\Common\Config\ConfigTestCase;
@@ -19,8 +20,9 @@ class YamlFileLoaderTest extends ConfigTestCase
     /** @var  YamlFileLoader */
     protected $loader;
 
-    protected function setUp()
+    public function setUp()
     {
+        parent::setUp();
         $this->loader = new YamlFileLoader(new FileLocator([sys_get_temp_dir()]));
     }
 
@@ -41,9 +43,9 @@ class YamlFileLoaderTest extends ConfigTestCase
 foo: bar
 bar: baz
 EOF;
-        $this->dumpTempFile('parameters.yaml', $content);
+        $file = vfsStream::newFile('parameters.yaml')->at($this->getRoot())->setContent($content);
 
-        $test = $this->loader->load('parameters.yaml');
+        $test = $this->loader->load($file->url());
         $this->assertEquals('bar', $test['foo']);
         $this->assertEquals('baz', $test['bar']);
     }
@@ -68,24 +70,22 @@ not yaml content
 only plain
 text
 EOF;
-        $this->dumpTempFile('nonvalid.yaml', $content);
+        $file = vfsStream::newFile('nonvalid.yaml')->at($this->getRoot())->setContent($content);
 
-        $this->loader->load('nonvalid.yaml');
+        $this->loader->load($file->url());
     }
 
     public function testYamlFileIsEmpty()
     {
-        $content = '';
-        $this->dumpTempFile('empty.yaml', $content);
-
-        $actual = $this->loader->load('empty.yaml');
+        $file = vfsStream::newFile('empty.yaml')->at($this->getRoot())->setContent('');
+        $actual = $this->loader->load($file->url());
 
         $this->assertEquals([], $actual);
     }
 
     /**
      * @expectedException Propel\Common\Config\Exception\InputOutputException
-     * @expectedExceptionMessage You don't have permissions to access configuration file notreadable.yaml.
+     * @expectedExceptionMessage You don't have permissions to access configuration file vfs://root/notreadable.yaml.
      */
     public function testYamlFileNotReadableThrowsException()
     {
@@ -93,11 +93,9 @@ EOF;
 foo: bar
 bar: baz
 EOF;
+        $file = vfsStream::newFile('notreadable.yaml', 200)->at($this->getRoot())->setContent($content);
 
-        $this->dumpTempFile('notreadable.yaml', $content);
-        $this->getFilesystem()->chmod(sys_get_temp_dir() . '/notreadable.yaml', 0200);
-
-        $actual = $this->loader->load('notreadable.yaml');
+        $actual = $this->loader->load($file->url());
         $this->assertEquals('bar', $actual['foo']);
         $this->assertEquals('baz', $actual['bar']);
     }

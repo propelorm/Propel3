@@ -28,7 +28,7 @@ class GetArchiveMethod extends BuildComponent
     {
         /** @var ArchivableBehavior $behavior */
         $behavior = $this->getBehavior();
-        $archiveClassName = $behavior->getArchiveEntity()->getFullClassName();
+        $archiveClassName = $behavior->getArchiveEntity()->getFullName();
         $archiveRepositoryName = $this->getRepositoryClassNameForEntity($behavior->getArchiveEntity(), true);
 
         $body = "
@@ -49,7 +49,7 @@ return \$archive;
 
         $this->addMethod('getArchive')
             ->setDescription('[Archivable] returns archived version.')
-            ->addSimpleDescParameter('entity', $this->getEntity()->getFullClassName())
+            ->addSimpleDescParameter('entity', $this->getEntity()->getFullName())
             ->setType($archiveClassName.'|null')
             ->setBody($body);
     }

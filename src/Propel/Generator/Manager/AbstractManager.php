@@ -8,14 +8,15 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Manager;
 
-use Propel\Generator\Builder\Util\SchemaReader;
 use Propel\Generator\Config\GeneratorConfigInterface;
 use Propel\Generator\Exception\BuildException;
-use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Schema;
+use Propel\Generator\Schema\SchemaReader;
 use Propel\Runtime\Map\DatabaseMap;
 
 /**
@@ -69,7 +70,8 @@ abstract class AbstractManager
     private $loggerClosure = null;
 
     /**
-     * Have datamodels been initialized?
+     * Have data models been initialized?
+     *
      * @var boolean
      */
     private $dataModelsLoaded = false;
@@ -121,7 +123,6 @@ abstract class AbstractManager
         return $this->workingDirectory;
     }
 
-
     /**
      * Returns the data models that have been
      * processed.
@@ -157,7 +158,7 @@ abstract class AbstractManager
     public function getDatabases(): array
     {
         if (null === $this->databases) {
-            /** @var DatabaseMap[] $databases */
+            /** @var Database[] $databases */
             $databases = [];
             foreach ($this->getDataModels() as $dataModel) {
                 foreach ($dataModel->getDatabases() as $database) {
@@ -167,7 +168,7 @@ abstract class AbstractManager
                         $entities = $database->getEntities();
                         // Merge entities from different schema.xml to the same database
                         foreach ($entities as $entity) {
-                            if (!$databases[$database->getName()]->hasEntity($entity->getName(), true)) {
+                            if (!$databases[$database->getName()]->hasEntityByName($entity->getName())) {
                                 $databases[$database->getName()]->addEntity($entity);
                             }
                         }
@@ -214,7 +215,7 @@ abstract class AbstractManager
      * Returns all matching XML schema files and loads them into data models for
      * class.
      */
-    protected function loadDataModels()
+    protected function loadDataModels(): void
     {
         $schemas = [];
         $totalNbEntities   = 0;
@@ -223,20 +224,15 @@ abstract class AbstractManager
         if (empty($dataModelFiles)) {
             throw new BuildException('No schema files were found (matching your schema fileset definition).');
         }
-//Move This to the XMLLoader
         // Make a transaction for each file
         foreach ($dataModelFiles as $schema) {
             $dmFilename = $schema->getPathName();
             $this->log('Processing: ' . $schema->getFileName());
 
-            //@todo load datamodel
+            $schemaReader = new SchemaReader($this->getGeneratorConfig());
+            $schema = $schemaReader->parse($dmFilename);
 
-            $this->includeExternalSchemas($dom, $schema->getPath());
-
-            $xmlParser = new SchemaReader($this->dbEncoding);
-            $xmlParser->setGeneratorConfig($this->getGeneratorConfig());
-            $schema = $xmlParser->parseString($dom->saveXML(), $dmFilename);
-            $nbEntities = $schema->getDatabase(null, false)->countEntities();
+            $nbEntities = $schema->getDatabase()->countEntities();
             $totalNbEntities += $nbEntities;
 
             $this->log(sprintf('  %d entities processed successfully', $nbEntities));
@@ -264,52 +260,10 @@ abstract class AbstractManager
         }
 
         foreach ($this->dataModels as $schema) {
-            $schema->doFinalInitialization();
+            $schema->getPlatform()->doFinalInitialization($schema);
         }
 
         $this->dataModelsLoaded = true;
-    }
-
-    /**
-     * Replaces all external-schema nodes with the content of xml schema that node refers to
-     *
-     * Recurses to include any external schema referenced from in an included xml (and deeper)
-     * Note: this function very much assumes at least a reasonable XML schema, maybe it'll proof
-     * users don't have those and adding some more informative exceptions would be better
-     *
-     * @param \DOMDocument $dom
-     * @param string       $srcDir
-     */
-    //@todo move to schemaLoaders
-    protected function includeExternalSchemas(\DOMDocument $dom, $srcDir)
-    {
-        $databaseNode = $dom->getElementsByTagName('database')->item(0);
-        $externalSchemaNodes = $dom->getElementsByTagName('external-schema');
-
-        $nbIncludedSchemas = 0;
-        while ($externalSchema = $externalSchemaNodes->item(0)) {
-            $include = $externalSchema->getAttribute('filename');
-            $referenceOnly = $externalSchema->getAttribute('referenceOnly');
-            $this->log('Processing external schema: ' . $include);
-
-            $externalSchema->parentNode->removeChild($externalSchema);
-
-            $externalSchemaDom = new \DOMDocument('1.0', 'UTF-8');
-            $externalSchemaDom->load(realpath($include));
-
-            // The external schema may have external schemas of its own ; recurs
-            $this->includeExternalSchemas($externalSchemaDom, $srcDir);
-            foreach ($externalSchemaDom->getElementsByTagName('entity') as $entityNode) {
-                if ($referenceOnly) {
-                    $entityNode->setAttribute("skipSql", "true");
-                }
-                $databaseNode->appendChild($dom->importNode($entityNode, true));
-            }
-
-            $nbIncludedSchemas++;
-        }
-
-        return $nbIncludedSchemas;
     }
 
     /**
@@ -320,7 +274,7 @@ abstract class AbstractManager
      * @param  array  $schemas
      * @return Schema
      */
-    protected function joinDataModels(array $schemas)
+    protected function joinDataModels(array $schemas): Schema
     {
         $mainSchema = array_shift($schemas);
         $mainSchema->joinSchemas($schemas);

@@ -20,6 +20,6 @@ class Attributes extends BuildComponent
 
         $this->addProperty('currentTranslations', null)
             ->setDescription('Current translation objects')
-            ->setTypeDescription('array[' . $behavior->getI18nEntity()->getFullClassName() . ']');
+            ->setTypeDescription('array[' . $behavior->getI18nEntity()->getFullName() . ']');
     }
 }

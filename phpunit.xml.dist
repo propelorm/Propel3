@@ -11,7 +11,7 @@
     >
 
   <testsuites>
-    <testsuite name="Propel2 Test Suite">
+    <testsuite name="Propel3 Test Suite">
       <directory>tests/Propel/Tests/</directory>
     </testsuite>
   </testsuites>

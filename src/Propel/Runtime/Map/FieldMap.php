@@ -235,7 +235,7 @@ class FieldMap
      */
     public function getFullyQualifiedName()
     {
-        return $this->getEntity()->getFullClassName() . '.' . $this->getName();
+        return $this->getEntity()->getFullName() . '.' . $this->getName();
     }
 
     /**
@@ -243,7 +243,7 @@ class FieldMap
      */
     public function getFullyQualifierColumnName()
     {
-        return $this->getEntity()->getFQTableName() . '.' . $this->getColumnName();
+        return $this->getEntity()->getFullTableName() . '.' . $this->getColumnName();
     }
 
     /**

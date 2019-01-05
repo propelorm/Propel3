@@ -94,177 +94,177 @@ class MysqlAdapterTest extends TestCaseFixtures
 
     public function dataApplyLimit()
     {
-        return array(
+        return [
 
             /*
                 Offset & limit = 0
              */
 
-            'Zero offset & limit' => array(
+            'Zero offset & limit' => [
                 'offset'      => 0,
                 'limit'       => 0,
                 'expectedSql' => ' LIMIT 0'
-            ),
+            ],
 
             /*
                 Offset = 0
              */
 
-            '32-bit limit' => array(
+            '32-bit limit' => [
                 'offset'      => 0,
                 'limit'       => 4294967295,
                 'expectedSql' => ' LIMIT 4294967295'
-            ),
-            '32-bit limit as a string' => array(
+            ],
+            '32-bit limit as a string' => [
                 'offset'      => 0,
                 'limit'       => '4294967295',
                 'expectedSql' => ' LIMIT 4294967295'
-            ),
+            ],
 
-            '64-bit limit' => array(
+            '64-bit limit' => [
                 'offset'      => 0,
                 'limit'       => 9223372036854775807,
                 'expectedSql' => ' LIMIT 9223372036854775807'
-            ),
-            '64-bit limit as a string' => array(
+            ],
+            '64-bit limit as a string' => [
                 'offset'      => 0,
                 'limit'       => '9223372036854775807',
                 'expectedSql' => ' LIMIT 9223372036854775807'
-            ),
+            ],
 
-            'Float limit' => array(
+            'Float limit' => [
                 'offset'      => 0,
                 'limit'       => 123.9,
                 'expectedSql' => ' LIMIT 123'
-            ),
-            'Float limit as a string' => array(
+            ],
+            'Float limit as a string' => [
                 'offset'      => 0,
                 'limit'       => '123.9',
                 'expectedSql' => ' LIMIT 123'
-            ),
+            ],
 
-            'Negative limit' => array(
+            'Negative limit' => [
                 'offset'      => 0,
                 'limit'       => -1,
                 'expectedSql' => ''
-            ),
-            'Non-numeric string limit' => array(
+            ],
+            'Non-numeric string limit' => [
                 'offset'      => 0,
                 'limit'       => 'foo',
                 'expectedSql' => ' LIMIT 0'
-            ),
-            'SQL injected limit' => array(
+            ],
+            'SQL injected limit' => [
                 'offset'      => 0,
                 'limit'       => '3;DROP TABLE abc',
                 'expectedSql' => ' LIMIT 3'
-            ),
+            ],
 
             /*
                 Limit = 0
              */
 
-            '32-bit offset' => array(
+            '32-bit offset' => [
                 'offset'      => 4294967295,
                 'limit'       => 0,
                 'expectedSql' => ' LIMIT 4294967295, 0'
-            ),
-            '32-bit offset as a string' => array(
+            ],
+            '32-bit offset as a string' => [
                 'offset'      => '4294967295',
                 'limit'       => 0,
                 'expectedSql' => ' LIMIT 4294967295, 0'
-            ),
+            ],
 
-            '64-bit offset' => array(
+            '64-bit offset' => [
                 'offset'      => 9223372036854775807,
                 'limit'       => 0,
                 'expectedSql' => ' LIMIT 9223372036854775807, 0'
-            ),
-            '64-bit offset as a string' => array(
+            ],
+            '64-bit offset as a string' => [
                 'offset'      => '9223372036854775807',
                 'limit'       => 0,
                 'expectedSql' => ' LIMIT 9223372036854775807, 0'
-            ),
+            ],
 
-            'Float offset' => array(
+            'Float offset' => [
                 'offset'      => 123.9,
                 'limit'       => 0,
                 'expectedSql' => ' LIMIT 123, 0'
-            ),
-            'Float offset as a string' => array(
+            ],
+            'Float offset as a string' => [
                 'offset'      => '123.9',
                 'limit'       => 0,
                 'expectedSql' => ' LIMIT 123, 0'
-            ),
+            ],
 
-            'Negative offset' => array(
+            'Negative offset' => [
                 'offset'      => -1,
                 'limit'       => 0,
                 'expectedSql' => ' LIMIT 0'
-            ),
-            'Non-numeric string offset' => array(
+            ],
+            'Non-numeric string offset' => [
                 'offset'      => 'foo',
                 'limit'       => 0,
                 'expectedSql' => ' LIMIT 0'
-            ),
-            'SQL injected offset' => array(
+            ],
+            'SQL injected offset' => [
                 'offset'      => '3;DROP TABLE abc',
                 'limit'       => 0,
                 'expectedSql' => ' LIMIT 3, 0'
-            ),
+            ],
 
             /*
                 Offset & limit != 0
              */
 
-            array(
+            [
                 'offset'      => 4294967295,
                 'limit'       => 999,
                 'expectedSql' => ' LIMIT 4294967295, 999'
-            ),
-            array(
+            ],
+            [
                 'offset'      => '4294967295',
                 'limit'       => 999,
                 'expectedSql' => ' LIMIT 4294967295, 999'
-            ),
+            ],
 
-            array(
+            [
                 'offset'      => 9223372036854775807,
                 'limit'       => 999,
                 'expectedSql' => ' LIMIT 9223372036854775807, 999'
-            ),
-            array(
+            ],
+            [
                 'offset'      => '9223372036854775807',
                 'limit'       => 999,
                 'expectedSql' => ' LIMIT 9223372036854775807, 999'
-            ),
+            ],
 
-            array(
+            [
                 'offset'      => 123.9,
                 'limit'       => 999,
                 'expectedSql' => ' LIMIT 123, 999'
-            ),
-            array(
+            ],
+            [
                 'offset'      => '123.9',
                 'limit'       => 999,
                 'expectedSql' => ' LIMIT 123, 999'
-            ),
+            ],
 
-            array(
+            [
                 'offset'      => -1,
                 'limit'       => 999,
                 'expectedSql' => ' LIMIT 999'
-            ),
-            array(
+            ],
+            [
                 'offset'      => 'foo',
                 'limit'       => 999,
                 'expectedSql' => ' LIMIT 999'
-            ),
-            array(
+            ],
+            [
                 'offset'      => '3;DROP TABLE abc',
                 'limit'       => 999,
                 'expectedSql' => ' LIMIT 3, 999'
-            ),
-        );
+            ],
+        ];
     }
 }
 

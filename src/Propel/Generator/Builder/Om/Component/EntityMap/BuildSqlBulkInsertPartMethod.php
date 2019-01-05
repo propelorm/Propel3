@@ -73,7 +73,7 @@ if (null !== \$value) {
         }
 
         foreach ($this->getEntity()->getRelations() as $relation) {
-            $className = $relation->getForeignEntity()->getFullClassName();
+            $className = $relation->getForeignEntity()->getFullName();
             $propertyName = $this->getRelationVarName($relation);
 
             $body .= "
@@ -92,7 +92,7 @@ if (null !== \$value) {
                     foreach ($foreignEntity->getRelations() as $foreignRelation) {
                         if ($foreignRelation->getLocalField()->getName() === $foreignFieldName ) {
                             $body .= "
-\$reader = \$this->getClassPropReader('{$foreignRelation->getForeignEntity()->getFullClassName()}');
+\$reader = \$this->getClassPropReader('{$foreignRelation->getForeignEntity()->getFullName()}');
 \$forEnt = \$foreignEntityReader(\$foreignEntity, '{$this->getRelationVarName($foreignRelation)}');
 \$value = \$reader(\$forEnt, '{$foreignRelation->getForeignField()->getName()}');";
                         }

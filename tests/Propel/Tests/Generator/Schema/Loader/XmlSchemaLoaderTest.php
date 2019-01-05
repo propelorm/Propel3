@@ -28,28 +28,28 @@ class XmlSchemaLoaderTest extends ReaderTestCase
     {
         $this->assertTrue($this->loader->supports('foo.xml'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($this->loader->supports('foo.foo'), '->supports() returns false if the resource is not loadable');
-        $this->assertFalse($this->loader->supports($this->root->url()), '->supports() returns false if the resource is not a string.');
+        $this->assertFalse($this->loader->supports($this->getRoot()->url()), '->supports() returns false if the resource is not a string.');
     }
 
     public function testXmlSchemaCanBeLoaded()
     {
-        $actual = $this->loader->load(vfsStream::url('schema_dir/schema.xml'));
+        $actual = $this->loader->load(vfsStream::url('root/schema.xml'));
         $this->assertEquals('bookstore', $actual['database']['name']);
         $this->assertEquals('Book', $actual['database']['entity'][0]['name']);
     }
 
     /**
      * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage The file "vfs://inexistent.xml" does not exist
+     * @expectedExceptionMessage The file "vfs://root/inexistent.xml" does not exist
      */
     public function testXmlFileDoesNotExist()
     {
-        $this->loader->load(vfsStream::url('inexistent.xml'));
+        $this->loader->load(vfsStream::url('root/inexistent.xml'));
     }
 
     /**
      * @expectedException        Propel\Generator\Schema\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The schema file 'vfs://schema_dir/nonvalid.xml' has invalid content.
+     * @expectedExceptionMessage The schema file 'vfs://root/nonvalid.xml' has invalid content.
      */
     public function testXmlFileHasInvalidContent()
     {
@@ -58,18 +58,18 @@ not xml content
 only plain
 text
 EOF;
-        vfsStream::newFile('nonvalid.xml')->at($this->root)->setContent($content);
-        $this->loader->load(vfsStream::url('schema_dir/nonvalid.xml'));
+        vfsStream::newFile('nonvalid.xml')->at($this->getRoot())->setContent($content);
+        $this->loader->load(vfsStream::url('root/nonvalid.xml'));
     }
 
     /**
      * @expectedException        Propel\Generator\Schema\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The schema file 'vfs://schema_dir/empty.xml' has invalid content.
+     * @expectedExceptionMessage The schema file 'vfs://root/empty.xml' has invalid content.
      */
     public function testXmlFileIsEmpty()
     {
-        vfsStream::newFile('empty.xml')->at($this->root)->setContent('');
-        $this->loader->load(vfsStream::url('schema_dir/empty.xml'));
+        vfsStream::newFile('empty.xml')->at($this->getRoot())->setContent('');
+        $this->loader->load(vfsStream::url('root/empty.xml'));
     }
 
     /**
@@ -87,7 +87,7 @@ EOF;
 </database>
 EOF;
 
-        vfsStream::newFile('notreadable.xml', 0000)->at($this->root)->setContent($content);
-        $this->loader->load(vfsStream::url('schema_dir/notreadable.xml'));
+        vfsStream::newFile('notreadable.xml', 0000)->at($this->getRoot())->setContent($content);
+        $this->loader->load(vfsStream::url('root/notreadable.xml'));
     }
 }

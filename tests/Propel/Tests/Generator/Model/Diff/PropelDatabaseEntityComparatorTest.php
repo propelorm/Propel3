@@ -10,7 +10,7 @@
 
 namespace Propel\Tests\Generator\Model\Diff\DatabaseEntityComparatorTest;
 
-use phootwork\collection\Set;
+use Propel\Common\Collection\Set;
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\FieldDefaultValue;
 use Propel\Generator\Model\Database;
@@ -40,6 +40,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
     public function testCompareSameEntities()
     {
         $d1 = new Database();
+        $d1->setPlatform($this->platform);
         $t1 = new Entity('Foo_Entity');
         $c1 = new Field('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
@@ -53,6 +54,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $d1->addEntity($t2);
 
         $d2 = new Database();
+        $d2->setPlatform($this->platform);
         $t3 = new Entity('Foo_Entity');
         $c3 = new Field('Foo');
         $c3->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));

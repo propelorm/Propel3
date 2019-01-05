@@ -8,8 +8,9 @@
  *
  */
 
-namespace Propel\Tests\Generator\Model;
+declare(strict_types=1);
 
+namespace Propel\Tests\Generator\Model;
 
 use Propel\Generator\Model\ModelFactory;
 
@@ -41,16 +42,18 @@ class ModelFactoryTest extends ModelTestCase
 
     public function provideBehaviors()
     {
-        return array(
-            array('aggregate_field', 'AggregateField'),
-            array('auto_add_pk', 'AutoAddPk'),
-            array('concrete_inheritance', 'ConcreteInheritance'),
-            array('delegate', 'Delegate'),
-            array('nested_set', 'NestedSet'),
-            array('query_cache', 'QueryCache'),
-            array('sluggable', 'Sluggable'),
-            array('sortable', 'Sortable'),
-            array('timestampable', 'Timestampable'),
-        );
+        return [
+            ['aggregate_field', 'AggregateField'],
+            ['auto_add_pk', 'AutoAddPk'],
+            ['concrete_inheritance', 'ConcreteInheritance'],
+            ['delegate', 'Delegate'],
+            ['nested_set', 'NestedSet'],
+            ['query_cache', 'QueryCache'],
+            ['sluggable', 'Sluggable'],
+            ['sortable', 'Sortable'],
+            ['timestampable', 'Timestampable'],
+        ];
     }
+
+
 }

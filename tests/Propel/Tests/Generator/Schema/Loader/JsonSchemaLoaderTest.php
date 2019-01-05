@@ -28,12 +28,12 @@ class JsonSchemaLoaderTest extends ReaderTestCase
     {
         $this->assertTrue($this->loader->supports('foo.json'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($this->loader->supports('foo.bar'), '->supports() returns false if the resource is not loadable');
-        $this->assertFalse($this->loader->supports($this->root->url()), '->supports() returns false if the resource is not a string.');
+        $this->assertFalse($this->loader->supports($this->getRoot()->url()), '->supports() returns false if the resource is not a string.');
     }
 
     public function testJsonSchemaCanBeLoaded()
     {
-        $actual = $this->loader->load(vfsStream::url('schema_dir/schema.json'));
+        $actual = $this->loader->load(vfsStream::url('root/schema.json'));
         $this->assertEquals('bookstore', $actual['database']['name']);
         $this->assertEquals('Book', $actual['database']['entities'][0]['name']);
     }
@@ -58,9 +58,9 @@ not json content
 only plain
 text
 EOF;
-        vfsStream::newFile('nonvalid.json')->at($this->root)->setContent($content);
+        vfsStream::newFile('nonvalid.json')->at($this->getRoot())->setContent($content);
 
-        $this->loader->load(vfsStream::url('schema_dir/nonvalid.json'));
+        $this->loader->load(vfsStream::url('root/nonvalid.json'));
     }
 
     /**
@@ -69,9 +69,9 @@ EOF;
      */
     public function testJsonFileIsEmpty()
     {
-        vfsStream::newFile('empty.json')->at($this->root)->setContent('');
+        vfsStream::newFile('empty.json')->at($this->getRoot())->setContent('');
 
-        $this->loader->load(vfsStream::url('schema_dir/empty.json'));
+        $this->loader->load(vfsStream::url('root/empty.json'));
     }
 
     /**
@@ -87,7 +87,7 @@ EOF;
 }
 EOF;
 
-        vfsStream::newFile('notreadable.json', 0000)->at($this->root)->setContent($content);
-        $this->loader->load(vfsStream::url('schema_dir/notreadable.json'));
+        vfsStream::newFile('notreadable.json', 0000)->at($this->getRoot())->setContent($content);
+        $this->loader->load(vfsStream::url('root/notreadable.json'));
     }
 }

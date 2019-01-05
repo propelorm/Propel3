@@ -44,7 +44,7 @@ if (!\$entities) {
 
 \$pks = [];
 \$session = \$this->getConfiguration()->getSession();
-/** @var \\{$relation->getEntity()->getFullClassName()}[] \$entities */
+/** @var \\{$relation->getEntity()->getFullName()}[] \$entities */
 foreach (\$entities as \$entity) {
     \$pk = [];
 
@@ -90,7 +90,7 @@ foreach (\$entities as \$entity) {
 }
 
 /** @var \\$repositoryClass \$relatedRepo */
-\$relatedRepo = \$this->getConfiguration()->getRepository('{$relation->getForeignEntity()->getFullClassName()}');
+\$relatedRepo = \$this->getConfiguration()->getRepository('{$relation->getForeignEntity()->getFullName()}');
 \$relatedQuery = \$relatedRepo->createQuery();
 \$relatedObjects = \$relatedQuery
     ->filterByPrimaryKeys(array_unique(\$pks))

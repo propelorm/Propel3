@@ -10,16 +10,19 @@
 
 namespace Propel\Tests\Common\Config\Loader;
 
+use org\bovigo\vfs\vfsStream;
 use Propel\Common\Config\Loader\JsonFileLoader;
 use Propel\Common\Config\FileLocator;
 use Propel\Tests\Common\Config\ConfigTestCase;
 
 class JsonFileLoaderTest extends ConfigTestCase
 {
+    /** @var JsonFileLoader */
     protected $loader;
 
-    protected function setUp()
+    public function setUp()
     {
+        parent::setUp();
         $this->loader = new JsonFileLoader(new FileLocator([sys_get_temp_dir()]));
     }
 
@@ -39,9 +42,9 @@ class JsonFileLoaderTest extends ConfigTestCase
   "bar": "baz"
 }
 EOF;
-        $this->dumpTempFile('parameters.json', $content);
+        $file = vfsStream::newFile('parameters.json')->at($this->getRoot())->setContent($content);
 
-        $actual = $this->loader->load('parameters.json');
+        $actual = $this->loader->load($file->url());
         $this->assertEquals('bar', $actual['foo']);
         $this->assertEquals('baz', $actual['bar']);
     }
@@ -65,24 +68,23 @@ not json content
 only plain
 text
 EOF;
-        $this->dumpTempFile('nonvalid.json', $content);
+        $file = vfsStream::newFile('nonvalid.json')->at($this->getRoot())->setContent($content);
 
-        $this->loader->load('nonvalid.json');
+        $this->loader->load($file->url());
     }
 
     public function testJsonFileIsEmpty()
     {
-        $content = '';
-        $this->dumpTempFile('empty.json', $content);
+        $file = vfsStream::newFile('empty.json')->at($this->getRoot())->setContent('');
 
-        $actual = $this->loader->load('empty.json');
+        $actual = $this->loader->load($file->url());
 
         $this->assertEquals([], $actual);
     }
 
     /**
      * @expectedException Propel\Common\Config\Exception\InputOutputException
-     * @expectedExceptionMessage You don't have permissions to access configuration file notreadable.json.
+     * @expectedExceptionMessage You don't have permissions to access configuration file vfs://root/notreadable.json.
      */
     public function testJsonFileNotReadableThrowsException()
     {
@@ -92,11 +94,10 @@ EOF;
   "bar": "baz"
 }
 EOF;
+        $file = vfsStream::newFile('notreadable.json', 200)->at($this->getRoot())->setContent($content);
 
-        $this->dumpTempFile('notreadable.json', $content);
-        $this->getFilesystem()->chmod(sys_get_temp_dir() . '/notreadable.json', 0200);
+        $actual = $this->loader->load($file->url());
 
-        $actual = $this->loader->load('notreadable.json');
         $this->assertEquals('bar', $actual['foo']);
         $this->assertEquals('baz', $actual['bar']);
     }

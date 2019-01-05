@@ -30,7 +30,7 @@ class NestedManagerBuilder extends AbstractBuilder
     /**
      * {@inheritdoc}
      */
-    public function getFullClassName($injectNamespace = '', $classPrefix = '')
+    public function getFullClassName(string $injectNamespace = '', string $classPrefix = ''): string
     {
         return parent::getFullClassName($injectNamespace, $classPrefix) . 'NestedManager';
     }

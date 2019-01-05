@@ -411,7 +411,7 @@ abstract class EntityMap
      */
     public function createObject()
     {
-        $reflection = new \ReflectionClass($this->getFullClassName());
+        $reflection = new \ReflectionClass($this->getFullName());
         return $reflection->newInstanceWithoutConstructor();
     }
 
@@ -647,7 +647,7 @@ abstract class EntityMap
 
                 $join = new ModelJoin();
                 $join->setEntityMap($relation->getMiddleEntity());
-                $join->setLeftTableName($relation->getMiddleEntity()->getFullClassName());
+                $join->setLeftTableName($relation->getMiddleEntity()->getFullName());
 
                 //first only supported
                 $outgoing = current($relation->getFieldMappingOutgoing());
@@ -677,7 +677,7 @@ abstract class EntityMap
                 $query->$filterBy($entity);
 
                 $items = $query->find();
-                $foreignWriter = $this->getClassPropWriter($relation->getRightEntity()->getFullClassName());
+                $foreignWriter = $this->getClassPropWriter($relation->getRightEntity()->getFullName());
                 foreach ($items as $item) {
                     $foreignWriter($item, $relation->getRefName(), $entity);
                 }
@@ -1034,7 +1034,7 @@ abstract class EntityMap
      *
      * @return string
      */
-    public function getFQTableName()
+    public function getFullTableName()
     {
         return static::FQ_TABLE_NAME;
     }

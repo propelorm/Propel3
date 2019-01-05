@@ -39,7 +39,7 @@ class Getters extends BuildComponent
     protected function addGetPk()
     {
         $body = "
-\$entityMap = Configuration::getCurrentConfiguration()->getEntityMap('{$this->getBehavior()->getEntity()->getFullClassName()}');
+\$entityMap = Configuration::getCurrentConfiguration()->getEntityMap('{$this->getBehavior()->getEntity()->getFullName()}');
 \$pkFields = \$entityMap->getPrimaryKeys();
 \$propReader = \$entityMap->getPropReader();
 

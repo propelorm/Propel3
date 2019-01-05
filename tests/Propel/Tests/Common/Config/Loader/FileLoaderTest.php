@@ -11,10 +11,12 @@
 namespace Propel\Tests\Common\Config\Loader;
 
 use Propel\Common\Config\Loader\FileLoader as BaseFileLoader;
+use Propel\Common\Config\Loader\FileLoader;
 use Propel\Tests\TestCase;
 
 class FileLoaderTest extends TestCase
 {
+    /** @var FileLoader */
     private $loader;
 
     public function setUp()

@@ -17,6 +17,7 @@ use Propel\Generator\Builder\Om\ObjectBuilder;
 use Propel\Generator\Builder\Om\QueryBuilder;
 use Propel\Generator\Builder\Om\RepositoryBuilder;
 use Propel\Generator\Model\Behavior;
+use Propel\Generator\Model\ModelFactory;
 
 /**
  * Behavior to adds nested set tree structure fields and abilities
@@ -29,13 +30,13 @@ class NestedSetBehavior extends Behavior
     use ComponentTrait;
     
     // default parameters value
-    protected $parameters = [
+    protected $defaultParameters = [
         'left_field'       => 'tree_left',
         'right_field'      => 'tree_right',
         'level_field'      => 'tree_level',
-        'use_scope'         => 'false',
+        'use_scope'         => false,
         'scope_field'      => 'tree_scope',
-        'method_proxies'    => 'false'
+        'method_proxies'    => false
     ];
 
     public function __construct()
@@ -51,33 +52,34 @@ class NestedSetBehavior extends Behavior
     public function modifyEntity()
     {
         $entity = $this->getEntity();
+        $modelFactory = new ModelFactory();
 
         if (!$entity->hasField($this->getParameter('left_field'))) {
-            $entity->addField([
+            $entity->addField($modelFactory->createField([
                 'name' => $this->getParameter('left_field'),
                 'type' => 'INTEGER'
-            ]);
+            ]));
         }
 
         if (!$entity->hasField($this->getParameter('right_field'))) {
-            $entity->addField([
+            $entity->addField($modelFactory->createField([
                 'name' => $this->getParameter('right_field'),
                 'type' => 'INTEGER'
-            ]);
+            ]));
         }
 
         if (!$entity->hasField($this->getParameter('level_field'))) {
-            $entity->addField([
+            $entity->addField($modelFactory->createField([
                 'name' => $this->getParameter('level_field'),
                 'type' => 'INTEGER'
-            ]);
+            ]));
         }
 
         if ('true' === $this->getParameter('use_scope') && !$entity->hasField($this->getParameter('scope_field'))) {
-            $entity->addField([
+            $entity->addField($modelFactory->createField([
                 'name' => $this->getParameter('scope_field'),
                 'type' => 'INTEGER'
-            ]);
+            ]));
         }
     }
 
@@ -88,7 +90,7 @@ class NestedSetBehavior extends Behavior
 
     public function useScope()
     {
-        return 'true' === $this->getParameter('use_scope');
+        return $this->getParameter('use_scope');
     }
 
     public function objectBuilderModification(ObjectBuilder $builder)

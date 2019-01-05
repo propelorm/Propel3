@@ -10,6 +10,7 @@
 
 namespace Propel\Tests\Common\Config;
 
+use org\bovigo\vfs\vfsStream;
 use Propel\Common\Config\XmlToArrayConverter;
 
 class XmlToArrayConverterTest extends ConfigTestCase
@@ -66,7 +67,6 @@ XML
 <?xml version="1.0" encoding="utf-8"?>
 <config>
   <datasources default="bookstore">
-    <datasource id="bookstore">
       <adapter>mysql</adapter>
       <connection>
         <dsn>mysql:host=localhost;dbname=bookstore</dsn>
@@ -79,19 +79,16 @@ XML
         <dsn>mysql:host=slave-server2;dbname=bookstore</dsn>
        </connection>
       </slaves>
-    </datasource>
   </datasources>
 </config>
 XML
 , ['datasources' => [
-    'bookstore' => [
-        'adapter' => 'mysql',
-        'connection' => ['dsn' => 'mysql:host=localhost;dbname=bookstore'],
-        'slaves' => [
-            'connection' => [
-                ['dsn' => 'mysql:host=slave-server1;dbname=bookstore'],
-                ['dsn' => 'mysql:host=slave-server2;dbname=bookstore'],
-            ],
+    'adapter' => 'mysql',
+    'connection' => ['dsn' => 'mysql:host=localhost;dbname=bookstore'],
+    'slaves' => [
+        'connection' => [
+            ['dsn' => 'mysql:host=slave-server1;dbname=bookstore'],
+            ['dsn' => 'mysql:host=slave-server2;dbname=bookstore'],
         ],
     ],
     'default' => 'bookstore',
@@ -101,24 +98,21 @@ XML
 <?xml version="1.0" encoding="utf-8"?>
 <config>
   <datasources default="bookstore">
-    <datasource id="bookstore">
       <adapter>mysql</adapter>
       <connection>
         <dsn>mysql:host=localhost;dbname=bookstore</dsn>
       </connection>
-    </datasource>
-  </datasources>
+</datasources>
 </config>
 XML
 , ['datasources' => [
-                'bookstore' => [
-                    'adapter' => 'mysql',
-                    'connection' => [
-                        'dsn' => 'mysql:host=localhost;dbname=bookstore',
-                    ],
-                ],
-                'default' => 'bookstore',
-            ]]
+        'adapter' => 'mysql',
+        'connection' => [
+            'dsn' => 'mysql:host=localhost;dbname=bookstore',
+        ],
+        'default' => 'bookstore',
+    ]
+  ]
             ],
             [<<<XML
 <?xml version="1.0" encoding="utf-8"?>
@@ -163,8 +157,8 @@ XML
      */
     public function testConvertFromFile($xml, $expected)
     {
-        $this->dumpTempFile('testconvert.xml', $xml);
-        $actual = XmlToArrayConverter::convert(sys_get_temp_dir() . '/testconvert.xml');
+        $file = vfsStream::newFile('testconvert.xml')->at($this->getRoot())->setContent($xml);
+        $actual = XmlToArrayConverter::convert($file->url());
 
         $this->assertEquals($expected, $actual);
     }
@@ -246,8 +240,8 @@ XML;
 
     public function testEmptyFileReturnsEmptyArray()
     {
-        $this->dumpTempFile('empty.xml', '');
-        $actual = XmlToArrayConverter::convert(sys_get_temp_dir() . '/empty.xml');
+        $file = vfsStream::newFile('empty.xml')->at($this->getRoot())->setContent('');
+        $actual = XmlToArrayConverter::convert($file->url());
 
         $this->assertEquals([], $actual);
     }

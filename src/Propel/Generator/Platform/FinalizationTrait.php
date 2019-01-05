@@ -19,6 +19,7 @@ use Propel\Generator\Model\Field;
 use Propel\Generator\Model\Index;
 use Propel\Generator\Model\Model;
 use Propel\Generator\Model\Relation;
+use Propel\Generator\Model\Schema;
 
 /**
  * Trait FinalizationTrait
@@ -29,11 +30,31 @@ use Propel\Generator\Model\Relation;
 trait FinalizationTrait
 {
     /**
-     * Do the finalinitialization
+     * @var bool
+     */
+    private $isInitialized;
+
+    /**
+     * Do final initialization of the whole schema.
+     *
+     * @param Schema $schema
+     */
+    public function doFinalInitialization(Schema $schema)
+    {
+        if (!$this->isInitialized) {
+            foreach ($schema->getDatabases() as $database) {
+                $this->doFinalizeDatabase($database);
+            }
+            $this->isInitialized = true;
+        }
+    }
+
+    /**
+     * Do the final initialization on Database object
      *
      * @param Database $database
      */
-    public function doFinalInitialization(Database $database)
+    public function doFinalizeDatabase(Database $database)
     {
         // execute database behaviors
         foreach ($database->getBehaviors() as $behavior) {
@@ -110,7 +131,7 @@ trait FinalizationTrait
                     'Entity "%s" contains a relation to nonexistent entity "%s". [%s]',
                     $entity->getName(),
                     $relation->getForeignEntityName(),
-                    $entity->getDatabase()->getEntityNames()
+                    implode(', ', $entity->getDatabase()->getEntityNames())
                 )
             );
         }
@@ -124,7 +145,7 @@ trait FinalizationTrait
         // foreign pk's
         $localFieldNames = $relation->getLocalFields();
         foreach ($localFieldNames as $localFieldName) {
-            $localField = $entity->getField($localFieldName);
+            $localField = $entity->getFieldByName($localFieldName);
             if (null !== $localField) {
                 if ($localField->isPrimaryKey() && !$entity->getContainsForeignPK()) {
                     $entity->setContainsForeignPK(true);

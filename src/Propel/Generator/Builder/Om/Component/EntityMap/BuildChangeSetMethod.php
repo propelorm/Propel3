@@ -77,7 +77,7 @@ if (\$different) {
 
         foreach ($this->getEntity()->getRelations() as $relation) {
             $varName = $this->getRelationVarName($relation);
-            $foreignEntityClass = $relation->getForeignEntity()->getFullClassName();
+            $foreignEntityClass = $relation->getForeignEntity()->getFullName();
             $body .= "
 // relation {$relation->getField()}
 \$lazyLastLoaded = isset(\$originValues['$varName']);
@@ -132,7 +132,7 @@ if (false === \$lazyLastLoaded && false === \$lazyNowLoaded) {
                 $varName = $this->getCrossRelationRelationVarName($relation);
 
                 $body .= "
-// cross relation to {$crossRelation->getForeignEntity()->getFullClassName()} via {$crossRelation->getMiddleEntity()->getFullClassName()}
+// cross relation to {$crossRelation->getForeignEntity()->getFullName()} via {$crossRelation->getMiddleEntity()->getFullName()}
 \$lazyLastLoaded = isset(\$originValues['$varName']);
 \$lazyNowLoaded = \$isset(\$entity, '$varName');
 if (false === \$lazyLastLoaded && false === \$lazyNowLoaded) {
@@ -163,7 +163,7 @@ if (false === \$lazyLastLoaded && false === \$lazyNowLoaded) {
             $varName = $this->getRefRelationCollVarName($relation);
 
             $body .= "
-// ref relation to {$relation->getForeignEntity()->getFullClassName()}
+// ref relation to {$relation->getForeignEntity()->getFullName()}
 \$lazyLastLoaded = isset(\$originValues['$varName']);
 \$lazyNowLoaded = \$isset(\$entity, '$varName');
 if (false === \$lazyLastLoaded && false === \$lazyNowLoaded) {

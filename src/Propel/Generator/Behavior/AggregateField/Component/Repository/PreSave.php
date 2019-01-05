@@ -38,7 +38,7 @@ foreach (\$event->getEntities() as \$entity) {
         if (null !== \$lastValues['{$field->getName()}']) {
             if (null === \$entity->get{$relation->getForeignEntity()->getName()}() || \$entity->get{$relation->getForeignEntity()->getName()}() !== \$lastValues['{$field->getName()}']) {
                 /** @var \\{$this->getRepositoryClassNameForEntity($relation->getForeignEntity(), true)} \$relatedRepo */
-                \$relatedRepo = \$this->getConfiguration()->getRepository('{$relation->getForeignEntity()->getFullClassName()}');
+                \$relatedRepo = \$this->getConfiguration()->getRepository('{$relation->getForeignEntity()->getFullName()}');
                 \$relatedObjects = \$relatedRepo->createQuery()
                     ->filterByPrimaryKey(\$lastValues['{$field->getName()}'])
                     ->find();

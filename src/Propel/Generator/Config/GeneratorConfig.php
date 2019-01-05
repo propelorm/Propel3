@@ -171,12 +171,12 @@ class GeneratorConfig extends ConfigurationManager implements GeneratorConfigInt
      * @param  Entity $entity
      * @param  string $type
      *
-     * @return DataModelBuilder
+     * @return AbstractBuilder
      *
      * @throws \Propel\Generator\Exception\ClassNotFoundException if the type of builder is wrong and the builder class
      *                                                            doesn't exists
      */
-    public function getConfiguredBuilder(Entity $entity, string $type): DataModelBuilder
+    public function getConfiguredBuilder(Entity $entity, string $type): AbstractBuilder
     {
         $className = $this->getConfigProperty('generator.objectModel.builders.' . $type);
 
@@ -281,7 +281,7 @@ class GeneratorConfig extends ConfigurationManager implements GeneratorConfigInt
         return $con;
     }
 
-    public function getBehaviorManager()
+    public function getBehaviorManager(): BehaviorManager
     {
         if (!$this->behaviorManager) {
             $this->behaviorManager = new BehaviorManager($this);
