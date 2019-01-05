@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Model\Parts;
 
-use phootwork\collection\Set;
+use Propel\Common\Collection\Set;
 use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Field;

@@ -1,4 +1,14 @@
 <?php
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ *
+ */
+
+declare(strict_types=1);
 
 namespace Propel\Tests\Helpers\Bookstore\Behavior;
 
@@ -8,7 +18,7 @@ class AddClassBehaviorBuilder extends AbstractBuilder
 {
     public $overwrite = true;
 
-    public function getFullClassName($injectNamespace = '', $classPrefix = '')
+    public function getFullClassName(string $injectNamespace = '', string $classPrefix = ''): string
     {
         return parent::getFullClassName() . 'FooClass';
     }

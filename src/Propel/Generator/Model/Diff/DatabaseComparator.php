@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Model\Diff;
 
-use phootwork\collection\Set;
+use Propel\Common\Collection\Set;
 use Propel\Generator\Model\Database;
 
 /**
@@ -76,15 +76,16 @@ class DatabaseComparator
         $this->fromDatabase = $fromDatabase;
     }
 
+    //@todo never used: remove?
     /**
      * Returns the fromDatabase property.
      *
      * @return Database
      */
-    public function getFromDatabase(): Database
-    {
-        return $this->fromDatabase;
-    }
+//    public function getFromDatabase(): Database
+//    {
+//        return $this->fromDatabase;
+//    }
 
     /**
      * Sets the toDatabase property.
@@ -96,15 +97,16 @@ class DatabaseComparator
         $this->toDatabase = $toDatabase;
     }
 
+    //@todo never used: remove?
     /**
      * Returns the toDatabase property.
      *
      * @return Database
      */
-    public function getToDatabase(): Database
-    {
-        return $this->toDatabase;
-    }
+//    public function getToDatabase(): Database
+//    {
+//        return $this->toDatabase;
+//    }
 
     /**
      * Set true to handle removed tables or false to ignore them

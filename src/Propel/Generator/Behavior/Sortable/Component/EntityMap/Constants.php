@@ -27,7 +27,7 @@ class Constants extends BuildComponent
     {
         /** @var SortableBehavior $behavior */
         $behavior = $this->getBehavior();
-        $entityName = $this->getEntity()->getFullClassName();
+        $entityName = $this->getEntity()->getFullName();
 
         $col = [];
 

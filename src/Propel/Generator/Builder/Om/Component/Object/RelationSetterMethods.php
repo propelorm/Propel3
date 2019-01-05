@@ -40,7 +40,7 @@ class RelationSetterMethods extends BuildComponent
         $setterName = 'set' . $this->getRelationPhpName($relation, false);
         $relationEntity = $relation->getForeignEntity();
 
-        $relationClassName = $this->useClass($relationEntity->getFullClassName());
+        $relationClassName = $this->useClass($relationEntity->getFullName());
 
         $body = $this->renderTemplate(
             [
@@ -53,7 +53,7 @@ class RelationSetterMethods extends BuildComponent
             'RelationSetterMethod'
         );
 
-        $internal = "\nMapped by fields " . implode(', ', $relation->getLocalFields());
+        $internal = "\nMapped by fields " . implode(', ', $relation->getLocalFields()->toArray());
 
         $this->addMethod($setterName)
             ->setDescription("Declares an association between this object and a $relationClassName object.$internal")

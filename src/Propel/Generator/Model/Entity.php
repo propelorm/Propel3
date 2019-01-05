@@ -28,7 +28,7 @@ use Propel\Generator\Model\Parts\SuperordinatePart;
 use Propel\Generator\Model\Parts\VendorPart;
 use Propel\Generator\Platform\PlatformInterface;
 use Propel\Runtime\Exception\RuntimeException;
-use phootwork\collection\Set;
+use Propel\Common\Collection\Set;
 
 /**
  * Data about a entity used in an application.
@@ -62,7 +62,10 @@ class Entity
     //
     // Model properties
     // ------------------------------------------------------------
+    /** @var string */
     private $tableName;
+
+    /** @var string */
     private $alias;
 
 
@@ -108,7 +111,7 @@ class Entity
     private $allowPkInsert;
 
     /** @var bool */
-    private $containsForeignPK;
+    private $containsForeignPK = false;
 
     /**
      * Whether this entity is an implementation detail. Implementation details are entities that are only
@@ -164,8 +167,6 @@ class Entity
 
         // init
         $this->fields = new Set();
-        //$this->fieldsByName = new Map();
-        //$this->fieldsByLowercaseName = new Map();
         $this->relations = new Set();
         $this->foreignEntityNames = new Set();
         $this->indices = new Set();
@@ -186,19 +187,25 @@ class Entity
         $this->forReferenceOnly = false;
     }
 
-    // @TODO it's todo
     public function __clone()
     {
-        $fields = [];
-        if ($this->fields) {
-            foreach ($this->fields as $oldCol) {
-                $col = clone $oldCol;
-                $fields[] = $col;
-          //      $this->fieldsByName[$col->getName()] = $col;
-          //      $this->fieldsByLowercaseName[strtolower($col->getName())] = $col;
-                //            $this->fieldsByPhpName[$col->getName()] = $col;
+        $this->fields = clone $this->fields;
+        $this->behaviors = clone $this->behaviors;
+        $this->idMethodParameters = clone $this->idMethodParameters;
+        $this->vendor = clone $this->vendor;
+        //Circular reference. Which strategy? Leave the reference to the original database
+        //or set it to null?
+        //$this->database = clone $this->database;
+        $this->relations = clone $this->relations;
+        $this->referrers = clone $this->referrers;
+        $this->foreignEntityNames = clone $this->foreignEntityNames;
+        $this->indices = clone $this->indices;
+        $this->unices = clone $this->unices;
+        foreach ($this->fields as $field) {
+            if ($field->isInheritance()) {
+                $this->inheritanceField = $field;
+                break;
             }
-            $this->fields = $fields;
         }
     }
 
@@ -514,24 +521,6 @@ class Entity
         $this->foreignEntityNames->add($relation->getForeignEntityName());
 
         return $this;
-
-        if ($data instanceof Relation) {
-            $relation = $data;
-            $relation->setEntity($this);
-            $this->relations[] = $relation;
-
-            if (!in_array($relation->getForeignEntityName(), $this->foreignEntityNames)) {
-                $this->foreignEntityNames[] = $relation->getForeignEntityName();
-            }
-
-            return $relation;
-        }
-
-        $relation = new Relation();
-        $relation->setEntity($this);
-        $relation->loadMapping($data);
-
-        return $this->addRelation($relation);
     }
 
     /**
@@ -571,13 +560,11 @@ class Entity
      *
      * @return Relation
      */
-    public function getRelation($fieldName): Relation
+    public function getRelation(string $fieldName): Relation
     {
-        foreach ($this->relations as $relation) {
-            if ($relation->getField() == $fieldName) {
-                return $relation;
-            }
-        }
+        return $this->relations->find($fieldName, function(Relation $element, string $query) {
+            return $element->getName() === $query;
+        });
     }
 
     /**
@@ -624,7 +611,7 @@ class Entity
     }
 
     /**
-     * Returns the list of cross foreign keys.
+     * Returns the list of cross relations.
      *
      * @return CrossRelation[]
      */
@@ -634,8 +621,10 @@ class Entity
         foreach ($this->referrers as $refRelation) {
             if ($refRelation->getEntity()->isCrossRef()) {
                 $crossRelation = new CrossRelation($refRelation, $this);
+                /** @var Relation $relation */
                 foreach ($refRelation->getOtherFks() as $relation) {
-                    if ($relation->isAtLeastOneLocalPrimaryKeyIsRequired() && $crossRelation->isAtLeastOneLocalPrimaryKeyNotCovered($relation)) {
+                    if ($relation->isAtLeastOneLocalPrimaryKeyIsRequired() &&
+                        $crossRelation->isAtLeastOneLocalPrimaryKeyNotCovered($relation)) {
                         $crossRelation->addRelation($relation);
                     }
                 }
@@ -699,8 +688,7 @@ class Entity
     public function createIndex(string $name, array $fields): Index
     {
         $index = new Index($name);
-        $index->setFields($fields);
-        $index->resetFieldsSize();
+        $index->addFields($fields);
 
         $this->addIndex($index);
 
@@ -733,12 +721,6 @@ class Entity
         $this->indices->add($index);
 
         return $this;
-
-//         $idx = new Index();
-//         $idx->loadMapping($index);
-//         foreach ((array)@$index['fields'] as $field) {
-//             $idx->addField($field);
-//         }
     }
 
     /**
@@ -804,12 +786,12 @@ class Entity
     public function removeIndex($index): Entity
     {
         if (is_string($index)) {
-            $index = $this->indices->find($index, function (Index $index, $query) {
-                return $index->getName() == $query;
+            $index = $this->indices->find($index, function (Index $index, string $query) {
+                return $index->getName() === $query;
             });
         }
 
-        if ($index instanceof Index && $index->getEntity() == $this) {
+        if ($index instanceof Index && $index->getEntity() === $this) {
             $index->setEntity(null);
             $this->indices->remove($index);
         }
@@ -845,6 +827,7 @@ class Entity
      *
      * @param Field[]|string[] $keys
      * @return bool
+     * @throws \InvalidArgumentException If a field is not associated to this entity
      */
     public function isUnique(array $keys): bool
     {
@@ -886,7 +869,7 @@ class Entity
 
         // check if there is a unique constrains that contains exactly the $keys
         foreach ($this->unices as $unique) {
-            if (count($unique->getFields()) === count($keys)) {
+            if (count($unique->getFields()->toArray()) === count($keys)) {
                 $allAvailable = true;
                 foreach ($keys as $key) {
                     if (!$unique->hasField($key instanceof Field ? $key->getName() : $key)) {
@@ -918,12 +901,18 @@ class Entity
     /**
      * Removes an unique index off this entity
      *
-     * @param Unique $unique
+     * @param Unique|string $unique
      * @return $this
      */
-    public function removeUnique(Unique $unique): Entity
+    public function removeUnique($unique): Entity
     {
-        if ($unique->getEntity() == $this) {
+        if (is_string($unique)) {
+            $unique = $this->unices->find($unique, function (Unique $index, string $query) {
+                return $index->getName() == $query;
+            });
+        }
+
+        if ($unique instanceof Unique && $unique->getEntity() === $this) {
             $unique->setEntity(null);
             $this->unices->remove($unique);
         }
@@ -1202,11 +1191,13 @@ class Entity
     }
 
     /**
+     * @todo never used: remove?
+     *
      * Returns all required(notNull && no defaultValue) primary keys which are not in $primaryKeys.
      *
      * @param Field[] $primaryKeys
      * @return Field[]
-     */
+     *//*
     public function getOtherRequiredPrimaryKeys(array $primaryKeys): array
     {
         $pks = [];
@@ -1218,7 +1209,7 @@ class Entity
         }
 
         return $pks;
-    }
+    }*/
 
     /**
      * Returns whether or not this entity has any auto-increment primary keys.
@@ -1356,6 +1347,7 @@ class Entity
      *
      * @param bool $flag
      * @return $this;
+     * @deprecated use setCrossRef
      */
     public function setIsCrossRef(bool $flag = true): Entity
     {
@@ -1379,6 +1371,7 @@ class Entity
      * @see Entity::isCrossRef
      *
      * @return bool
+     * @deprecated use isCrossRef
      */
     public function getIsCrossRef(): bool
     {
@@ -1415,29 +1408,6 @@ class Entity
 
         return $additionalBuilders;
     }
-
-    /**
-     * Get the early entity behaviors
-     *
-     * @return Array of Behavior objects
-     */
-    public function getEarlyBehaviors(): array
-    {
-        $behaviors = [];
-        foreach ($this->behaviors as $name => $behavior) {
-            if ($behavior->isEarly()) {
-                $behaviors[$name] = $behavior;
-            }
-        }
-
-        return $behaviors;
-    }
-
-
-
-
-
-
 
     //
     // MISC

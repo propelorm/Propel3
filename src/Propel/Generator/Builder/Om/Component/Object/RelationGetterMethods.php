@@ -33,13 +33,13 @@ class RelationGetterMethods extends BuildComponent
     {
         $varName = $this->getRelationVarName($relation);
 
-        $foreignClassName = $this->useClass($relation->getForeignEntity()->getFullClassName());
+        $foreignClassName = $this->useClass($relation->getForeignEntity()->getFullName());
 
         $body = "
 return \$this->$varName;
 ";
 
-        $internal = "\nMapped by fields " . implode(', ', $relation->getLocalFields());
+        $internal = "\nMapped by fields " . implode(', ', $relation->getLocalFields()->toArray());
 
         $methodName = 'get' . $this->getRelationPhpName($relation, false);
         $this->addMethod($methodName)

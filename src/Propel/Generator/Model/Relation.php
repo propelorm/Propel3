@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Model;
 
-use phootwork\collection\ArrayList;
+use Propel\Common\Collection\ArrayList;
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Model\Parts\DatabasePart;
 use Propel\Generator\Model\Parts\EntityPart;
@@ -20,7 +20,7 @@ use Propel\Generator\Model\Parts\NamePart;
 use Propel\Generator\Model\Parts\SuperordinatePart;
 use Propel\Generator\Model\Parts\VendorPart;
 use Propel\Generator\Platform\PlatformInterface;
-use Propel\Generator\Util\UniqueList;
+use Propel\Common\Collection\UniqueList;
 
 /**
  * A class for information about table foreign keys.
@@ -104,6 +104,11 @@ class Relation
     private $autoNaming = false;
 
     /**
+     * @var string
+     */
+    private $foreignSchema;
+
+    /**
      * Constructs a new Relation object.
      *
      * @param string $name
@@ -116,6 +121,7 @@ class Relation
 
         $this->onUpdate = Model::RELATION_NONE;
         $this->onDelete = Model::RELATION_NONE;
+        $this->defaultJoin = 'INNER JOIN';
         $this->localFields = new UniqueList();
         $this->foreignFields = new ArrayList();
         $this->skipSql = false;
@@ -132,7 +138,7 @@ class Relation
     /**
      * @return string
      */
-    public function getField(): string
+    public function getField(): ?string
     {
         $field = $this->field;
 
@@ -788,7 +794,7 @@ class Relation
      *
      * @return boolean
      */
-    public function isAtLeastOneLocalPrimaryKeyIsRequired():bool
+    public function isAtLeastOneLocalPrimaryKeyIsRequired(): bool
     {
         foreach ($this->getLocalPrimaryKeys() as $pk) {
             if ($pk->isNotNull() && !$pk->hasDefaultValue()) {
@@ -988,5 +994,15 @@ class Relation
         $cols = $this->getLocalPrimaryKeys();
 
         return 0 !== count($cols);
+    }
+
+    public function setForeignSchema(string $foreignSchema): void
+    {
+        $this->foreignSchema = $foreignSchema;
+    }
+
+    public function getForeignSchema()
+    {
+        return $this->foreignSchema;
     }
 }

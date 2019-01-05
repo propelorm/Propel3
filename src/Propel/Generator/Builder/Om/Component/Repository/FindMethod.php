@@ -40,7 +40,7 @@ if (null === \$key) {
         }
         $pkHash = $this->getFirstLevelCacheKeySnippet($pks);
         $body .= "
-if ((null !== (\$obj = \$this->getInstanceFromFirstLevelCache('{$entity->getFullClassName()}', {$pkHash})))) {
+if ((null !== (\$obj = \$this->getInstanceFromFirstLevelCache('{$entity->getFullName()}', {$pkHash})))) {
     // the object is already in the instance pool
     return \$obj;
 }

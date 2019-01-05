@@ -8,8 +8,13 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Tests\Generator\Model;
 
+use Propel\Common\Types\FieldTypeInterface;
+use Propel\Common\Types\SQL\VarcharType;
+use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\PropelTypes;
 
@@ -23,8 +28,8 @@ class FieldTest extends ModelTestCase
     public function testCreateNewField()
     {
         $field = new Field('title');
-        //$entity = $this->getEntityMock('FakeEntity');
-        //$field->setEntity($entity);
+        $entity = $this->getEntityMock('FakeEntity');
+        $field->setEntity($entity);
 
         $this->assertSame('title', $field->getName());
         $this->assertEmpty($field->getAutoIncrementString());
@@ -32,7 +37,7 @@ class FieldTest extends ModelTestCase
         $this->assertSame('public', $field->getMutatorVisibility());
         $this->assertSame('public', $field->getAccessorVisibility());
         $this->assertEquals(0, $field->getSize());
-//        $this->assertTrue($field->getReferrers()->isEmpty());
+        $this->assertTrue($field->getReferrers()->isEmpty());
         $this->assertFalse($field->isAutoIncrement());
         $this->assertFalse($field->isEnumeratedClasses());
         $this->assertFalse($field->isLazyLoad());
@@ -141,65 +146,6 @@ class FieldTest extends ModelTestCase
         $this->assertCount(0, $field->getChildren());
     }
 
-/*
- * addInheritance accepts only Inheritance objects
- * remove this test
-    public function testAddArrayInheritance()
-    {
-        $field = new Field();
-
-        $field->addInheritance([
-            'key' => 'baz',
-            'extends' => 'BaseObject',
-            'class' => 'Foo\Bar',
-            'package' => 'Foo',
-        ]);
-
-        $field->addInheritance([
-            'key' => 'foo',
-            'extends' => 'BaseObject',
-            'class' => 'Acme\Foo',
-            'package' => 'Acme',
-        ]);
-
-        $this->assertCount(2, $field->getChildren());
-    }
-*/
-/* no more clearRelation method
-    public function testClearRelations()
-    {
-        $fks = [
-            $this->createMock('Propel\Generator\Model\Relation'),
-            $this->createMock('Propel\Generator\Model\Relation'),
-        ];
-
-        $entity = $this->getEntityMock('books');
-        $entity
-            ->expects($this->any())
-            ->method('getFieldRelations')
-            ->with('author_id')
-            ->will($this->returnValue($fks))
-        ;
-
-        $field = new Field('author_id');
-        $field->setEntity($entity);
-        $field->getEntity()->addReferrer($fks[0]);
-        $field->getEntity()->addReferrer($fks[1]);
-
-        $this->assertTrue($field->isRelation());
-        $this->assertTrue($field->hasMultipleFK());
-        $this->assertTrue($field->getEntity()->hasReferrers());
-        $this->assertTrue($field->hasReferrer($fks[0]));
-        $this->assertCount(2, $field->getReferrers());
-
-        // Clone the current field
-        $clone = clone $field;
-
-        $field->clearReferrers();
-        $this->assertCount(0, $field->getReferrers());
-        $this->assertCount(0, $clone->getReferrers());
-    }
-*/
     public function testIsDefaultSqlTypeFromDomain()
     {
         $toCopy = $this->getDomainMock();
@@ -850,5 +796,117 @@ class FieldTest extends ModelTestCase
 
         $this->assertEquals($field->getName(), 'Aliases');
         $this->assertEquals($field->getSingularName(), 'Alias');
+    }
+
+    public function testGetMethodName()
+    {
+        $field = new Field('title');
+        $this->assertEquals('Title', $field->getMethodName());
+    }
+
+    public function testSetPhpType()
+    {
+        $field = new Field('title');
+        $field->setType('VARCHAR');
+        $field->setPhpType('string');
+        $this->assertEquals('string', $field->getPhpType());
+    }
+
+    public function testGetPosition()
+    {
+        $field = new Field('foo');
+        $field->setPosition(1);
+
+        $this->assertSame(1, $field->getPosition());
+    }
+
+    public function testGetInheritanceType()
+    {
+        $field = new Field('foo');
+        $field->setInheritanceType('single');
+
+        $this->assertEquals('single', $field->getInheritanceType());
+    }
+
+    public function testIsInheritance()
+    {
+        $field = new Field('foo');
+        $field->setInheritanceType('single');
+        $this->assertTrue($field->isInheritance());
+
+        $field->setInheritanceType('false');
+        $this->assertFalse($field->isInheritance());
+    }
+
+    public function testSetPrimaryKey()
+    {
+        $field= new Field('foo');
+        $this->assertFalse($field->isPrimaryKey());
+
+        $field->setPrimaryKey(true);
+        $this->assertTrue($field->isPrimaryKey());
+    }
+
+    public function testGetRelations()
+    {
+        $entity = new Entity('book');
+        $field = new Field('author_id');
+        $field->setEntity($entity);
+        $relation = $this->getRelationMock('author_fk',[
+            'entity' => $entity,
+            'target' => 'author',
+            'local_fields' => ['author_id']
+        ]);
+        $entity->addRelation($relation);
+
+        $this->assertTrue($field->isRelation());
+        $this->assertSame([$relation], $field->getRelations());
+    }
+
+    public function testHasMultipleFk()
+    {
+        $entity = new Entity('book');
+        $field = new Field('author_id');
+        $field->setEntity($entity);
+        $relation = $this->getRelationMock('author_fk',[
+            'entity' => $entity,
+            'target' => 'author',
+            'local_fields' => ['author_id']
+        ]);
+        $entity->addRelation($relation);
+        $this->assertFalse($field->hasMultipleFK());
+
+        $relation1 = $this->getRelationMock('author_fk',[
+            'entity' => $entity,
+            'target' => 'foo',
+            'local_fields' => ['author_id']
+        ]);
+        $entity->addRelation($relation1);
+        $this->assertTrue($field->hasMultipleFK());
+    }
+
+    public function testGetFieldType()
+    {
+        $generatorConfig = $this
+            ->getMockBuilder('Propel\Generator\Config\GeneratorConfig')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $generatorConfig
+            ->expects($this->any())
+            ->method('getFieldType')
+            ->willReturn(new VarcharType())
+        ;
+        $entity = $this->getEntityMock('book');
+        $entity
+            ->expects($this->any())
+            ->method('getGeneratorConfig')
+            ->willReturn($generatorConfig)
+        ;
+
+        $field = new Field('title');
+        $field->setEntity($entity);
+
+        $this->assertInstanceOf(FieldTypeInterface::class, $field->getFieldType());
     }
 }

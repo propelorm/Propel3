@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Builder;
 
 use Propel\Common\Pluralizer\PluralizerInterface;
@@ -152,7 +154,7 @@ abstract class DataModelBuilder
      *
      * @return PluralizerInterface
      */
-    public function getPluralizer()
+    public function getPluralizer(): PluralizerInterface
     {
         if (!isset($this->pluralizer)) {
             $this->pluralizer = $this->getGeneratorConfig()->getConfiguredPluralizer();
@@ -171,7 +173,7 @@ abstract class DataModelBuilder
      *
      * @return ObjectBuilder
      */
-    public function getObjectBuilder()
+    public function getObjectBuilder(): ObjectBuilder
     {
         if (!isset($this->objectBuilder)) {
             $this->objectBuilder = $this->getGeneratorConfig()->getConfiguredBuilder($this->getEntity(), 'object');
@@ -185,7 +187,7 @@ abstract class DataModelBuilder
      *
      * @return ProxyBuilder
      */
-    public function getProxyBuilder()
+    public function getProxyBuilder(): ProxyBuilder
     {
         if (!isset($this->proxyBuilder)) {
             $this->proxyBuilder = $this->getGeneratorConfig()->getConfiguredBuilder($this->getEntity(), 'proxy');
@@ -199,7 +201,7 @@ abstract class DataModelBuilder
      *
      * @return ActiveRecordTraitBuilder
      */
-    public function getActiveRecordTraitBuilder()
+    public function getActiveRecordTraitBuilder(): ActiveRecordTraitBuilder
     {
         if (!isset($this->activeRecordTraitBuilder)) {
             $this->activeRecordTraitBuilder = $this->getGeneratorConfig()->getConfiguredBuilder(
@@ -216,7 +218,7 @@ abstract class DataModelBuilder
      *
      * @return RepositoryBuilder
      */
-    public function getRepositoryBuilder()
+    public function getRepositoryBuilder(): RepositoryBuilder
     {
         if (!isset($this->objectRepository)) {
             $this->objectRepository = $this->getGeneratorConfig()->getConfiguredBuilder(
@@ -233,7 +235,7 @@ abstract class DataModelBuilder
      *
      * @return StubRepositoryBuilder
      */
-    public function getStubRepositoryBuilder()
+    public function getStubRepositoryBuilder():StubRepositoryBuilder
     {
         if (!isset($this->stubRepositoryBuilder)) {
             $this->stubRepositoryBuilder = $this->getGeneratorConfig()->getConfiguredBuilder(
@@ -250,7 +252,7 @@ abstract class DataModelBuilder
      *
      * @return QueryBuilder
      */
-    public function getQueryBuilder()
+    public function getQueryBuilder(): QueryBuilder
     {
         if (!isset($this->queryBuilder)) {
             $this->queryBuilder = $this->getGeneratorConfig()->getConfiguredBuilder($this->getEntity(), 'query');
@@ -264,7 +266,7 @@ abstract class DataModelBuilder
      *
      * @return StubQueryBuilder
      */
-    public function getStubQueryBuilder()
+    public function getStubQueryBuilder(): StubQueryBuilder
     {
         if (!isset($this->stubQueryBuilder)) {
             $this->stubQueryBuilder = $this->getGeneratorConfig()->getConfiguredBuilder(
@@ -281,7 +283,7 @@ abstract class DataModelBuilder
      *
      * @return EntityMapBuilder
      */
-    public function getEntityMapBuilder()
+    public function getEntityMapBuilder(): EntityMapBuilder
     {
         if (!isset($this->entitymapBuilder)) {
             $this->entitymapBuilder = $this->getGeneratorConfig()->getConfiguredBuilder(
@@ -298,7 +300,7 @@ abstract class DataModelBuilder
      *
      * @return AbstractBuilder
      */
-    public function getInterfaceBuilder()
+    public function getInterfaceBuilder(): AbstractBuilder
     {
         if (!isset($this->interfaceBuilder)) {
             $this->interfaceBuilder = $this->getGeneratorConfig()->getConfiguredBuilder(
@@ -315,7 +317,7 @@ abstract class DataModelBuilder
      *
      * @return MultiExtendObjectBuilder
      */
-    public function getMultiExtendObjectBuilder()
+    public function getMultiExtendObjectBuilder(): MultiExtendObjectBuilder
     {
         if (!isset($this->multiExtendObjectBuilder)) {
             $this->multiExtendObjectBuilder = $this->getGeneratorConfig()->getConfiguredBuilder(
@@ -335,7 +337,7 @@ abstract class DataModelBuilder
      *
      * @return DataModelBuilder
      */
-    public function getNewBuilder(Entity $entity, $classname)
+    public function getNewBuilder(Entity $entity, $classname): DataModelBuilder
     {
         /** @var DataModelBuilder $builder */
         $builder = new $classname($entity);
@@ -354,7 +356,7 @@ abstract class DataModelBuilder
      *
      * @return ObjectBuilder
      */
-    public function getNewObjectBuilder(Entity $entity)
+    public function getNewObjectBuilder(Entity $entity): ObjectBuilder
     {
         return $this->getGeneratorConfig()->getConfiguredBuilder($entity, 'object');
     }
@@ -369,7 +371,7 @@ abstract class DataModelBuilder
      *
      * @return ActiveRecordTraitBuilder
      */
-    public function getNewActiveRecordTraitObjectBuilder(Entity $entity)
+    public function getNewActiveRecordTraitObjectBuilder(Entity $entity): ActiveRecordTraitBuilder
     {
         return $this->getGeneratorConfig()->getConfiguredBuilder($entity, 'activerecordtrait');
     }
@@ -384,7 +386,7 @@ abstract class DataModelBuilder
      *
      * @return RepositoryBuilder
      */
-    public function getNewRepositoryBuilder(Entity $entity)
+    public function getNewRepositoryBuilder(Entity $entity): RepositoryBuilder
     {
         return $this->getGeneratorConfig()->getConfiguredBuilder($entity, 'repository');
     }
@@ -399,7 +401,7 @@ abstract class DataModelBuilder
      *
      * @return StubRepositoryBuilder
      */
-    public function getNewStubRepositoryBuilder(Entity $entity)
+    public function getNewStubRepositoryBuilder(Entity $entity): StubRepositoryBuilder
     {
         return $this->getGeneratorConfig()->getConfiguredBuilder($entity, 'repositorystub');
     }
@@ -414,7 +416,7 @@ abstract class DataModelBuilder
      *
      * @return QueryBuilder
      */
-    public function getNewQueryBuilder(Entity $entity)
+    public function getNewQueryBuilder(Entity $entity): QueryBuilder
     {
         return $this->getGeneratorConfig()->getConfiguredBuilder($entity, 'query');
     }
@@ -429,7 +431,7 @@ abstract class DataModelBuilder
      *
      * @return QueryBuilder
      */
-    public function getNewStubQueryBuilder(Entity $entity)
+    public function getNewStubQueryBuilder(Entity $entity): StubQueryBuilder
     {
         return $this->getGeneratorConfig()->getConfiguredBuilder($entity, 'querystub');
     }
@@ -441,7 +443,7 @@ abstract class DataModelBuilder
      *
      * @return ObjectBuilder
      */
-    public function getNewQueryInheritanceBuilder(Inheritance $child)
+    public function getNewQueryInheritanceBuilder(Inheritance $child): QueryInheritanceBuilder
     {
         /** @var QueryInheritanceBuilder $queryInheritanceBuilder */
         $queryInheritanceBuilder = $this->getGeneratorConfig()->getConfiguredBuilder(
@@ -460,7 +462,7 @@ abstract class DataModelBuilder
      *
      * @return StubQueryInheritanceBuilder
      */
-    public function getNewStubQueryInheritanceBuilder(Inheritance $child)
+    public function getNewStubQueryInheritanceBuilder(Inheritance $child): StubQueryInheritanceBuilder
     {
         /** @var QueryInheritanceBuilder $stubQueryInheritanceBuilder */
         $stubQueryInheritanceBuilder = $this->getGeneratorConfig()->getConfiguredBuilder(
@@ -477,7 +479,7 @@ abstract class DataModelBuilder
      *
      * @return EntityMapBuilder
      */
-    public function getNewEntityMapBuilder(Entity $entity)
+    public function getNewEntityMapBuilder(Entity $entity): EntityMapBuilder
     {
         return $this->getGeneratorConfig()->getConfiguredBuilder($entity, 'entitymap');
     }
@@ -487,7 +489,7 @@ abstract class DataModelBuilder
      *
      * @return GeneratorConfigInterface
      */
-    public function getGeneratorConfig()
+    public function getGeneratorConfig(): GeneratorConfigInterface
     {
         return $this->generatorConfig;
     }
@@ -505,7 +507,7 @@ abstract class DataModelBuilder
      *
      * @return string
      */
-    public function getBuildProperty($name)
+    public function getBuildProperty(string $name)
     {
         if ($this->getGeneratorConfig()) {
             return $this->getGeneratorConfig()->getConfigProperty($name);
@@ -519,7 +521,7 @@ abstract class DataModelBuilder
      *
      * @param GeneratorConfigInterface $v
      */
-    public function setGeneratorConfig(GeneratorConfigInterface $v)
+    public function setGeneratorConfig(GeneratorConfigInterface $v): void
     {
         $this->generatorConfig = $v;
     }
@@ -529,7 +531,7 @@ abstract class DataModelBuilder
      *
      * @param Entity $entity
      */
-    public function setEntity(Entity $entity)
+    public function setEntity(Entity $entity): void
     {
         $this->entity = $entity;
     }
@@ -539,7 +541,7 @@ abstract class DataModelBuilder
      *
      * @return Entity
      */
-    public function getEntity()
+    public function getEntity(): Entity
     {
         return $this->entity;
     }
@@ -549,7 +551,7 @@ abstract class DataModelBuilder
      *
      * @return PlatformInterface
      */
-    public function getPlatform()
+    public function getPlatform(): PlatformInterface
     {
         if (null === $this->platform) {
             // try to load the platform from the entity
@@ -571,7 +573,7 @@ abstract class DataModelBuilder
      *
      * @param PlatformInterface $platform
      */
-    public function setPlatform(PlatformInterface $platform)
+    public function setPlatform(PlatformInterface $platform): void
     {
         $this->platform = $platform;
     }
@@ -583,7 +585,7 @@ abstract class DataModelBuilder
      *
      * @return string
      */
-    public function quoteIdentifier($text)
+    public function quoteIdentifier(string $text): string
     {
         if ($this->getEntity()->isIdentifierQuotingEnabled()) {
             return $this->getPlatform()->doQuoting($text);
@@ -597,7 +599,7 @@ abstract class DataModelBuilder
      *
      * @return Database
      */
-    public function getDatabase()
+    public function getDatabase(): Database
     {
         if ($this->getEntity()) {
             return $this->getEntity()->getDatabase();
@@ -609,7 +611,7 @@ abstract class DataModelBuilder
      *
      * @param string $msg The warning message.
      */
-    protected function warn($msg)
+    protected function warn(string $msg): void
     {
         $this->warnings[] = $msg;
     }
@@ -619,7 +621,7 @@ abstract class DataModelBuilder
      *
      * @return string[]
      */
-    public function getWarnings()
+    public function getWarnings(): array
     {
         return $this->warnings;
     }
@@ -630,7 +632,7 @@ abstract class DataModelBuilder
      * @return string
      * @see OMBuilder#getClassName()
      */
-    public function prefixClassName($identifier)
+    public function prefixClassName(string $identifier): string
     {
         return $this->getBuildProperty('generator.objectModel.classPrefix') . $identifier;
     }

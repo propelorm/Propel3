@@ -8,9 +8,12 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Behavior\AutoAddPk;
 
 use Propel\Generator\Model\Behavior;
+use Propel\Generator\Model\Field;
 
 /**
  * Adds a primary key to models defined without one
@@ -20,9 +23,9 @@ use Propel\Generator\Model\Behavior;
 class AutoAddPkBehavior extends Behavior
 {
     // default parameters value
-    protected $parameters = [
+    protected $defaultParameters = [
         'name'          => 'id',
-        'autoIncrement' => 'true',
+        'autoIncrement' => true,
         'type'          => 'INTEGER'
     ];
 
@@ -47,8 +50,11 @@ class AutoAddPkBehavior extends Behavior
     {
         $entity = $this->getEntity();
         if (!$entity->hasPrimaryKey() && !$entity->hasBehavior('concrete_inheritance')) {
-            $fieldAttributes = array_merge(['primaryKey' => 'true'], $this->getParameters());
-            $this->getEntity()->addField($fieldAttributes);
+            $field = new Field($this->getParameter('name'));
+            $field->setType($this->getParameter('type'));
+            $field->setAutoIncrement($this->getParameter('autoIncrement'));
+            $field->setPrimaryKey(true);
+            $this->getEntity()->addField($field);
         }
     }
 }

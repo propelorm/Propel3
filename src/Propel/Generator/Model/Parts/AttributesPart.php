@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Model\Parts;
 
-use phootwork\collection\Map;
+use Propel\Common\Collection\Map;
 
 /**
  * Trait Attributes part.

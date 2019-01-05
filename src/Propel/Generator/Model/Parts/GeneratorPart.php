@@ -68,7 +68,7 @@ trait GeneratorPart
             return $this->mutatorVisibility;
         }
 
-        if ($this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getMutatorVisibility')) {var_dump('eccolo');
+        if ($this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getMutatorVisibility')) {
             return $this->getSuperordinate()->getMutatorVisibility();
         }
 

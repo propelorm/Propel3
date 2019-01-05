@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Tests\Generator\Model;
 
 use Propel\Generator\Model\Vendor;
@@ -26,6 +28,15 @@ class VendorInfoTest extends TestCase
         $info->setType('foo');
 
         $this->assertSame('foo', $info->getType());
+    }
+
+    public function testSetUpObjectWithParameters()
+    {
+        $info = new Vendor('foo', ['bar' => 'baz']);
+
+        $this->assertSame('foo', $info->getType());
+        $this->assertTrue($info->hasParameter('bar'));
+        $this->assertEquals('baz', $info->getParameter('bar'));
     }
 
     public function testGetSetType()

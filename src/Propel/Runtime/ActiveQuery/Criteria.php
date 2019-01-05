@@ -435,7 +435,7 @@ class Criteria
             throw new \InvalidArgumentException('entityName can not be empty.');
         }
         $entityMap = $this->getConfiguration()->getDatabase($this->getDbName())->getEntity($entityName);
-        return $entityMap->getFQTableName();
+        return $entityMap->getFullTableName();
     }
 
     /**
@@ -2102,7 +2102,7 @@ class Criteria
                 $entityMap = $dbMap->getEntity($entityMapName);
                 $quoteIdentifier = $entityMap->isIdentifierQuotingEnabled();
                 if ($rightSide) {
-                    $string = $entityMap->getFQTableName();
+                    $string = $entityMap->getFullTableName();
                     if ($entityMap->hasField($rightSide)) {
                         $string .= '.' . $entityMap->getField($rightSide)->getColumnName();
                     } else {
@@ -2137,7 +2137,7 @@ class Criteria
 
             $quoteIdentifier = $entityMap->isIdentifierQuotingEnabled();
 
-            $string = $entityMap->getFQTableName();
+            $string = $entityMap->getFullTableName();
             if ($alias) {
                 $string .= " $alias";
             }

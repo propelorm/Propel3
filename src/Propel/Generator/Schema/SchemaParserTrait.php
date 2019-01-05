@@ -33,7 +33,7 @@ trait SchemaParserTrait
      */
     private $modelFactory;
 
-    protected function getModelFactory(): ModelFactory
+    private function getModelFactory(): ModelFactory
     {
         if (null === $this->modelFactory) {
             $this->modelFactory = new ModelFactory($this->getGeneratorConfig());
@@ -46,7 +46,7 @@ trait SchemaParserTrait
      * @param array $schemaContent
      * @param Schema $schema
      */
-    protected function parseDatabase(array $schemaContent, Schema $schema): void
+    private function parseDatabase(array $schemaContent, Schema $schema): void
     {
         $database = $this->getModelFactory()->createDatabase($schemaContent);
         $schema->addDatabase($database);
@@ -55,14 +55,13 @@ trait SchemaParserTrait
         $this->addBehaviors($schemaContent['behaviors'], $database);
         $this->addVendor($schemaContent, $database);
         $this->addEntities($schemaContent['entities'], $database);
-        $database->getPlatform()->doFinalInitialization($database);
     }
 
     /**
      * @param array $entities
      * @param Database $database
      */
-    protected function addEntities(array $entities, Database $database): void
+    private function addEntities(array $entities, Database $database): void
     {
         foreach ($entities as $entity) {
             $entityObj = $this->getModelFactory()->createEntity($entity);
@@ -80,13 +79,15 @@ trait SchemaParserTrait
             $this->addVendor($entity, $entityObj);
             $this->addIdMethodParameter($entity, $entityObj);
         }
+
+        //$this->addReferrers($database);
     }
 
     /**
      * @param array $fields
      * @param Entity $entity
      */
-    protected function addFields(array $fields, Entity $entity): void
+    private function addFields(array $fields, Entity $entity): void
     {
         foreach ($fields as $field) {
             $fieldObj = $this->getModelFactory()->createField($field);
@@ -118,7 +119,7 @@ trait SchemaParserTrait
      * @param array $indices
      * @param Entity $entity
      */
-    public function addIndices(array $indices, Entity $entity): void
+    private function addIndices(array $indices, Entity $entity): void
     {
         if (count($indices) <= 0) {
             return;
@@ -142,7 +143,7 @@ trait SchemaParserTrait
      * @param array $uniques
      * @param Entity $entity
      */
-    public function addUniques(array $uniques, Entity $entity): void
+    private function addUniques(array $uniques, Entity $entity): void
     {
         if (count($uniques) <= 0) {
             return;
@@ -175,7 +176,7 @@ trait SchemaParserTrait
         foreach ($externalSchemas as $externalSchema) {
             $filename = $this->getExternalFilename($externalSchema['filename'], $schema);
             /** @var Schema $extSchema */
-            $extSchema = $this->parse($filename, $schema->getGeneratorConfig());
+            $extSchema = $this->parse($filename);
             $extSchema->setReferenceOnly($externalSchema['referenceOnly']);
             $schema->addExternalSchema($extSchema);
         }
@@ -260,29 +261,6 @@ trait SchemaParserTrait
             return $schemaFile->getDirname() . DIRECTORY_SEPARATOR . $file->getPathname();
         }
 
-        return $file->getPathname()->toString();
-    }
-
-    /**
-     * Finalizes the setup process.
-     *
-     * @param Database $database
-     */
-    public function doFinalInitialization(Database $database): void
-    {
-        // execute database behaviors
-        foreach ($database->getBehaviors() as $behavior) {
-            $behavior->modifyDatabase();
-        }
-
-        // execute entity behaviors (may add new entities and new behaviors)
-        while ($behavior = $database->getNextEntityBehavior()) {
-            $behavior->getEntityModifier()->modifyEntity();
-            $behavior->setEntityModified(true);
-        }
-
-        if ($platform = $database->getPlatform()) {
-            $platform->finalizeDefinition($database);
-        }
+        return $file->getPathname();
     }
 }

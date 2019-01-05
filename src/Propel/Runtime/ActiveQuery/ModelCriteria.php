@@ -1672,7 +1672,7 @@ class ModelCriteria extends BaseModelCriteria
                 return $key;
             }
 
-            return $this->quoteIdentifier($entityMap->getFQTableName());
+            return $this->quoteIdentifier($entityMap->getFullTableName());
         }
         
         list($field, $realFullFieldName) = $this->getFieldFromName($key);

@@ -10,16 +10,19 @@
 
 namespace Propel\Tests\Common\Config\Loader;
 
+use org\bovigo\vfs\vfsStream;
 use Propel\Common\Config\FileLocator;
 use Propel\Common\Config\Loader\XmlFileLoader;
 use Propel\Tests\Common\Config\ConfigTestCase;
 
 class XmlFileLoaderTest extends ConfigTestCase
 {
+    /** @var XmlFileLoader */
     protected $loader;
 
-    protected function setUp()
+    public function setUp()
     {
+        parent::setUp();
         $this->loader = new XmlFileLoader(new FileLocator([sys_get_temp_dir()]));
     }
 
@@ -41,9 +44,9 @@ class XmlFileLoaderTest extends ConfigTestCase
   <bar>baz</bar>
 </properties>
 XML;
-        $this->dumpTempFile('parameters.xml', $content);
+        $file = vfsStream::newFile('parameters.xml')->at($this->getRoot())->setContent($content);
 
-        $test = $this->loader->load('parameters.xml');
+        $test = $this->loader->load($file->url());
         $this->assertEquals('bar', $test['foo']);
         $this->assertEquals('baz', $test['bar']);
     }
@@ -68,24 +71,22 @@ not xml content
 only plain
 text
 EOF;
-        $this->dumpTempFile('nonvalid.xml', $content);
+        $file = vfsStream::newFile('nonvalid.xml')->at($this->getRoot())->setContent($content);
 
-        @$this->loader->load('nonvalid.xml');
+        @$this->loader->load($file->url());
     }
 
     public function testXmlFileIsEmpty()
     {
-        $content = '';
-        $this->dumpTempFile('empty.xml', $content);
-
-        $actual = $this->loader->load('empty.xml');
+        $file = vfsStream::newFile('empty.xml')->at($this->getRoot())->setContent('');
+        $actual = $this->loader->load($file->url());
 
         $this->assertEquals([], $actual);
     }
 
     /**
      * @expectedException Propel\Common\Config\Exception\InputOutputException
-     * @expectedExceptionMessage You don't have permissions to access configuration file notreadable.xml.
+     * @expectedExceptionMessage You don't have permissions to access configuration file vfs://root/notreadable.xml.
      */
     public function testXmlFileNotReadableThrowsException()
     {
@@ -96,11 +97,9 @@ EOF;
   <bar>baz</bar>
 </properties>
 XML;
+        $file = vfsStream::newFile('notreadable.xml', 200)->at($this->getRoot())->setContent($content);
 
-        $this->dumpTempFile('notreadable.xml', $content);
-        $this->getFilesystem()->chmod(sys_get_temp_dir() . '/notreadable.xml', 0200);
-
-        $actual = $this->loader->load('notreadable.xml');
+        $actual = $this->loader->load($file->url());
         $this->assertEquals('bar', $actual['foo']);
         $this->assertEquals('baz', $actual['bar']);
     }

@@ -23,7 +23,7 @@ class QueryBuilder extends AbstractBuilder
     /**
      * @return string
      */
-    public function getFullClassName($fullClassName = 'Base', $classPrefix = 'Base')
+    public function getFullClassName(string $fullClassName = 'Base', string $classPrefix = 'Base'): string
     {
         return parent::getFullClassName('Base', 'Base') . 'Query';
     }

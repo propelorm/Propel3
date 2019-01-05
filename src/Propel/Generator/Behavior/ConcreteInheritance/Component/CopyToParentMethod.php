@@ -33,6 +33,6 @@ EOF;
         $this->addMethod('copyToParent')
             ->addSimpleParameter('entity', 'object')
             ->addSimpleParameter('parentEntity', 'object')
-            ->setBody(sprintf($body, $parentEntity->getFullClassName()));
+            ->setBody(sprintf($body, $parentEntity->getFullName()));
     }
 }

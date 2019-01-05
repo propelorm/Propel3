@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Tests\Generator\Model;
 
 use Propel\Generator\Model\Inheritance;
@@ -38,5 +40,13 @@ class InheritanceTest extends TestCase
         $this->assertSame('BaseObject', $inheritance->getAncestor());
         $this->assertSame('baz', $inheritance->getKey());
         $this->assertSame('Foo\Bar', $inheritance->getClassName());
+    }
+
+    public function testSetPackage()
+    {
+        $inheritance = new Inheritance();
+        $inheritance->setPackage('myPackage');
+
+        $this->assertEquals('myPackage', $inheritance->getPackage());
     }
 }

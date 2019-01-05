@@ -26,10 +26,16 @@ trait SchemaNamePart
     /**
      * Returns the schema name.
      *
-     * @return string
+     * @return string|null
      */
-    public function getSchemaName(): string
+    public function getSchemaName(): ?string
     {
+        if (null === $this->schemaName) {
+            if ($this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getSchemaName')) {
+                return $this->getSuperordinate()->getSchemaName();
+            }
+        }
+
         return $this->schemaName;
     }
 

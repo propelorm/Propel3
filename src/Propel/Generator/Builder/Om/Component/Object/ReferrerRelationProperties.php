@@ -33,7 +33,7 @@ class ReferrerRelationProperties extends BuildComponent
      */
     protected function addRefRelationAttributes(Relation $refRelation)
     {
-        $className = $this->useClass($refRelation->getEntity()->getFullClassName());
+        $className = $this->useClass($refRelation->getEntity()->getFullName());
 
         if ($refRelation->isLocalPrimaryKey()) {
             $varName = $this->getPKRefRelationVarName($refRelation);

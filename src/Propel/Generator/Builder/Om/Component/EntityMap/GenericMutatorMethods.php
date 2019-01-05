@@ -73,7 +73,7 @@ if (method_exists(\$entity, '$setter') && is_callable([\$entity, '$setter'])) {
 
         foreach ($this->getEntity()->getRelations() as $relation) {
             $propertyName = var_export($this->getRelationVarName($relation), true);
-            $foreignClassName = var_export($relation->getForeignEntity()->getFullClassName(), true);
+            $foreignClassName = var_export($relation->getForeignEntity()->getFullName(), true);
 
             $body .= "
 //relation:{{$relation->getName()}}
@@ -87,7 +87,7 @@ if (isset(\$data[$propertyName])) {
         foreach ($this->getEntity()->getCrossRelations() as $crossRelation) {
             foreach ($crossRelation->getRelations() as $relation) {
                 $propertyName = var_export($this->getCrossRelationRelationVarName($relation), true);
-                $foreignClassName = var_export($relation->getForeignEntity()->getFullClassName(), true);
+                $foreignClassName = var_export($relation->getForeignEntity()->getFullName(), true);
 
                 $body .= "
 //cross-relation:{{$relation->getName()}}

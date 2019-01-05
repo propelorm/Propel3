@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace Propel\Generator\Model\Parts;
 
 use Propel\Generator\Model\Vendor;
-use phootwork\collection\Map;
+use Propel\Common\Collection\Map;
 
 /**
  * Trait VendorPart
@@ -51,7 +51,7 @@ trait VendorPart
      * @param string $type
      * @return Vendor
      */
-    public function getVendorByType($type): Vendor
+    public function getVendorByType(string $type): Vendor
     {
         if (!$this->vendor->has($type)) {
             $this->addVendor(new Vendor($type));

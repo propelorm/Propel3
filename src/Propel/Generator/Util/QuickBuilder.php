@@ -8,10 +8,12 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Util;
 
 use Propel\Generator\Builder\Om\EntityMapBuilder;
-use Propel\Generator\Builder\Util\SchemaReader;
+use Propel\Generator\Schema\SchemaReader;
 use Propel\Generator\Config\GeneratorConfigInterface;
 use Propel\Generator\Config\QuickGeneratorConfig;
 use Propel\Generator\Exception\BuildException;
@@ -24,10 +26,7 @@ use Propel\Generator\Reverse\SchemaParserInterface;
 use Propel\Runtime\Adapter\AdapterInterface;
 use Propel\Runtime\Adapter\Pdo\SqliteAdapter;
 use Propel\Runtime\Configuration;
-use Propel\Runtime\Connection\ConnectionManagerSingle;
-use Propel\Runtime\Connection\PdoConnection;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Runtime\Connection\ConnectionWrapper;
 
 class QuickBuilder
 {
@@ -103,7 +102,7 @@ class QuickBuilder
     /**
      * @param string $schema
      */
-    public function setSchema($schema)
+    public function setSchema(string $schema): void
     {
         $this->schema = $schema;
     }
@@ -111,7 +110,7 @@ class QuickBuilder
     /**
      * @return string
      */
-    public function getSchema()
+    public function getSchema(): string
     {
         return $this->schema;
     }
@@ -119,7 +118,7 @@ class QuickBuilder
     /**
      * @param string $schemaName
      */
-    public function setSchemaName($schemaName)
+    public function setSchemaName(string $schemaName): void
     {
         $this->schemaName = $schemaName;
     }
@@ -127,7 +126,7 @@ class QuickBuilder
     /**
      * @return string
      */
-    public function getSchemaName()
+    public function getSchemaName(): string
     {
         return $this->schemaName;
     }
@@ -135,7 +134,7 @@ class QuickBuilder
     /**
      * @param \Propel\Generator\Reverse\SchemaParserInterface $parser
      */
-    public function setParser($parser)
+    public function setParser(SchemaParserInterface $parser): void
     {
         $this->parser = $parser;
     }
@@ -143,7 +142,7 @@ class QuickBuilder
     /**
      * @return \Propel\Generator\Reverse\SchemaParserInterface
      */
-    public function getParser()
+    public function getParser(): SchemaParserInterface
     {
         return $this->parser;
     }
@@ -153,7 +152,7 @@ class QuickBuilder
      *
      * @param PlatformInterface $platform
      */
-    public function setPlatform($platform)
+    public function setPlatform(PlatformInterface $platform): void
     {
         $this->platform = $platform;
     }
@@ -163,7 +162,7 @@ class QuickBuilder
      *
      * @return PlatformInterface
      */
-    public function getPlatform()
+    public function getPlatform(): PlatformInterface
     {
         if (null === $this->platform) {
             $this->platform = new SqlitePlatform();
@@ -179,7 +178,7 @@ class QuickBuilder
      *
      * @param GeneratorConfigInterface $config
      */
-    public function setConfig(GeneratorConfigInterface $config)
+    public function setConfig(GeneratorConfigInterface $config): void
     {
         $this->config = $config;
     }
@@ -189,7 +188,7 @@ class QuickBuilder
      *
      * @return GeneratorConfigInterface
      */
-    public function getConfig()
+    public function getConfig(): GeneratorConfigInterface
     {
         if (null === $this->config) {
             $this->config = new QuickGeneratorConfig();
@@ -199,9 +198,18 @@ class QuickBuilder
     }
 
     /**
+     * @param string $schema
+     * @param string|null $dsn
+     * @param string|null $user
+     * @param string|null $pass
+     * @param AdapterInterface|null $adapter
+     *
      * @return Configuration
+     * @throws \Exception
      */
-    public static function buildSchema($schema, $dsn = null, $user = null, $pass = null, $adapter = null)
+    public static function buildSchema(
+        string $schema, ?string $dsn = null, ?string $user = null, ?string $pass = null, AdapterInterface $adapter = null
+    ): Configuration
     {
         $builder = new self;
         $builder->setSchema($schema);
@@ -220,12 +228,13 @@ class QuickBuilder
      * @throws \Exception
      */
     public function build(
-        $dsn = null,
-        $user = null,
-        $pass = null,
+        ?string $dsn = null,
+        ?string $user = null,
+        ?string $pass = null,
         AdapterInterface $adapter = null,
         array $classTargets = null
-    ) {
+    ): Configuration
+    {
         if (null === $dsn) {
             $sqliteFile = 'latest_quickbuilder_sqlite.db';
             $reflection = new \ReflectionClass('\Propel\Tests\TestCase');
@@ -272,19 +281,18 @@ class QuickBuilder
         return static::$configuration;
     }
 
-    public function setAdapter($adapter)
+    public function setAdapter(AdapterInterface $adapter): void
     {
         static::$configuration->setAdapter($this->getDatabase()->getName(), $adapter);
     }
 
-    public function getDatabase()
+    public function getDatabase(): Database
     {
         if (null === $this->database) {
             $reader = new SchemaReader();
             $reader->setGeneratorConfig($this->getConfig());
-            $reader->setPlatform($this->getPlatform());
             $appData = $reader->parseString($this->schema);
-            $this->database = $appData->getDatabase(); // does final initialization
+            $this->database = $appData->getDatabase();
         }
 
         $this->database->setPlatform($this->getPlatform());
@@ -292,7 +300,13 @@ class QuickBuilder
         return $this->database;
     }
 
-    public function buildSQL(ConnectionInterface $con)
+    /**
+     * @param ConnectionInterface $con
+     *
+     * @return int
+     * @throws \Exception
+     */
+    public function buildSQL(ConnectionInterface $con): int
     {
         $sql = $this->getSQL();
         $statements = SqlParser::parseString($sql);
@@ -317,7 +331,12 @@ class QuickBuilder
         return count($statements);
     }
 
-    public function updateDB(ConnectionInterface $con)
+    /**
+     * @param ConnectionInterface $con
+     *
+     * @return Database|null
+     */
+    public function updateDB(ConnectionInterface $con): ?Database
     {
         $database = $this->readConnectedDatabase();
         $diff = DatabaseComparator::computeDiff($database, $this->database);
@@ -354,7 +373,7 @@ class QuickBuilder
     /**
      * @return Database
      */
-    public function readConnectedDatabase()
+    public function readConnectedDatabase(): Database
     {
         $this->getDatabase();
         $database = new Database();
@@ -371,7 +390,7 @@ class QuickBuilder
         return $this->getPlatform()->getAddEntitiesDDL($this->getDatabase());
     }
 
-    public function getBuildName($classTargets = null)
+    public function getBuildName(string $classTargets = null): string
     {
         $entitys = [];
         foreach ($this->getDatabase()->getEntities() as $entity) {
@@ -394,7 +413,7 @@ class QuickBuilder
      * @param array $classTargets array('entitymap', 'object', 'query', 'activerecordtrait', 'querystub')
      * @param bool  $separate     pass true to get for each class a own file. better for debugging.
      */
-    public function buildClasses(array $classTargets = null, $separate = false)
+    public function buildClasses(?array $classTargets = null, bool $separate = false)
     {
         $classes = $classTargets === null ? $this->classTargets : $classTargets;
 
@@ -417,7 +436,7 @@ class QuickBuilder
                 foreach ($classes as $class) {
                     $code = $this->getClassesForEntity($entity, [$class]);
                     $tempFile = $dir
-                        . str_replace('\\', '-', $entity->getFullClassName())
+                        . str_replace('\\', '-', $entity->getFullName())
                         . "-$class"
                         . '.php';
                     file_put_contents($tempFile, "<?php\n" . $code);
@@ -427,7 +446,7 @@ class QuickBuilder
                 if ($entity->hasAdditionalBuilders()) {
                     $code = $this->getClassesFromAdditionalBuilders($entity);
                     $tempFile = $dir
-                        . str_replace('\\', '-', $entity->getFullClassName())
+                        . str_replace('\\', '-', $entity->getFullName())
                         . 'additional.php';
                     file_put_contents($tempFile, "<?php\n" . $code);
                     $includes[] = $tempFile;
@@ -451,7 +470,7 @@ class QuickBuilder
         }
     }
 
-    public function getClasses(array $classTargets = null)
+    public function getClasses(?array $classTargets = null): string
     {
         $script = '';
         foreach ($this->getDatabase()->getEntities() as $entity) {
@@ -464,7 +483,7 @@ class QuickBuilder
     /**
      * @param Configuration $configuration
      */
-    public function registerEntities(Configuration $configuration = null)
+    public function registerEntities(Configuration $configuration = null): void
     {
         if (!$configuration) {
             $configuration = Configuration::getCurrentConfiguration();
@@ -475,7 +494,7 @@ class QuickBuilder
         }
     }
 
-    public function getClassesForEntity(Entity $entity, array $classTargets = null)
+    public function getClassesForEntity(Entity $entity, ?array $classTargets = null): string
     {
         if (null === $classTargets) {
             $classTargets = $this->classTargets;
@@ -487,7 +506,7 @@ class QuickBuilder
             $builder = $this->getConfig()->getConfiguredBuilder($entity, $target);
             if ($builder instanceof EntityMapBuilder) {
                 $dbName = $builder->getEntity()->getDatabase()->getName();
-                $fullEntityClassName = $builder->getObjectBuilder()->getFullClassName();
+                $fullEntityClassName = $builder->getEntity()->getFullName();
                 $this->knownEntityClassNames[$dbName][] = $fullEntityClassName;
             }
             $source = $builder->build();
@@ -519,7 +538,7 @@ class QuickBuilder
         return $script;
     }
 
-    public static function debugClassesForEntity($schema, $entityName)
+    public static function debugClassesForEntity(string $schema, string $entityName)
     {
         $builder = new self;
         $builder->setSchema($schema);
@@ -533,7 +552,7 @@ class QuickBuilder
     /**
      * @see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/ClassLoader/ClassCollectionLoader.php
      */
-    public function fixNamespaceDeclarations($source)
+    public function fixNamespaceDeclarations(string $source): string
     {
         $source = $this->forceNamespace($source);
 
@@ -591,7 +610,7 @@ class QuickBuilder
      *
      * @return string
      */
-    protected function forceNamespace($code)
+    protected function forceNamespace(string $code): string
     {
         if (0 === preg_match('/\nnamespace/', $code)) {
             return "\nnamespace\n{\n" . $code . "\n}\n";
@@ -603,7 +622,7 @@ class QuickBuilder
     /**
      * @return boolean
      */
-    public function isIdentifierQuotingEnabled()
+    public function isIdentifierQuotingEnabled(): bool
     {
         return $this->identifierQuoting;
     }
@@ -611,7 +630,7 @@ class QuickBuilder
     /**
      * @param boolean $identifierQuoting
      */
-    public function setIdentifierQuoting($identifierQuoting)
+    public function setIdentifierQuoting(bool $identifierQuoting): void
     {
         $this->identifierQuoting = $identifierQuoting;
     }
@@ -621,7 +640,7 @@ class QuickBuilder
      *
      * @return string
      */
-    protected function getClassesFromAdditionalBuilders($entity)
+    protected function getClassesFromAdditionalBuilders(Entity $entity): string
     {
         if ($entity->hasAdditionalBuilders()) {
             foreach ($entity->getAdditionalBuilders() as $builderClass) {

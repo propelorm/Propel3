@@ -37,7 +37,7 @@ class FindRelatedMethod extends BuildComponent
         $foreignEntity = $behavior->getForeignEntity();
 
         $variableName = $relationName . ucfirst($behavior->getParameter('aggregate_name'));
-        $foreignEntityClassName = $foreignEntity->getFullClassName();
+        $foreignEntityClassName = $foreignEntity->getFullName();
         $foreignClass = $this->getQueryClassNameForEntity($foreignEntity, true);
 
         $body = "

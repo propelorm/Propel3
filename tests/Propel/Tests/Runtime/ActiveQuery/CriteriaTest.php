@@ -1041,61 +1041,61 @@ class CriteriaTest extends BookstoreTestBase
 
     public function dataLimit()
     {
-        return array(
-            'Negative value' => array(
+        return [
+            'Negative value' => [
                 'limit'    => -1,
                 'expected' => -1
-            ),
-            'Zero' => array(
+            ],
+            'Zero' => [
                 'limit'    => 0,
                 'expected' => 0
-            ),
+            ],
 
-            'Small integer' => array(
+            'Small integer' => [
                 'limit'    => 38427,
                 'expected' => 38427
-            ),
-            'Small integer as a string' => array(
+            ],
+            'Small integer as a string' => [
                 'limit'    => '38427',
                 'expected' => 38427
-            ),
+            ],
 
-            'Largest 32-bit integer' => array(
+            'Largest 32-bit integer' => [
                 'limit'    => 2147483647,
                 'expected' => 2147483647
-            ),
-            'Largest 32-bit integer as a string' => array(
+            ],
+            'Largest 32-bit integer as a string' => [
                 'limit'    => '2147483647',
                 'expected' => 2147483647
-            ),
+            ],
 
-            'Largest 64-bit integer' => array(
+            'Largest 64-bit integer' => [
                 'limit'    => 9223372036854775807,
                 'expected' => 9223372036854775807
-            ),
-            'Largest 64-bit integer as a string' => array(
+            ],
+            'Largest 64-bit integer as a string' => [
                 'limit'    => '9223372036854775807',
                 'expected' => 9223372036854775807
-            ),
+            ],
 
-            'Decimal value' => array(
+            'Decimal value' => [
                 'limit'    => 123.9,
                 'expected' => 123
-            ),
-            'Decimal value as a string' => array(
+            ],
+            'Decimal value as a string' => [
                 'limit'    => '123.9',
                 'expected' => 123
-            ),
+            ],
 
-            'Non-numeric string' => array(
+            'Non-numeric string' => [
                 'limit'    => 'foo',
                 'expected' => 0
-            ),
-            'Injected SQL' => array(
+            ],
+            'Injected SQL' => [
                 'limit'    => '3;DROP TABLE abc',
                 'expected' => 3
-            ),
-        );
+            ],
+        ];
     }
 
     public function testDefaultOffset()
@@ -1118,61 +1118,61 @@ class CriteriaTest extends BookstoreTestBase
 
     public function dataOffset()
     {
-        return array(
-            'Negative value' => array(
+        return [
+            'Negative value' => [
                 'offset'   => -1,
                 'expected' => -1
-            ),
-            'Zero' => array(
+            ],
+            'Zero' => [
                 'offset'   => 0,
                 'expected' => 0
-            ),
+            ],
 
-            'Small integer' => array(
+            'Small integer' => [
                 'offset'   => 38427,
                 'expected' => 38427
-            ),
-            'Small integer as a string' => array(
+            ],
+            'Small integer as a string' => [
                 'offset'   => '38427',
                 'expected' => 38427
-            ),
+            ],
 
-            'Largest 32-bit integer' => array(
+            'Largest 32-bit integer' => [
                 'offset'   => 2147483647,
                 'expected' => 2147483647
-            ),
-            'Largest 32-bit integer as a string' => array(
+            ],
+            'Largest 32-bit integer as a string' => [
                 'offset'   => '2147483647',
                 'expected' => 2147483647
-            ),
+            ],
 
-            'Largest 64-bit integer' => array(
+            'Largest 64-bit integer' => [
                 'offset'   => 9223372036854775807,
                 'expected' => 9223372036854775807
-            ),
-            'Largest 64-bit integer as a string' => array(
+            ],
+            'Largest 64-bit integer as a string' => [
                 'offset'   => '9223372036854775807',
                 'expected' => 9223372036854775807
-            ),
+            ],
 
-            'Decimal value' => array(
+            'Decimal value' => [
                 'offset'   => 123.9,
                 'expected' => 123
-            ),
-            'Decimal value as a string' => array(
+            ],
+            'Decimal value as a string' => [
                 'offset'   => '123.9',
                 'expected' => 123
-            ),
+            ],
 
-            'Non-numeric string' => array(
+            'Non-numeric string' => [
                 'offset'   => 'foo',
                 'expected' => 0
-            ),
-            'Injected SQL' => array(
+            ],
+            'Injected SQL' => [
                 'offset'   => '3;DROP TABLE abc',
                 'expected' => 3
-            ),
-        );
+            ],
+        ];
     }
 
     public function testCombineAndFilterBy()

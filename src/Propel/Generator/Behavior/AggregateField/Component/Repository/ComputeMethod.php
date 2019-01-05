@@ -45,7 +45,7 @@ class ComputeMethod extends BuildComponent
             $bindings[$index + 1] = $foreign->getName();
         }
 
-        $foreignEntity = $database->getEntity($behavior->getParameter('foreign_entity'));
+        $foreignEntity = $database->getEntityByName($behavior->getParameter('foreign_entity'));
 //
 //        $tableName = $database->getEntityPrefix() . $foreignEntity->getEntityName();
 //        if ($database->getPlatform()->supportsSchemas() && $behavior->getParameter('foreign_schema')) {
@@ -57,7 +57,7 @@ class ComputeMethod extends BuildComponent
         $sql = sprintf(
             'SELECT %s FROM %s WHERE %s',
             $behavior->getParameter('expression'),
-            $behavior->getEntity()->quoteIdentifier($foreignEntity->getFQTableName()),
+            $behavior->getEntity()->quoteIdentifier($foreignEntity->getFullTableName()),
             implode(' AND ', $conditions)
         );
 

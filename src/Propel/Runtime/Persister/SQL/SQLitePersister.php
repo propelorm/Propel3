@@ -51,7 +51,7 @@ class SQLitePersister extends SqlPersister
     protected function readAutoIncrement(EntityMap $entityMap, ConnectionInterface $connection)
     {
         $autoIncrementField = current($entityMap->getPrimaryKeys());
-        $tableName = $autoIncrementField->getEntity()->getFQTableName();
+        $tableName = $autoIncrementField->getEntity()->getFullTableName();
 
         $stmt = $connection->prepare("SELECT seq FROM sqlite_sequence WHERE name = ?");
         $stmt->bindValue(1, $tableName, \PDO::PARAM_STR);
@@ -97,7 +97,7 @@ class SQLitePersister extends SqlPersister
 EOF;
 
         $columnName = $autoIncrementField->getColumnName();
-        $tableName = $autoIncrementField->getEntity()->getFQTableName();
+        $tableName = $autoIncrementField->getEntity()->getFullTableName();
         $sql = sprintf($sql, $columnName, $tableName, $columnName);
 
         $stmt = $connection->prepare($sql);

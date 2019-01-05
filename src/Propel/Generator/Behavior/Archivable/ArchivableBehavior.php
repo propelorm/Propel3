@@ -19,6 +19,7 @@ use Propel\Generator\Model\Behavior;
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\Index;
 use Propel\Generator\Model\Entity;
+use Propel\Generator\Model\ModelFactory;
 use Propel\Generator\Model\NamingTool;
 
 /**
@@ -31,14 +32,14 @@ class ArchivableBehavior extends Behavior
     use ComponentTrait;
 
     // default parameters value
-    protected $parameters = [
+    protected $defaultParameters = [
         'archive_entity'       => '',
         'archive_table'        => null,
-        'log_archived_at'     => 'true',
+        'log_archived_at'     => true,
         'archived_at_field'   => 'archivedAt',
-        'archive_on_insert'   => 'false',
-        'archive_on_update'   => 'false',
-        'archive_on_delete'   => 'true',
+        'archive_on_insert'   => false,
+        'archive_on_update'   => false,
+        'archive_on_delete'   => true,
     ];
 
     /**
@@ -74,27 +75,27 @@ class ArchivableBehavior extends Behavior
         $entity = $this->getEntity();
         $database = $entity->getDatabase();
         $archiveEntityName = $this->getParameter('archive_entity');
+        $modelFactory = new ModelFactory();
 
         if (!$archiveEntityName && $tableName = $this->getParameter('archive_table')) {
-            $archiveEntityName = ucfirst(NamingTool::toCamelCase($tableName));
+            $archiveEntityName = NamingTool::toStudlyCase($tableName);
         }
 
         if (!$archiveEntityName) {
             $archiveEntityName = $this->getEntity()->getName() . 'Archive';
         }
 
-        if (!$database->hasEntity($archiveEntityName)) {
+        if (!$database->hasEntityByName($archiveEntityName)) {
             // create the version entity
-            $archiveEntity = $database->addEntity(
-                [
+            $archiveEntity = $modelFactory->createEntity([
                     'name' => $archiveEntityName,
                     'tableName' => $this->getParameter('archive_table'),
-                    'package' => $entity->getPackage(),
-                    'schema' => $entity->getSchema(),
+                    'schema' => $entity->getSchemaName(),
                     'activeRecord' => $entity->getActiveRecord(),
                     'namespace' => $entity->getNamespace() ? '\\' . $entity->getNamespace() : null,
                 ]
             );
+            $database->addEntity($archiveEntity);
 
             // copy all the fields
             foreach ($entity->getFields() as $field) {
@@ -108,23 +109,25 @@ class ArchivableBehavior extends Behavior
                 $archiveEntity->addField($fieldInArchiveEntity);
             }
         } else {
-            $archiveEntity = $database->getEntity($archiveEntityName);
+            $archiveEntity = $database->getEntityByName($archiveEntityName);
         }
 
         $archiveEntity->isArchiveEntity = true;
 
         // add archived_at field
         if ('true' === $this->getParameter('log_archived_at')) {
-            $archiveEntity->addField([
+            $archiveField = $modelFactory->createField([
                 'name' => $this->getParameter('archived_at_field'),
                 'type' => 'TIMESTAMP'
             ]);
+
+            $archiveEntity->addField($archiveField);
         }
 
         // do not copy foreign keys
         // copy the indices
         foreach ($entity->getIndices() as $index) {
-            if (!$archiveEntity->isIndex($index->getFieldObjects())) {
+            if (!$archiveEntity->isIndex($index->getFields()->toArray())) {
                 $copiedIndex = clone $index;
                 $archiveEntity->addIndex($copiedIndex);
             }
@@ -136,13 +139,13 @@ class ArchivableBehavior extends Behavior
             $index->setEntity($entity);
             foreach ($unique->getFields() as $fieldName) {
                 if ($size = $unique->getFieldSize($fieldName)) {
-                    $index->addField(['name' => $fieldName, 'size' => $size]);
+                    $index->addField($modelFactory->createField(['name' => $fieldName, 'size' => $size]));
                 } else {
-                    $index->addField(['name' => $fieldName]);
+                    $index->addField($modelFactory->createField(['name' => $fieldName]));
                 }
             }
 
-            if (!$archiveEntity->isIndex($index->getFieldObjects())) {
+            if (!$archiveEntity->isIndex($index->getFields()->toArray())) {
                 $archiveEntity->addIndex($index);
             }
         }

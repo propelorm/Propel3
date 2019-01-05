@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Tests\Generator\Model;
 
 use Propel\Generator\Model\Domain;
@@ -110,6 +112,51 @@ class DomainTest extends ModelTestCase
         ];
     }
 
+    public function testGetPhpDefaultValueArray()
+    {
+        $value = $this->getFieldDefaultValueMock();
+        $value
+            ->expects($this->once())
+            ->method('getValue')
+            ->will($this->returnValue('foo, bar, baz, foobar'))
+        ;
+
+        $domain = new Domain('ARRAY');
+        $domain->setDefaultValue($value);
+
+        $this->assertSame('||foo | bar | baz | foobar||', $domain->getPhpDefaultValue());
+    }
+
+    public function testGetPhpDefaultValueArrayNull()
+    {
+        $value = $this->getFieldDefaultValueMock();
+        $value
+            ->expects($this->once())
+            ->method('getValue')
+            ->will($this->returnValue(''))
+        ;
+
+        $domain = new Domain('ARRAY');
+        $domain->setDefaultValue($value);
+
+        $this->assertNull($domain->getPhpDefaultValue());
+    }
+
+    public function testGetPhpDefaultValueArrayDelimiter()
+    {
+        $value = $this->getFieldDefaultValueMock();
+        $value
+            ->expects($this->once())
+            ->method('getValue')
+            ->will($this->returnValue(' | '))
+        ;
+
+        $domain = new Domain('ARRAY');
+        $domain->setDefaultValue($value);
+
+        $this->assertNull($domain->getPhpDefaultValue());
+    }
+
     public function testCantGetPhpDefaultValue()
     {
         $value = $this->getFieldDefaultValueMock();
@@ -169,6 +216,28 @@ class DomainTest extends ModelTestCase
         $this->assertSame('Mapping between FLOAT and DOUBLE', $newDomain->getName());
         $this->assertSame('Some description', $newDomain->getDescription());
         $this->assertInstanceOf('Propel\Generator\Model\FieldDefaultValue', $value);
+    }
+
+    public function testCloneWithDefaultValue()
+    {
+        $value = $this->getFieldDefaultValueMock();
+
+        $domain = new Domain();
+        $domain->setDefaultValue($value);
+
+        $clonedDoman = clone $domain;
+
+        $this->assertEquals($domain, $clonedDoman);
+        $this->assertNotSame($domain, $clonedDoman);
+    }
+
+    public function testCloneWithoutDefaultValue()
+    {
+        $domain = new Domain();
+        $clonedDoman = clone $domain;
+
+        $this->assertEquals($domain, $clonedDoman);
+        $this->assertNotSame($domain, $clonedDoman);
     }
 
     private function getFieldDefaultValueMock()

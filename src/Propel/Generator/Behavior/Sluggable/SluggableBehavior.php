@@ -16,6 +16,7 @@ use Propel\Generator\Builder\Om\QueryBuilder;
 use Propel\Generator\Builder\Om\RepositoryBuilder;
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Model\Behavior;
+use Propel\Generator\Model\ModelFactory;
 use Propel\Generator\Model\Unique;
 
 /**
@@ -28,13 +29,13 @@ class SluggableBehavior extends Behavior
 {
     use ComponentTrait;
 
-    protected $parameters = [
+    protected $defaultParameters = [
         'slug_field' => 'slug',
         'slug_pattern' => '',
         'replace_pattern' => '/\W+/',
         'replacement' => '-',
         'separator' => '-',
-        'permanent' => 'false',
+        'permanent' => false,
         'scope_field' => '',
     ];
 
@@ -44,6 +45,7 @@ class SluggableBehavior extends Behavior
     public function modifyEntity()
     {
         $entity = $this->getEntity();
+        $modelFactory = new ModelFactory();
 
         //Search a primary string
 
@@ -52,14 +54,14 @@ class SluggableBehavior extends Behavior
         }
 
         if (!$entity->hasField($this->getParameter('slug_field'))) {
-            $entity->addField(
+            $entity->addField($modelFactory->createField(
                 [
                     'name' => $this->getParameter('slug_field'),
                     'type' => 'VARCHAR',
                     'size' => 255,
                     'required' => false,
                 ]
-            );
+            ));
 
             // add a unique to field
             $unique = new Unique($this->getFieldForParameter('slug_field'));

@@ -10,6 +10,7 @@ use Propel\Generator\Builder\Om\Component\NamingTrait;
 use Propel\Generator\Builder\Om\Component\RelationTrait;
 use Propel\Generator\Model\CrossRelation;
 use Propel\Generator\Model\Field;
+use Propel\Generator\Model\NamingTool;
 use Propel\Generator\Model\PropelTypes;
 use Propel\Generator\Model\Relation;
 use Propel\Runtime\ActiveQuery\ModelJoin;
@@ -47,9 +48,9 @@ class FilterByCrossRelationMethods extends BuildComponent
         foreach ($crossRelation->getRelations() as $relation) {
             $queryClass = $this->getQueryClassName();
             $foreignEntity = $relation->getForeignEntity();
-            $fkPhpName = $foreignEntity->getFullClassName();
+            $fkPhpName = $foreignEntity->getFullName();
             $relName = $this->getRelationPhpName($relation, false);
-            $objectName = '$' . $foreignEntity->getCamelCaseName();
+            $objectName = '$' . NamingTool::toCamelCase($foreignEntity->getName());
 
             $description = "Filter the query by a related $fkPhpName object
 using the {$relation->getEntity()->getName()} entity as cross reference";
@@ -62,7 +63,7 @@ return \$this
 ";
 
             $methodName = "filterBy$relName";
-            $variableParameter = new PhpParameter($foreignEntity->getCamelCaseName());
+            $variableParameter = new PhpParameter(NamingTool::toCamelCase($foreignEntity->getName()));
 
 //            if ($relation->isComposite()) {
             $variableParameter->setType('\\'.$fkPhpName);

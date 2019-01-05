@@ -8,11 +8,12 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Tests\Generator\Model;
 
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Entity;
-use Propel\Generator\Model\ModelFactory;
 use Propel\Generator\Platform\PgsqlPlatform;
 use Propel\Generator\Model\Model;
 
@@ -66,24 +67,24 @@ class DatabaseTest extends ModelTestCase
 
      public function testGetNextEntityBehavior()
      {
-         $entity1 = $this->getEntityMock('books', array('behaviors' => array(
-             $this->getBehaviorMock('foo', array(
+         $entity1 = $this->getEntityMock('books', ['behaviors' => [
+             $this->getBehaviorMock('foo', [
                  'is_entity_modified'  => false,
                 'modification_order' => 2,
-             )),
-             $this->getBehaviorMock('bar', array(
+             ]),
+             $this->getBehaviorMock('bar', [
                  'is_entity_modified'  => false,
                 'modification_order' => 1,
-             )),
-             $this->getBehaviorMock('baz', array('is_entity_modified'  => true)),
-         )));
+             ]),
+             $this->getBehaviorMock('baz', ['is_entity_modified'  => true]),
+         ]]);
 
-         $entity2 = $this->getEntityMock('authors', array('behaviors' => array(
-             $this->getBehaviorMock('mix', array(
+         $entity2 = $this->getEntityMock('authors', ['behaviors' => [
+             $this->getBehaviorMock('mix', [
                  'is_entity_modified'  => false,
                  'modification_order' => 1,
-             )),
-         )));
+             ]),
+         ]]);
 
          $database = new Database();
          $database->addEntity($entity1);
@@ -97,9 +98,9 @@ class DatabaseTest extends ModelTestCase
 
      public function testCantGetNextEntityBehavior()
      {
-         $entity1 = $this->getEntityMock('books', array('behaviors' => array(
-             $this->getBehaviorMock('foo', array('is_entity_modified' => true)),
-         )));
+         $entity1 = $this->getEntityMock('books', ['behaviors' => [
+             $this->getBehaviorMock('foo', ['is_entity_modified' => true]),
+         ]]);
 
          $database = new Database();
          $database->addEntity($entity1);
@@ -246,5 +247,81 @@ class DatabaseTest extends ModelTestCase
         $t1b->setSchemaName('bis');
         $db->addEntity($t1b);
         $this->assertNotSame($t1b, $db->getEntityByName('t1'), 'Entities with same name are not added to the database');
+    }
+
+    public function testHasEntity()
+    {
+        $db = new Database();
+        $entity = $this->getEntityMock('first');
+        $db->addEntity($entity);
+
+        $this->assertTrue($db->hasEntity($entity));
+    }
+
+    public function testEntityGetters()
+    {
+        $db = new Database();
+        $entity = $this->getEntityMock('First', ['tableName' => 'first_table', 'namespace' => 'my\\namespace']);
+        $entity->expects($this->any())->method('getFullTableName')->willReturn('mySchema.first_table');
+        $db->addEntity($entity);
+
+        $this->assertTrue($db->hasEntityByFullName('my\\namespace\\First'));
+        $this->assertEquals($entity, $db->getEntityByFullName('my\\namespace\\First'));
+
+        $this->assertTrue($db->hasEntityByTableName('first_table'));
+        $this->assertEquals($entity, $db->getEntityByTableName('first_table'));
+
+        $this->assertTrue($db->hasEntityByFullTableName('mySchema.first_table'));
+        $this->assertEquals($entity, $db->getEntityByFullTableName('mySchema.first_table'));
+    }
+
+    public function testGetEntityNames()
+    {
+        $db = new Database();
+        $db->addEntity($this->getEntityMock('First'));
+        $db->addEntity($this->getEntityMock('Second'));
+        $db->addEntity($this->getEntityMock('Third'));
+
+        $this->assertEquals(['First', 'Second', 'Third'], $db->getEntityNames());
+    }
+
+    public function testAddEntities()
+    {
+        $entities = [];
+        for ($i = 0; $i <= 4; $i++ ) {
+            $entities[] = $this->getEntityMock("Entity$i");
+        }
+        $db = new Database();
+        $db->addEntities($entities);
+
+        $this->assertCount(5, $db->getEntities());
+        $this->assertEquals($entities, $db->getEntities());
+    }
+
+    public function testClone()
+    {
+        $generatorConfig = $this->getMockBuilder('Propel\\Generator\\Config\\GeneratorConfig')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $vendor = $this->getMockBuilder('Propel\\Generator\\Model\\Vendor')->getMock();
+
+        $db = new Database();
+        for ($i = 0; $i <= 4; $i++ ) {
+            $db->addEntity($this->getEntityMock("Entity$i", ['database' => $db]));
+        }
+        $db->setPlatform($this->getPlatformMock());
+        $db->setGeneratorConfig($generatorConfig);
+        $db->setSchema($this->getSchemaMock());
+        $db->addVendor($vendor);
+
+        $clone = clone $db;
+
+        $this->assertEquals($db, $clone, 'The clone object is equal.');
+        $this->assertNotSame($db, $clone, 'The clone object is not the same.');
+
+        $this->assertEquals($db->getEntities(), $clone->getEntities());
+        $this->assertNotSame($db->getEntities(), $clone->getEntities());
+        $this->assertEquals($db->getPlatform(), $clone->getPlatform());
+        $this->assertNotSame($db->getPlatform(), $clone->getPlatform());
     }
 }

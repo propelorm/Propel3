@@ -18,5 +18,5 @@ class Propel
     /**
      * The Propel version.
      */
-    const VERSION = '2.0.0-dev';
+    const VERSION = '3.0.0-dev';
 }

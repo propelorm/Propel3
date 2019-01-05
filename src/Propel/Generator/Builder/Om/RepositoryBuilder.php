@@ -24,7 +24,7 @@ class RepositoryBuilder extends AbstractBuilder
     /**
      * @return string
      */
-    public function getFullClassName($injectNamespace = 'Base', $classPrefix = '')
+    public function getFullClassName(string $injectNamespace = 'Base', string $classPrefix = ''): string
     {
 //        if ($this->getEntity()->getRepository()) {
 //            //we have a stub class, so this will be the normal base

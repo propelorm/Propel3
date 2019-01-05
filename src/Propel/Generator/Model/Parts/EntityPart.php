@@ -31,7 +31,7 @@ trait EntityPart
      *
      * @return $this
      */
-    public function setEntity(Entity $entity)
+    public function setEntity(?Entity $entity)
     {
         $this->entity = $entity;
 

@@ -39,8 +39,6 @@ class ModelManager extends AbstractManager
 
     public function build()
     {
-        $this->validate();
-
         $totalNbFiles = 0;
         $dataModels = $this->getDataModels();
         $generatorConfig = $this->getGeneratorConfig();
@@ -142,7 +140,7 @@ class ModelManager extends AbstractManager
      * with the build properties.
      *
      * @param  AbstractBuilder $builder
-     * @param  boolean               $overwrite
+     * @param  boolean         $overwrite
      *
      * @return int
      */

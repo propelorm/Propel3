@@ -47,7 +47,7 @@ EOF;
 
         $description = <<<EOF
 Associate a $crossObjectClassName to this object
-through the {$crossRelation->getMiddleEntity()->getFullClassName()} cross reference entity.
+through the {$crossRelation->getMiddleEntity()->getFullName()} cross reference entity.
 EOF;
 
         $method = $this->addMethod('add' . $relatedObjectClassName)

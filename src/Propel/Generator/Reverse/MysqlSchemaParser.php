@@ -163,7 +163,7 @@ class MysqlSchemaParser extends AbstractSchemaParser
      */
     protected function addFields(Entity $entity)
     {
-        $stmt = $this->dbh->query(sprintf('SHOW COLUMNS FROM %s', $this->getPlatform()->doQuoting($entity->getFQTableName())));
+        $stmt = $this->dbh->query(sprintf('SHOW COLUMNS FROM %s', $this->getPlatform()->doQuoting($entity->getFullTableName())));
 
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             $field = $this->getFieldFromRow($row, $entity);
@@ -228,7 +228,7 @@ class MysqlSchemaParser extends AbstractSchemaParser
         if (!$propelType) {
             $propelType = Field::DEFAULT_TYPE;
             $sqlType = $row['Type'];
-            $this->warn("Field [" . $entity->getFQTableName() . "." . $name. "] has a field type (".$nativeType.") that Propel does not support.");
+            $this->warn("Field [" . $entity->getFullTableName() . "." . $name. "] has a field type (".$nativeType.") that Propel does not support.");
         }
 
         // Special case for TINYINT(1) which is a BOOLEAN
@@ -278,7 +278,7 @@ class MysqlSchemaParser extends AbstractSchemaParser
     {
         $database = $entity->getDatabase();
 
-        $dataFetcher = $this->dbh->query(sprintf('SHOW CREATE TABLE %s', $this->getPlatform()->doQuoting($entity->getFQTableName())));
+        $dataFetcher = $this->dbh->query(sprintf('SHOW CREATE TABLE %s', $this->getPlatform()->doQuoting($entity->getFullTableName())));
         $row = $dataFetcher->fetch();
 
         $Relations = []; // local store to avoid duplicates
@@ -349,7 +349,7 @@ class MysqlSchemaParser extends AbstractSchemaParser
 
                 if (!isset($Relations[$name])) {
                     $fk = new Relation($name);
-                    $fk->setForeignEntityName($foreignEntity->getFullClassName());
+                    $fk->setForeignEntityName($foreignEntity->getFullName());
                     $fk->setOnDelete($fkactions['ON DELETE']);
                     $fk->setOnUpdate($fkactions['ON UPDATE']);
                     $entity->addRelation($fk);
@@ -369,7 +369,7 @@ class MysqlSchemaParser extends AbstractSchemaParser
      */
     protected function addIndexes(Entity $entity)
     {
-        $stmt = $this->dbh->query(sprintf('SHOW INDEX FROM %s', $this->getPlatform()->doQuoting($entity->getFQTableName())));
+        $stmt = $this->dbh->query(sprintf('SHOW INDEX FROM %s', $this->getPlatform()->doQuoting($entity->getFullTableName())));
 
         // Loop through the returned results, grouping the same key_name together
         // adding each field for that key.
@@ -419,7 +419,7 @@ class MysqlSchemaParser extends AbstractSchemaParser
      */
     protected function addPrimaryKey(Entity $entity)
     {
-        $stmt = $this->dbh->query(sprintf('SHOW KEYS FROM %s', $this->getPlatform()->doQuoting($entity->getFQTableName())));
+        $stmt = $this->dbh->query(sprintf('SHOW KEYS FROM %s', $this->getPlatform()->doQuoting($entity->getFullTableName())));
 
         // Loop through the returned results, grouping the same key_name together
         // adding each field for that key.
@@ -440,7 +440,7 @@ class MysqlSchemaParser extends AbstractSchemaParser
      */
     protected function addEntityVendorInfo(Entity $entity)
     {
-        $stmt = $this->dbh->query("SHOW TABLE STATUS LIKE '" . $entity->getFQTableName() . "'");
+        $stmt = $this->dbh->query("SHOW TABLE STATUS LIKE '" . $entity->getFullTableName() . "'");
         $row = $stmt->fetch(\PDO::FETCH_ASSOC);
         if (!$this->addVendorInfo) {
             // since we depend on `Engine` in the MysqlPlatform, we always have to extract this vendor information

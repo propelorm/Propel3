@@ -10,6 +10,7 @@
 
 namespace Propel\Tests\Common\Config\Loader;
 
+use org\bovigo\vfs\vfsStream;
 use Propel\Common\Config\Loader\IniFileLoader;
 use Propel\Common\Config\FileLocator;
 use Propel\Tests\Common\Config\ConfigTestCase;
@@ -19,9 +20,10 @@ class IniFileLoaderTest extends ConfigTestCase
     /** @var  IniFileLoader */
     protected $loader;
 
-    protected function setUp()
+    public function setUp()
     {
-        $this->loader = new IniFileLoader(new FileLocator([sys_get_temp_dir()]));
+        parent::setup();
+        $this->loader = new IniFileLoader(new FileLocator([$this->getRoot()->url()]));
     }
 
     public function testSupports()
@@ -41,9 +43,9 @@ class IniFileLoaderTest extends ConfigTestCase
 foo = bar
 bar = baz
 EOF;
-        $this->dumpTempFile('parameters.ini', $content);
+        $file = vfsStream::newFile('parameters.ini')->at($this->getRoot())->setContent($content);
 
-        $test = $this->loader->load('parameters.ini');
+        $test = $this->loader->load($file->url());
         $this->assertEquals('bar', $test['foo']);
         $this->assertEquals('baz', $test['bar']);
     }
@@ -59,7 +61,7 @@ EOF;
 
     /**
      * @expectedException        Propel\Common\Config\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The configuration file 'nonvalid.ini' has invalid content.
+     * @expectedExceptionMessage The configuration file 'vfs://root/nonvalid.ini' has invalid content.
      */
     public function testIniFileHasInvalidContent()
     {
@@ -68,17 +70,16 @@ EOF;
 only plain
 text
 EOF;
-        $this->dumpTempFile('nonvalid.ini', $content);
+        $file = vfsStream::newFile('nonvalid.ini')->at($this->getRoot())->setContent($content);
 
-        @$this->loader->load('nonvalid.ini');
+        @$this->loader->load($file->url());
     }
 
     public function testIniFileIsEmpty()
     {
-        $content = '';
-        $this->dumpTempFile('empty.ini', $content);
+        $file = vfsStream::newFile('empty.ini')->at($this->getRoot())->setContent('');
 
-        $actual = $this->loader->load('empty.ini');
+        $actual = $this->loader->load($file->url());
 
         $this->assertEquals([], $actual);
     }
@@ -93,8 +94,8 @@ Donald[]     = Dewey
 Donald[]     = Louie
 Mickey[love] = Minnie
 EOF;
-        $this->dumpTempFile('section.ini', $content);
-        $actual = $this->loader->load('section.ini');
+        $file = vfsStream::newFile('section.ini')->at($this->getRoot())->setContent($content);
+        $actual = $this->loader->load($file->url());
 
         $this->assertEquals('Pluto', $actual['Cartoons']['Dog']);
         $this->assertEquals('Huey', $actual['Cartoons']['Donald'][0]);
@@ -111,8 +112,8 @@ foo.bar.babaz = foobabar
 bla.foo       = blafoo
 bla.bar       = blabar
 EOF;
-        $this->dumpTempFile('nested.ini', $content);
-        $actual = $this->loader->load('nested.ini');
+        $file= vfsStream::newFile('nested.ini')->at($this->getRoot())->setContent($content);
+        $actual = $this->loader->load($file->url());
 
         $this->assertEquals('foobar', $actual['foo']['bar']['baz']);
         $this->assertEquals('foobabar', $actual['foo']['bar']['babaz']);
@@ -129,8 +130,8 @@ bla.foo.baz[] = foobaz1
 bla.foo.baz[] = foobaz2
 
 EOF;
-        $this->dumpTempFile('mixnested.ini', $content);
-        $actual = $this->loader->load('mixnested.ini');
+        $file = vfsStream::newFile('mixnested.ini')->at($this->getRoot())->setContent($content);
+        $actual = $this->loader->load($file->url());
 
         $this->assertEquals('foobar', $actual['bla']['foo']['bar']);
         $this->assertEquals('foobarArray', $actual['bla']['foobar'][0]);
@@ -140,7 +141,7 @@ EOF;
 
     /**
      * @expectedException Propel\Common\Config\Exception\InputOutputException
-     * @expectedExceptionMessage You don't have permissions to access configuration file notreadable.ini.
+     * @expectedExceptionMessage You don't have permissions to access configuration file vfs://root/notreadable.ini.
      */
     public function testIniFileNotReadableThrowsException()
     {
@@ -148,11 +149,9 @@ EOF;
 foo = bar
 bar = baz
 EOF;
+        $file = vfsStream::newFile('notreadable.ini', 000)->at($this->getRoot())->setContent($content);
 
-        $this->dumpTempFile('notreadable.ini', $content);
-        $this->getFilesystem()->chmod(sys_get_temp_dir() . '/notreadable.ini', 0200);
-
-        $actual = $this->loader->load('notreadable.ini');
+        $actual = $this->loader->load($file->url());
         $this->assertEquals('bar', $actual['foo']);
         $this->assertEquals('baz', $actual['bar']);
     }

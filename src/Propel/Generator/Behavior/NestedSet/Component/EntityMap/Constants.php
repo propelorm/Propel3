@@ -23,7 +23,7 @@ class Constants extends BuildComponent
 
     public function process()
     {
-        $entityName = $this->getEntity()->getFullClassName();
+        $entityName = $this->getEntity()->getFullName();
 
         $this->getDefinition()
             ->setConstant(PhpConstant::create(

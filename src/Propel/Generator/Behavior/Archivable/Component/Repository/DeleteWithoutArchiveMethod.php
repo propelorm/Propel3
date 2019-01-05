@@ -33,7 +33,7 @@ class DeleteWithoutArchiveMethod extends BuildComponent
 
         $this->addMethod('deleteWithoutArchive')
             ->setDescription('[Archivable] Deletes the object without archiving it.')
-            ->addSimpleDescParameter('entity', $this->getEntity()->getFullClassName())
+            ->addSimpleDescParameter('entity', $this->getEntity()->getFullName())
             ->setBody($body);
     }
 }

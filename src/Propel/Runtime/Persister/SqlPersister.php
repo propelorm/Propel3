@@ -94,7 +94,7 @@ class SqlPersister implements PersisterInterface
             $whereClauses[] = $this->getEntityPrimaryClause($entityMap, $entity, $params);
         }
 
-        $query = sprintf('DELETE FROM %s WHERE %s', $entityMap->getFQTableName(), implode(' OR ', $whereClauses));
+        $query = sprintf('DELETE FROM %s WHERE %s', $entityMap->getFullTableName(), implode(' OR ', $whereClauses));
 
         $connection = $this->getSession()->getConfiguration()->getConnectionManager($entityMap->getDatabaseName());
         $connection = $connection->getWriteConnection();
@@ -236,7 +236,7 @@ class SqlPersister implements PersisterInterface
             }
         }
 
-        $sql = sprintf('INSERT INTO %s (%s) VALUES ', $entityMap->getFQTableName(), implode(', ', $fields));
+        $sql = sprintf('INSERT INTO %s (%s) VALUES ', $entityMap->getFullTableName(), implode(', ', $fields));
 
         $params = [];
         $firstRound = true;
@@ -424,7 +424,7 @@ class SqlPersister implements PersisterInterface
         $this->getSession()->getConfiguration()->getEventDispatcher()->dispatch(Events::PRE_UPDATE, $event);
 
         //todo, use CASE WHEN THEN to improve performance
-        $sqlStart = 'UPDATE ' . $entityMap->getFQTableName();
+        $sqlStart = 'UPDATE ' . $entityMap->getFullTableName();
         $connection = $this->getSession()->getConfiguration()->getConnectionManager($entityMap->getDatabaseName());
         $connection = $connection->getWriteConnection();
 

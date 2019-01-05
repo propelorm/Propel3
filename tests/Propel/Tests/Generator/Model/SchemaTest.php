@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Tests\Generator\Model;
 
 use Propel\Generator\Model\Database;
@@ -48,7 +50,7 @@ class SchemaTest extends ModelTestCase
 
         $this->expectException('Propel\Generator\Exception\EngineException');
 
-        $schema->joinSchemas(array($subSchema1));
+        $schema->joinSchemas([$subSchema1]);
     }
 
     public function testJoinMultipleSchemasWithSameDatabase()
@@ -72,7 +74,7 @@ class SchemaTest extends ModelTestCase
         $database
             ->expects($this->any())
             ->method('getBehaviors')
-            ->will($this->returnValue(array($behavior)))
+            ->will($this->returnValue([$behavior]))
         ;
 
         $subSchema1 = new Schema($this->getPlatformMock());
@@ -81,7 +83,7 @@ class SchemaTest extends ModelTestCase
         $schema = new Schema($this->getPlatformMock());
         $schema->addDatabase($database);
 
-        $schema->joinSchemas(array($subSchema1));
+        $schema->joinSchemas([$subSchema1]);
 
         $this->assertCount(1, $schema->getDatabases(false));
         $this->assertSame(2, $schema->countEntities());
@@ -99,7 +101,7 @@ class SchemaTest extends ModelTestCase
         $schema = new Schema($this->getPlatformMock());
         $schema->addDatabase(new Database('skatestore'));
 
-        $schema->joinSchemas(array($subSchema1, $subSchema2));
+        $schema->joinSchemas([$subSchema1, $subSchema2]);
 
         $this->assertCount(4, $schema->getDatabases());
         $this->assertTrue($schema->hasDatabase('bookstore'));

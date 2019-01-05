@@ -16,10 +16,10 @@ use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Parts\PlatformMutatorPart;
 use Propel\Generator\Platform\PlatformInterface;
 use Propel\Generator\Schema\Dumper\XmlDumper;
-use phootwork\collection\Set;
+use Propel\Common\Collection\Set;
 use Propel\Generator\Model\Parts\NamePart;
 use Propel\Generator\Model\Parts\SchemaPart;
-use phootwork\collection\ArrayList;
+use Propel\Common\Collection\ArrayList;
 
 /**
  * A class for holding application data structures.
@@ -37,17 +37,18 @@ class Schema
     use NamePart;
     use SchemaPart;
 
-//     private $isInitialized;
-
     /** @var ArrayList */
     private $databases;
 
+    /** @var Set */
     protected $schemas;
     protected $filename;
     protected $referenceOnly = true;
 
     /**
      * Creates a new instance for the specified database type.
+     *
+     * @param PlatformInterface $platform
      */
     public function __construct(?PlatformInterface $platform = null)
     {
@@ -58,9 +59,6 @@ class Schema
         // init
         $this->databases = new ArrayList();
         $this->schemas = new Set();
-
-        // default values
-//         $this->isInitialized = false;
     }
 
     protected function getSuperordinate()
@@ -258,12 +256,6 @@ class Schema
      */
     public function getDatabase(?string $name = null): ?Database
     {
-        // this is temporary until we'll have a clean solution
-        // for packaging datamodels/requiring schemas
-//         if ($doFinalInitialization) {
-//             $this->doFinalInitialization();
-//         }
-
         if ($this->databases->size() === 0) {
             return null;
         }
@@ -287,12 +279,6 @@ class Schema
      */
     public function getDatabases()
     {
-        // this is temporary until we'll have a clean solution
-        // for packaging datamodels/requiring schemas
-//         if ($doFinalInitialization) {
-//             $this->doFinalInitialization();
-//         }
-
         return $this->databases->toArray();
     }
 
@@ -322,29 +308,13 @@ class Schema
     }
 
     /**
-     * @TODO externalize
-     * Finalizes the databases initialization.
-     *
-     */
-    public function doFinalInitialization()
-    {
-        if (!$this->isInitialized) {
-            foreach ($this->databases as $database) {
-                $database->doFinalInitialization();
-            }
-            $this->isInitialized = true;
-        }
-    }
-
-    /**
      * @TODO
      * Merge other Schema objects together into this Schema object.
-     *
-     * @param Schema[] $schemas
      */
     public function joinSchemas(array $schemas)
     {
         foreach ($schemas as $schema) {
+            /** @var Database $addDb */
             foreach ($schema->getDatabases() as $addDb) {
                 $addDbName = $addDb->getName();
                 if ($this->hasDatabase($addDbName)) {
@@ -376,8 +346,14 @@ class Schema
         }
     }
 
+    public function joinExternalSchemas()
+    {
+        $this->joinSchemas($this->schemas->toArray());
+        $this->schemas->clear();
+    }
+
     /**
-     * Returns the number of tables in all the databases of this Schema object.
+     * Returns the number of entities in all the databases of this Schema object.
      *
      * @return int
      */

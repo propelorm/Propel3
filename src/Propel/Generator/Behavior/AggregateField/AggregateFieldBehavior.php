@@ -15,6 +15,8 @@ namespace Propel\Generator\Behavior\AggregateField;
 use Propel\Generator\Builder\Om\Component\ComponentTrait;
 use Propel\Generator\Builder\Om\RepositoryBuilder;
 use Propel\Generator\Model\Behavior;
+use Propel\Generator\Model\Entity;
+use Propel\Generator\Model\Field;
 use Propel\Generator\Model\Relation;
 
 /**
@@ -27,7 +29,7 @@ class AggregateFieldBehavior extends Behavior
     use ComponentTrait;
 
     // default parameters value
-    protected $parameters = [
+    protected $defaultParameters = [
         'name' => null,
         'expression' => null,
         'condition' => null,
@@ -62,15 +64,13 @@ class AggregateFieldBehavior extends Behavior
 
         // add the aggregate field if not present
         if (!$entity->hasField($fieldName)) {
-            $entity->addField(
-                [
-                    'name' => $fieldName,
-                    'type' => 'INTEGER',
-                ]
-            );
+            $field = new Field($fieldName);
+            $field->setType('INTEGER');
+            $entity->addField($field);
         }
 
         // add a behavior in the foreign entity to autoupdate the aggregate field
+        /** @var Entity $foreignEntity */
         $foreignEntity = $this->getForeignEntity();
         if (!$foreignEntity->hasBehavior('concrete_inheritance_parent')) {
             $relationBehavior = new AggregateFieldRelationBehavior();
@@ -100,7 +100,7 @@ class AggregateFieldBehavior extends Behavior
         $this->applyComponent('Repository\\UpdateMethod', $builder);
     }
 
-    public function getForeignEntity()
+    public function getForeignEntity(): Entity
     {
         $database = $this->getEntity()->getDatabase();
         $entityName = $this->getParameter('foreign_entity');
@@ -110,13 +110,13 @@ class AggregateFieldBehavior extends Behavior
                 . $entityName;
         }
 
-        return $database->getEntity($entityName);
+        return $database->getEntityByName($entityName);
     }
 
     /**
      * @return Relation
      */
-    public function getRelation()
+    public function getRelation(): Relation
     {
         $foreignEntity = $this->getForeignEntity();
         // let's infer the relation from the foreign entity
@@ -135,7 +135,7 @@ class AggregateFieldBehavior extends Behavior
         return array_shift($fks);
     }
 
-    public function getField()
+    public function getField(): Field
     {
         return $this->getEntity()->getField($this->getParameter('name'));
     }

@@ -29,28 +29,28 @@ class PhpSchemaLoaderTest extends ReaderTestCase
         $this->assertTrue($this->loader->supports('foo.php'), '->supports() returns true if the resource is loadable');
         $this->assertTrue($this->loader->supports('foo.inc'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($this->loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
-        $this->assertFalse($this->loader->supports($this->root->url()), '->supports() returns false if the resource is not a string.');
+        $this->assertFalse($this->loader->supports($this->getRoot()->url()), '->supports() returns false if the resource is not a string.');
     }
 
     public function testPhpSchemaCanBeLoaded()
     {
-        $actual = $this->loader->load(vfsStream::url('schema_dir/schema.php'));
+        $actual = $this->loader->load(vfsStream::url('root/schema.php'));
         $this->assertEquals('bookstore', $actual['database']['name']);
         $this->assertEquals('Book', $actual['database']['entities'][0]['name']);
     }
 
     /**
      * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage The file "vfs://inexistent.php" does not exist
+     * @expectedExceptionMessage The file "vfs://root/inexistent.php" does not exist
      */
     public function testPhpFileDoesNotExist()
     {
-        $this->loader->load(vfsStream::url('inexistent.php'));
+        $this->loader->load(vfsStream::url('root/inexistent.php'));
     }
 
     /**
      * @expectedException        Propel\Generator\Schema\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The schema file 'vfs://schema_dir/nonvalid.php' has invalid content.
+     * @expectedExceptionMessage The schema file 'vfs://root/nonvalid.php' has invalid content.
      */
     public function testPhpFileHasInvalidContent()
     {
@@ -59,18 +59,18 @@ not php content
 only plain
 text
 EOF;
-        vfsStream::newFile('nonvalid.php')->at($this->root)->setContent($content);
-        $this->loader->load(vfsStream::url('schema_dir/nonvalid.php'));
+        vfsStream::newFile('nonvalid.php')->at($this->getRoot())->setContent($content);
+        $this->loader->load(vfsStream::url('root/nonvalid.php'));
     }
 
     /**
      * @expectedException        Propel\Generator\Schema\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The schema file 'vfs://schema_dir/empty.php' has invalid content.
+     * @expectedExceptionMessage The schema file 'vfs://root/empty.php' has invalid content.
      */
     public function testPhpFileIsEmpty()
     {
-        vfsStream::newFile('empty.php')->at($this->root)->setContent('');
-        $this->loader->load(vfsStream::url('schema_dir/empty.php'));
+        vfsStream::newFile('empty.php')->at($this->getRoot())->setContent('');
+        $this->loader->load(vfsStream::url('root/empty.php'));
     }
 
     /**
@@ -86,7 +86,7 @@ EOF;
 
 EOF;
 
-        vfsStream::newFile('notreadable.php', 0000)->at($this->root)->setContent($content);
-        $actual = $this->loader->load(vfsStream::url('schema_dir/notreadable.php'));
+        vfsStream::newFile('notreadable.php', 0000)->at($this->getRoot())->setContent($content);
+        $actual = $this->loader->load(vfsStream::url('root/notreadable.php'));
     }
 }

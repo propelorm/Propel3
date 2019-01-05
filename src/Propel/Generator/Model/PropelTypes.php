@@ -378,7 +378,7 @@ class PropelTypes
      * @param  mixed   $value
      * @return boolean
      */
-    public static function booleanValue($value)
+    public static function booleanValue($value): bool
     {
         if (is_bool($value)) {
             return $value;

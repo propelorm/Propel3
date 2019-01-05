@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Builder\Om;
 
 use gossi\codegen\model\PhpTrait;
@@ -23,9 +25,12 @@ use gossi\codegen\model\PhpTrait;
 class ActiveRecordTraitBuilder extends AbstractBuilder
 {
     /**
+     * @param string $fullClassName
+     * @param string $classPrefix
+     *
      * @return string
      */
-    public function getFullClassName($fullClassName = 'Base', $classPrefix = '')
+    public function getFullClassName(string $fullClassName = 'Base', string $classPrefix = ''): string
     {
         return parent::getFullClassName('Base') . 'ActiveRecordTrait';
     }

@@ -2,7 +2,7 @@
 
 namespace Propel\Tests\Generator\Model\Diff;
 
-use phootwork\collection\Map;
+use Propel\Common\Collection\Map;
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Diff\FieldDiff;

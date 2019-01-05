@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Platform;
 
 use Propel\Generator\Model\Domain;
@@ -51,40 +53,45 @@ class MssqlPlatform extends SqlDefaultPlatform
         $this->setSchemaDomainMapping(new Domain(PropelTypes::ENUM, "VARCHAR(MAX)"));
     }
 
-    public function getMaxFieldNameLength()
+    public function getMaxFieldNameLength(): int
     {
         return 128;
     }
 
-    public function getNullString($notNull)
+    public function getNullString(): string
     {
-        return $notNull ? 'NOT NULL' : 'NULL';
+        return 'NULL';
     }
 
-    public function supportsNativeDeleteTrigger()
+    public function getNotNullString(): string
+    {
+        return 'NOT NULL';
+    }
+
+    public function supportsNativeDeleteTrigger(): bool
     {
         return true;
     }
 
-    public function supportsInsertNullPk()
+    public function supportsInsertNullPk(): bool
     {
         return false;
     }
 
-    public function getDropEntityDDL(Entity $entity)
+    public function getDropEntityDDL(Entity $entity): string
     {
         $ret = '';
         foreach ($entity->getRelations() as $relation) {
             $ret .= "
 IF EXISTS (SELECT 1 FROM sysobjects WHERE type ='RI' AND name='" . $relation->getName() . "')
-    ALTER TABLE " . $this->quoteIdentifier($entity->getFQTableName()) . " DROP CONSTRAINT " . $this->quoteIdentifier($relation->getName()) . ";
+    ALTER TABLE " . $this->quoteIdentifier($entity->getFullTableName()) . " DROP CONSTRAINT " . $this->quoteIdentifier($relation->getName()) . ";
 ";
         }
 
         self::$dropCount++;
 
         $ret .= "
-IF EXISTS (SELECT 1 FROM sysobjects WHERE type = 'U' AND name = '" . $entity->getFQTableName() . "')
+IF EXISTS (SELECT 1 FROM sysobjects WHERE type = 'U' AND name = '" . $entity->getFullTableName() . "')
 BEGIN
     DECLARE @reftable_" . self::$dropCount . " nvarchar(60), @constraintname_" . self::$dropCount . " nvarchar(60)
     DECLARE refcursor CURSOR FOR
@@ -96,7 +103,7 @@ BEGIN
         where tables.id = ref.rkeyid
             and cons.id = ref.constid
             and reftables.id = ref.fkeyid
-            and tables.name = '" . $entity->getFQTableName() . "'
+            and tables.name = '" . $entity->getFullTableName() . "'
     OPEN refcursor
     FETCH NEXT from refcursor into @reftable_" . self::$dropCount . ", @constraintname_" . self::$dropCount . "
     while @@FETCH_STATUS = 0
@@ -106,14 +113,14 @@ BEGIN
     END
     CLOSE refcursor
     DEALLOCATE refcursor
-    DROP TABLE " . $this->quoteIdentifier($entity->getFQTableName()) . "
+    DROP TABLE " . $this->quoteIdentifier($entity->getFullTableName()) . "
 END
 ";
 
         return $ret;
     }
 
-    public function getPrimaryKeyDDL(Entity $entity)
+    public function getPrimaryKeyDDL(Entity $entity): string
     {
         if ($entity->hasPrimaryKey()) {
             $pattern = 'CONSTRAINT %s PRIMARY KEY (%s)';
@@ -126,10 +133,10 @@ END
         }
     }
 
-    public function getAddRelationDDL(Relation $relation)
+    public function getAddRelationDDL(Relation $relation): string
     {
         if ($relation->isSkipSql()) {
-            return;
+            return '';
         }
         $pattern = "
 BEGIN
@@ -140,22 +147,22 @@ END
 
         return sprintf(
             $pattern,
-            $this->quoteIdentifier($relation->getEntity()->getFQTableName()),
+            $this->quoteIdentifier($relation->getEntity()->getFullTableName()),
             $this->getRelationDDL($relation)
         );
     }
 
-    public function getRelationDDL(Relation $relation)
+    public function getRelationDDL(Relation $relation): string
     {
         if ($relation->isSkipSql()) {
-            return;
+            return '';
         }
         $pattern = 'CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)';
         $script = sprintf(
             $pattern,
             $this->quoteIdentifier($relation->getName()),
             $this->getFieldListDDL($relation->getLocalFieldObjects()),
-            $this->quoteIdentifier($relation->getForeignEntity()->getFQTableName()),
+            $this->quoteIdentifier($relation->getForeignEntity()->getFullTableName()),
             $this->getFieldListDDL($relation->getForeignFieldObjects())
         );
         if ($relation->hasOnUpdate() && $relation->getOnUpdate() != Relation::SETNULL) {
@@ -171,12 +178,12 @@ END
     /**
      * @see Platform::supportsSchemas()
      */
-    public function supportsSchemas()
+    public function supportsSchemas(): bool
     {
         return true;
     }
 
-    public function hasSize($sqlType)
+    public function hasSize(string $sqlType): bool
     {
         return !('INT' === $sqlType || 'TEXT' === $sqlType);
     }
@@ -184,12 +191,12 @@ END
     /**
      * {@inheritdoc}
      */
-    public function doQuoting($text)
+    public function doQuoting(string $text): string
     {
         return '[' . strtr($text, ['.' => '].[']) . ']';
     }
 
-    public function getTimestampFormatter()
+    public function getTimestampFormatter(): string
     {
         return 'Y-m-d H:i:s';
     }

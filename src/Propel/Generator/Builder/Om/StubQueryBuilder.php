@@ -24,7 +24,7 @@ class StubQueryBuilder extends AbstractBuilder
     /**
      * @return string
      */
-    public function getFullClassName($injectNamespace = '', $classPrefix = '')
+    public function getFullClassName(string $injectNamespace = '', string $classPrefix = ''): string
     {
         return parent::getFullClassName('') . 'Query';
     }

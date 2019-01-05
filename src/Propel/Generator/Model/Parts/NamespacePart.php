@@ -22,6 +22,7 @@ trait NamespacePart
     use NamePart;
     use SuperordinatePart;
 
+    /** @var string */
     protected $namespace;
 
     /**

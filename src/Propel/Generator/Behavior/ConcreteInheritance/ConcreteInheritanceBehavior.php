@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Behavior\ConcreteInheritance;
 
 use Propel\Generator\Builder\Om\Component\ComponentTrait;
@@ -16,6 +18,7 @@ use Propel\Generator\Builder\Om\QueryBuilder;
 use Propel\Generator\Builder\Om\RepositoryBuilder;
 use Propel\Generator\Exception\InvalidArgumentException;
 use Propel\Generator\Model\Behavior;
+use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Relation;
 
 /**
@@ -32,9 +35,9 @@ class ConcreteInheritanceBehavior extends Behavior
     use ComponentTrait;
 
     // default parameters value
-    protected $parameters = [
+    protected $defaultParameters = [
         'extends' => '',
-        'copy_data_to_parent' => 'true',
+        'copy_data_to_parent' => true,
         'descendant_field'   => 'descendantClass',
     ];
 
@@ -109,12 +112,12 @@ class ConcreteInheritanceBehavior extends Behavior
         }
     }
 
-    public function getParentEntity()
+    public function getParentEntity(): Entity
     {
         $database = $this->getEntity()->getDatabase();
         $entityName = $this->getParameter('extends');
 
-        if (!$entity = $database->getEntity($entityName)) {
+        if (!$entity = $database->getEntityByName($entityName)) {
             throw new InvalidArgumentException(
                 sprintf(
                     'Entity "%s" used in the concrete_inheritance behavior at entity "%s" not exist.',
@@ -127,9 +130,9 @@ class ConcreteInheritanceBehavior extends Behavior
         return $entity;
     }
 
-    protected function isCopyData()
+    protected function isCopyData(): bool
     {
-        return 'true' === $this->getParameter('copy_data_to_parent');
+        return $this->getParameter('copy_data_to_parent');
     }
 
     public function preSave(RepositoryBuilder $repositoryBuilder)
@@ -141,7 +144,7 @@ class ConcreteInheritanceBehavior extends Behavior
 
     public function postSave(RepositoryBuilder $repositoryBuilder)
     {
-        $entityClass = $this->getParentEntity()->getFullClassName();
+        $entityClass = $this->getParentEntity()->getFullName();
 
         if ($this->isCopyData()) {
             $getter = 'get' . $this->getParentEntity()->getName();
@@ -177,13 +180,13 @@ foreach (\$event->getEntities() as \$entity) {
 }
 EOF;
 
-            return sprintf($code, $this->getParentEntity()->getFullClassName());
+            return sprintf($code, $this->getParentEntity()->getFullName());
         }
     }
 
     public function objectBuilderModification(ObjectBuilder $builder)
     {
-        $builder->getDefinition()->setParentClassName('\\' . $this->getParentEntity()->getFullClassName());
+        $builder->getDefinition()->setParentClassName('\\' . $this->getParentEntity()->getFullName());
 
         if (!isset($this->getEntity()->concreteParentRelation)) {
             return;

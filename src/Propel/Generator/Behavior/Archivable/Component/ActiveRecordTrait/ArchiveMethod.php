@@ -23,7 +23,7 @@ class ArchiveMethod extends BuildComponent
     {
         /** @var ArchivableBehavior $behavior */
         $behavior = $this->getBehavior();
-        $archiveClassName = $behavior->getArchiveEntity()->getFullClassName();
+        $archiveClassName = $behavior->getArchiveEntity()->getFullName();
 
         $body = "
 \$archive = \$this->getRepository()->archive(\$this);

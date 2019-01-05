@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Model;
 
-use phootwork\collection\Map;
-use phootwork\collection\Set;
+use Propel\Common\Collection\Map;
+use Propel\Common\Collection\Set;
 use Propel\Common\Types\BuildableFieldTypeInterface;
 use Propel\Common\Types\FieldTypeInterface;
 use Propel\Generator\Exception\EngineException;
@@ -24,6 +24,7 @@ use Propel\Generator\Model\Parts\GeneratorPart;
 use Propel\Generator\Model\Parts\NamePart;
 use Propel\Generator\Model\Parts\NodePart;
 use Propel\Generator\Model\Parts\PlatformAccessorPart;
+use Propel\Generator\Model\Parts\VendorPart;
 use Propel\Generator\Platform\PlatformInterface;
 
 /**
@@ -40,7 +41,7 @@ use Propel\Generator\Platform\PlatformInterface;
  */
 class Field
 {
-    use NodePart, DomainPart, NamePart, GeneratorPart, EntityPart, PlatformAccessorPart, DescriptionPart;
+    use NodePart, DomainPart, NamePart, GeneratorPart, EntityPart, PlatformAccessorPart, DescriptionPart, VendorPart;
 
     const CONSTANT_PREFIX    = 'FIELD_';
 
@@ -52,7 +53,11 @@ class Field
      * @var string The name of the mapped column
      */
     private $columnName;
+
+    /** @var string */
     private $singularName;
+
+    /** @var bool  */
     private $isNotNull;
 
     /**
@@ -61,14 +66,26 @@ class Field
      */
     private $phpType;
 
+    /** @var int */
     private $position;
+
+    /** @var bool  */
     private $isPrimaryKey;
+
+    /** @var bool  */
     private $isUnique;
+
+    /** @var bool  */
     private $isAutoIncrement;
+
+    /** @var bool  */
     private $skipCodeGeneration = false;
+
+    /** @var bool  */
     private $isLazyLoad;
+
     /**
-     * @var Set
+     * @var bool
      */
     private $isPrimaryString;
 
@@ -77,7 +94,10 @@ class Field
     // classnames specified in the schema.    Others may be
     // supported later.
 
+    /** @var string 'single' or 'false' are accepted values */
     private $inheritanceType;
+
+    /** @var bool  */
     private $isEnumeratedClasses;
 
     /**
@@ -138,6 +158,8 @@ class Field
         $this->valueSet = new Set();
         $this->inheritanceList = new Set();
         $this->referrers =  new Set();
+        $this->mutatorVisibility = Model::VISIBILITY_PUBLIC;
+        $this->accessorVisibility = Model::VISIBILITY_PUBLIC;
     }
 
     /**
@@ -305,7 +327,7 @@ class Field
         return $this->inheritanceType;
     }
 
-    public function setInheritenceType(string $type): void
+    public function setInheritanceType(string $type): void
     {
         $this->inheritanceType = $type;
     }
@@ -928,7 +950,7 @@ class Field
      *
      * @param boolean $flag
      */
-    public function setAutoIncrement(bool $flag = true)
+    public function setAutoIncrement(bool $flag = true): void
     {
         $this->isAutoIncrement = (Boolean) $flag;
     }
@@ -1000,14 +1022,18 @@ class Field
         return PropelTypes::isPhpObjectType($this->getPhpType());
     }
 
-    //@todo
     /**
      * Clones the current object.
      *
      */
     public function __clone()
     {
-        $this->referrers = null;
+        $this->referrers = clone $this->referrers;
+        $this->valueSet = clone $this->valueSet;
+        $this->inheritanceList = clone $this->inheritanceList;
+        if ($this->vendor) {
+            $this->vendor = clone $this->vendor;
+        }
         if ($this->domain) {
             $this->domain = clone $this->domain;
         }

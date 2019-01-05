@@ -68,7 +68,7 @@ abstract class AbstractCommand extends Command
     {
         $finder = new Finder();
         $finder
-            ->name('*schema.xml')
+            ->name('*schema.{php,inc,yaml,yml,xml,json}')
             ->in($directory);
         if (!$recursive) {
             $finder->depth(0);

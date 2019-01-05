@@ -10,9 +10,7 @@
 
 declare(strict_types=1);
 
-namespace Propel\Generator\Util;
-
-use phootwork\collection\ArrayList;
+namespace Propel\Common\Collection;
 
 /**
  * Class UniqueList

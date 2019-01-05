@@ -43,9 +43,9 @@ class FilterByFieldMethods extends BuildComponent
      */
     protected function addFilterByCol(Field $field)
     {
-        $fieldPhpName = NamingTool::toUpperCamelCase($field->getName());
+        $fieldPhpName = NamingTool::toStudlyCase($field->getName());
         $fieldName = $field->getName();
-        $variableName = $field->getCamelCaseName();
+        $variableName = NamingTool::toCamelCase($field->getName());
         $qualifiedName = $field->getFQConstantName();
 
         $variableParameter = new PhpParameter($variableName);
@@ -222,7 +222,7 @@ return \$this->addUsingAlias($qualifiedName, \$$variableName, \$comparison);
     {
         $singularPhpName = ucfirst($field->getSingularName());
         $fieldName = $field->getName();
-        $variableName = $field->getCamelCaseName();
+        $variableName = NamingTool::toCamelCase($field->getName());
         $qualifiedName = $field->getFQConstantName();
 
         $description = "Filter the query on the $fieldName column";

@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Tests\Generator\Model;
 
 use org\bovigo\vfs\vfsStream;
@@ -24,9 +26,6 @@ use Propel\Tests\Helpers\MultipleBehavior;
  */
 class BehaviorTest extends ModelTestCase
 {
-    private $schemaReader;
-    private $appData;
-
     public function testName()
     {
         $b = new Behavior();
@@ -81,7 +80,7 @@ class BehaviorTest extends ModelTestCase
   </entity>
 </database>
 EOF;
-        $schema = vfsStream::newFile('schema.xml')->at($this->root)->setContent($content);
+        $schema = vfsStream::newFile('schema.xml')->at($this->getRoot())->setContent($content);
         $appData = $schemaReader->parse($schema->url());
         $entity = $appData->getDatabase('test1')->getEntityByName('Entity1');
         $behaviors = $entity->getBehaviors();
@@ -109,7 +108,7 @@ EOF;
   </entity>
 </database>
 EOF;
-        $schema = vfsStream::newFile('schema.xml')->at($this->root)->setContent($content);
+        $schema = vfsStream::newFile('schema.xml')->at($this->getRoot())->setContent($content);
         $appData = $schemaReader->parse($schema->url());
     }
 
@@ -125,7 +124,7 @@ EOF;
   </entity>
 </database>
 EOF;
-        $schema = vfsStream::newFile('schema.xml')->at($this->root)->setContent($content);
+        $schema = vfsStream::newFile('schema.xml')->at($this->getRoot())->setContent($content);
         $appData = $schemaReader->parse($schema->url());
         $entity = $appData->getDatabase('test1')->getEntityByName('Table2');
         $this->assertEquals($entity->getFields()->size(), 4, 'A behavior can modify its table by implementing modifyEntity()');
@@ -142,7 +141,7 @@ EOF;
   </entity>
 </database>
 EOF;
-        $schema = vfsStream::newFile('schema.xml')->at($this->root)->setContent($content);
+        $schema = vfsStream::newFile('schema.xml')->at($this->getRoot())->setContent($content);
         $appData = $schemaReader->parse($schema->url());
         $entity = $appData->getDatabase('test1')->getEntityByName('Table1');
         $this->assertTrue(array_key_exists('timestampable', $entity->getBehaviors()), 'A database behavior is automatically copied to all its table');
@@ -165,7 +164,7 @@ EOF;
   </entity>
 </database>
 EOF;
-        $schema = vfsStream::newFile('schema.xml')->at($this->root)->setContent($content);
+        $schema = vfsStream::newFile('schema.xml')->at($this->getRoot())->setContent($content);
         $appData = $schemaReader->parse($schema->url());
         $entity = $appData->getDatabase('test1')->getEntityByName('Table1');
         $behavior = $entity->getBehavior('timestampable');

@@ -33,7 +33,7 @@ class Attribute extends BuildComponent
         $variableName = $relationName . ucfirst($behavior->getParameter('aggregate_name'));
 
 //        $relationName = $behavior->getRelationName();
-        $relatedClass = $behavior->getForeignEntity()->getFullClassName();
+        $relatedClass = $behavior->getForeignEntity()->getFullName();
 //        $aggregateName = $behavior->getParameter('aggregate_name');
 
         $property = new PhpProperty("afCache{$variableName}");

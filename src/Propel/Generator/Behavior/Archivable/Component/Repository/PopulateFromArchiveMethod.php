@@ -25,7 +25,7 @@ class PopulateFromArchiveMethod extends BuildComponent
     {
         /** @var ArchivableBehavior $behavior */
         $behavior = $this->getBehavior();
-        $archiveClassName = $behavior->getArchiveEntity()->getFullClassName();
+        $archiveClassName = $behavior->getArchiveEntity()->getFullName();
         $this->getDefinition()->declareUse($archiveClassName);
 
         $body = "
@@ -34,7 +34,7 @@ class PopulateFromArchiveMethod extends BuildComponent
 
         $this->addMethod('populateFromArchive')
             ->setDescription('[Archivable] Populates the $entity object based on a $archive object.')
-            ->addSimpleDescParameter('entity', $this->getEntity()->getFullClassName())
+            ->addSimpleDescParameter('entity', $this->getEntity()->getFullName())
             ->addSimpleDescParameter('archive', $archiveClassName)
             ->setBody($body);
     }

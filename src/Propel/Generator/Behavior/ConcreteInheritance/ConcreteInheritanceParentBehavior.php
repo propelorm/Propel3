@@ -15,6 +15,7 @@ use Propel\Generator\Builder\Om\ActiveRecordTraitBuilder;
 use Propel\Generator\Builder\Om\ObjectBuilder;
 use Propel\Generator\Builder\Om\RepositoryBuilder;
 use Propel\Generator\Model\Behavior;
+use Propel\Generator\Model\ModelFactory;
 
 /**
  * Symmetrical behavior of the concrete_inheritance. When model A extends model B,
@@ -26,19 +27,20 @@ use Propel\Generator\Model\Behavior;
 class ConcreteInheritanceParentBehavior extends Behavior
 {
     // default parameters value
-    protected $parameters = [
+    protected $defaultParameters = [
         'descendant_field' => 'descendantClass'
     ];
 
     public function modifyEntity()
     {
+        $modelFactory = new ModelFactory();
         $table = $this->getEntity();
         if (!$table->hasField($this->getParameter('descendant_field'))) {
-            $table->addField([
+            $table->addField($modelFactory->createField([
                 'name' => $this->getParameter('descendant_field'),
                 'type' => 'VARCHAR',
                 'size' => 100
-            ]);
+            ]));
         }
     }
 

@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Builder\Om;
 
 use Propel\Generator\Model\Relation;
@@ -26,7 +28,7 @@ class EntityMapBuilder extends AbstractBuilder
      *
      * @return string
      */
-    public function getFullClassName($injectNamespace = '', $classPrefix = '')
+    public function getFullClassName(string $injectNamespace = '', string $classPrefix = ''): string
     {
         $injectNamespace = 'Map';
 

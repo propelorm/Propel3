@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Behavior\I18n;
 
 use Propel\Generator\Builder\Om\Component\ComponentTrait;
@@ -19,7 +21,6 @@ use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Behavior;
 use Propel\Generator\Model\Relation;
 use Propel\Generator\Model\PropelTypes;
-use Propel\Generator\Behavior\Validate\ValidateBehavior;
 
 /**
  * Allows translation of text fields through transparent one-to-many
@@ -34,7 +35,7 @@ class I18nBehavior extends Behavior
     const DEFAULT_LOCALE = 'en_US';
 
     // default parameters value
-    protected $parameters = [
+    protected $defaultParameters = [
         'i18n_entity'      => '%ENTITYNAME%I18n',
         'i18n_fields'      => '',
         'i18n_relation_field' => null,

@@ -11,6 +11,7 @@ namespace Propel\Generator\Builder\Om\Component\Query;
 
 use Propel\Generator\Builder\Om\Component\BuildComponent;
 use Propel\Generator\Builder\Om\Component\NamingTrait;
+use Propel\Generator\Model\NamingTool;
 
 /**
  * Adds all filterBy methods for fields.
@@ -24,7 +25,7 @@ class PruneMethod extends BuildComponent
     public function process()
     {
         $entity = $this->getEntity();
-        $objectName = '$' . $entity->getCamelCaseName();
+        $objectName = '$' . NamingTool::toCamelCase($entity->getName());
 
         $body = "
 if ($objectName) {";
@@ -61,7 +62,7 @@ return \$this;
         $this->addMethod('prune')
             ->setDescription('Exclude object from result.')
             ->setType("\$this|{$this->getQueryClassName()}", "The current query, for fluid interface")
-            ->addSimpleDescParameter($entity->getCamelCaseName(), null, "Object to remove from the list of results", null)
+            ->addSimpleDescParameter(NamingTool::toCamelCase($entity->getName()), null, "Object to remove from the list of results", null)
             ->setBody($body)
         ;
     }

@@ -15,7 +15,7 @@ namespace Propel\Generator\Config;
 use Propel\Common\Pluralizer\PluralizerInterface;
 use Propel\Common\Types\BuildableFieldTypeInterface;
 use Propel\Common\Types\FieldTypeInterface;
-use Propel\Generator\Builder\DataModelBuilder;
+use Propel\Generator\Builder\Om\AbstractBuilder;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Platform\PlatformInterface;
 use Propel\Runtime\Connection\ConnectionInterface;
@@ -30,9 +30,9 @@ interface GeneratorConfigInterface
      * @param  Entity $entity
      * @param  string $type
      *
-     * @return DataModelBuilder
+     * @return AbstractBuilder
      */
-    public function getConfiguredBuilder(Entity $entity, string $type): DataModelBuilder;
+    public function getConfiguredBuilder(Entity $entity, string $type): AbstractBuilder;
 
     /**
      * Returns a configured Pluralizer class.
@@ -64,7 +64,7 @@ interface GeneratorConfigInterface
      *
      * @return BehaviorManager
      */
-    public function getBehaviorManager();
+    public function getBehaviorManager(): BehaviorManager;
 
     /**
      * @param string $name

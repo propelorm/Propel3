@@ -33,7 +33,7 @@ class PersistWithoutArchiveMethod extends BuildComponent
 
         $this->addMethod('persistWithoutArchive')
             ->setDescription('[Archivable] Persists the object without archiving it.')
-            ->addSimpleDescParameter('entity', $this->getEntity()->getFullClassName())
+            ->addSimpleDescParameter('entity', $this->getEntity()->getFullName())
             ->setBody($body);
     }
 }

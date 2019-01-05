@@ -20,7 +20,7 @@ class ProxyBuilder extends AbstractBuilder
     /**
      * @return string
      */
-    public function getFullClassName($fullClassName = 'Base', $classPrefix = '')
+    public function getFullClassName(string $fullClassName = 'Base', string $classPrefix = ''): string
     {
         return parent::getFullClassName('Base', '').'Proxy';
     }

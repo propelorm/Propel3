@@ -31,7 +31,12 @@ class ModelFactory
         'identifierQuoting' => 'setIdentifierQuoting',
         'scope' => 'setScope',
         'defaultStringFormat' => 'setStringFormat',
-        'activeRecord' => 'setActiveRecord'
+        'activeRecord' => 'setActiveRecord',
+        'schema' => 'setSchemaName',
+        'namespace' => 'setNamespace',
+        'package' => 'setPackage',
+        'tablePrefix' => 'setTablePrefix'
+
     ]];
 
     private $entity = ['map' => [
@@ -51,7 +56,8 @@ class ModelFactory
         'reloadOnUpdate' => 'setReloadOnUpdate',
         'isCrossRef' => 'setCrossRef',
         'defaultStringFormat' => 'setStringFormat',
-        'heavyIndexing' => 'setHeavyIndexing'
+        'heavyIndexing' => 'setHeavyIndexing',
+        'schema' => 'setSchemaName'
     ]];
 
     private $field = ['map' => [
@@ -90,7 +96,8 @@ class ModelFactory
         'onUpdate' => 'setOnUpdate',
         'onDelete' => 'setOnDelete',
         'defaultJoin' => 'setDefaultJoin',
-        'skipSql' => 'setSkipSql'
+        'skipSql' => 'setSkipSql',
+        'foreignSchema' => 'setForeignSchema'
     ]];
 
     /** @var GeneratorConfigInterface */
@@ -197,7 +204,9 @@ class ModelFactory
     public function createIndex(array $attributes): Index
     {
         $index = new Index();
-        $index->setName($attributes['name']);
+        if (isset($attributes['name'])) {
+            $index->setName($attributes['name']);
+        }
 
         return $index;
     }
@@ -210,7 +219,9 @@ class ModelFactory
     public function createUnique(array $attributes): Unique
     {
         $unique = new Unique();
-        $unique->setName($attributes['name']);
+        if (isset($attributes['name'])) {
+            $unique->setName($attributes['name']);
+        }
 
         return $unique;
     }

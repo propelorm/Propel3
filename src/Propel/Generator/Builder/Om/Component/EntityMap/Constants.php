@@ -37,7 +37,7 @@ class Constants extends BuildComponent
 
         $constant = new PhpConstant('ENTITY_CLASS');
         $constant->setDescription("The full entity class name");
-        $constant->setValue($entity->getFullClassName());
+        $constant->setValue($entity->getFullName());
         $this->getDefinition()->setConstant($constant);
 
 
@@ -60,11 +60,11 @@ class Constants extends BuildComponent
 
         $constant = new PhpConstant('FQ_TABLE_NAME');
         $constant->setDescription("The full qualified table name (with schema name)");
-        $constant->setValue($entity->getFQTableName());
+        $constant->setValue($entity->getFullTableName());
         $this->getDefinition()->setConstant($constant);
 
         $constant = new PhpConstant('DEFAULT_STRING_FORMAT');
-        $constant->setValue($entity->getDefaultStringFormat());
+        $constant->setValue($entity->getStringFormat());
         $this->getDefinition()->setConstant($constant);
     }
 }

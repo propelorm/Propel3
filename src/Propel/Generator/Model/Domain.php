@@ -263,6 +263,10 @@ class Domain
      */
     public function getSqlType(): ?string
     {
+        if (null === $this->sqlType) {
+            return $this->getType();
+        }
+
         return $this->sqlType;
     }
 
@@ -311,5 +315,26 @@ class Domain
         if ($this->defaultValue) {
             $this->defaultValue = clone $this->defaultValue;
         }
+    }
+
+    protected function getDefaultValueForArray(?string $stringValue): ?string
+    {
+        $stringValue = trim($stringValue);
+
+        if (empty($stringValue)) {
+            return null;
+        }
+
+        $values = [];
+        foreach (explode(',', $stringValue) as $v) {
+            $values[] = trim($v);
+        }
+
+        $value = implode($values, ' | ');
+        if (empty($value) || '|' === trim($value)) {
+            return null;
+        }
+
+        return sprintf('||%s||', $value);
     }
 }

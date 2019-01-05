@@ -185,7 +185,7 @@ trait NamingTrait
      */
     public function getClassNameFromEntity(Entity $entity, $fqcn = false)
     {
-        $fullClassName = $entity->getFullClassName();
+        $fullClassName = $entity->getFullName();
 
         return $fqcn ? $fullClassName : $this->extractClassName($fullClassName);
     }

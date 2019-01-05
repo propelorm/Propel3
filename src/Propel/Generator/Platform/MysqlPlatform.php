@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Platform;
 
 use Propel\Generator\Config\GeneratorConfigInterface;
@@ -65,7 +67,7 @@ class MysqlPlatform extends SqlDefaultPlatform
     /**
      * Adds extra indices for reverse foreign keys
      * This is required for MySQL databases,
-     * and is called from Database::doFinalInitialization()
+     * and is called while performing the final initialization of the model.
      */
     protected function addExtraIndices(Entity $entity)
     {
@@ -85,7 +87,7 @@ class MysqlPlatform extends SqlDefaultPlatform
         /** @var Index[] $entityIndices */
         $entityIndices = array_merge($entity->getIndices(), $entity->getUnices());
         foreach ($entityIndices as $index) {
-            $this->collectIndexedFields($this->getName($index), $index->getFields(), $indices);
+            $this->collectIndexedFields($this->getName($index), $index->getFields()->toArray(), $indices);
         }
 
         // we're determining which entitys have foreign keys that point to this entity,
@@ -144,7 +146,7 @@ class MysqlPlatform extends SqlDefaultPlatform
      * @param array  $columns          The column names or objects
      * @param array  $collectedIndexes The collected indexes
      */
-    protected function collectIndexedFields($indexName, $columns, &$collectedIndexes)
+    protected function collectIndexedFields(string $indexName, array $columns, array &$collectedIndexes)
     {
         /**
          * "If the entity has a multiple-column index, any leftmost prefix of the
@@ -173,7 +175,7 @@ class MysqlPlatform extends SqlDefaultPlatform
      * @param  string $delimiter
      * @return string
      */
-    public function getFieldList($columns, $delimiter = ','): string
+    public function getFieldList(array $columns, string $delimiter = ','): string
     {
         $list = [];
         foreach ($columns as $col) {
@@ -203,7 +205,7 @@ class MysqlPlatform extends SqlDefaultPlatform
      *
      * @param string $tableEngineKeyword
      */
-    public function setEntityEngineKeyword($tableEngineKeyword)
+    public function setEntityEngineKeyword(string $tableEngineKeyword)
     {
         $this->tableEngineKeyword = $tableEngineKeyword;
     }
@@ -213,7 +215,7 @@ class MysqlPlatform extends SqlDefaultPlatform
      *
      * @return string
      */
-    public function getEntityEngineKeyword()
+    public function getEntityEngineKeyword(): string
     {
         return $this->tableEngineKeyword;
     }
@@ -223,7 +225,7 @@ class MysqlPlatform extends SqlDefaultPlatform
      *
      * @param string $defaultEntityEngine
      */
-    public function setDefaultEntityEngine($defaultEntityEngine)
+    public function setDefaultEntityEngine(string $defaultEntityEngine)
     {
         $this->defaultEntityEngine = $defaultEntityEngine;
     }
@@ -233,32 +235,32 @@ class MysqlPlatform extends SqlDefaultPlatform
      *
      * @return string
      */
-    public function getDefaultEntityEngine()
+    public function getDefaultEntityEngine(): string
     {
         return $this->defaultEntityEngine;
     }
 
-    public function getAutoIncrement()
+    public function getAutoIncrement(): string
     {
         return 'AUTO_INCREMENT';
     }
 
-    public function getMaxFieldNameLength()
+    public function getMaxFieldNameLength(): int
     {
         return 64;
     }
 
-    public function supportsNativeDeleteTrigger()
+    public function supportsNativeDeleteTrigger(): bool
     {
         return strtolower($this->getDefaultEntityEngine()) == 'innodb';
     }
 
-    public function supportsIndexSize()
+    public function supportsIndexSize(): bool
     {
         return true;
     }
 
-    public function supportsRelations(Entity $entity)
+    public function supportsRelations(Entity $entity): bool
     {
         $vendorSpecific = $entity->getVendorInfoForType('mysql');
         if ($vendorSpecific->hasParameter('Type')) {
@@ -272,7 +274,7 @@ class MysqlPlatform extends SqlDefaultPlatform
         return strtolower($mysqlEntityType) == 'innodb';
     }
 
-    public function getAddEntitiesDDL(Database $database)
+    public function getAddEntitiesDDL(Database $database): string
     {
         $ret = '';
         foreach ($database->getEntitiesForSql() as $entity) {
@@ -287,7 +289,7 @@ class MysqlPlatform extends SqlDefaultPlatform
         return $ret;
     }
 
-    public function getBeginDDL()
+    public function getBeginDDL(): string
     {
         return "
 # This is a fix for InnoDB in MySQL >= 4.1.x
@@ -296,7 +298,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 ";
     }
 
-    public function getEndDDL()
+    public function getEndDDL(): string
     {
         return "
 # This restores the fkey checks, after having unset them earlier
@@ -311,7 +313,7 @@ SET FOREIGN_KEY_CHECKS = 1;
      *
      * @return string
      */
-    public function getPrimaryKeyDDL(Entity $entity)
+    public function getPrimaryKeyDDL(Entity $entity): string
     {
         if ($entity->hasPrimaryKey()) {
             $keys = $entity->getPrimaryKey();
@@ -332,7 +334,7 @@ SET FOREIGN_KEY_CHECKS = 1;
         }
     }
 
-    public function getAddEntityDDL(Entity $entity)
+    public function getAddEntityDDL(Entity $entity): string
     {
         $lines = [];
 
@@ -363,7 +365,7 @@ SET FOREIGN_KEY_CHECKS = 1;
             }
         }
 
-        $vendorSpecific = $entity->getVendorInfoForType('mysql');
+        $vendorSpecific = $entity->getVendorByType('mysql');
         if ($vendorSpecific->hasParameter('Type')) {
             $mysqlEntityType = $vendorSpecific->getParameter('Type');
         } elseif ($vendorSpecific->hasParameter('Engine')) {
@@ -401,8 +403,8 @@ CREATE TABLE %s
 
     protected function getEntityOptions(Entity $entity)
     {
-        $dbVI = $entity->getDatabase()->getVendorInfoForType('mysql');
-        $entityVI = $entity->getVendorInfoForType('mysql');
+        $dbVI = $entity->getDatabase()->getVendorByType('mysql');
+        $entityVI = $entity->getVendorByType('mysql');
         $vi = $dbVI->getMergedVendorInfo($entityVI);
         $entityOptions = [];
         // List of supported entity options
@@ -458,14 +460,14 @@ CREATE TABLE %s
         return $entityOptions;
     }
 
-    public function getDropEntityDDL(Entity $entity)
+    public function getDropEntityDDL(Entity $entity): string
     {
         return "
 DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
 ";
     }
 
-    public function getFieldDDL(Field $col)
+    public function getFieldDDL(Field $col): string
     {
         $domain = $col->getDomain();
         $sqlType = $domain->getSqlType();
@@ -502,7 +504,7 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
             $ddl[] = '("' . implode('","', $col->getValueSet()) . '")';
         }
 
-        $colinfo = $col->getVendorInfoForType($this->getDatabaseType());
+        $colinfo = $col->getVendorByType($this->getDatabaseType());
         if ($colinfo->hasParameter('Charset')) {
             $ddl[] = 'CHARACTER SET '. $this->quote($colinfo->getParameter('Charset'));
         }
@@ -552,8 +554,8 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
     protected function getIndexFieldListDDL(Index $index)
     {
         $list = [];
-        foreach ($index->getFieldObjects() as $col) {
-            $list[] = $this->quoteIdentifier($this->getName($col)) . ($index->hasFieldSize($col->getName()) ? '(' . $index->getFieldSize($col->getName()) . ')' : '');
+        foreach ($index->getFields() as $col) {
+            $list[] = $this->quoteIdentifier($this->getName($col)) . ($index->getField($col->getName())->getSize() ? '(' . $index->getFieldSize($col->getName()) . ')' : '');
         }
 
         return implode(', ', $list);
@@ -565,7 +567,7 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
      * @param  Entity  $entity
      * @return string
      */
-    public function getDropPrimaryKeyDDL(Entity $entity)
+    public function getDropPrimaryKeyDDL(Entity $entity): string
     {
         if (!$entity->hasPrimaryKey()) {
             return '';
@@ -587,7 +589,7 @@ ALTER TABLE %s DROP PRIMARY KEY;
      * @param  Index  $index
      * @return string
      */
-    public function getAddIndexDDL(Index $index)
+    public function getAddIndexDDL(Index $index): string
     {
         $pattern = "
 CREATE %sINDEX %s ON %s (%s);
@@ -608,7 +610,7 @@ CREATE %sINDEX %s ON %s (%s);
      * @param  Index  $index
      * @return string
      */
-    public function getDropIndexDDL(Index $index)
+    public function getDropIndexDDL(Index $index): string
     {
         $pattern = "
 DROP INDEX %s ON %s;
@@ -625,7 +627,7 @@ DROP INDEX %s ON %s;
      * Builds the DDL SQL for an Index object.
      * @return string
      */
-    public function getIndexDDL(Index $index)
+    public function getIndexDDL(Index $index): string
     {
         return sprintf(
             '%sINDEX %s (%s)',
@@ -638,7 +640,7 @@ DROP INDEX %s ON %s;
     protected function getIndexType(Index $index)
     {
         $type = '';
-        $vendorInfo = $index->getVendorInfoForType($this->getDatabaseType());
+        $vendorInfo = $index->getVendorByType($this->getDatabaseType());
         if ($vendorInfo && $vendorInfo->getParameter('Index_type')) {
             $type = $vendorInfo->getParameter('Index_type') . ' ';
         } elseif ($index->isUnique()) {
@@ -648,7 +650,7 @@ DROP INDEX %s ON %s;
         return $type;
     }
 
-    public function getUniqueDDL(Unique $unique)
+    public function getUniqueDDL(Unique $unique): string
     {
         return sprintf(
             'UNIQUE INDEX %s (%s)',
@@ -657,7 +659,7 @@ DROP INDEX %s ON %s;
         );
     }
 
-    public function getAddRelationDDL(Relation $relation)
+    public function getAddRelationDDL(Relation $relation): string
     {
         if ($this->supportsRelations($relation->getEntity())) {
             return parent::getAddRelationDDL($relation);
@@ -673,7 +675,7 @@ DROP INDEX %s ON %s;
      *
      * @return string
      */
-    public function getRelationDDL(Relation $relation)
+    public function getRelationDDL(Relation $relation): string
     {
         if ($this->supportsRelations($relation->getEntity())) {
             return parent::getRelationDDL($relation);
@@ -682,14 +684,14 @@ DROP INDEX %s ON %s;
         return '';
     }
 
-    public function getDropRelationDDL(Relation $relation)
+    public function getDropRelationDDL(Relation $relation): string
     {
         if (!$this->supportsRelations($relation->getEntity())) {
             return '';
         }
 
         if ($relation->isSkipSql()) {
-            return;
+            return '';
         }
         $pattern = "
 ALTER TABLE %s DROP FOREIGN KEY %s;
@@ -702,7 +704,7 @@ ALTER TABLE %s DROP FOREIGN KEY %s;
         );
     }
 
-    public function getCommentBlockDDL($comment)
+    public function getCommentBlockDDL(string $comment): string
     {
         $pattern = "
 -- ---------------------------------------------------------------------
@@ -719,7 +721,7 @@ ALTER TABLE %s DROP FOREIGN KEY %s;
      *
      * @return string
      */
-    public function getModifyDatabaseDDL(DatabaseDiff $databaseDiff)
+    public function getModifyDatabaseDDL(DatabaseDiff $databaseDiff): string
     {
         $ret = '';
 
@@ -750,7 +752,7 @@ ALTER TABLE %s DROP FOREIGN KEY %s;
      * Builds the DDL SQL to rename a entity
      * @return string
      */
-    public function getRenameEntityDDL($fromEntityName, $toEntityName)
+    public function getRenameEntityDDL(string $fromEntityName, string $toEntityName): string
     {
         $pattern = "
 RENAME TABLE %s TO %s;
@@ -768,7 +770,7 @@ RENAME TABLE %s TO %s;
      *
      * @return string
      */
-    public function getRemoveFieldDDL(Field $field)
+    public function getRemoveFieldDDL(Field $field): string
     {
         $pattern = "
 ALTER TABLE %s DROP %s;
@@ -785,7 +787,7 @@ ALTER TABLE %s DROP %s;
      * Builds the DDL SQL to rename a field
      * @return string
      */
-    public function getRenameFieldDDL(Field $fromField, Field $toField)
+    public function getRenameFieldDDL(Field $fromField, Field $toField): string
     {
         return $this->getChangeFieldDDL($fromField, $toField);
     }
@@ -795,7 +797,7 @@ ALTER TABLE %s DROP %s;
      *
      * @return string
      */
-    public function getModifyFieldDDL(FieldDiff $fieldDiff)
+    public function getModifyFieldDDL(FieldDiff $fieldDiff): string
     {
         return $this->getChangeFieldDDL($fieldDiff->getFromField(), $fieldDiff->getToField());
     }
@@ -804,7 +806,7 @@ ALTER TABLE %s DROP %s;
      * Builds the DDL SQL to change a field
      * @return string
      */
-    public function getChangeFieldDDL(Field $fromField, Field $toField)
+    public function getChangeFieldDDL(Field $fromField, Field $toField): string
     {
         $pattern = "
 ALTER TABLE %s CHANGE %s %s;
@@ -822,7 +824,7 @@ ALTER TABLE %s CHANGE %s %s;
      *
      * @return string
      */
-    public function getModifyFieldsDDL($fieldDiffs)
+    public function getModifyFieldsDDL($fieldDiffs): string
     {
         $ret = '';
         foreach ($fieldDiffs as $fieldDiff) {
@@ -835,12 +837,12 @@ ALTER TABLE %s CHANGE %s %s;
     /**
      * @see Platform::supportsSchemas()
      */
-    public function supportsSchemas()
+    public function supportsSchemas(): bool
     {
         return true;
     }
 
-    public function hasSize($sqlType)
+    public function hasSize(string $sqlType): bool
     {
         return !in_array($sqlType, [
             'MEDIUMTEXT',
@@ -851,7 +853,7 @@ ALTER TABLE %s CHANGE %s %s;
         ]);
     }
 
-    public function getDefaultTypeSizes()
+    public function getDefaultTypeSizes(): array
     {
         return [
             'char'     => 1,
@@ -868,7 +870,7 @@ ALTER TABLE %s CHANGE %s %s;
      * @param  string $text
      * @return string
      */
-    public function disconnectedEscapeText($text)
+    public function disconnectedEscapeText(string $text): string
     {
         return addslashes($text);
     }
@@ -883,16 +885,17 @@ ALTER TABLE %s CHANGE %s %s;
      * @param  string $text the identifier
      * @return string the quoted identifier
      */
-    public function doQuoting($text)
+    public function doQuoting(string $text): string
     {
         return '`' . strtr($text, ['.' => '`.`']) . '`';
     }
 
-    public function getTimestampFormatter()
+    public function getTimestampFormatter(): string
     {
         return 'Y-m-d H:i:s';
     }
 
+    /*
     public function getFieldBindingPHP(Field $field, $identifier, $fieldValueAccessor, $tab = "            ")
     {
         // FIXME - This is a temporary hack to get around apparent bugs w/ PDO+MYSQL
@@ -909,4 +912,5 @@ ALTER TABLE %s CHANGE %s %s;
 
         return parent::getFieldBindingPHP($field, $identifier, $fieldValueAccessor, $tab);
     }
+    */
 }

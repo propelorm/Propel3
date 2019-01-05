@@ -91,7 +91,7 @@ class BuildFieldsMethod extends BuildComponent
             } // if col-is prim key
             if ($field->isEnumType()) {
                 $body .= "
-\$this->getField('$fieldName')->setValueSet(" . var_export($field->getValueSet(), true) . ");";
+\$this->getField('$fieldName')->setValueSet(" . var_export($field->getValueSet()->toArray(), true) . ");";
             }
             if ($field->isPrimaryString()) {
                 $body .= "

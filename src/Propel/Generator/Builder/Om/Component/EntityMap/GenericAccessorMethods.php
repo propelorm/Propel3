@@ -81,7 +81,7 @@ if (\$includeLazyLoadColumns || \$includeLazyLoadColumns === $lazyLoading) {
 //relation to {$relation->getForeignEntityName()}
 \$relationName = '$propertyName';
 \$foreignEntity = \$reader(\$entity, '$propertyName');
-\$foreignEntityMap = \$this->getConfiguration()->getEntityMap('{$relation->getForeignEntity()->getFullClassName()}');
+\$foreignEntityMap = \$this->getConfiguration()->getEntityMap('{$relation->getForeignEntity()->getFullName()}');
 \$value = null;
 if (\$foreignEntity) {
     \$value = \$foreignEntityMap->toArray(\$foreignEntity, \$keyType, \$includeLazyLoadColumns, \$includeForeignObjects, \$alreadyDumpedObjectsWatcher);
@@ -113,7 +113,7 @@ if (\$value) {
 \$relationName = '$propertyName';
 /** @var $typeHint \$foreignEntity */
 \$foreignEntity = \$reader(\$entity, '$propertyName');
-\$foreignEntityMap = \$this->getConfiguration()->getEntityMap('{$refRelation->getForeignEntity()->getFullClassName()}');
+\$foreignEntityMap = \$this->getConfiguration()->getEntityMap('{$refRelation->getForeignEntity()->getFullName()}');
 \$value = $defaultValue;
 if (\$foreignEntity) {
     \$value = {$toArrayCall};

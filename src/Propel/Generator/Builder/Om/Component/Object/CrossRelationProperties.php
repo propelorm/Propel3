@@ -29,7 +29,7 @@ class CrossRelationProperties extends BuildComponent
     protected function addCrossRelationAttributes(CrossRelation $crossRelation)
     {
         $relation = $crossRelation->getOutgoingRelation();
-        $className = $relation->getForeignEntity()->getFullClassName();
+        $className = $relation->getForeignEntity()->getFullName();
         $varName = $this->getCrossRelationRelationVarName($relation);
 
         $this->addProperty($varName)

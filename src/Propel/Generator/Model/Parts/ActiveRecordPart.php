@@ -38,26 +38,26 @@ trait ActiveRecordPart
     }
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function isActiveRecord(): bool
+    public function getActiveRecord(): bool
     {
         if (null !== $this->activeRecord) {
             return $this->activeRecord;
         }
 
-        if ($this->getSuperordinate() && method_exists($this->getSuperordinate(), 'isActiveRecord')) {
-            return $this->getSuperordinate()->isActiveRecord();
+        if ($this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getActiveRecord')) {
+            return $this->getSuperordinate()->getActiveRecord();
         }
 
-        return $this->activeRecord;
+        return false;
     }
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function getActiveRecord(): bool
+    public function isActiveRecord(): bool
     {
-        return $this->activeRecord;
+        return $this->getActiveRecord();
     }
 }

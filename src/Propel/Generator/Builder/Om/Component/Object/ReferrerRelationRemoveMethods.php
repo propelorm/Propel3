@@ -42,7 +42,7 @@ class ReferrerRelationRemoveMethods extends BuildComponent
         $className = $this->getObjectClassName();
         $methodName = 'remove' . ucfirst($varName);
         $colVarName = $this->getRefRelationCollVarName($refRelation);
-        $relationClassName = $this->useClass($refRelation->getEntity()->getFullClassName());
+        $relationClassName = $this->useClass($refRelation->getEntity()->getFullName());
 
         $body = "
 if (\$this->{$colVarName} instanceof ObjectCollection) {

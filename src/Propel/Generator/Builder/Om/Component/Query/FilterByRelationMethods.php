@@ -9,6 +9,7 @@ use Propel\Generator\Builder\Om\Component\BuildComponent;
 use Propel\Generator\Builder\Om\Component\NamingTrait;
 use Propel\Generator\Builder\Om\Component\RelationTrait;
 use Propel\Generator\Model\Field;
+use Propel\Generator\Model\NamingTool;
 use Propel\Generator\Model\PropelTypes;
 use Propel\Generator\Model\Relation;
 use Propel\Runtime\ActiveQuery\ModelJoin;
@@ -43,9 +44,9 @@ class FilterByRelationMethods extends BuildComponent
     {
         $foreignEntity = $relation->getForeignEntity();
 
-        $fkPhpName = $this->useClass($foreignEntity->getFullClassName());
+        $fkPhpName = $this->useClass($foreignEntity->getFullName());
         $relationName = $this->getRelationPhpName($relation);
-        $objectName = '$' . $foreignEntity->getCamelCaseName();
+        $objectName = '$' . NamingTool::toCamelCase($foreignEntity->getName());
 
         $description = "Filter the query by a related $fkPhpName object.";
 
@@ -85,7 +86,7 @@ if ($objectName instanceof $fkPhpName) {
 ";
 
         $methodName = "filterBy$relationName";
-        $variableParameter = new PhpParameter($foreignEntity->getCamelCaseName());
+        $variableParameter = new PhpParameter(NamingTool::toCamelCase($foreignEntity->getName()));
 
 //        if ($relation->isComposite()) {
         $variableParameter->setType($fkPhpName);

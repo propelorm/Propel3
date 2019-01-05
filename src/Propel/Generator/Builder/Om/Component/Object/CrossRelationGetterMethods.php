@@ -59,7 +59,7 @@ class CrossRelationGetterMethods extends BuildComponent
         $relation = $crossRelation->getOutgoingRelation();
 
         $relatedName = $this->getRelationPhpName($relation, true);
-        $relatedObjectClassName = $this->useClass($relation->getForeignEntity()->getFullClassName());
+        $relatedObjectClassName = $this->useClass($relation->getForeignEntity()->getFullName());
 
         $collName = $this->getCrossRelationRelationVarName($relation);
 
@@ -150,8 +150,8 @@ return \$$collVarName;
 ";
 
         $description = <<<EOF
-Gets a combined collection of {$crossRelation->getForeignEntity()->getFullClassName()} objects related by a many-to-many relationship
-to the current object by way of the {$crossRelation->getMiddleEntity()->getFullClassName()} cross-reference entity.
+Gets a combined collection of {$crossRelation->getForeignEntity()->getFullName()} objects related by a many-to-many relationship
+to the current object by way of the {$crossRelation->getMiddleEntity()->getFullName()} cross-reference entity.
 
 This method has filter arguments and additional functionality due to fact that you activated "activeRecord".
 As soon as you pass arguments into this method it hits always the database instead of returning the current list.
@@ -197,7 +197,7 @@ EOF;
 
         $items = [];
         foreach ($crossRelation->getRelations() as $relation) {
-            $items[] = $relation->getForeignEntity()->getFullClassName();
+            $items[] = $relation->getForeignEntity()->getFullName();
         }
         foreach ($crossRelation->getUnclassifiedPrimaryKeyNames() as $name) {
             $items[] = $name;

@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Platform;
 
 use Propel\Generator\Config\GeneratorConfigInterface;
@@ -77,10 +79,10 @@ class SqlDefaultPlatform implements PlatformInterface
      *
      * @return string
      */
-    public function getName($object)
+    public function getName($object): string
     {
         if ($object instanceof Entity) {
-            return $object->getFQTableName();
+            return $object->getFullTableName();
         } elseif ($object instanceof Field) {
             return $object->getColumnName();
         } else {
@@ -88,12 +90,12 @@ class SqlDefaultPlatform implements PlatformInterface
         }
     }
 
-    protected function toUnderscore($v)
+    protected function toUnderscore(string $v): string
     {
         return NamingTool::toSnakeCase($v);
     }
 
-    public function getRepositoryBuilder(Entity $entity)
+    public function getRepositoryBuilder(Entity $entity): Repository
     {
         return new Repository($entity);
     }
@@ -113,7 +115,7 @@ class SqlDefaultPlatform implements PlatformInterface
      *
      * @return ConnectionInterface
      */
-    public function getConnection()
+    public function getConnection(): ConnectionInterface
     {
         return $this->con;
     }
@@ -121,7 +123,7 @@ class SqlDefaultPlatform implements PlatformInterface
     /**
      * @return boolean
      */
-    public function isIdentifierQuotingEnabled()
+    public function isIdentifierQuotingEnabled(): bool
     {
         return $this->identifierQuoting;
     }
@@ -129,7 +131,7 @@ class SqlDefaultPlatform implements PlatformInterface
     /**
      * @param boolean $enabled
      */
-    public function setIdentifierQuoting($enabled)
+    public function setIdentifierQuoting(bool $enabled)
     {
         $this->identifierQuoting = $enabled;
     }
@@ -176,7 +178,7 @@ class SqlDefaultPlatform implements PlatformInterface
      * @return string
      * @throws \ReflectionException
      */
-    public function getDatabaseType()
+    public function getDatabaseType(): string
     {
         $reflClass = new \ReflectionClass($this);
         $clazz = $reflClass->getShortName();
@@ -190,7 +192,7 @@ class SqlDefaultPlatform implements PlatformInterface
      *
      * @return int The max field length
      */
-    public function getMaxFieldNameLength()
+    public function getMaxFieldNameLength(): int
     {
         return 64;
     }
@@ -198,7 +200,7 @@ class SqlDefaultPlatform implements PlatformInterface
     /**
      * @return string
      */
-    public function getSchemaDelimiter()
+    public function getSchemaDelimiter(): string
     {
         return '.';
     }
@@ -208,12 +210,12 @@ class SqlDefaultPlatform implements PlatformInterface
      *
      * @return string The native IdMethod (PlatformInterface:IDENTITY, PlatformInterface::SEQUENCE).
      */
-    public function getNativeIdMethod()
+    public function getNativeIdMethod(): string
     {
         return PlatformInterface::IDENTITY;
     }
 
-    public function isNativeIdMethodAutoIncrement()
+    public function isNativeIdMethodAutoIncrement(): bool
     {
         return PlatformInterface::IDENTITY === $this->getNativeIdMethod();
     }
@@ -224,7 +226,7 @@ class SqlDefaultPlatform implements PlatformInterface
      * @param string
      * @return Domain
      */
-    public function getDomainForType($mappingType)
+    public function getDomainForType(string $mappingType): Domain
     {
         if (!isset($this->schemaDomainMap[$mappingType])) {
             throw new EngineException(sprintf('Cannot map unknown Propel type %s to native database type.', var_export($mappingType, true)));
@@ -238,9 +240,14 @@ class SqlDefaultPlatform implements PlatformInterface
      *
      * @return string.
      */
-    public function getNullString($notNull)
+    public function getNullString(): string
     {
-        return $notNull ? 'NOT NULL' : '';
+        return '';
+    }
+
+    public function getNotNullString(): string
+    {
+        return 'NOT NULL';
     }
 
     /**
@@ -248,7 +255,7 @@ class SqlDefaultPlatform implements PlatformInterface
      *
      * @return string.
      */
-    public function getAutoIncrement()
+    public function getAutoIncrement(): string
     {
         return 'IDENTITY';
     }
@@ -260,10 +267,9 @@ class SqlDefaultPlatform implements PlatformInterface
      * id-method-parameter tag, if specified.
      *
      * @param Entity $entity
-     *
      * @return string
      */
-    public function getSequenceName(Entity $entity)
+    public function getSequenceName(Entity $entity): string
     {
         static $longNamesMap = [];
         $result = null;
@@ -292,16 +298,17 @@ class SqlDefaultPlatform implements PlatformInterface
      * Returns the DDL SQL to add the entitys of a database
      * together with index and foreign keys
      *
+     * @param Database $database
      * @return string
      */
-    public function getAddEntitiesDDL(Database $database)
+    public function getAddEntitiesDDL(Database $database): string
     {
         $ret = $this->getBeginDDL();
         foreach ($database->getEntitiesForSql() as $entity) {
             $this->normalizeEntity($entity);
         }
         foreach ($database->getEntitiesForSql() as $entity) {
-            $ret .= $this->getCommentBlockDDL($entity->getFQTableName());
+            $ret .= $this->getCommentBlockDDL($entity->getFullTableName());
             $ret .= $this->getDropEntityDDL($entity);
             $ret .= $this->getAddEntityDDL($entity);
             $ret .= $this->getAddIndicesDDL($entity);
@@ -317,8 +324,9 @@ class SqlDefaultPlatform implements PlatformInterface
      *
      * @return string
      */
-    public function getBeginDDL()
+    public function getBeginDDL(): string
     {
+        return '';
     }
 
     /**
@@ -326,15 +334,18 @@ class SqlDefaultPlatform implements PlatformInterface
      *
      * @return string
      */
-    public function getEndDDL()
+    public function getEndDDL(): string
     {
+        return '';
     }
 
     /**
      * Builds the DDL SQL to drop a entity
+     *
+     * @param Entity $entity
      * @return string
      */
-    public function getDropEntityDDL(Entity $entity)
+    public function getDropEntityDDL(Entity $entity): string
     {
         return "
 DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
@@ -345,9 +356,10 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
      * Builds the DDL SQL to add a entity
      * without index and foreign keys
      *
+     * @param Entity $entity
      * @return string
      */
-    public function getAddEntityDDL(Entity $entity)
+    public function getAddEntityDDL(Entity $entity): string
     {
         $entityDescription = $entity->hasDescription() ? $this->getCommentLineDDL($entity->getDescription()) : '';
 
@@ -385,9 +397,11 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
 
     /**
      * Builds the DDL SQL for a Field object.
+     *
+     * @param Field $col
      * @return string
      */
-    public function getFieldDDL(Field $col)
+    public function getFieldDDL(Field $col): string
     {
         $domain = $col->getDomain();
 
@@ -401,8 +415,8 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
         if ($default = $this->getFieldDefaultValueDDL($col)) {
             $ddl[] = $default;
         }
-        if ($notNull = $this->getNullString($col->isNotNull())) {
-            $ddl[] = $notNull;
+        if ($col->isNotNull()) {
+            $ddl[] = $this->getNotNullString();
         }
         if ($autoIncrement = $col->getAutoIncrementString()) {
             $ddl[] = $autoIncrement;
@@ -413,9 +427,11 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
 
     /**
      * Returns the SQL for the default value of a Field object
+     *
+     * @param Field $col
      * @return string
      */
-    public function getFieldDefaultValueDDL(Field $col)
+    public function getFieldDefaultValueDDL(Field $col): string
     {
         $default = '';
         $defaultValue = $col->getDefaultValue();
@@ -454,11 +470,11 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
      * // '"foo","bar"'
      * </code>
      * @param array Field[] or string[]
-     * @param string $delim The delimiter to use in separating the field names.
+     * @param string $delimiter The delimiter to use in separating the field names.
      *
      * @return string
      */
-    public function getFieldListDDL($fields, $delimiter = ',')
+    public function getFieldListDDL($fields, string $delimiter = ','): string
     {
         $list = [];
         if (!$fields) {
@@ -475,19 +491,21 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
     /**
      * Returns the name of a entity primary key.
      *
+     * @param Entity $entity
      * @return string
      */
-    public function getPrimaryKeyName(Entity $entity)
+    public function getPrimaryKeyName(Entity $entity): string
     {
-        return $entity->getFQTableName() . '_pk';
+        return $entity->getFullTableName() . '_pk';
     }
 
     /**
      * Returns the SQL for the primary key of a Entity object.
      *
+     * @param Entity $entity
      * @return string
      */
-    public function getPrimaryKeyDDL(Entity $entity)
+    public function getPrimaryKeyDDL(Entity $entity): string
     {
         if ($entity->hasPrimaryKey()) {
             return 'PRIMARY KEY (' . $this->getFieldListDDL($entity->getPrimaryKey()) . ')';
@@ -500,7 +518,7 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
      * @param  Entity  $entity
      * @return string
      */
-    public function getDropPrimaryKeyDDL(Entity $entity)
+    public function getDropPrimaryKeyDDL(Entity $entity): string
     {
         if (!$entity->hasPrimaryKey()) {
             return '';
@@ -523,7 +541,7 @@ ALTER TABLE %s DROP CONSTRAINT %s;
      * @param  Entity  $entity From Entity
      * @return string
      */
-    public function getAddPrimaryKeyDDL(Entity $entity)
+    public function getAddPrimaryKeyDDL(Entity $entity): string
     {
         if (!$entity->hasPrimaryKey()) {
             return '';
@@ -546,7 +564,7 @@ ALTER TABLE %s ADD %s;
      * @param  Entity  $entity To Entity
      * @return string
      */
-    public function getAddIndicesDDL(Entity $entity)
+    public function getAddIndicesDDL(Entity $entity): string
     {
         $ret = '';
         foreach ($entity->getIndices() as $index) {
@@ -562,7 +580,7 @@ ALTER TABLE %s ADD %s;
      * @param  Index  $index
      * @return string
      */
-    public function getAddIndexDDL(Index $index)
+    public function getAddIndexDDL(Index $index): string
     {
         $pattern = "
 CREATE %sINDEX %s ON %s (%s);
@@ -573,7 +591,7 @@ CREATE %sINDEX %s ON %s (%s);
             $index->isUnique() ? 'UNIQUE ' : '',
             $this->quoteIdentifier($this->getName($index)),
             $this->quoteIdentifier($this->getName($index->getEntity())),
-            $this->getFieldListDDL($index->getFieldObjects())
+            $this->getFieldListDDL($index->getFields()->toArray())
         );
     }
 
@@ -583,7 +601,7 @@ CREATE %sINDEX %s ON %s (%s);
      * @param  Index  $index
      * @return string
      */
-    public function getDropIndexDDL(Index $index)
+    public function getDropIndexDDL(Index $index): string
     {
         $pattern = "
 DROP INDEX %s;
@@ -602,13 +620,13 @@ DROP INDEX %s;
      * @param  Index  $index
      * @return string
      */
-    public function getIndexDDL(Index $index)
+    public function getIndexDDL(Index $index): string
     {
         return sprintf(
             '%sINDEX %s (%s)',
             $index->isUnique() ? 'UNIQUE ' : '',
             $this->quoteIdentifier($this->getName($index)),
-            $this->getFieldListDDL($index->getFieldObjects())
+            $this->getFieldListDDL($index->getFields()->toArray())
         );
     }
 
@@ -618,9 +636,9 @@ DROP INDEX %s;
      * @param  Unique $unique
      * @return string
      */
-    public function getUniqueDDL(Unique $unique)
+    public function getUniqueDDL(Unique $unique): string
     {
-        return sprintf('UNIQUE (%s)', $this->getFieldListDDL($unique->getFieldObjects()));
+        return sprintf('UNIQUE (%s)', $this->getFieldListDDL($unique->getFields()->toArray()));
     }
 
     /**
@@ -629,7 +647,7 @@ DROP INDEX %s;
      * @param  Entity  $entity
      * @return string
      */
-    public function getAddRelationsDDL(Entity $entity)
+    public function getAddRelationsDDL(Entity $entity): string
     {
         $ret = '';
         foreach ($entity->getRelations() as $relation) {
@@ -645,10 +663,10 @@ DROP INDEX %s;
      * @param  Relation $relation
      * @return string
      */
-    public function getAddRelationDDL(Relation $relation)
+    public function getAddRelationDDL(Relation $relation): string
     {
         if ($relation->isSkipSql()) {
-            return;
+            return '';
         }
         $pattern = "
 ALTER TABLE %s ADD %s;
@@ -667,10 +685,10 @@ ALTER TABLE %s ADD %s;
      * @param  Relation $relation
      * @return string
      */
-    public function getDropRelationDDL(Relation $relation)
+    public function getDropRelationDDL(Relation $relation): string
     {
         if ($relation->isSkipSql()) {
-            return;
+            return '';
         }
         $pattern = "
 ALTER TABLE %s DROP CONSTRAINT %s;
@@ -685,13 +703,16 @@ ALTER TABLE %s DROP CONSTRAINT %s;
 
     /**
      * Builds the DDL SQL for a Relation object.
+     *
+     * @param Relation $relation
      * @return string
      */
-    public function getRelationDDL(Relation $relation)
+    public function getRelationDDL(Relation $relation): string
     {
         if ($relation->isSkipSql()) {
-            return;
+            return '';
         }
+
         $pattern = "CONSTRAINT %s
     FOREIGN KEY (%s)
     REFERENCES %s (%s)";
@@ -714,7 +735,11 @@ ALTER TABLE %s DROP CONSTRAINT %s;
         return $script;
     }
 
-    public function getCommentLineDDL($comment)
+    /**
+     * @param string $comment
+     * @return string
+     */
+    public function getCommentLineDDL(string $comment): string
     {
         $pattern = "-- %s
 ";
@@ -722,7 +747,11 @@ ALTER TABLE %s DROP CONSTRAINT %s;
         return sprintf($pattern, $comment);
     }
 
-    public function getCommentBlockDDL($comment)
+    /**
+     * @param string $comment
+     * @return string
+     */
+    public function getCommentBlockDDL(string $comment): string
     {
         $pattern = "
 -----------------------------------------------------------------------
@@ -737,9 +766,10 @@ ALTER TABLE %s DROP CONSTRAINT %s;
      * Builds the DDL SQL to modify a database
      * based on a DatabaseDiff instance
      *
+     * @param DatabaseDiff $databaseDiff
      * @return string
      */
-    public function getModifyDatabaseDDL(DatabaseDiff $databaseDiff)
+    public function getModifyDatabaseDDL(DatabaseDiff $databaseDiff): string
     {
         $ret = '';
         foreach ($databaseDiff->getRemovedEntities() as $entity) {
@@ -772,9 +802,13 @@ ALTER TABLE %s DROP CONSTRAINT %s;
 
     /**
      * Builds the DDL SQL to rename a entity
+     *
+     * @param string $fromEntityName
+     * @param string $toEntityName
+     *
      * @return string
      */
-    public function getRenameEntityDDL($fromEntityName, $toEntityName)
+    public function getRenameEntityDDL(string $fromEntityName, string $toEntityName): string
     {
         $pattern = "
 ALTER TABLE %s RENAME TO %s;
@@ -791,9 +825,10 @@ ALTER TABLE %s RENAME TO %s;
      * Builds the DDL SQL to alter a entity
      * based on a EntityDiff instance
      *
+     * @param EntityDiff $entityDiff
      * @return string
      */
-    public function getModifyEntityDDL(EntityDiff $entityDiff)
+    public function getModifyEntityDDL(EntityDiff $entityDiff): string
     {
         $ret = '';
 
@@ -898,9 +933,10 @@ ALTER TABLE %s%s;
      * Builds the DDL SQL to alter a entity
      * based on a EntityDiff instance
      *
+     * @param EntityDiff $entityDiff
      * @return string
      */
-    public function getModifyEntityFieldsDDL(EntityDiff $entityDiff)
+    public function getModifyEntityFieldsDDL(EntityDiff $entityDiff): string
     {
         $ret = '';
 
@@ -913,11 +949,11 @@ ALTER TABLE %s%s;
         }
 
         if ($modifiedFields = $entityDiff->getModifiedFields()) {
-            $ret .= $this->getModifyFieldsDDL($modifiedFields);
+            $ret .= $this->getModifyFieldsDDL($modifiedFields->toArray());
         }
 
         if ($addedFields = $entityDiff->getAddedFields()) {
-            $ret .= $this->getAddFieldsDDL($addedFields);
+            $ret .= $this->getAddFieldsDDL($addedFields->toArray());
         }
 
         return $ret;
@@ -927,9 +963,10 @@ ALTER TABLE %s%s;
      * Builds the DDL SQL to alter a entity's primary key
      * based on a EntityDiff instance
      *
+     * @param EntityDiff $entityDiff
      * @return string
      */
-    public function getModifyEntityPrimaryKeyDDL(EntityDiff $entityDiff)
+    public function getModifyEntityPrimaryKeyDDL(EntityDiff $entityDiff): string
     {
         $ret = '';
 
@@ -945,9 +982,10 @@ ALTER TABLE %s%s;
      * Builds the DDL SQL to alter a entity's indices
      * based on a EntityDiff instance
      *
+     * @param EntityDiff $entityDiff
      * @return string
      */
-    public function getModifyEntityIndicesDDL(EntityDiff $entityDiff)
+    public function getModifyEntityIndicesDDL(EntityDiff $entityDiff): string
     {
         $ret = '';
 
@@ -972,9 +1010,10 @@ ALTER TABLE %s%s;
      * Builds the DDL SQL to alter a entity's foreign keys
      * based on a EntityDiff instance
      *
+     * @param EntityDiff $entityDiff
      * @return string
      */
-    public function getModifyEntityRelationsDDL(EntityDiff $entityDiff)
+    public function getModifyEntityRelationsDDL(EntityDiff $entityDiff): string
     {
         $ret = '';
 
@@ -998,9 +1037,10 @@ ALTER TABLE %s%s;
     /**
      * Builds the DDL SQL to remove a field
      *
+     * @param Field $field
      * @return string
      */
-    public function getRemoveFieldDDL(Field $field)
+    public function getRemoveFieldDDL(Field $field): string
     {
         $pattern = "
 ALTER TABLE %s DROP COLUMN %s;
@@ -1016,9 +1056,12 @@ ALTER TABLE %s DROP COLUMN %s;
     /**
      * Builds the DDL SQL to rename a field
      *
+     * @param Field $fromField
+     * @param Field $toField
+     *
      * @return string
      */
-    public function getRenameFieldDDL(Field $fromField, Field $toField)
+    public function getRenameFieldDDL(Field $fromField, Field $toField): string
     {
         $pattern = "
 ALTER TABLE %s RENAME COLUMN %s TO %s;
@@ -1035,9 +1078,11 @@ ALTER TABLE %s RENAME COLUMN %s TO %s;
     /**
      * Builds the DDL SQL to modify a field
      *
+     * @param FieldDiff $fieldDiff
+     *
      * @return string
      */
-    public function getModifyFieldDDL(FieldDiff $fieldDiff)
+    public function getModifyFieldDDL(FieldDiff $fieldDiff): string
     {
         $toField = $fieldDiff->getToField();
         $pattern = "
@@ -1057,7 +1102,7 @@ ALTER TABLE %s MODIFY %s;
      * @param  FieldDiff[] $fieldDiffs
      * @return string
      */
-    public function getModifyFieldsDDL($fieldDiffs)
+    public function getModifyFieldsDDL(array $fieldDiffs): string
     {
         $lines = [];
         $entity = null;
@@ -1089,9 +1134,11 @@ ALTER TABLE %s MODIFY
     /**
      * Builds the DDL SQL to remove a field
      *
+     * @param Field $field
+     *
      * @return string
      */
-    public function getAddFieldDDL(Field $field)
+    public function getAddFieldDDL(Field $field): string
     {
         $pattern = "
 ALTER TABLE %s ADD %s;
@@ -1110,7 +1157,7 @@ ALTER TABLE %s ADD %s;
      * @param  Field[] $fields
      * @return string
      */
-    public function getAddFieldsDDL($fields)
+    public function getAddFieldsDDL(array $fields): string
     {
         $lines = [];
         $entity = null;
@@ -1144,7 +1191,7 @@ ALTER TABLE %s ADD
      * @param  string  $sqlType the SQL type
      * @return boolean True if the type has a size attribute
      */
-    public function hasSize($sqlType)
+    public function hasSize(string $sqlType): bool
     {
         return true;
     }
@@ -1155,17 +1202,18 @@ ALTER TABLE %s ADD
      * @param  string  $sqlType the SQL type
      * @return boolean True if the type has a scale attribute
      */
-    public function hasScale($sqlType)
+    public function hasScale(string $sqlType): bool
     {
         return true;
     }
 
     /**
      * Quote and escape needed characters in the string for underlying RDBMS.
+     *
      * @param  string $text
      * @return string
      */
-    public function quote($text)
+    public function quote(string $text): string
     {
         if ($con = $this->getConnection()) {
             return $con->quote($text);
@@ -1183,7 +1231,7 @@ ALTER TABLE %s ADD
      * @param  string $text Text that needs to be escaped.
      * @return string
      */
-    protected function disconnectedEscapeText($text)
+    protected function disconnectedEscapeText(string $text): string
     {
         return str_replace("'", "''", $text);
     }
@@ -1195,7 +1243,7 @@ ALTER TABLE %s ADD
      * @param  string $text
      * @return string Quoted identifier.
      */
-    protected function quoteIdentifier($text)
+    protected function quoteIdentifier(string $text): string
     {
         return $this->isIdentifierQuotingEnabled() ? $this->doQuoting($text) : $text;
     }
@@ -1203,7 +1251,7 @@ ALTER TABLE %s ADD
     /**
      * {@inheritdoc}
      */
-    public function doQuoting($text)
+    public function doQuoting(string $text): string
     {
         return '"' . strtr($text, ['.' => '"."']) . '"';
     }
@@ -1212,7 +1260,7 @@ ALTER TABLE %s ADD
      * Whether RDBMS supports native ON DELETE triggers (e.g. ON DELETE CASCADE).
      * @return boolean
      */
-    public function supportsNativeDeleteTrigger()
+    public function supportsNativeDeleteTrigger(): bool
     {
         return false;
     }
@@ -1221,7 +1269,7 @@ ALTER TABLE %s ADD
      * Whether RDBMS supports INSERT null values in autoincremented primary keys
      * @return boolean
      */
-    public function supportsInsertNullPk()
+    public function supportsInsertNullPk(): bool
     {
         return true;
     }
@@ -1229,7 +1277,7 @@ ALTER TABLE %s ADD
     /**
      * @return bool
      */
-    public function supportsIndexSize()
+    public function supportsIndexSize(): bool
     {
         return false;
     }
@@ -1239,7 +1287,7 @@ ALTER TABLE %s ADD
      *
      * @return boolean
      */
-    public function hasStreamBlobImpl()
+    public function hasStreamBlobImpl(): bool
     {
         return false;
     }
@@ -1247,7 +1295,7 @@ ALTER TABLE %s ADD
     /**
      * @see Platform::supportsSchemas()
      */
-    public function supportsSchemas()
+    public function supportsSchemas(): bool
     {
         return false;
     }
@@ -1255,13 +1303,13 @@ ALTER TABLE %s ADD
     /**
      * @see Platform::supportsMigrations()
      */
-    public function supportsMigrations()
+    public function supportsMigrations(): bool
     {
         return true;
     }
 
 
-    public function supportsVarcharWithoutSize()
+    public function supportsVarcharWithoutSize(): bool
     {
         return false;
     }
@@ -1319,7 +1367,7 @@ ALTER TABLE %s ADD
      * Gets the preferred timestamp formatter for setting date/time values.
      * @return string
      */
-    public function getTimestampFormatter()
+    public function getTimestampFormatter(): string
     {
         return 'Y-m-d H:i:s';
     }
@@ -1328,7 +1376,7 @@ ALTER TABLE %s ADD
      * Gets the preferred time formatter for setting date/time values.
      * @return string
      */
-    public function getTimeFormatter()
+    public function getTimeFormatter(): string
     {
         return 'H:i:s';
     }
@@ -1337,7 +1385,7 @@ ALTER TABLE %s ADD
      * Gets the preferred date formatter for setting date/time values.
      * @return string
      */
-    public function getDateFormatter()
+    public function getDateFormatter(): string
     {
         return 'Y-m-d';
     }
@@ -1399,7 +1447,7 @@ if (is_resource($fieldValueAccessor)) {
      *
      * @return integer[] type indexed array of integers
      */
-    public function getDefaultTypeSizes()
+    public function getDefaultTypeSizes(): array
     {
         return [];
     }
@@ -1410,11 +1458,11 @@ if (is_resource($fieldValueAccessor)) {
      * @param string $type
      * @return integer
      */
-    public function getDefaultTypeSize($type)
+    public function getDefaultTypeSize(string $type): ?int
     {
         $sizes = $this->getDefaultTypeSizes();
 
-        return isset($sizes[strtolower($type)]) ? $sizes[strtolower($type)] : null;
+        return $sizes[strtolower($type)] ?? null;
     }
 
     /**
@@ -1431,18 +1479,18 @@ if (is_resource($fieldValueAccessor)) {
             foreach ($entity->getRelations() as $relation) {
                 if ($relation->getForeignEntity() && !$relation->getForeignEntity()->isUnique($relation->getForeignFieldObjects())) {
                     $unique = new Unique();
-                    $unique->setFields($relation->getForeignFieldObjects());
+                    $unique->addFields($relation->getForeignFieldObjects());
                     $relation->getForeignEntity()->addUnique($unique);
                 }
             }
         }
 
-        if (!$this->supportsIndexSize() && $entity->getIndices()) {
-            // when the plafform does not support index sizes we reset it
-            foreach ($entity->getIndices() as $index) {
-                $index->resetFieldsSize();
-            }
-        }
+//        if (!$this->supportsIndexSize() && $entity->getIndices()) {
+//            // when the plafform does not support index sizes we reset it
+//            foreach ($entity->getIndices() as $index) {
+//                $index->resetFieldsSize();
+//            }
+//        }
 
         foreach ($entity->getFields() as $field) {
             if ($field->getSize() && $defaultSize = $this->getDefaultTypeSize($field->getType())) {

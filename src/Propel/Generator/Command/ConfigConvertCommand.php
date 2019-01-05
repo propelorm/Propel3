@@ -69,13 +69,13 @@ class ConfigConvertCommand extends AbstractCommand
             $manager->setFilesystem($this->getFilesystem());
             $generatorConfig = $this->getGeneratorConfig([], $input);
             $manager->setGeneratorConfig($generatorConfig);
-            $manager->setSchemas($schemas, $input->getOption('recursive'));
+            $manager->setSchemas($schemas);
             $manager->setWorkingDirectory($input->getOption('output-dir'));
 
             $databaseToEntities = [];
             foreach ($manager->getDatabases() as $database) {
                 $entities = array_map(function (Entity $entity) {
-                    return $entity->getFullClassName();
+                    return $entity->getFullName();
                 }, $database->getEntities());
 
                 $databaseToEntities[$database->getName()] = $entities;

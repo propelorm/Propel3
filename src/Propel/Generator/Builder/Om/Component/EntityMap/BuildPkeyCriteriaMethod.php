@@ -53,7 +53,7 @@ throw new LogicException('The {$this->getObjectClassName()} entity has no primar
                     continue;
                 }
 
-                $className = $relation->getForeignEntity()->getFullClassName();
+                $className = $relation->getForeignEntity()->getFullName();
                 $propertyName = $this->getRelationVarName($relation);
 
                 $body .= "
