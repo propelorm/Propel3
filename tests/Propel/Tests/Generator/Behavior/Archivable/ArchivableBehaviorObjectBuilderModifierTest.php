@@ -1,12 +1,12 @@
 <?php
 
-/*
- *	$Id$
+/**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * @license MIT License
+ *
  */
 
 namespace Propel\Tests\Generator\Behavior\Archivable;
@@ -237,13 +237,15 @@ EOF;
 
     public function testInsertCreatesArchiveIfSpecified()
     {
+        \MyOldArchivableTest30Query::create()->deleteAll();
+        $this->assertEquals(0, \MyOldArchivableTest30Query::create()->count());
+
         $a = new \ArchivableTest30();
         $a->setTitle('foo');
         $a->setAge(12);
-        \MyOldArchivableTest30Query::create()->deleteAll();
         $a->save();
-        $this->assertGreaterThan(0, $a->getId());
 
+        $this->assertGreaterThan(0, $a->getId());
         $this->assertEquals(1, \MyOldArchivableTest30Query::create()->count());
         $archive = \MyOldArchivableTest30Query::create()
             ->filterById($a->getId())

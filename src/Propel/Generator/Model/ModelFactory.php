@@ -75,7 +75,8 @@ class ModelFactory
         'lazyLoad' => 'setLazyLoad',
         'primaryString' => 'setPrimaryString',
         'valueSet' => 'setValueSet',
-        'inheritance' => 'setInheritanceType'
+        'inheritance' => 'setInheritanceType',
+        'required' => 'setNotNull'
     ]];
 
     private $vendor = ['map' => ['type' => 'setType']];
