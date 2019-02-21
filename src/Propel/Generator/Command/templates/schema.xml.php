@@ -23,7 +23,7 @@
           xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/propelorm/Propel3/master/resources/xsd/database.xsd"
           namespace="<?php echo $namespace?>"
         >
-    <!-- Within the <database> tag, Propel expects one <table> tag for each table -->
+    <!-- Within the <database> tag, Propel expects one <entity> tag for each table -->
 
 
     <!--
@@ -33,7 +33,7 @@
         CamelCase version of the table name as its phpName - that means that you could omit the `phpName` attribute
         on our `book` table.
     -->
-    <table name="book" phpName="Book">
+    <entity name="book" phpName="Book">
         <!--
             Each column has a `name` (the one used by the database), and an optional `phpName` attribute. Once again,
             the Propel default behavior is to use a CamelCase version of the name as `phpName` when not specified.
@@ -53,11 +53,11 @@
             As for the other column attributes, `required`, `primaryKey`, and `autoIncrement`, they mean exactly
             what their names imply.
         -->
-        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
-        <column name="title" type="varchar" size="255" required="true"/>
-        <column name="isbn" type="varchar" size="24" required="true" phpName="ISBN"/>
-        <column name="publisher_id" type="integer" required="true"/>
-        <column name="author_id" type="integer" required="true"/>
+        <field name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <field name="title" type="varchar" size="255" required="true"/>
+        <field name="isbn" type="varchar" size="24" required="true" phpName="ISBN"/>
+        <field name="publisher_id" type="integer" required="true"/>
+        <field name="author_id" type="integer" required="true"/>
 
         <!--
             A foreign key represents a relationship. Just like a table or a column, a relationship has a `phpName`.
@@ -71,18 +71,18 @@
         <foreign-key foreignTable="author">
             <reference local="author_id" foreign="id"/>
         </foreign-key>
-    </table>
+    </entity>
 
-    <table name="author" phpName="Author">
-        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
-        <column name="first_name" type="varchar" size="128" required="true"/>
-        <column name="last_name" type="varchar" size="128" required="true"/>
-    </table>
+    <entity name="author" phpName="Author">
+        <field name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <field name="first_name" type="varchar" size="128" required="true"/>
+        <field name="last_name" type="varchar" size="128" required="true"/>
+    </entity>
 
-    <table name="publisher" phpName="Publisher">
-        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
-        <column name="name" type="varchar" size="128" required="true"/>
-    </table>
+    <entity name="publisher" phpName="Publisher">
+        <field name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <field name="name" type="varchar" size="128" required="true"/>
+    </entity>
 
     <!--
         When you're done with editing, open a terminal and run

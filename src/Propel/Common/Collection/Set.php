@@ -16,16 +16,11 @@ use phootwork\collection\Set as BaseSet;
 
 class Set extends BaseSet
 {
-    public function __clone()
+    use CollectionTrait;
+
+    public function add($element)
     {
-        $clonedCollection = [];
-        foreach ($this->collection as $key => $element) {
-            if (is_object($element)) {
-                $clonedCollection[$key] = clone $element;
-                continue;
-            }
-            $clonedCollection[$key] = $element;
-        }
-        $this->collection = $clonedCollection;
+        $this->checkClass($element);
+        parent::add($element);
     }
 }

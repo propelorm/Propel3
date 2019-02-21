@@ -25,7 +25,6 @@ class QueryCacheTest extends TestCase
     {
         if (!class_exists('\QuerycacheEntity1')) {
             $schema = <<<XML
-<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <database name="QueryCacheTest" defaultIdMethod="native" activeRecord="true">
 
     <entity name="QuerycacheEntity1">

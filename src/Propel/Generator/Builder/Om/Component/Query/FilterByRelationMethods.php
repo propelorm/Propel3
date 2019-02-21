@@ -56,11 +56,11 @@ if ($objectName instanceof $fkPhpName) {
         foreach ($relation->getFieldObjectsMapArray() as $map) {
             list($localColumnObject, $foreignColumnObject) = $map;
             $body .= "
-        ->addUsingAlias(" . $localColumnObject->getFQConstantName() . ", " . $objectName . "->get" . $foreignColumnObject->getName() . "(), \$comparison)";
+        ->addUsingAlias(" . $localColumnObject->getFullConstantName() . ", " . $objectName . "->get" . $foreignColumnObject->getName() . "(), \$comparison)";
         }
         $body .= ";";
         if (!$relation->isComposite()) {
-            $localColumnConstant = $relation->getLocalField()->getFQConstantName();
+            $localColumnConstant = $relation->getLocalField()->getFullConstantName();
             $foreignColumnName = $relation->getForeignField()->getName();
             $keyColumn = $relation->getForeignEntity()->hasCompositePrimaryKey() ? $foreignColumnName : 'PrimaryKey';
             $body .= "

@@ -26,7 +26,7 @@ trait BehaviorPart
 
     protected function initBehaviors()
     {
-        $this->behaviors = new Map();
+        $this->behaviors = new Map([], Behavior::class);
     }
 
     /**

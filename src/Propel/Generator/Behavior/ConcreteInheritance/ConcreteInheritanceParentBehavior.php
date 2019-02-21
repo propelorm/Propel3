@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Behavior\ConcreteInheritance;
 
 use gossi\codegen\model\PhpMethod;

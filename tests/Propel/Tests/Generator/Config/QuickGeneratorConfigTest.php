@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,6 +6,8 @@
  *
  * @license MIT License
  */
+
+declare(strict_types=1);
 
 namespace Propel\Tests\Generator\Config;
 
@@ -50,11 +51,11 @@ class QuickGeneratorConfigTest extends TestCase
         $this->assertInstanceOf('\\Propel\\Common\\Pluralizer\\StandardEnglishPluralizer', $actual);
     }
 
-    public function testGetBehaviorLocator()
+    public function testGetBehaviorManager()
     {
-        $actual = $this->generatorConfig->getBehaviorLocator();
+        $actual = $this->generatorConfig->getBehaviorManager();
 
-        $this->assertInstanceOf('\\Propel\\Generator\\Util\\BehaviorLocator', $actual);
+        $this->assertInstanceOf('\\Propel\\Generator\\Manager\\BehaviorManager', $actual);
     }
 
     public function testPassExtraConfigProperties()

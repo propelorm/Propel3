@@ -12,18 +12,20 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Platform;
 
+use Propel\Common\Collection\Map;
 use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Diff\EntityDiff;
 use Propel\Generator\Model\Domain;
 use Propel\Generator\Model\Index;
-use Propel\Generator\Model\IdMethod;
 use Propel\Generator\Model\Model;
+use Propel\Generator\Model\NamingTool;
 use Propel\Generator\Model\PropelTypes;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Unique;
 use Propel\Generator\Model\Diff\FieldDiff;
+use Propel\Generator\Model\Vendor;
 
 /**
  * Postgresql PlatformInterface implementation.
@@ -116,7 +118,7 @@ class PgsqlPlatform extends SqlDefaultPlatform
      */
     public function getSequenceName(Entity $entity): string
     {
-        $result = null;
+        $result = '';
         if ($entity->getIdMethod() == Model::ID_METHOD_NATIVE) {
             $idMethodParams = $entity->getIdMethodParameters();
             if (empty($idMethodParams)) {
@@ -125,7 +127,7 @@ class PgsqlPlatform extends SqlDefaultPlatform
                 // because I'm not sure how Postgres would handle this w/ SERIAL anyway)
                 foreach ($entity->getFields() as $col) {
                     if ($col->isAutoIncrement()) {
-                        $result = $entity->getName() . '_' . $col->getName() . '_seq';
+                        $result = $entity->getTableName() . '_' . $col->getName() . '_seq';
                         break; // there's only one auto-increment field allowed
                     }
                 }
@@ -150,6 +152,8 @@ CREATE SEQUENCE %s;
                 $this->quoteIdentifier(strtolower($this->getSequenceName($entity)))
             );
         }
+
+        return '';
     }
 
     protected function getDropSequenceDDL(Entity $entity): string
@@ -165,6 +169,8 @@ DROP SEQUENCE %s;
                 $this->quoteIdentifier(strtolower($this->getSequenceName($entity)))
             );
         }
+
+        return '';
     }
 
     public function getAddSchemasDDL(Database $database): string
@@ -204,6 +210,8 @@ SET search_path TO %s;
 
             return sprintf($pattern, $this->quoteIdentifier($vi->getParameter('schema')));
         }
+
+        return '';
     }
 
     public function getResetSchemaDDL(Entity $entity): string
@@ -214,6 +222,8 @@ SET search_path TO %s;
 SET search_path TO public;
 ";
         }
+
+        return '';
     }
 
     public function getAddEntitiesDDL(Database $database): string
@@ -326,6 +336,8 @@ COMMENT ON COLUMN %s.%s IS %s;
                 $this->quote($description)
             );
         }
+
+        return '';
     }
 
     public function getDropEntityDDL(Entity $entity): string
@@ -352,6 +364,9 @@ DROP TABLE IF EXISTS %s CASCADE;
     public function getFieldDDL(Field $col): string
     {
         $domain = $col->getDomain();
+        if (!$col->isDefaultSqlType($this) && !$col->getDomain()->isReplaced()) {
+            $domain = $this->getDomainForType($col->getType());
+        }
 
         $ddl = [$this->quoteIdentifier($col->getColumnName())];
         $sqlType = $domain->getSqlType();
@@ -359,7 +374,7 @@ DROP TABLE IF EXISTS %s CASCADE;
         if ($col->isAutoIncrement() && $entity && $entity->getIdMethodParameters() == null) {
             $sqlType = $col->getType() === PropelTypes::BIGINT ? 'bigserial' : 'serial';
         }
-        if ($this->hasSize($sqlType) && $col->isDefaultSqlType($this)) {
+        if ($this->hasSize($sqlType) && !$col->getDomain()->isReplaced()) {
             if ($this->isNumber($sqlType)) {
                 if ('NUMERIC' === strtoupper($sqlType)) {
                     $ddl[] = $sqlType . $col->getSizeDefinition();
@@ -395,7 +410,7 @@ DROP TABLE IF EXISTS %s CASCADE;
         return sprintf(
             'CONSTRAINT %s UNIQUE (%s)',
             $this->quoteIdentifier($unique->getName()),
-            $this->getFieldListDDL($unique->getFieldObjects())
+            $this->getFieldListDDL($unique->getFields())
         );
     }
 
@@ -411,14 +426,15 @@ ALTER TABLE %s RENAME TO %s;
 
         return sprintf(
             $pattern,
-            $this->quoteIdentifier($fromEntityName),
-            $this->quoteIdentifier($toEntityName)
+            $this->quoteIdentifier(NamingTool::toSnakeCase($fromEntityName)),
+            $this->quoteIdentifier(NamingTool::toSnakeCase($toEntityName))
         );
     }
 
     /**
      * @see Platform::supportsSchemas()
      */
+
     public function supportsSchemas(): bool
     {
         return true;
@@ -477,9 +493,9 @@ ALTER TABLE %s ALTER COLUMN %s;
 ";
 
         if (isset($changedProperties['autoIncrement'])) {
-            $entityName = $entity->getName();
+            $tableName = $entity->getTableName();
             $colPlainName = $toField->getColumnName();
-            $seqName = "{$entityName}_{$colPlainName}_seq";
+            $seqName = "{$tableName}_{$colPlainName}_seq";
 
             if ($toField->isAutoIncrement() && $entity && $entity->getIdMethodParameters() == null) {
                 $defaultValue = "nextval('$seqName'::regclass)";
@@ -568,7 +584,7 @@ DROP SEQUENCE %s CASCADE;
 
     public function isNumber(string $type): bool
     {
-        $numbers = ['INTEGER', 'INT4', 'INT2', 'NUMBER', 'NUMERIC', 'SMALLINT', 'BIGINT', 'DECICAML', 'REAL', 'DOUBLE PRECISION', 'SERIAL', 'BIGSERIAL'];
+        $numbers = ['INTEGER', 'INT4', 'INT2', 'NUMBER', 'NUMERIC', 'SMALLINT', 'BIGINT', 'DECIMAL', 'REAL', 'DOUBLE PRECISION', 'SERIAL', 'BIGSERIAL'];
 
         return in_array(strtoupper($type), $numbers);
     }
@@ -614,10 +630,11 @@ DROP SEQUENCE %s CASCADE;
      * Overrides the implementation from SqlDefaultPlatform
      *
      * @author     Niklas Närhinen <niklas@narhinen.net>
+     * @param Map $fieldDiffs Map of FieldDiff objects
      * @return string
      * @see DefaultPlatform::getModifyFieldsDDL
      */
-    public function getModifyFieldsDDL(array $fieldDiffs): string
+    public function getModifyFieldsDDL(Map $fieldDiffs): string
     {
         $ret = '';
         foreach ($fieldDiffs as $fieldDiff) {

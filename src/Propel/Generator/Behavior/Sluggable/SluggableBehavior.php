@@ -17,6 +17,7 @@ use Propel\Generator\Builder\Om\RepositoryBuilder;
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Model\Behavior;
 use Propel\Generator\Model\ModelFactory;
+use Propel\Generator\Model\NamingTool;
 use Propel\Generator\Model\Unique;
 
 /**
@@ -64,8 +65,11 @@ class SluggableBehavior extends Behavior
             ));
 
             // add a unique to field
-            $unique = new Unique($this->getFieldForParameter('slug_field'));
-            $unique->setName($entity->getTableName() . '_slug');
+            $unique = new Unique();
+            $unique->addField($this->getFieldForParameter('slug_field'));
+            $unique->setName(
+                ($entity->getSchemaName() ? "{$entity->getSchemaName()}_" : '') . $entity->getTableName() . '_slug'
+            );
             $unique->addField($entity->getField($this->getParameter('slug_field')));
             if ($this->getParameter('scope_field')) {
                 $unique->addField($entity->getField($this->getParameter('scope_field')));

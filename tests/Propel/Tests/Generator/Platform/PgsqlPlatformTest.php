@@ -15,6 +15,7 @@ use Propel\Generator\Model\FieldDefaultValue;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\IdMethod;
 use Propel\Generator\Model\IdMethodParameter;
+use Propel\Generator\Model\Model;
 use Propel\Generator\Model\PropelTypes;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Platform\PgsqlPlatform;
@@ -84,7 +85,7 @@ CREATE TABLE "book"
     PRIMARY KEY ("id")
 );
 
-CREATE INDEX "book_i_639136" ON "book" ("title");
+CREATE INDEX "book_i_853ae9" ON "book" ("title");
 
 -----------------------------------------------------------------------
 -- author
@@ -224,7 +225,7 @@ CREATE TABLE "x"."book"
     PRIMARY KEY ("id")
 );
 
-CREATE INDEX "book_i_639136" ON "x"."book" ("title");
+CREATE INDEX "book_i_853ae9" ON "x"."book" ("title");
 
 -----------------------------------------------------------------------
 -- y.author
@@ -321,7 +322,7 @@ CREATE TABLE "foo"
     "id" serial NOT NULL,
     "bar" INTEGER,
     PRIMARY KEY ("id"),
-    CONSTRAINT "foo_u_14f552" UNIQUE ("bar")
+    CONSTRAINT "foo_u_853ae9" UNIQUE ("bar")
 );
 
 EOF;
@@ -362,7 +363,7 @@ EOF;
      */
     public function testGetAddEntityDDLSchema($schema)
     {
-        $table = $this->getEntityFromSchema($schema, 'foo');
+        $table = $this->getEntityFromSchema($schema, 'Foo');
         $expected = <<<EOF
 
 CREATE TABLE "Woopah"."foo"
@@ -468,7 +469,7 @@ EOF;
      */
     public function testGetDropEntityDDLSchema($schema)
     {
-        $table = $this->getEntityFromSchema($schema, 'foo');
+        $table = $this->getEntityFromSchema($schema, 'Foo');
         $expected = <<<EOF
 
 DROP TABLE IF EXISTS "Woopah"."foo" CASCADE;
@@ -497,7 +498,7 @@ DROP SEQUENCE "foo_sequence";
         $c = new Field('foo');
         $c->getDomain()->copy($this->getPlatform()->getDomainForType('DOUBLE'));
         $c->getDomain()->replaceScale(2);
-        $c->getDomain()->replaceSize(3);
+        $c->getDomain()->setSize(3);
         $c->setNotNull(true);
         $c->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $expected = '"foo" DOUBLE PRECISION DEFAULT 123 NOT NULL';
@@ -524,7 +525,7 @@ DROP SEQUENCE "foo_sequence";
         $column = new Field('foo');
         $column->getDomain()->copy($this->getPlatform()->getDomainForType('DOUBLE'));
         $column->getDomain()->replaceScale(2);
-        $column->getDomain()->replaceSize(3);
+        $column->getDomain()->setSize(3);
         $column->setNotNull(true);
         $column->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $column->getDomain()->replaceSqlType('DECIMAL(5,6)');

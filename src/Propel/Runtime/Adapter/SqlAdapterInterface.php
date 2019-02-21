@@ -64,7 +64,7 @@ interface SqlAdapterInterface extends AdapterInterface
     public function random($seed = null);
 
     /**
-     * Returns the "DELETE FROM <table> [AS <alias>]" part of DELETE query.
+     * Returns the "DELETE FROM <entity> [AS <alias>]" part of DELETE query.
      *
      * @param Criteria $criteria
      * @param string   $tableName

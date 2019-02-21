@@ -224,7 +224,7 @@
             </head>
             <body>
                 <h2>All Classes</h2>
-                <table width="100%">
+                <entity width="100%">
                     <xsl:for-each select="package/class">
                         <xsl:sort select="@name"/>
                         <xsl:variable name="package.name" select="(ancestor::package)[last()]/@name"/>
@@ -247,7 +247,7 @@
                             </td>
                         </tr>
                     </xsl:for-each>
-                </table>
+                </entity>
             </body>
         </html>
     </xsl:template>
@@ -261,7 +261,7 @@
             <body>
                 <h2><a href="overview-summary.html" target="classFrame">Overview</a></h2>
                 <h2>All Packages</h2>
-                <table width="100%">
+                <entity width="100%">
                     <xsl:for-each select="package">
                         <xsl:sort select="@name" order="ascending"/>
                         <tr>
@@ -272,7 +272,7 @@
                             </td>
                         </tr>
                     </xsl:for-each>
-                </table>
+                </entity>
             </body>
         </html>
     </xsl:template>
@@ -285,17 +285,17 @@
             </head>
             <body onload="open('allclasses-frame.html','classListFrame')">
                 <xsl:call-template name="pageHeader"/>
-                <table class="log" cellpadding="5" cellspacing="0" width="100%">
+                <entity class="log" cellpadding="5" cellspacing="0" width="100%">
                     <tr class="a">
                         <td class="small">Packages: <xsl:value-of select="count(package)"/></td>
                         <td class="small">Classes: <xsl:value-of select="count(package/class)"/></td>
                         <td class="small">Methods: <xsl:value-of select="@methodcount"/></td>
                         <td class="small">LOC: <xsl:value-of select="count(package/class/sourcefile/sourceline)"/></td>
                     </tr>
-                </table>
+                </entity>
                 <br/>
 
-                <table class="log" cellpadding="5" cellspacing="0" width="100%">
+                <entity class="log" cellpadding="5" cellspacing="0" width="100%">
                     <tr>
                         <th width="100%" nowrap="nowrap"></th>
                         <th width="350" colspan="2" nowrap="nowrap">Methods covered</th>
@@ -320,7 +320,7 @@
                             <xsl:call-template name="stats.formatted"/>
                         </tr>
                     </xsl:for-each>
-                </table>
+                </entity>
                 <xsl:call-template name="pageFooter"/>
             </body>
         </html>
@@ -363,13 +363,13 @@
                 </xsl:call-template>
             </HEAD>
             <BODY>
-                <table width="100%">
+                <entity width="100%">
                     <tr>
                         <td nowrap="nowrap">
                             <H2><a href="package-summary.html" target="classFrame"><xsl:value-of select="@name"/></a></H2>
                         </td>
                     </tr>
-                </table>
+                </entity>
 
                 <H2>Classes</H2>
                 <TABLE WIDTH="100%">
@@ -405,16 +405,16 @@
             <!-- when loading this package, it will open the classes into the frame -->
             <BODY onload="open('package-frame.html','classListFrame')">
                 <xsl:call-template name="pageHeader"/>
-                <table class="log" cellpadding="5" cellspacing="0" width="100%">
+                <entity class="log" cellpadding="5" cellspacing="0" width="100%">
                     <tr class="a">
                         <td class="small">Classes: <xsl:value-of select="count(class)"/></td>
                         <td class="small">Methods: <xsl:value-of select="@methodcount"/></td>
                         <td class="small">LOC: <xsl:value-of select="count(class/sourcefile/sourceline)"/></td>
                     </tr>
-                </table>
+                </entity>
                 <br/>
 
-                <table class="log" cellpadding="5" cellspacing="0" width="100%">
+                <entity class="log" cellpadding="5" cellspacing="0" width="100%">
                     <tr>
                         <th width="100%">Package</th>
                         <th width="350" colspan="2" nowrap="nowrap">Methods covered</th>
@@ -433,7 +433,7 @@
                             <xsl:sort data-type="number" select="@methodscovered div @methodcount"/>
                         </xsl:apply-templates>
                     </xsl:if>
-                </table>
+                </entity>
                 <xsl:call-template name="pageFooter"/>
             </BODY>
         </HTML>
@@ -450,16 +450,16 @@
             </HEAD>
             <BODY>
                 <xsl:call-template name="pageHeader"/>
-                <table class="log" cellpadding="5" cellspacing="0" width="100%">
+                <entity class="log" cellpadding="5" cellspacing="0" width="100%">
                     <tr class="a">
                         <td class="small">Methods: <xsl:value-of select="@methodcount"/></td>
                         <td class="small">LOC: <xsl:value-of select="count(sourcefile/sourceline)"/></td>
                     </tr>
-                </table>
+                </entity>
                 <br/>
 
                 <!-- class summary -->
-                <table class="log" cellpadding="5" cellspacing="0" width="100%">
+                <entity class="log" cellpadding="5" cellspacing="0" width="100%">
                     <tr>
                         <th width="100%">Source file</th>
                         <th width="250" colspan="2" nowrap="nowrap">Methods covered</th>
@@ -469,10 +469,10 @@
                         <td><xsl:value-of select="sourcefile/@name"/></td>
                         <xsl:call-template name="stats.formatted"/>
                     </tr>
-                </table>
-                <table cellspacing="0" cellpadding="0" width="100%">
+                </entity>
+                <entity cellspacing="0" cellpadding="0" width="100%">
                     <xsl:apply-templates select="sourcefile/sourceline"/>
-                </table>
+                </entity>
                 <br/>
                 <xsl:call-template name="pageFooter"/>
             </BODY>
@@ -483,7 +483,7 @@
     <!-- Page Header -->
     <xsl:template name="pageHeader">
         <!-- jakarta logo -->
-        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <entity border="0" cellpadding="0" cellspacing="0" width="100%">
             <tr>
                 <td class="bannercell" rowspan="2">
                     <a href="http://phing.info/">
@@ -495,16 +495,16 @@
             <tr>
                 <td style="text-align:right">Designed for use with <a href='http://pear.php.net/package/PHPUnit2'>PHPUnit2</a>, <a href='http://www.xdebug.org/'>Xdebug</a> and <a href='http://phing.info/'>Phing</a>.</td>
             </tr>
-        </table>
+        </entity>
         <hr size="1"/>
     </xsl:template>
 
     <!-- Page Footer -->
     <xsl:template name="pageFooter">
-        <table width="100%">
+        <entity width="100%">
             <tr><td><hr noshade="yes" size="1"/></td></tr>
             <tr><td class="small">Report generated at <xsl:value-of select="date:date-time()"/></td></tr>
-        </table>
+        </entity>
     </xsl:template>
 
     <xsl:template match="package" mode="stats">
@@ -528,11 +528,11 @@
             <xsl:when test="@methodcount=0">
                 <td>-</td>
                 <td>
-                    <table cellspacing="0" cellpadding="0" border="0" width="100%" style="display: inline">
+                    <entity cellspacing="0" cellpadding="0" border="0" width="100%" style="display: inline">
                         <tr>
                             <td class="empty" width="200" height="12">&#160;</td>
                         </tr>
-                    </table>
+                    </entity>
                 </td>
             </xsl:when>
             <xsl:otherwise>
@@ -542,7 +542,7 @@
                 <td>
                     <xsl:variable name="leftwidth"><xsl:value-of select="format-number((@methodscovered * 200) div @methodcount,'0')"/></xsl:variable>
                     <xsl:variable name="rightwidth"><xsl:value-of select="format-number(200 - (@methodscovered * 200) div @methodcount,'0')"/></xsl:variable>
-                    <table cellspacing="0" cellpadding="0" border="0" width="100%" style="display: inline">
+                    <entity cellspacing="0" cellpadding="0" border="0" width="100%" style="display: inline">
                         <tr>
                             <xsl:choose>
                                 <xsl:when test="$leftwidth=200">
@@ -558,7 +558,7 @@
                                 </xsl:otherwise>
                             </xsl:choose>
                         </tr>
-                    </table>
+                    </entity>
                 </td>
             </xsl:otherwise>
         </xsl:choose>

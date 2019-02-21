@@ -505,7 +505,7 @@ abstract class DataModelBuilder
      *
      * @param  string $name
      *
-     * @return string
+     * @return mixed
      */
     public function getBuildProperty(string $name)
     {
@@ -513,7 +513,7 @@ abstract class DataModelBuilder
             return $this->getGeneratorConfig()->getConfigProperty($name);
         }
 
-        return null; // just to be explicit
+        return null;
     }
 
     /**

@@ -23,7 +23,6 @@ propel:
     defaultConnection: migration
     connections:
       - migration
-    targetPackage: migration
 
   runtime:
     defaultConnection: migration

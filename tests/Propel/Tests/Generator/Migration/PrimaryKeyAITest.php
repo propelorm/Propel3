@@ -11,19 +11,19 @@ class PrimaryKeyAITest extends MigrationTestCase
     {
         $originXml = '
 <database>
-    <table name="migration_test_9">
-        <column name="id" type="integer"/>
-        <column name="title" required="true" />
-    </table>
+    <entity name="migration_test_9">
+        <field name="id" type="integer"/>
+        <field name="title" required="true" />
+    </entity>
 </database>
 ';
 
         $targetXml = '
 <database>
-    <table name="migration_test_9">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true"/>
-        <column name="title" required="true" />
-    </table>
+    <entity name="migration_test_9">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true"/>
+        <field name="title" required="true" />
+    </entity>
 </database>
 ';
         $this->migrateAndTest($originXml, $targetXml);
@@ -33,19 +33,19 @@ class PrimaryKeyAITest extends MigrationTestCase
     {
         $originXml = '
 <database>
-    <table name="migration_test_9">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true"/>
-        <column name="title" required="true" />
-    </table>
+    <entity name="migration_test_9">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true"/>
+        <field name="title" required="true" />
+    </entity>
 </database>
 ';
 
         $targetXml = '
 <database>
-    <table name="migration_test_9">
-        <column name="id" type="integer"/>
-        <column name="title" required="true" />
-    </table>
+    <entity name="migration_test_9">
+        <field name="id" type="integer"/>
+        <field name="title" required="true" />
+    </entity>
 </database>
 ';
         $this->migrateAndTest($originXml, $targetXml);
@@ -55,21 +55,21 @@ class PrimaryKeyAITest extends MigrationTestCase
     {
         $originXml = '
 <database>
-    <table name="migration_test_9">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true"/>
-        <column name="title" required="true" />
-        <column name="uri" required="true" />
-    </table>
+    <entity name="migration_test_9">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true"/>
+        <field name="title" required="true" />
+        <field name="uri" required="true" />
+    </entity>
 </database>
 ';
 
         $targetXml = '
 <database>
-    <table name="migration_test_9">
-        <column name="id" type="integer" primaryKey="true"/>
-        <column name="title" required="true" />
-        <column name="uri" required="true" />
-    </table>
+    <entity name="migration_test_9">
+        <field name="id" type="integer" primaryKey="true"/>
+        <field name="title" required="true" />
+        <field name="uri" required="true" />
+    </entity>
 </database>
 ';
         $this->migrateAndTest($originXml, $targetXml);
@@ -79,19 +79,19 @@ class PrimaryKeyAITest extends MigrationTestCase
     {
         $originXml = '
 <database>
-    <table name="migration_test_9">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true"/>
-        <column name="title" required="true" />
-    </table>
+    <entity name="migration_test_9">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true"/>
+        <field name="title" required="true" />
+    </entity>
 </database>
 ';
 
         $targetXml = '
 <database>
-    <table name="migration_test_9">
-        <column name="new_id" type="integer" primaryKey="true" autoIncrement="true"/>
-        <column name="title" required="true" />
-    </table>
+    <entity name="migration_test_9">
+        <field name="new_id" type="integer" primaryKey="true" autoIncrement="true"/>
+        <field name="title" required="true" />
+    </entity>
 </database>
 ';
         $this->migrateAndTest($originXml, $targetXml);
@@ -104,19 +104,19 @@ class PrimaryKeyAITest extends MigrationTestCase
     {
         $originXml = '
 <database>
-    <table name="migration_test_9">
-        <column name="id" type="integer" size="1" primaryKey="true" autoIncrement="true"/>
-        <column name="title" required="true" />
-    </table>
+    <entity name="migration_test_9">
+        <field name="id" type="integer" size="1" primaryKey="true" autoIncrement="true"/>
+        <field name="title" required="true" />
+    </entity>
 </database>
 ';
 
         $targetXml = '
 <database>
-    <table name="migration_test_9">
-        <column name="id" type="integer" size="5" primaryKey="true" autoIncrement="true"/>
-        <column name="title" required="true" />
-    </table>
+    <entity name="migration_test_9">
+        <field name="id" type="integer" size="5" primaryKey="true" autoIncrement="true"/>
+        <field name="title" required="true" />
+    </entity>
 </database>
 ';
         $this->migrateAndTest($originXml, $targetXml);

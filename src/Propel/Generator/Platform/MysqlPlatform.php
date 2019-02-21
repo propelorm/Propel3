@@ -17,6 +17,7 @@ use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Domain;
+use Propel\Generator\Model\NamingTool;
 use Propel\Generator\Model\Relation;
 use Propel\Generator\Model\Index;
 use Propel\Generator\Model\PropelTypes;
@@ -24,6 +25,7 @@ use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Unique;
 use Propel\Generator\Model\Diff\FieldDiff;
 use Propel\Generator\Model\Diff\DatabaseDiff;
+use Propel\Generator\Model\Vendor;
 
 /**
  * MySql PlatformInterface implementation.
@@ -54,14 +56,6 @@ class MysqlPlatform extends SqlDefaultPlatform
         $this->setSchemaDomainMapping(new Domain(PropelTypes::PHP_ARRAY, 'TEXT'));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::ENUM, 'ENUM'));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::REAL, 'DOUBLE'));
-    }
-
-    public function finalizeDefinition(Database $database)
-    {
-        parent::finalizeDefinition($database);
-        foreach ($database->getEntities() as $entity) {
-            $this->addExtraIndices($entity);
-        }
     }
 
     /**
@@ -262,7 +256,8 @@ class MysqlPlatform extends SqlDefaultPlatform
 
     public function supportsRelations(Entity $entity): bool
     {
-        $vendorSpecific = $entity->getVendorInfoForType('mysql');
+        $vendorSpecific = $entity->getVendorByType('mysql');
+
         if ($vendorSpecific->hasParameter('Type')) {
             $mysqlEntityType = $vendorSpecific->getParameter('Type');
         } elseif ($vendorSpecific->hasParameter('Engine')) {
@@ -365,14 +360,7 @@ SET FOREIGN_KEY_CHECKS = 1;
             }
         }
 
-        $vendorSpecific = $entity->getVendorByType('mysql');
-        if ($vendorSpecific->hasParameter('Type')) {
-            $mysqlEntityType = $vendorSpecific->getParameter('Type');
-        } elseif ($vendorSpecific->hasParameter('Engine')) {
-            $mysqlEntityType = $vendorSpecific->getParameter('Engine');
-        } else {
-            $mysqlEntityType = $this->getDefaultEntityEngine();
-        }
+        $mysqlEntityType = $this->getMysqlEntityType($entity);
 
         $entityOptions = $this->getEntityOptions($entity);
 
@@ -470,8 +458,11 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
     public function getFieldDDL(Field $col): string
     {
         $domain = $col->getDomain();
+        if (!$col->isDefaultSqlType($this) && !$domain->isReplaced()) {
+            $domain = $this->getDomainForType($col->getType());
+        }
         $sqlType = $domain->getSqlType();
-        $notNullString = $this->getNullString($col->isNotNull());
+        $notNullString = $col->isNotNull() ? $this->getNotNullString() : '';
         $defaultSetting = $this->getFieldDefaultValueDDL($col);
 
         // Special handling of TIMESTAMP/DATETIME types ...
@@ -494,25 +485,26 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
         }
 
         $ddl = [$this->quoteIdentifier($this->getName($col))];
-        if ($this->hasSize($sqlType) && $col->isDefaultSqlType($this)) {
-            $ddl[] = $sqlType . $col->getSizeDefinition();
+        if ($this->hasSize($sqlType) && !$col->getDomain()->isReplaced()) {
+            $ddl[] = $sqlType . ($col->getSizeDefinition() !== '' ? $col->getSizeDefinition() : $this->getDomainForType($col->getType())->getSizeDefinition());
         } else {
             $ddl[] = $sqlType;
         }
 
         if ($sqlType == "ENUM") {
-            $ddl[] = '("' . implode('","', $col->getValueSet()) . '")';
+            $ddl[] = '("' . implode($col->getValueSet()->toArray(), '","') . '")';
         }
 
         $colinfo = $col->getVendorByType($this->getDatabaseType());
         if ($colinfo->hasParameter('Charset')) {
-            $ddl[] = 'CHARACTER SET '. $this->quote($colinfo->getParameter('Charset'));
+            $ddl[] = 'CHARACTER SET ' . $this->quote($colinfo->getParameter('Charset'));
         }
         if ($colinfo->hasParameter('Collation')) {
-            $ddl[] = 'COLLATE '. $this->quote($colinfo->getParameter('Collation'));
+            $ddl[] = 'COLLATE ' . $this->quote($colinfo->getParameter('Collation'));
         } elseif ($colinfo->hasParameter('Collate')) {
-            $ddl[] = 'COLLATE '. $this->quote($colinfo->getParameter('Collate'));
+            $ddl[] = 'COLLATE ' . $this->quote($colinfo->getParameter('Collate'));
         }
+
         if ($sqlType === 'TIMESTAMP') {
             if ($notNullString == '') {
                 $notNullString = 'NULL';
@@ -555,7 +547,9 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
     {
         $list = [];
         foreach ($index->getFields() as $col) {
-            $list[] = $this->quoteIdentifier($this->getName($col)) . ($index->getField($col->getName())->getSize() ? '(' . $index->getFieldSize($col->getName()) . ')' : '');
+            $element = $this->quoteIdentifier($this->getName($col));
+            $list[] = $element .
+                ($index->getFieldSizes()->get($col->getName()) ? "({$index->getFieldSizes()->get($col->getName())})" : '');
         }
 
         return implode(', ', $list);
@@ -760,8 +754,8 @@ RENAME TABLE %s TO %s;
 
         return sprintf(
             $pattern,
-            $this->quoteIdentifier($fromEntityName),
-            $this->quoteIdentifier($toEntityName)
+            $this->quoteIdentifier(NamingTool::toSnakeCase($fromEntityName)),
+            $this->quoteIdentifier(NamingTool::toSnakeCase($toEntityName))
         );
     }
 
@@ -893,6 +887,23 @@ ALTER TABLE %s CHANGE %s %s;
     public function getTimestampFormatter(): string
     {
         return 'Y-m-d H:i:s';
+    }
+
+    public function getMysqlEntityType(Entity $entity): string
+    {
+        $vendorSpecific = $entity->getVendorByType('mysql');
+        if ([] === $vendorSpecific->getParameters()) {
+            $vendorSpecific = $entity->getDatabase()->getVendorByType('mysql');
+        }
+        if ($vendorSpecific->hasParameter('Type')) {
+            return $vendorSpecific->getParameter('Type');
+        }
+
+        if ($vendorSpecific->hasParameter('Engine')) {
+            return $vendorSpecific->getParameter('Engine');
+        }
+
+        return $this->getDefaultEntityEngine();
     }
 
     /*

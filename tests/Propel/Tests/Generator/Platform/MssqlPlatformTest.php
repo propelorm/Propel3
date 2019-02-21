@@ -15,6 +15,7 @@ use Propel\Generator\Model\FieldDefaultValue;
 use Propel\Generator\Model\IdMethod;
 use Propel\Generator\Model\IdMethodParameter;
 use Propel\Generator\Model\Entity;
+use Propel\Generator\Model\Model;
 use Propel\Generator\Platform\MssqlPlatform;
 
 /**
@@ -100,7 +101,7 @@ CREATE TABLE [book]
     CONSTRAINT [book_pk] PRIMARY KEY ([id])
 );
 
-CREATE INDEX [book_i_639136] ON [book] ([title]);
+CREATE INDEX [book_i_853ae9] ON [book] ([title]);
 
 BEGIN
 ALTER TABLE [book] ADD CONSTRAINT [book_fk_b97a1a] FOREIGN KEY ([author_id]) REFERENCES [author] ([id])
@@ -196,7 +197,7 @@ CREATE TABLE [x].[book]
     CONSTRAINT [x].[book_pk] PRIMARY KEY ([id])
 );
 
-CREATE INDEX [book_i_639136] ON [x].[book] ([title]);
+CREATE INDEX [book_i_853ae9] ON [x].[book] ([title]);
 
 BEGIN
 ALTER TABLE [x].[book] ADD CONSTRAINT [book_fk_9f6743] FOREIGN KEY ([author_id]) REFERENCES [y].[author] ([id])
@@ -358,7 +359,7 @@ CREATE TABLE [foo]
      */
     public function testGetAddEntityDDLSchema($schema)
     {
-        $table = $this->getEntityFromSchema($schema, 'foo');
+        $table = $this->getEntityFromSchema($schema, 'Foo');
         $expected = "
 CREATE TABLE [Woopah].[foo]
 (
@@ -407,7 +408,7 @@ END
      */
     public function testGetDropEntityDDLSchema($schema)
     {
-        $table = $this->getEntityFromSchema($schema, 'foo');
+        $table = $this->getEntityFromSchema($schema, 'Foo');
         $expected = "
 IF EXISTS (SELECT 1 FROM sysobjects WHERE type = 'U' AND name = 'Woopah.foo')
 BEGIN
@@ -442,7 +443,7 @@ END
         $column = new Field('foo');
         $column->getDomain()->copy($this->getPlatform()->getDomainForType('DOUBLE'));
         $column->getDomain()->replaceScale(2);
-        $column->getDomain()->replaceSize(3);
+        $column->getDomain()->setSize(3);
         $column->setNotNull(true);
         $column->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $column->getDomain()->replaceSqlType('DECIMAL(5,6)');

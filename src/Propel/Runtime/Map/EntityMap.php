@@ -117,13 +117,6 @@ abstract class EntityMap
      */
     protected $fullClassName;
 
-//    /**
-//     * The Package for this entity
-//     *
-//     * @var string
-//     */
-//    protected $package;
-
     /**
      * Whether to use an id generator for pkey
      *
@@ -411,7 +404,7 @@ abstract class EntityMap
      */
     public function createObject()
     {
-        $reflection = new \ReflectionClass($this->getFullName());
+        $reflection = new \ReflectionClass($this->getFullClassName());
         return $reflection->newInstanceWithoutConstructor();
     }
 
@@ -677,7 +670,7 @@ abstract class EntityMap
                 $query->$filterBy($entity);
 
                 $items = $query->find();
-                $foreignWriter = $this->getClassPropWriter($relation->getRightEntity()->getFullName());
+                $foreignWriter = $this->getClassPropWriter($relation->getRightEntity()->getFullClassName());
                 foreach ($items as $item) {
                     $foreignWriter($item, $relation->getRefName(), $entity);
                 }
@@ -764,7 +757,7 @@ abstract class EntityMap
     /**
      * @param object $entity
      * @return array
-     */
+     *//*
     public function toArray($entity)
     {
         $array = [];
@@ -777,7 +770,7 @@ abstract class EntityMap
 
         return $array;
     }
-
+*/
     /**
      * Returns the primary key values from the an array as array or directly when the
      * entity has only one primary key.

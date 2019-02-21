@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,6 +6,8 @@
  *
  * @license MIT License
  */
+
+declare(strict_types=1);
 
 namespace Propel\Generator\Behavior\NestedSet;
 
@@ -49,7 +50,7 @@ class NestedSetBehavior extends Behavior
     /**
      * Add the left, right, level and scope properties to the current entity
      */
-    public function modifyEntity()
+    public function modifyEntity(): void
     {
         $entity = $this->getEntity();
         $modelFactory = new ModelFactory();
@@ -75,7 +76,7 @@ class NestedSetBehavior extends Behavior
             ]));
         }
 
-        if ('true' === $this->getParameter('use_scope') && !$entity->hasField($this->getParameter('scope_field'))) {
+        if (true === $this->getParameter('use_scope') && !$entity->hasField($this->getParameter('scope_field'))) {
             $entity->addField($modelFactory->createField([
                 'name' => $this->getParameter('scope_field'),
                 'type' => 'INTEGER'
@@ -83,12 +84,12 @@ class NestedSetBehavior extends Behavior
         }
     }
 
-    public function getFieldAttribute($name)
+    public function getFieldAttribute(string $name): string
     {
         return strtolower($this->getFieldForParameter($name)->getName());
     }
 
-    public function useScope()
+    public function useScope(): bool
     {
         return $this->getParameter('use_scope');
     }

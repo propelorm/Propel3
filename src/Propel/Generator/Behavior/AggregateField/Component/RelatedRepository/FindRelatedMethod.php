@@ -8,6 +8,8 @@
  *
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Behavior\AggregateField\Component\RelatedRepository;
 
 use Propel\Generator\Behavior\AggregateField\AggregateFieldRelationBehavior;

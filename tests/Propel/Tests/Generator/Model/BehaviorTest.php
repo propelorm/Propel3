@@ -82,6 +82,7 @@ class BehaviorTest extends ModelTestCase
 EOF;
         $schema = vfsStream::newFile('schema.xml')->at($this->getRoot())->setContent($content);
         $appData = $schemaReader->parse($schema->url());
+        $appData->getPlatform()->doFinalInitialization($appData);
         $entity = $appData->getDatabase('test1')->getEntityByName('Entity1');
         $behaviors = $entity->getBehaviors();
         $this->assertEquals(1, count($behaviors), 'SchemaReader ads as many behaviors as there are behaviors tags');
@@ -126,8 +127,9 @@ EOF;
 EOF;
         $schema = vfsStream::newFile('schema.xml')->at($this->getRoot())->setContent($content);
         $appData = $schemaReader->parse($schema->url());
+        $appData->getPlatform()->doFinalInitialization($appData);
         $entity = $appData->getDatabase('test1')->getEntityByName('Table2');
-        $this->assertEquals($entity->getFields()->size(), 4, 'A behavior can modify its table by implementing modifyEntity()');
+        $this->assertEquals(4, $entity->getFields()->size(), 'A behavior can modify its table by implementing modifyEntity()');
     }
 
     public function testModifyDatabase()
@@ -143,6 +145,7 @@ EOF;
 EOF;
         $schema = vfsStream::newFile('schema.xml')->at($this->getRoot())->setContent($content);
         $appData = $schemaReader->parse($schema->url());
+        $appData->getPlatform()->doFinalInitialization($appData);
         $entity = $appData->getDatabase('test1')->getEntityByName('Table1');
         $this->assertTrue(array_key_exists('timestampable', $entity->getBehaviors()), 'A database behavior is automatically copied to all its table');
     }

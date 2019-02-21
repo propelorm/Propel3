@@ -55,7 +55,10 @@ class Vendor
     const ORACLE_PK_PCT_INCREASE = 'PKPCTIncrease';
     const ORACLE_PK_TABLESPACE = 'PKTablespace';
 
+    /** @var string */
     private $type;
+
+    /** @var Map */
     private $parameters;
 
     /**

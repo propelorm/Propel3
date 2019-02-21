@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Schema;
 
+use Propel\Generator\Model\Model;
 use Propel\Generator\Model\NamingTool;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -40,12 +41,13 @@ class SchemaConfiguration implements ConfigurationInterface
                 ->addDefaultsIfNotSet()
                 ->children()
                     ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
-                    ->enumNode('defaultIdMethod')->values(['none', 'native'])->defaultValue('native')->end()
+                    ->enumNode('defaultIdMethod')
+                        ->values([Model::ID_METHOD_NONE, Model::ID_METHOD_NATIVE])
+                        ->defaultValue(Model::ID_METHOD_NATIVE)
+                    ->end()
                     ->scalarNode('namespace')->end()
-                    ->scalarNode('package')->end()
                     ->booleanNode('activeRecord')->defaultFalse()->end()
                     ->booleanNode('identifierQuoting')->end()
-                    ->scalarNode('tablePrefix')->end()
                     ->scalarNode('defaultStringFormat')->end()
                     ->booleanNode('heavyIndexing')->defaultFalse()->end()
                     ->scalarNode('baseClass')->end()
@@ -130,7 +132,6 @@ class SchemaConfiguration implements ConfigurationInterface
                                 ->booleanNode('readOnly')->defaultFalse()->end()
                                 ->booleanNode('abstract')->defaultFalse()->end()
                                 ->booleanNode('isCrossRef')->defaultFalse()->end()
-                                ->scalarNode('package')->end()
                                 ->scalarNode('schema')->end()
                                 ->scalarNode('namespace')->end()
                                 ->booleanNode('identifierQuoting')->end()
@@ -184,7 +185,6 @@ class SchemaConfiguration implements ConfigurationInterface
                                                     ->children()
                                                         ->scalarNode('key')->isRequired()->end()
                                                         ->scalarNode('class')->isRequired()->end()
-                                                        ->scalarNode('package')->end()
                                                         ->scalarNode('extends')->end()
                                                     ->end()
                                                 ->end()
@@ -212,7 +212,15 @@ class SchemaConfiguration implements ConfigurationInterface
                                     ->arrayPrototype()
                                         ->fixXmlConfig('reference')
                                         ->children()
-                                            ->scalarNode('target')->isRequired()->cannotBeEmpty()->end()
+                                            ->scalarNode('target')
+                                                ->isRequired()
+                                                ->cannotBeEmpty()
+                                                ->beforeNormalization()
+                                                    ->always(function($name) {
+                                                        return NamingTool::toStudlyCase($name);
+                                                        })
+                                                ->end()
+                                            ->end()
                                             ->scalarNode('field')->end()
                                             ->scalarNode('name')->end()
                                             ->scalarNode('refField')->end()
@@ -376,7 +384,7 @@ class SchemaConfiguration implements ConfigurationInterface
                                         ->end()
                                     ->end()
                                 ->end()
-                                ->arrayNode('id-method-parameter')
+                                ->arrayNode('id_method_parameter')
                                     ->children()
                                         ->scalarNode('value')->end()
                                     ->end()

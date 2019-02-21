@@ -42,7 +42,7 @@ class EntityIndexComparatorTest extends TestCase
         $c1 = new Field('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t1->addField($c1);
@@ -53,7 +53,7 @@ class EntityIndexComparatorTest extends TestCase
         $c2 = new Field('Foo');
         $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c2->getDomain()->replaceScale(2);
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t2->addField($c2);
@@ -70,7 +70,7 @@ class EntityIndexComparatorTest extends TestCase
         $c1 = new Field('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t1->addField($c1);
@@ -81,7 +81,7 @@ class EntityIndexComparatorTest extends TestCase
         $c2 = new Field('Foo');
         $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c2->getDomain()->replaceScale(2);
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t2->addField($c2);
@@ -100,7 +100,7 @@ class EntityIndexComparatorTest extends TestCase
         $c2 = new Field('Foo');
         $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c2->getDomain()->replaceScale(2);
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t2->addField($c2);
@@ -124,7 +124,7 @@ class EntityIndexComparatorTest extends TestCase
         $c1 = new Field('Bar');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t1->addField($c1);
@@ -148,7 +148,7 @@ class EntityIndexComparatorTest extends TestCase
         $t1 = new Entity();
         $c1 = new Field('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c1->getDomain()->replaceSize(255);
+        $c1->getDomain()->setSize(255);
         $c1->setNotNull(false);
         $t1->addField($c1);
         $i1 = new Index('Foo_Index');
@@ -158,7 +158,7 @@ class EntityIndexComparatorTest extends TestCase
         $c2 = new Field('Foo');
         $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c2->getDomain()->replaceScale(2);
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t2->addField($c2);

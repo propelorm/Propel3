@@ -9,7 +9,10 @@
     <entity name="ConcreteContent">
         <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
         <field name="title" type="VARCHAR" size="100" primaryString="true" />
-        <relation target="ConcreteCategory" onDelete="cascade"/>
+        <field name="concreteCategoryId" type="INTEGER" />
+        <relation target="ConcreteCategory" onDelete="cascade">
+            <reference local="concreteCategoryId" foreign="id" />
+        </relation>
         <index>
             <index-field name="title" />
         </index>
@@ -17,7 +20,10 @@
 
     <entity name="ConcreteArticle">
         <field name="body" type="longvarchar" />
-        <relation field="concreteAuthor" refField="article" target="ConcreteAuthor" onDelete="cascade" />
+        <field name="concreteAuthorId" type="INTEGER" />
+        <relation field="concreteAuthor" refField="article" target="ConcreteAuthor" onDelete="cascade" >
+            <reference local="concreteAuthorId" foreign="id" />
+        </relation>
         <behavior name="concrete_inheritance">
             <parameter name="extends" value="ConcreteContent" />
         </behavior>

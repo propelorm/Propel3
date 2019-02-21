@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -19,6 +18,9 @@ use Propel\Generator\Builder\Om\QueryBuilder;
 use Propel\Generator\Builder\Om\RepositoryBuilder;
 use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Behavior;
+use Propel\Generator\Model\Entity;
+use Propel\Generator\Model\Field;
+use Propel\Generator\Model\Model;
 use Propel\Generator\Model\Relation;
 use Propel\Generator\Model\PropelTypes;
 
@@ -166,17 +168,18 @@ class I18nBehavior extends Behavior
         $database       = $entity->getDatabase();
         $i18nEntityName = $this->getI18nEntityName();
 
-        if ($database->hasEntity($i18nEntityName)) {
-            $this->i18nEntity = $database->getEntity($i18nEntityName);
+        if ($database->hasEntityByName($i18nEntityName)) {
+            $this->i18nEntity = $database->getEntityByName($i18nEntityName);
         } else {
-            $this->i18nEntity = $database->addEntity([
-                'name'      => $i18nEntityName,
-                'package'   => $entity->getPackage(),
-                'schema'    => $entity->getSchema(),
-                'namespace' => $entity->getNamespace() ? '\\' . $entity->getNamespace() : null,
-                'skipSql'   => $entity->isSkipSql(),
-                'identifierQuoting' => $entity->getIdentifierQuoting()
-            ]);
+            $this->i18nEntity = new Entity($i18nEntityName);
+            if ($entity->getSchemaName()) {
+                $this->i18nEntity->setSchemaName($entity->getSchemaName());
+            }
+            $this->i18nEntity->setNamespace($entity->getNamespace() ? '\\' . $entity->getNamespace() : null);
+            $this->i18nEntity->setSkipSql($entity->isSkipSql());
+            $this->i18nEntity->setIdentifierQuoting($entity->getIdentifierQuoting() ?? false);
+
+            $database->addEntity($this->i18nEntity);
 
             // every behavior adding a table should re-execute database behaviors
             foreach ($database->getBehaviors() as $behavior) {
@@ -201,21 +204,22 @@ class I18nBehavior extends Behavior
         if ($this->getParameter('i18n_relation_field')) {
             // custom i18n table pk name
             $i18nField->setName($this->getParameter('i18n_relation_field'));
-        } elseif (in_array($entity->getName(), $i18nEntity->getForeignEntityNames())) {
+        } elseif ($i18nEntity->getForeignEntityNames()->contains($entity->getName())) {
             // custom i18n table pk name not set, but some fk already exists
             return;
         }
 
         if (!$i18nEntity->hasField($i18nField->getName())) {
             $i18nField->setAutoIncrement(false);
+            $i18nField->setNotNull(true);
             $i18nEntity->addField($i18nField);
         }
 
         $relation = new Relation();
         $relation->setForeignEntityName($entity->getName());
         $relation->setDefaultJoin('LEFT JOIN');
-        $relation->setOnDelete(Relation::CASCADE);
-        $relation->setOnUpdate(Relation::NONE);
+        $relation->setOnDelete(Model::RELATION_CASCADE);
+        $relation->setOnUpdate(Model::RELATION_NONE);
         $relation->addReference($i18nField->getName(), $field->getName());
 
         $i18nEntity->addRelation($relation);
@@ -228,13 +232,14 @@ class I18nBehavior extends Behavior
         $localeFieldName = $this->getLocaleFieldName();
 
         if (!$this->i18nEntity->hasField($localeFieldName)) {
-            $this->i18nEntity->addField([
-                'name'       => $localeFieldName,
-                'type'       => PropelTypes::VARCHAR,
-                'size'       => $this->getParameter('locale_length') ? (int) $this->getParameter('locale_length') : 5,
-                'default'    => $this->getDefaultLocale(),
-                'primaryKey' => true
-            ]);
+            $field = new Field($localeFieldName);
+            $field->setType(PropelTypes::VARCHAR);
+            $field->setSize($this->getParameter('locale_length') ? (int) $this->getParameter('locale_length') : 5);
+            $field->setDefaultValue($this->getDefaultLocale());
+            $field->setPrimaryKey(true);
+            $field->setNotNull(true);
+
+            $this->i18nEntity->addField($field);
         }
     }
 

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,22 +7,27 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Tests\Common\Config\Loader;
 
 use org\bovigo\vfs\vfsStream;
 use Propel\Common\Config\Loader\YamlFileLoader;
 use Propel\Common\Config\FileLocator;
-use Propel\Tests\Common\Config\ConfigTestCase;
+use Propel\Tests\TestCase;
+use Propel\Tests\VfsTrait;
 
-class YamlFileLoaderTest extends ConfigTestCase
+class YamlFileLoaderTest extends TestCase
 {
+    use VfsTrait;
+
     /** @var  YamlFileLoader */
     protected $loader;
 
     public function setUp()
     {
         parent::setUp();
-        $this->loader = new YamlFileLoader(new FileLocator([sys_get_temp_dir()]));
+        $this->loader = new YamlFileLoader(new FileLocator([$this->getRoot()->url()]));
     }
 
     public function testSupports()
@@ -43,7 +47,7 @@ class YamlFileLoaderTest extends ConfigTestCase
 foo: bar
 bar: baz
 EOF;
-        $file = vfsStream::newFile('parameters.yaml')->at($this->getRoot())->setContent($content);
+        $file = $this->newFile('parameters.yaml', $content);
 
         $test = $this->loader->load($file->url());
         $this->assertEquals('bar', $test['foo']);
@@ -70,14 +74,14 @@ not yaml content
 only plain
 text
 EOF;
-        $file = vfsStream::newFile('nonvalid.yaml')->at($this->getRoot())->setContent($content);
+        $file = $this->newFile('nonvalid.yaml', $content);
 
         $this->loader->load($file->url());
     }
 
     public function testYamlFileIsEmpty()
     {
-        $file = vfsStream::newFile('empty.yaml')->at($this->getRoot())->setContent('');
+        $file = $this->newFile('empty.yaml', '');
         $actual = $this->loader->load($file->url());
 
         $this->assertEquals([], $actual);
@@ -93,7 +97,7 @@ EOF;
 foo: bar
 bar: baz
 EOF;
-        $file = vfsStream::newFile('notreadable.yaml', 200)->at($this->getRoot())->setContent($content);
+        $file = $this->newFile('notreadable.yaml', $content)->chmod(200);
 
         $actual = $this->loader->load($file->url());
         $this->assertEquals('bar', $actual['foo']);

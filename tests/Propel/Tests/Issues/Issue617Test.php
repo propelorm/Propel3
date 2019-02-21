@@ -54,29 +54,29 @@ class Issue617Test extends PlatformDatabaseBuildTimeBase
          */
         $schema = '
 <database name="bookstore" identifierQuoting="true">
-<table name="issue617_user">
+<entity name="issue617_user">
   <vendor type="mysql">
     <parameter name="Engine" value="InnoDB"/>
     <parameter name="Charset" value="utf8"/>
   </vendor>
-  <column name="id" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
-  <column name="full_name" type="VARCHAR" size="50" required="true" />
+  <field name="id" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+  <field name="full_name" type="VARCHAR" size="50" required="true" />
 
   <!-- this column (and FK) will be removed from schema, but not from DB on migrate -->
-  <column name="group_id" type="INTEGER" />
+  <field name="group_id" type="INTEGER" />
   <foreign-key foreignTable="issue617_group" onDelete="setnull">
     <reference local="group_id" foreign="id" />
   </foreign-key>
-</table>
+</entity>
 
-<table name="issue617_group">
+<entity name="issue617_group">
   <vendor type="mysql">
     <parameter name="Engine" value="InnoDB"/>
     <parameter name="Charset" value="utf8"/>
   </vendor>
-  <column name="id" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
-  <column name="name" type="VARCHAR" size="50" required="true" />
-</table>
+  <field name="id" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+  <field name="name" type="VARCHAR" size="50" required="true" />
+</entity>
 </database>
 ';
 
@@ -123,23 +123,23 @@ CREATE TABLE `issue617_group`
         $this->readDatabase();
         $updatedSchema = '
 <database name="reverse-bookstore" identifierQuoting="true">
-<table name="issue617_user">
+<entity name="issue617_user">
   <vendor type="mysql">
     <parameter name="Engine" value="InnoDB"/>
     <parameter name="Charset" value="utf8"/>
   </vendor>
-  <column name="id" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
-  <column name="full_name" type="VARCHAR" size="50" required="true" />
-</table>
+  <field name="id" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+  <field name="full_name" type="VARCHAR" size="50" required="true" />
+</entity>
 
-<table name="issue617_group">
+<entity name="issue617_group">
   <vendor type="mysql">
     <parameter name="Engine" value="InnoDB"/>
     <parameter name="Charset" value="utf8"/>
   </vendor>
-  <column name="id" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
-  <column name="name" type="VARCHAR" size="50" required="true" />
-</table>
+  <field name="id" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+  <field name="name" type="VARCHAR" size="50" required="true" />
+</entity>
 </database>
 ';
 

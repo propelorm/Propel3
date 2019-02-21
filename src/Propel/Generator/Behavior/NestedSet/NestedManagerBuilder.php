@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,6 +6,8 @@
  *
  * @license MIT License
  */
+
+declare(strict_types=1);
 
 namespace Propel\Generator\Behavior\NestedSet;
 
@@ -35,7 +36,7 @@ class NestedManagerBuilder extends AbstractBuilder
         return parent::getFullClassName($injectNamespace, $classPrefix) . 'NestedManager';
     }
 
-    public function buildClass()
+    public function buildClass(): void
     {
         $behavior = $this->getEntity()->getBehavior('nested_set');
         $this->getDefinition()->addInterface('\Propel\Runtime\EntityManager\NestedManagerInterface');

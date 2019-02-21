@@ -10,19 +10,21 @@
 
 namespace Propel\Tests\Common\Config\Loader;
 
-use org\bovigo\vfs\vfsStream;
 use Propel\Common\Config\Loader\IniFileLoader;
 use Propel\Common\Config\FileLocator;
-use Propel\Tests\Common\Config\ConfigTestCase;
+use Propel\Tests\TestCase;
+use Propel\Tests\VfsTrait;
 
-class IniFileLoaderTest extends ConfigTestCase
+class IniFileLoaderTest extends TestCase
 {
+    use VfsTrait;
+
     /** @var  IniFileLoader */
     protected $loader;
 
     public function setUp()
     {
-        parent::setup();
+        parent::setUp();
         $this->loader = new IniFileLoader(new FileLocator([$this->getRoot()->url()]));
     }
 
@@ -43,7 +45,7 @@ class IniFileLoaderTest extends ConfigTestCase
 foo = bar
 bar = baz
 EOF;
-        $file = vfsStream::newFile('parameters.ini')->at($this->getRoot())->setContent($content);
+        $file = $this->newFile('parameters.ini', $content);
 
         $test = $this->loader->load($file->url());
         $this->assertEquals('bar', $test['foo']);
@@ -70,14 +72,14 @@ EOF;
 only plain
 text
 EOF;
-        $file = vfsStream::newFile('nonvalid.ini')->at($this->getRoot())->setContent($content);
+        $file = $this->newFile('nonvalid.ini', $content);
 
         @$this->loader->load($file->url());
     }
 
     public function testIniFileIsEmpty()
     {
-        $file = vfsStream::newFile('empty.ini')->at($this->getRoot())->setContent('');
+        $file = $this->newFile('empty.ini', '');
 
         $actual = $this->loader->load($file->url());
 
@@ -94,7 +96,7 @@ Donald[]     = Dewey
 Donald[]     = Louie
 Mickey[love] = Minnie
 EOF;
-        $file = vfsStream::newFile('section.ini')->at($this->getRoot())->setContent($content);
+        $file = $this->newFile('section.ini', $content);
         $actual = $this->loader->load($file->url());
 
         $this->assertEquals('Pluto', $actual['Cartoons']['Dog']);
@@ -112,7 +114,7 @@ foo.bar.babaz = foobabar
 bla.foo       = blafoo
 bla.bar       = blabar
 EOF;
-        $file= vfsStream::newFile('nested.ini')->at($this->getRoot())->setContent($content);
+        $file = $this->newFile('nested.ini', $content);
         $actual = $this->loader->load($file->url());
 
         $this->assertEquals('foobar', $actual['foo']['bar']['baz']);
@@ -130,7 +132,7 @@ bla.foo.baz[] = foobaz1
 bla.foo.baz[] = foobaz2
 
 EOF;
-        $file = vfsStream::newFile('mixnested.ini')->at($this->getRoot())->setContent($content);
+        $file = $this->newFile('mixnested.ini', $content);
         $actual = $this->loader->load($file->url());
 
         $this->assertEquals('foobar', $actual['bla']['foo']['bar']);
@@ -149,7 +151,7 @@ EOF;
 foo = bar
 bar = baz
 EOF;
-        $file = vfsStream::newFile('notreadable.ini', 000)->at($this->getRoot())->setContent($content);
+        $file = $this->newFile('notreadable.ini', $content)->chmod(200);
 
         $actual = $this->loader->load($file->url());
         $this->assertEquals('bar', $actual['foo']);

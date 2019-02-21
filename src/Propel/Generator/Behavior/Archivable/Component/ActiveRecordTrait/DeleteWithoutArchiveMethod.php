@@ -8,6 +8,8 @@
  *
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Behavior\Archivable\Component\ActiveRecordTrait;
 
 use Propel\Generator\Behavior\Archivable\ArchivableBehavior;

@@ -10,20 +10,22 @@
 
 namespace Propel\Tests\Common\Config\Loader;
 
-use org\bovigo\vfs\vfsStream;
 use Propel\Common\Config\Loader\JsonFileLoader;
 use Propel\Common\Config\FileLocator;
-use Propel\Tests\Common\Config\ConfigTestCase;
+use Propel\Tests\TestCase;
+use Propel\Tests\VfsTrait;
 
-class JsonFileLoaderTest extends ConfigTestCase
+class JsonFileLoaderTest extends TestCase
 {
+    use VfsTrait;
+    
     /** @var JsonFileLoader */
     protected $loader;
 
     public function setUp()
     {
         parent::setUp();
-        $this->loader = new JsonFileLoader(new FileLocator([sys_get_temp_dir()]));
+        $this->loader = new JsonFileLoader(new FileLocator([$this->getRoot()->url()]));
     }
 
     public function testSupports()
@@ -42,7 +44,7 @@ class JsonFileLoaderTest extends ConfigTestCase
   "bar": "baz"
 }
 EOF;
-        $file = vfsStream::newFile('parameters.json')->at($this->getRoot())->setContent($content);
+        $file = $this->newFile('parameters.json', $content);
 
         $actual = $this->loader->load($file->url());
         $this->assertEquals('bar', $actual['foo']);
@@ -68,14 +70,14 @@ not json content
 only plain
 text
 EOF;
-        $file = vfsStream::newFile('nonvalid.json')->at($this->getRoot())->setContent($content);
+        $file = $this->newFile('nonvalid.json', $content);
 
         $this->loader->load($file->url());
     }
 
     public function testJsonFileIsEmpty()
     {
-        $file = vfsStream::newFile('empty.json')->at($this->getRoot())->setContent('');
+        $file = $this->newFile('empty.json', '');
 
         $actual = $this->loader->load($file->url());
 
@@ -94,7 +96,7 @@ EOF;
   "bar": "baz"
 }
 EOF;
-        $file = vfsStream::newFile('notreadable.json', 200)->at($this->getRoot())->setContent($content);
+        $file = $this->newFile('notreadable.json', $content)->chmod(200);
 
         $actual = $this->loader->load($file->url());
 

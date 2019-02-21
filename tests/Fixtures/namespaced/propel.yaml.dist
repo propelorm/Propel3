@@ -23,7 +23,6 @@ propel:
     defaultConnection: bookstore_namespaced
     connections:
       - bookstore_namespaced
-    targetPackage: bookstore
 
   runtime:
     defaultConnection: bookstore_namespaced

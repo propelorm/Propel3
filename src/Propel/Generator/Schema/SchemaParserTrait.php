@@ -79,8 +79,6 @@ trait SchemaParserTrait
             $this->addVendor($entity, $entityObj);
             $this->addIdMethodParameter($entity, $entityObj);
         }
-
-        //$this->addReferrers($database);
     }
 
     /**
@@ -130,7 +128,7 @@ trait SchemaParserTrait
             foreach ($index['index-fields'] as $indexField) {
                 $field = $entity->getField($indexField['name']);
                 if (isset($indexField['size'])) {
-                    $field->setSize($indexField['size']);
+                    $index->getFieldSizes()->set($field->getName(), $indexField['size']);
                 }
                 $indexObj->addField($field);
             }
@@ -235,11 +233,11 @@ trait SchemaParserTrait
      */
     private function addIdMethodParameter(array $attributes, Entity $entity): void
     {
-        if (!isset($attributes['id-method-parameter'])) {
+        if (!isset($attributes['id_method_parameter'])) {
             return;
         }
 
-        $idObj = $this->getModelFactory()->createIdMethodParameter($attributes['id-method-parameter']);
+        $idObj = $this->getModelFactory()->createIdMethodParameter($attributes['id_method_parameter']);
         $entity->addIdMethodParameter($idObj);
     }
 

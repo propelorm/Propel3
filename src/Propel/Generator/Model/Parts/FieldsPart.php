@@ -29,6 +29,11 @@ trait FieldsPart
      */
     protected $fields;
 
+    public function initFields()
+    {
+        $this->fields =new Set([], Field::class);
+    }
+
     /**
      * Return the Field object with the given name.
      *

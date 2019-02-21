@@ -236,13 +236,16 @@ class QuickBuilder
     ): Configuration
     {
         if (null === $dsn) {
-            $sqliteFile = 'latest_quickbuilder_sqlite.db';
-            $reflection = new \ReflectionClass('\Propel\Tests\TestCase');
-            $sqliteFile = realpath(dirname($reflection->getFileName()) . '/../../') . '/' . $sqliteFile;
-            if (file_exists($sqliteFile)) {
-                unlink($sqliteFile);
+            $dsn = 'sqlite::memory:';
+            if (strtolower(getenv('SQLITE_DB')) !== 'memory') {
+                $sqliteFile = 'latest_quickbuilder_sqlite.db';
+                $reflection = new \ReflectionClass('\Propel\Tests\TestCase');
+                $sqliteFile = realpath(dirname($reflection->getFileName()) . '/../../') . '/' . $sqliteFile;
+                if (file_exists($sqliteFile)) {
+                    unlink($sqliteFile);
+                }
+                $dsn = 'sqlite:' . $sqliteFile;
             }
-            $dsn = 'sqlite:' . $sqliteFile;
         }
         if (null === $adapter) {
             $adapter = new SqliteAdapter();

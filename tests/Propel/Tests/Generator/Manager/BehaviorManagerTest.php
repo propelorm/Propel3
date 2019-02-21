@@ -1,17 +1,19 @@
 <?php
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * @license MIT License
+ *
  */
 
-namespace Propel\Tests\Generator\Behavior;
+declare(strict_types=1);
 
+namespace Propel\Tests\Generator\Manager;
+
+use Propel\Generator\Manager\BehaviorManager;
 use Propel\Tests\TestCase;
-use Propel\Generator\Util\BehaviorLocator;
 use Propel\Generator\Config\QuickGeneratorConfig;
 
 /**
@@ -19,7 +21,7 @@ use Propel\Generator\Config\QuickGeneratorConfig;
  *
  * @author Thomas Gossmann
  */
-class BehaviorLocatorTest extends TestCase
+class BehaviorManagerTest extends TestCase
 {
     protected function setUp()
     {
@@ -28,37 +30,37 @@ class BehaviorLocatorTest extends TestCase
         require_once(__DIR__ . '/../../../../Fixtures/behavior-development/src/CollectionBehavior.php');
     }
 
-    public function testBehaviorLocatorWithComposerLock()
+    public function testBehaviorManagerWithComposerLock()
     {
         $configOptions['propel']['paths']['composerDir'] = __DIR__ . '/../../../../Fixtures/behavior-installer';
         $config = new QuickGeneratorConfig($configOptions);
-        $locator = new BehaviorLocator($config);
+        $manager = new BehaviorManager($config);
         
         // test found behaviors
-        $behaviors = $locator->getBehaviors();
+        $behaviors = $manager->getBehaviors();
         $this->assertSame(1, count($behaviors));
         
         $this->assertTrue(array_key_exists('l10n', $behaviors));
         $this->assertSame('gossi/propel-l10n-behavior', $behaviors['l10n']['package']);
         
         // test class name
-        $this->assertSame('\\gossi\\propel\\behavior\\l10n\\L10nBehavior', $locator->getBehavior('l10n'));
+        $this->assertSame('\\gossi\\propel\\behavior\\l10n\\L10nBehavior', $manager->getClassname('l10n'));
     }
     
-    public function testBehaviorLocatorWithComposerJson()
+    public function testBehaviorManagerWithComposerJson()
     {
         $configOptions['propel']['paths']['composerDir'] = __DIR__ . '/../../../../Fixtures/behavior-development';
         $config = new QuickGeneratorConfig($configOptions);
-        $locator = new BehaviorLocator($config);
+        $manager = new BehaviorManager($config);
     
         // test found behaviors
-        $behaviors = $locator->getBehaviors();
+        $behaviors = $manager->getBehaviors();
         $this->assertSame(1, count($behaviors));
     
         $this->assertTrue(array_key_exists('collection', $behaviors));
         $this->assertSame('propel/collection-behavior', $behaviors['collection']['package']);
     
         // test class name
-        $this->assertSame('\\Propel\\Behavior\\Collection\\CollectionBehavior', $locator->getBehavior('collection'));
+        $this->assertSame('\\Propel\\Behavior\\Collection\\CollectionBehavior', $manager->getClassname('collection'));
     }
 }

@@ -30,7 +30,7 @@ if (null === \$alias) {";
         foreach ($this->getEntity()->getFields() as $field) {
             if (!$field->isLazyLoad()) {
                 $body .= "
-    \$criteria->addSelectField({$field->getFQConstantName()});";
+    \$criteria->addSelectField({$field->getFullConstantName()});";
             }
         }
 

@@ -70,14 +70,13 @@ class XmlDumper implements DumperInterface
      * Dumps a single Schema model into an XML formatted version.
      *
      * @param  Schema  $schema                The schema object
-     * @param  boolean $doFinalInitialization Whether or not to validate the schema
      * @return string
      */
-    public function dumpSchema(Schema $schema, $doFinalInitialization = true)
+    public function dumpSchema(Schema $schema)
     {
         $rootNode = $this->document->createElement('app-data');
         $this->document->appendChild($rootNode);
-        foreach ($schema->getDatabases($doFinalInitialization) as $database) {
+        foreach ($schema->getDatabases() as $database) {
             $this->appendDatabaseNode($database, $rootNode);
         }
 
@@ -94,13 +93,9 @@ class XmlDumper implements DumperInterface
     {
         $databaseNode = $parentNode->appendChild($this->document->createElement('database'));
         $databaseNode->setAttribute('name', $database->getName());
-        $databaseNode->setAttribute('defaultIdMethod', $database->getDefaultIdMethod());
+        $databaseNode->setAttribute('defaultIdMethod', $database->getIdMethod());
 
-        if ($package = $database->getPackage()) {
-            $databaseNode->setAttribute('package', $package);
-        }
-
-        if ($schema = $database->getSchema()) {
+        if ($schema = $database->getSchemaName()) {
             $databaseNode->setAttribute('schema', $schema);
         }
 
@@ -108,27 +103,23 @@ class XmlDumper implements DumperInterface
             $databaseNode->setAttribute('namespace', $namespace);
         }
 
-        $defaultAccessorVisibility = $database->getDefaultAccessorVisibility();
-        if ($defaultAccessorVisibility !== Database::VISIBILITY_PUBLIC) {
+        $defaultAccessorVisibility = $database->getAccessorVisibility();
+        if ($defaultAccessorVisibility !== Model::VISIBILITY_PUBLIC) {
             $databaseNode->setAttribute('defaultAccessorVisibility', $defaultAccessorVisibility);
         }
 
-        $defaultMutatorVisibility = $database->getDefaultMutatorVisibility();
-        if ($defaultMutatorVisibility !== Database::VISIBILITY_PUBLIC) {
+        $defaultMutatorVisibility = $database->getMutatorVisibility();
+        if ($defaultMutatorVisibility !== Model::VISIBILITY_PUBLIC) {
             $databaseNode->setAttribute('defaultMutatorVisibility', $defaultMutatorVisibility);
         }
 
         $defaultStringFormat = $database->getStringFormat();
-        if (Database::DEFAULT_STRING_FORMAT !== $defaultStringFormat) {
+        if (Model::DEFAULT_STRING_FORMAT !== $defaultStringFormat) {
             $databaseNode->setAttribute('defaultStringFormat', $defaultStringFormat);
         }
 
         if ($database->isHeavyIndexing()) {
             $databaseNode->setAttribute('heavyIndexing', 'true');
-        }
-
-        if ($tablePrefix = $database->getTablePrefix()) {
-            $databaseNode->setAttribute('tablePrefix', $tablePrefix);
         }
 
         /*
@@ -140,7 +131,7 @@ class XmlDumper implements DumperInterface
                 $this->appendDomainNode($databaseNode);
             }
          */
-        foreach ($database->getVendorInformation() as $vendorInformation) {
+        foreach ($database->getVendor() as $vendorInformation) {
             $this->appendVendorInformationNode($vendorInformation, $databaseNode);
         }
 
@@ -157,6 +148,11 @@ class XmlDumper implements DumperInterface
      */
     private function appendVendorInformationNode(Vendor $vendorInfo, \DOMNode $parentNode)
     {
+        //It's an empty Vendor created by VendorPart::getVendorByType method
+        if ([] === $vendorInfo->getParameters()) {
+            return;
+        }
+
         $vendorNode = $parentNode->appendChild($this->document->createElement('vendor'));
         $vendorNode->setAttribute('type', $vendorInfo->getType());
 
@@ -180,22 +176,17 @@ class XmlDumper implements DumperInterface
         $entityNode->setAttribute('name', $entity->getName());
 
         $database = $entity->getDatabase();
-        $schema = $entity->getSchema();
-        if ($schema && $schema !== $database->getSchema()) {
+        $schema = $entity->getSchemaName();
+        if ($schema && $schema !== $database->getSchemaName()) {
             $entityNode->setAttribute('schema', $schema);
         }
 
-        if (Model::ID_METHOD_NONE !== ($idMethod = $entity->getIdMethod())) {
+        if (Model::ID_METHOD_NATIVE !== ($idMethod = $entity->getIdMethod())) {
             $entityNode->setAttribute('idMethod', $idMethod);
         }
 
-        if ($tableName = $entity->getCommonTableName()) {
+        if ($tableName = $entity->getTableName()) {
             $entityNode->setAttribute('tableName', $tableName);
-        }
-
-        $package = $entity->getPackage();
-        if ($package && !$entity->isPackageOverriden()) {
-            $entityNode->setAttribute('package', $package);
         }
 
         if ($namespace = $entity->getNamespace()) {
@@ -222,7 +213,7 @@ class XmlDumper implements DumperInterface
             $entityNode->setAttribute('reloadOnUpdate', 'true');
         }
 
-        if (null !== ($referenceOnly = $entity->isForReferenceOnly())) {
+        if ($referenceOnly = $entity->isForReferenceOnly()) {
             $entityNode->setAttribute('forReferenceOnly', $referenceOnly ? 'true' : 'false');
         }
 
@@ -235,17 +226,17 @@ class XmlDumper implements DumperInterface
         }
 
         $defaultStringFormat = $entity->getStringFormat();
-        if (Entity::DEFAULT_STRING_FORMAT !== $defaultStringFormat) {
+        if (Model::DEFAULT_STRING_FORMAT !== $defaultStringFormat) {
             $entityNode->setAttribute('defaultStringFormat', $defaultStringFormat);
         }
 
-        $defaultAccessorVisibility = $entity->getDefaultAccessorVisibility();
-        if ($defaultAccessorVisibility !== Entity::VISIBILITY_PUBLIC) {
+        $defaultAccessorVisibility = $entity->getAccessorVisibility();
+        if ($defaultAccessorVisibility !== Model::VISIBILITY_PUBLIC) {
             $entityNode->setAttribute('defaultAccessorVisibility', $defaultAccessorVisibility);
         }
 
-        $defaultMutatorVisibility = $entity->getDefaultMutatorVisibility();
-        if ($defaultMutatorVisibility !== Entity::VISIBILITY_PUBLIC) {
+        $defaultMutatorVisibility = $entity->getMutatorVisibility();
+        if ($defaultMutatorVisibility !== Model::VISIBILITY_PUBLIC) {
             $entityNode->setAttribute('defaultMutatorVisibility', $defaultMutatorVisibility);
         }
 
@@ -269,7 +260,7 @@ class XmlDumper implements DumperInterface
             $this->appendUniqueIndexNode($index, $entityNode);
         }
 
-        foreach ($entity->getVendorInformation() as $vendorInformation) {
+        foreach ($entity->getVendor() as $vendorInformation) {
             $this->appendVendorInformationNode($vendorInformation, $entityNode);
         }
 
@@ -296,7 +287,7 @@ class XmlDumper implements DumperInterface
         foreach ($behavior->getParameters() as $name => $value) {
             $parameterNode = $behaviorNode->appendChild($this->document->createElement('parameter'));
             $parameterNode->setAttribute('name', $name);
-            $parameterNode->setAttribute('value', $value);
+            $parameterNode->setAttribute('value', is_bool($value) ? (true === $value ? 'true' : 'false') : $value);
         }
     }
 
@@ -311,10 +302,6 @@ class XmlDumper implements DumperInterface
         $fieldNode = $parentNode->appendChild($this->document->createElement('field'));
         $fieldNode->setAttribute('name', $field->getName());
 
-        if ($columnName = $field->getColumnName()) {
-            $fieldNode->setAttribute('columnName', $columnName);
-        }
-
         $fieldNode->setAttribute('type', $field->getType());
 
         $domain = $field->getDomain();
@@ -327,8 +314,8 @@ class XmlDumper implements DumperInterface
         }
 
         $platform = $field->getPlatform();
-        if ($platform && !$field->isDefaultSqlType($platform)) {
-            $fieldNode->setAttribute('sqlType', $domain->getSqlType());
+        if (!$field->isDefaultSqlType($platform)) {
+            $fieldNode->setAttribute('sqlType', $platform->getDomainForType($field->getType())->getSqlType());
         }
 
         if ($description = $field->getDescription()) {
@@ -360,14 +347,7 @@ class XmlDumper implements DumperInterface
             }
         }
 
-        if ($field->isNodeKey()) {
-            $fieldNode->setAttribute('nodeKey', 'true');
-            if ($nodeKeySeparator = $field->getNodeKeySep()) {
-                $fieldNode->setAttribute('nodeKeySep', $nodeKeySeparator);
-            }
-        }
-
-        foreach ($field->getVendorInformation() as $vendorInformation) {
+        foreach ($field->getVendor() as $vendorInformation) {
             $this->appendVendorInformationNode($vendorInformation, $fieldNode);
         }
     }
@@ -397,7 +377,7 @@ class XmlDumper implements DumperInterface
      */
     private function appendRelationNode(Relation $relation, \DOMNode $parentNode)
     {
-        $relationNode = $parentNode->appendChild($this->document->createElement('foreign-key'));
+        $relationNode = $parentNode->appendChild($this->document->createElement('relation'));
         $relationNode->setAttribute('target', $relation->getForeignEntityName());
 
         if ($relation->hasName()) {
@@ -421,13 +401,13 @@ class XmlDumper implements DumperInterface
             $relationNode->setAttribute('onUpdate', $onUpdateBehavior);
         }
 
-        for ($i = 0, $size = count($relation->getLocalFields()); $i < $size; $i++) {
+        for ($i = 0, $size = $relation->getLocalFields()->size(); $i < $size; $i++) {
             $refNode = $relationNode->appendChild($this->document->createElement('reference'));
-            $refNode->setAttribute('local', $relation->getLocalFieldName($i));
+            $refNode->setAttribute('local', $relation->getLocalField($i)->getName());
             $refNode->setAttribute('foreign', $relation->getForeignFields()->get($i));
         }
 
-        foreach ($relation->getVendorInformation() as $vendorInformation) {
+        foreach ($relation->getVendor() as $vendorInformation) {
             $this->appendVendorInformationNode($vendorInformation, $relationNode);
         }
     }
@@ -441,9 +421,6 @@ class XmlDumper implements DumperInterface
     private function appendIdMethodParameterNode(IdMethodParameter $parameter, \DOMNode $parentNode)
     {
         $idMethodParameterNode = $parentNode->appendChild($this->document->createElement('id-method-parameter'));
-        if ($name = $parameter->getName()) {
-            $idMethodParameterNode->setAttribute('name', $name);
-        }
         $idMethodParameterNode->setAttribute('value', $parameter->getValue());
     }
 
@@ -461,7 +438,7 @@ class XmlDumper implements DumperInterface
     /**
      * Appends the generated <unique> XML node to its parent node.
      *
-     * @param Unique   $unique     The Unique model instance
+     * @param Unique   $index     The Unique model instance
      * @param \DOMNode $parentNode The parent DOMNode object
      */
     private function appendUniqueIndexNode(Unique $index, \DOMNode $parentNode)
@@ -481,16 +458,16 @@ class XmlDumper implements DumperInterface
         $indexNode = $parentNode->appendChild($this->document->createElement($nodeType));
         $indexNode->setAttribute('name', $index->getName());
 
-        foreach ($index->getFields() as $fieldName) {
+        foreach ($index->getFields() as $field) {
             $indexFieldNode = $indexNode->appendChild($this->document->createElement($nodeType.'-field'));
-            $indexFieldNode->setAttribute('name', $fieldName);
+            $indexFieldNode->setAttribute('name', $field->getName());
 
-            if ($size = $index->getFieldSize($fieldName)) {
+            if ($size = $index->getFieldSizes()->get($field->getName())) {
                 $indexFieldNode->setAttribute('size', $size);
             }
         }
 
-        foreach ($index->getVendorInformation() as $vendorInformation) {
+        foreach ($index->getVendor() as $vendorInformation) {
             $this->appendVendorInformationNode($vendorInformation, $indexNode);
         }
     }

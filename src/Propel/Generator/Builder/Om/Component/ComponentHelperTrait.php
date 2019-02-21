@@ -64,7 +64,7 @@ trait ComponentHelperTrait
                     sprintf(
                         'Unable to parse default temporal value "%s" for column "%s"',
                         $field->getDefaultValueString(),
-                        $field->getFullyQualifiedName()
+                        $field->getFullName()
                     ),
                     0,
                     $exception
@@ -84,7 +84,7 @@ trait ComponentHelperTrait
         } elseif ($field->isPhpArrayType()) {
             $defaultValue = $val;
         } else {
-            throw new EngineException("Cannot get default value string for " . $field->getFullyQualifiedName());
+            throw new EngineException("Cannot get default value string for " . $field->getFullName());
         }
 
         return $defaultValue;

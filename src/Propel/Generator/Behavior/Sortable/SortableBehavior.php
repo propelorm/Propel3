@@ -175,9 +175,9 @@ class SortableBehavior extends Behavior
         $this->applyComponent('ActiveRecordTrait\UseStatements', $builder);
     }
 
-    public function useScope()
+    public function useScope(): bool
     {
-        return 'true' === $this->getParameter('use_scope');
+        return true === $this->getParameter('use_scope');
     }
 
     /**
@@ -186,7 +186,7 @@ class SortableBehavior extends Behavior
      *
      * @return array ($methodSignature, $scopeBuilder, $buildScopeVars)
      */
-    public function generateScopePhp()
+    public function generateScopePhp(): array
     {
         $methodSignature = [];
         $buildScope      = '';
@@ -251,7 +251,7 @@ class SortableBehavior extends Behavior
      *
      * @return string[]
      */
-    public function getScopes()
+    public function getScopes(): array
     {
         return $this->getParameter('scope_field')
             ? explode(',', str_replace(' ', '', trim($this->getParameter('scope_field'))))
@@ -263,7 +263,7 @@ class SortableBehavior extends Behavior
      *
      * @return bool
      */
-    public function hasMultipleScopes()
+    public function hasMultipleScopes(): bool
     {
         return count($this->getScopes()) > 1;
     }

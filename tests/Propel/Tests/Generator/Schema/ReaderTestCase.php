@@ -11,10 +11,14 @@
 namespace Propel\Tests\Generator\Schema;
 
 use org\bovigo\vfs\vfsStream;
-use Propel\Tests\VfsTestCase;
+use org\bovigo\vfs\visitor\vfsStreamPrintVisitor;
+use Propel\Tests\TestCase;
+use Propel\Tests\VfsTrait;
 
-class ReaderTestCase extends VfsTestCase
+class ReaderTestCase extends TestCase
 {
+    use VfsTrait;
+
     protected function addJsonSchema(): void
     {
         $content = <<<EOF
@@ -118,7 +122,7 @@ class ReaderTestCase extends VfsTestCase
   }
 }
 EOF;
-        vfsStream::newFile('schema.json')->at($this->getRoot())->setContent($content);
+        $this->newFile('schema.json', $content);
     }
 
     protected function addPhpSchema(): void
@@ -226,7 +230,7 @@ return [
   ]
 ];
 EOF;
-        vfsStream::newFile('schema.php')->at($this->getRoot())->setContent($content);
+        $this->newFile('schema.php', $content);
     }
 
     protected function addXmlSchema(): void
@@ -257,7 +261,7 @@ EOF;
 </database>
 XML;
 
-        vfsStream::newFile('schema.xml')->at($this->getRoot())->setContent($content);
+        $this->newFile('schema.xml', $content);
     }
 
     protected function addYamlSchema()
@@ -338,7 +342,7 @@ database:
                     size: 128
 YML;
 
-        vfsStream::newFile('schema.yaml')->at($this->getRoot())->setContent($content);
+        $this->newFile('schema.yaml', $content);
     }
 
     public function addExternalSchemas()
@@ -357,8 +361,7 @@ YML;
   </entity>
 </database>
 XML;
-        vfsStream::newFile('book.schema.xml')->at($this->getRoot())->setContent($content);
-        $dir = vfsStream::newDirectory('external')->at($this->getRoot());
+        $this->newFile('book.schema.xml', $content);
 
         $externalAuthor = <<<XML
 <database name="bookstore">
@@ -370,7 +373,7 @@ XML;
    </entity>
 </database>
 XML;
-        vfsStream::newFile('author.schema.xml')->at($dir)->setContent($externalAuthor);
+        $this->newFile('external/author.schema.xml', $externalAuthor);
 
         $externalPublisher = <<<XML
 <database name="bookstore">
@@ -380,6 +383,6 @@ XML;
   </entity>
 </database>
 XML;
-        vfsStream::newFile('publisher.schema.xml')->at($dir)->setContent($externalPublisher);
+        $this->newFile('external/publisher.schema.xml', $externalPublisher);
     }
 }

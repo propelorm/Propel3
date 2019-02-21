@@ -209,16 +209,15 @@ class EntityTest extends ModelTestCase
     public function testGetNameWithPlatform($supportsSchemas, $schemaName, $expectedName)
     {
         $platform = $this->getPlatformMock($supportsSchemas);
-
-        $database = $this->getDatabaseMock($schemaName, [
-            'platform' => $platform,
-        ]);
-
         $platform
             ->expects($supportsSchemas ? $this->once() : $this->never())
             ->method('getSchemaDelimiter')
             ->will($this->returnValue('.'))
         ;
+
+        $database = $this->getDatabaseMock($schemaName, [
+            'platform' => $platform,
+        ]);
 
         $schema = $this->getSchemaMock($schemaName);
         $database
@@ -227,6 +226,9 @@ class EntityTest extends ModelTestCase
         ;
 
         $entity = new Entity('books');
+        if ($supportsSchemas) {
+            $entity->setSchemaName($schemaName);
+        }
         $entity->setDatabase($database);
         $entity->getDatabase()->setSchema($schema);
 
@@ -876,11 +878,11 @@ class EntityTest extends ModelTestCase
     {
         $entity = new Entity('books');
 
-        $this->assertFalse($entity->getIsCrossRef());
+        $this->assertFalse($entity->isCrossRef());
         $this->assertFalse($entity->isCrossRef());
 
-        $entity->setIsCrossRef(true);
-        $this->assertTrue($entity->getIsCrossRef());
+        $entity->setCrossRef(true);
+        $this->assertTrue($entity->isCrossRef());
         $this->assertTrue($entity->isCrossRef());
     }
 

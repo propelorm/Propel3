@@ -30,11 +30,9 @@ class SqlBuildCommand extends AbstractCommand
         $this
             ->addOption('mysql-engine', null, InputOption::VALUE_REQUIRED, 'MySQL engine (MyISAM, InnoDB, ...)')
             ->addOption('output-dir', null, InputOption::VALUE_REQUIRED, 'The output directory')
-            ->addOption('validate', null, InputOption::VALUE_NONE, '')
             ->addOption('connection', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Connection to use', [])
             ->addOption('schema-name', null, InputOption::VALUE_REQUIRED, 'The schema name for RDBMS supporting them', '')
             //->addOption('encoding',     null, InputOption::VALUE_REQUIRED,  'The encoding to use for the database')
-            ->addOption('table-prefix', null, InputOption::VALUE_REQUIRED, 'Add a prefix to all the table names in the database', '')
             ->setName('sql:build')
             ->setAliases(['sql'])
             ->setDescription('Build SQL files')
@@ -87,7 +85,6 @@ class SqlBuildCommand extends AbstractCommand
         }
         $manager->setConnections($connections);
 
-        $manager->setValidate($input->getOption('validate'));
         $manager->setGeneratorConfig($generatorConfig);
         $manager->setSchemas($this->getSchemas($generatorConfig->getSection('paths')['schemaDir'], $input->getOption('recursive')));
         $manager->setLoggerClosure(function ($message) use ($input, $output) {

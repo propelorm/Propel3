@@ -121,7 +121,7 @@ class InitCommandTest extends TestCaseFixtures
             $distContent
         );
 
-        $stubContent = '<table name="book" phpName="Book">
+        $stubContent = '<entity name="book" phpName="Book">
         <!--
             Each column has a `name` (the one used by the database), and an optional `phpName` attribute. Once again,
             the Propel default behavior is to use a CamelCase version of the name as `phpName` when not specified.
@@ -141,11 +141,11 @@ class InitCommandTest extends TestCaseFixtures
             As for the other column attributes, `required`, `primaryKey`, and `autoIncrement`, they mean exactly
             what their names imply.
         -->
-        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
-        <column name="title" type="varchar" size="255" required="true"/>
-        <column name="isbn" type="varchar" size="24" required="true" phpName="ISBN"/>
-        <column name="publisher_id" type="integer" required="true"/>
-        <column name="author_id" type="integer" required="true"/>
+        <field name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <field name="title" type="varchar" size="255" required="true"/>
+        <field name="isbn" type="varchar" size="24" required="true" phpName="ISBN"/>
+        <field name="publisher_id" type="integer" required="true"/>
+        <field name="author_id" type="integer" required="true"/>
 
         <!--
             A foreign key represents a relationship. Just like a table or a column, a relationship has a `phpName`.
@@ -159,7 +159,7 @@ class InitCommandTest extends TestCaseFixtures
         <foreign-key foreignTable="author">
             <reference local="author_id" foreign="id"/>
         </foreign-key>
-    </table>';
+    </entity>';
 
         $this->assertContains($stubContent, file_get_contents($this->tempDir . '/schema.xml'), 'schema.xml file contains some stub content.');
     }

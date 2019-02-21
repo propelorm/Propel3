@@ -75,7 +75,7 @@ class PgsqlSchemaParserTest extends TestCaseFixturesDatabase
 
         // make sure our DDL insert produced exactly the SQL we inserted
         $this->assertGreaterThanOrEqual(1, $parser->parse($database), 'We parsed at least one table.');
-        $table = $database->getEntity('foo');
+        $table = $database->getEntityByName('foo');
         $columns = $table->getFields();
         $this->assertEquals(1, count($columns));
 

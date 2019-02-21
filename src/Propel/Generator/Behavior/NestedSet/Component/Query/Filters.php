@@ -7,6 +7,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Behavior\NestedSet\Component\Query;
 
 use Propel\Generator\Builder\Om\Component\BuildComponent;
@@ -134,7 +136,7 @@ if (\$manager->isRoot({$objectName})) {
         $this->addMethod('siblingsOf')
             ->setDescription("Filter the query to restrict the result to children of an object")
             ->setType("\$this|{$this->getQueryClassName()}", "The current query, for fluid interface")
-            ->addSimpleDescParameter(namingTool::toCamelCase($this->getEntity()->getName()), $this->getObjectClassName(), "The object to use for sibling search")
+            ->addSimpleDescParameter(NamingTool::toCamelCase($this->getEntity()->getName()), $this->getObjectClassName(), "The object to use for sibling search")
             ->addSimpleDescParameter('con', 'ConnectionInterface', 'Connection to use', null)
             ->setBody($body)
         ;
@@ -144,7 +146,7 @@ if (\$manager->isRoot({$objectName})) {
     {
         $entityMapClassName = $this->getEntityMapClassName();
         $objectClassName = $this->getObjectClassName();
-        $objectName = '$' . namingTool::toCamelCase($this->getEntity()->getName());
+        $objectName = '$' . NamingTool::toCamelCase($this->getEntity()->getName());
 
         $body = "
 return \$this";
@@ -159,7 +161,7 @@ return \$this";
         $this->addMethod('ancestorsOf')
             ->setDescription("Filter the query to restrict the result to ancestors of an object")
             ->setType("\$this|{$this->getQueryClassName()}", "The current query, for fluid interface")
-            ->addSimpleDescParameter(namingTool::toCamelCase($this->getEntity()->getName()), $objectClassName, "The object to use for ancestor search")
+            ->addSimpleDescParameter(NamingTool::toCamelCase($this->getEntity()->getName()), $objectClassName, "The object to use for ancestor search")
             ->setBody($body)
         ;
     }
@@ -168,7 +170,7 @@ return \$this";
     {
         $entityMapClassName = $this->getEntityMapClassName();
         $objectClassName = $this->getObjectClassName();
-        $objectName = '$' . namingTool::toCamelCase($this->getEntity()->getName());
+        $objectName = '$' . NamingTool::toCamelCase($this->getEntity()->getName());
         $body = "
 return \$this";
         if ($this->getBehavior()->useScope()) {
@@ -183,7 +185,7 @@ return \$this";
             ->setDescription("Filter the query to restrict the result to roots of an object.
 Same as ancestorsOf(), except that it includes the object passed as parameter in the result")
             ->setType("\$this|{$this->getQueryClassName()}", "The current query, for fluid interface")
-            ->addSimpleDescParameter(namingTool::toCamelCase($this->getEntity()->getName()), $objectClassName, "The object to use for ancestor search")
+            ->addSimpleDescParameter(NamingTool::toCamelCase($this->getEntity()->getName()), $objectClassName, "The object to use for ancestor search")
             ->setBody($body)
         ;
     }

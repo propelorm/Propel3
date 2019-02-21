@@ -14,12 +14,15 @@ use Propel\Generator\Config\GeneratorConfig;
 use Propel\Generator\Model\Column;
 use Propel\Generator\Platform\MysqlPlatform;
 use Propel\Generator\Platform\SqlDefaultPlatform;
+use Propel\Tests\VfsTrait;
 
 /**
  *
  */
 class MysqlPlatformMigrationMyISAMTest extends PlatformMigrationTestProvider
 {
+    use VfsTrait;
+
     protected $platform;
 
     /**
@@ -29,7 +32,7 @@ class MysqlPlatformMigrationMyISAMTest extends PlatformMigrationTestProvider
      */
     protected function getPlatform()
     {
-        if (!$this->platform) {
+        if (null === $this->platform) {
             $this->platform = new MysqlPlatform();
             $configFileContent = <<<EOF
 propel:
@@ -56,9 +59,8 @@ propel:
       - bookstore
 EOF;
 
-            $configFile = sys_get_temp_dir().'/propel.yaml';
-            file_put_contents($configFile, $configFileContent);
-            $config = new GeneratorConfig($configFile);
+            $file = $this->newFile('propel.yaml', $configFileContent);
+            $config = new GeneratorConfig($file->url());
 
             $this->platform->setGeneratorConfig($config);
         }

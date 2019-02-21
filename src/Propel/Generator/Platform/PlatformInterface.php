@@ -54,7 +54,7 @@ interface PlatformInterface
      * Returns the database connection to use for this Platform class.
      * @return ConnectionInterface The database connection or NULL if none has been set.
      */
-    public function getConnection(): ConnectionInterface;
+    public function getConnection(): ?ConnectionInterface;
 
     /**
      * Finalizes $entity definitions. For example for SQL platforms you need to make sure

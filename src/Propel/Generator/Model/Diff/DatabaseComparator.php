@@ -262,8 +262,8 @@ class DatabaseComparator
         }
 
         // check for table renamings
-        foreach ($this->databaseDiff->getAddedEntities() as $addedEntityName => $addedEntity) {
-            foreach ($this->databaseDiff->getRemovedEntities() as $removedEntityName => $removedEntity) {
+        foreach ($this->databaseDiff->getAddedEntities()->toArray() as $addedEntityName => $addedEntity) {
+            foreach ($this->databaseDiff->getRemovedEntities()->toArray() as $removedEntityName => $removedEntity) {
                 if (null === EntityComparator::computeDiff($addedEntity, $removedEntity)) {
                     // no difference except the name, that's probably a renaming
                     if ($this->getWithRenaming()) {

@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Tests\Generator\Behavior\Timestampable;
 
 use Propel\Generator\Util\QuickBuilder;
@@ -273,8 +275,8 @@ EOF;
         $schema = <<<EOF
 <database name="TimestampableBehaviorTest:testDisableCreatedAt">
     <entity name="EntityWithoutCreatedAt" activeRecord="true">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" />
-        <column name="name" type="varchar" />
+        <field name="id" type="INTEGER" primaryKey="true" autoIncrement="true" />
+        <field name="name" type="varchar" />
 
         <behavior name="timestampable">
             <parameter name="disable_created_at" value="true" />

@@ -32,11 +32,11 @@ class GeneratedObjectM2MRelationThreePKs2Test extends PlatformDatabaseBuildTimeB
         if (!class_exists('\RelationpkUserQuery')) {
             $schema = '
     <database name="migration" schema="migration" activeRecord="true">
-        <table name="relationpk_user_group" isCrossRef="true">
-            <column name="user_id" type="integer" primaryKey="true"/>
-            <column name="group_id" type="integer" primaryKey="true"/>
-            <column name="group_type" size="64" type="varchar" primaryKey="true"/>
-            <column name="position" type="varchar" size="64" primaryKey="true"/>
+        <entity name="relationpk_user_group" isCrossRef="true">
+            <field name="user_id" type="integer" primaryKey="true"/>
+            <field name="group_id" type="integer" primaryKey="true"/>
+            <field name="group_type" size="64" type="varchar" primaryKey="true"/>
+            <field name="position" type="varchar" size="64" primaryKey="true"/>
 
             <foreign-key foreignTable="relationpk_user" phpName="User" onDelete="cascade">
                 <reference local="user_id" foreign="id"/>
@@ -46,18 +46,18 @@ class GeneratedObjectM2MRelationThreePKs2Test extends PlatformDatabaseBuildTimeB
                 <reference local="group_id" foreign="id"/>
                 <reference local="group_type" foreign="type"/>
             </foreign-key>
-        </table>
+        </entity>
 
-        <table name="relationpk_user">
-            <column name="id" type="integer" primaryKey="true" autoIncrement="true"/>
-            <column name="name" />
-        </table>
+        <entity name="relationpk_user">
+            <field name="id" type="integer" primaryKey="true" autoIncrement="true"/>
+            <field name="name" />
+        </entity>
 
-        <table name="relationpk_group">
-            <column name="id" type="integer" primaryKey="true" autoIncrement="true"/>
-            <column name="type" type="varchar" size="64" primaryKey="true" default="standalone"/>
-            <column name="name" />
-        </table>
+        <entity name="relationpk_group">
+            <field name="id" type="integer" primaryKey="true" autoIncrement="true"/>
+            <field name="type" type="varchar" size="64" primaryKey="true" default="standalone"/>
+            <field name="name" />
+        </entity>
 
     </database>
         ';

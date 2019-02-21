@@ -19,8 +19,7 @@ interface DumperInterface
      * Dumps a single Schema model into an XML formatted version.
      *
      * @param  Schema  $schema                The schema model
-     * @param  boolean $doFinalInitialization Whether or not to validate the schema
      * @return string  The dumped formatted output (XML, YAML, CSV...)
      */
-    public function dumpSchema(Schema $schema, $doFinalInitialization = true);
+    public function dumpSchema(Schema $schema);
 }

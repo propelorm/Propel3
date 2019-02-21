@@ -33,10 +33,10 @@ class GeneratedObjectObjectColumnTypeTest extends TestCase
         if (!class_exists('ComplexColumnTypeEntity1')) {
             $schema = <<<EOF
 <database name="generated_object_complex_type_test_1" activeRecord="true">
-    <table name="complex_column_type_entity_1">
-        <column name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
-        <column name="bar" type="OBJECT" />
-    </table>
+    <entity name="complex_column_type_entity_1">
+        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
+        <field name="bar" type="OBJECT" />
+    </entity>
 </database>
 EOF;
             $this->configuration = QuickBuilder::buildSchema($schema);

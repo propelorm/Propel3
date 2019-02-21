@@ -10,42 +10,68 @@
 
 namespace Propel\Tests\Generator\Platform;
 
-use Propel\Generator\Builder\Util\SchemaReader;
 use Propel\Generator\Config\GeneratorConfig;
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\FieldDefaultValue;
-use Propel\Generator\Model\IdMethod;
 use Propel\Generator\Model\IdMethodParameter;
 use Propel\Generator\Model\Index;
 use Propel\Generator\Model\Entity;
+use Propel\Generator\Model\Model;
 use Propel\Generator\Model\Vendor;
 use Propel\Generator\Platform\MysqlPlatform;
+use Propel\Generator\Schema\SchemaReader;
+use Propel\Tests\VfsTrait;
 
 /**
  *
  */
 class MysqlPlatformMyISAMTest extends PlatformTestProvider
 {
+    use VfsTrait;
+
+    private $platform;
+
     /**
      * Get the Platform object for this class
      *
      * @return MysqlPlatform
      */
-    protected function getPlatform()
+    protected function getPlatform(): MysqlPlatform
     {
-        static $platform;
+        if (null === $this->platform) {
+            $this->platform = new MysqlPlatform();
+            $configFileContent = <<<EOF
+propel:
+  database:
+    connections:
+      bookstore:
+        adapter: mysql
+        classname: \Propel\Runtime\Connection\DebugPDO
+        dsn: mysql:host=127.0.0.1;dbname=test
+        user: root
+        password:
+    adapters:
+      mysql:
+        tableType: MyISAM
 
-        if (!$platform) {
-            $platform = new MysqlPlatform();
+  generator:
+    defaultConnection: bookstore
+    connections:
+      - bookstore
 
-            $configProp['propel']['database']['adapters']['mysql']['tableType'] = 'MyISAM';
-            $configProp['propel']['paths']['composerDir'] = __DIR__ . '/../../../../../';
-            $config = new GeneratorConfig(__DIR__ . '/../../../../Fixtures/bookstore', $configProp);
+  runtime:
+    defaultConnection: bookstore
+    connections:
+      - bookstore
+EOF;
 
-            $platform->setGeneratorConfig($config);
+            $file = $this->newFile('propel.yaml', $configFileContent);
+            $config = new GeneratorConfig($file->url());
+
+            $this->platform->setGeneratorConfig($config);
         }
 
-        return $platform;
+        return $this->platform;
     }
 
     public function testGetSequenceNameDefault()
@@ -92,7 +118,7 @@ CREATE TABLE `x`.`book`
     `title` VARCHAR(255) NOT NULL,
     `author_id` INTEGER,
     PRIMARY KEY (`id`),
-    INDEX `book_i_639136` (`title`),
+    INDEX `book_i_853ae9` (`title`),
     INDEX `book_fi_9f6743` (`author_id`)
 ) ENGINE=MyISAM;
 
@@ -156,7 +182,7 @@ CREATE TABLE `book`
     `title` VARCHAR(255) NOT NULL,
     `author_id` INTEGER,
     PRIMARY KEY (`id`),
-    INDEX `book_i_639136` (`title`),
+    INDEX `book_i_853ae9` (`title`),
     INDEX `book_fi_b97a1a` (`author_id`)
 ) ENGINE=MyISAM;
 
@@ -238,7 +264,7 @@ CREATE TABLE `foo`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `bar` INTEGER,
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `foo_u_14f552` (`bar`)
+    UNIQUE INDEX `foo_u_853ae9` (`bar`)
 ) ENGINE=MyISAM;
 ";
         $this->assertEquals($expected, $this->getPlatform()->getAddEntityDDL($entity));
@@ -264,7 +290,7 @@ CREATE TABLE `foo`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `bar` INTEGER,
     PRIMARY KEY (`id`),
-    INDEX `foo_i_14f552` (`bar`)
+    INDEX `foo_i_853ae9` (`bar`)
 ) ENGINE=MyISAM;
 ";
         $this->assertEquals($expected, $this->getPlatform()->getAddEntityDDL($entity));
@@ -274,14 +300,14 @@ CREATE TABLE `foo`
     {
         $schema = <<<EOF
 <database name="test" identifierQuoting="true">
-    <entity name="foo">
+    <entity name="Foo">
         <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
         <field name="bar_id" type="INTEGER" />
-        <relation target="bar">
+        <relation target="Bar">
             <reference local="bar_id" foreign="id" />
         </relation>
     </entity>
-    <entity name="bar">
+    <entity name="Bar">
         <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
     </entity>
 </database>
@@ -303,14 +329,14 @@ CREATE TABLE `foo`
     {
         $schema = <<<EOF
 <database name="test" identifierQuoting="true">
-    <entity name="foo">
+    <entity name="Foo">
         <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
         <field name="bar_id" type="INTEGER" />
-        <relation target="bar" skipSql="true">
+        <relation target="Bar" skipSql="true">
             <reference local="bar_id" foreign="id" />
         </relation>
     </entity>
-    <entity name="bar">
+    <entity name="Bar">
         <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
     </entity>
 </database>
@@ -342,9 +368,8 @@ EOF;
         $platform->setDefaultEntityEngine('MEMORY');
 
         $xtad = new SchemaReader();
-        $xtad->setPlatform($platform);
-        $appData = $xtad->parseString($schema);
-        $entity = $appData->getDatabase()->getEntity('foo');
+        $appData = $xtad->parseString($schema, $platform);
+        $entity = $appData->getDatabase()->getEntityByName('Foo');
 
         $expected = "
 CREATE TABLE `foo`
@@ -360,7 +385,7 @@ CREATE TABLE `foo`
     {
         $schema = <<<EOF
 <database name="test" identifierQuoting="true">
-    <entity name="foo">
+    <entity name="Foo">
         <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
         <vendor type="mysql">
             <parameter name="Engine" value="InnoDB"/>
@@ -386,7 +411,7 @@ CREATE TABLE `foo`
      */
     public function testGetAddEntityDDLSchema($schema)
     {
-        $entity = $this->getEntityFromSchema($schema, 'foo');
+        $entity = $this->getEntityFromSchema($schema, 'Foo');
         $expected = "
 CREATE TABLE `Woopah`.`foo`
 (
@@ -400,7 +425,7 @@ CREATE TABLE `Woopah`.`foo`
 
     public function testGetDropEntityDDL()
     {
-        $entity = new Entity('foo');
+        $entity = new Entity('Foo');
         $entity->setIdentifierQuoting(true);
         $expected = "
 DROP TABLE IF EXISTS `foo`;
@@ -413,7 +438,7 @@ DROP TABLE IF EXISTS `foo`;
      */
     public function testGetDropEntityDDLSchema($schema)
     {
-        $entity = $this->getEntityFromSchema($schema, 'foo');
+        $entity = $this->getEntityFromSchema($schema, 'Foo');
         $expected = "
 DROP TABLE IF EXISTS `Woopah`.`foo`;
 ";
@@ -425,7 +450,7 @@ DROP TABLE IF EXISTS `Woopah`.`foo`;
         $column = new Field('foo');
         $column->getDomain()->copy($this->getPlatform()->getDomainForType('DOUBLE'));
         $column->getDomain()->replaceScale(2);
-        $column->getDomain()->replaceSize(3);
+        $column->getDomain()->setSize(3);
         $column->setNotNull(true);
         $column->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $expected = '`foo` DOUBLE(3,2) DEFAULT 123 NOT NULL';
@@ -438,7 +463,7 @@ DROP TABLE IF EXISTS `Woopah`.`foo`;
         $column->getDomain()->copy($this->getPlatform()->getDomainForType('LONGVARCHAR'));
         $vendor = new Vendor('mysql');
         $vendor->setParameter('Charset', 'greek');
-        $column->addVendorInfo($vendor);
+        $column->addVendor($vendor);
         $expected = '`foo` TEXT CHARACTER SET \'greek\'';
         $this->assertEquals($expected, $this->getPlatform()->getFieldDDL($column));
     }
@@ -449,7 +474,7 @@ DROP TABLE IF EXISTS `Woopah`.`foo`;
         $column->getDomain()->copy($this->getPlatform()->getDomainForType('LONGVARCHAR'));
         $vendor = new Vendor('mysql');
         $vendor->setParameter('Collate', 'latin1_german2_ci');
-        $column->addVendorInfo($vendor);
+        $column->addVendor($vendor);
         $expected = '`foo` TEXT COLLATE \'latin1_german2_ci\'';
         $this->assertEquals($expected, $this->getPlatform()->getFieldDDL($column));
 
@@ -457,7 +482,7 @@ DROP TABLE IF EXISTS `Woopah`.`foo`;
         $column->getDomain()->copy($this->getPlatform()->getDomainForType('LONGVARCHAR'));
         $vendor = new Vendor('mysql');
         $vendor->setParameter('Collation', 'latin1_german2_ci');
-        $column->addVendorInfo($vendor);
+        $column->addVendor($vendor);
         $expected = '`foo` TEXT COLLATE \'latin1_german2_ci\'';
         $this->assertEquals($expected, $this->getPlatform()->getFieldDDL($column));
     }
@@ -478,7 +503,7 @@ DROP TABLE IF EXISTS `Woopah`.`foo`;
         $column->setNotNull(true);
         $vendor = new Vendor('mysql');
         $vendor->setParameter('Charset', 'greek');
-        $column->addVendorInfo($vendor);
+        $column->addVendor($vendor);
         $expected = '`foo` TEXT CHARACTER SET \'greek\' NOT NULL';
         $this->assertEquals($expected, $this->getPlatform()->getFieldDDL($column));
     }
@@ -488,7 +513,7 @@ DROP TABLE IF EXISTS `Woopah`.`foo`;
         $column = new Field('foo');
         $column->getDomain()->copy($this->getPlatform()->getDomainForType('DOUBLE'));
         $column->getDomain()->replaceScale(2);
-        $column->getDomain()->replaceSize(3);
+        $column->getDomain()->setSize(3);
         $column->setNotNull(true);
         $column->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $column->getDomain()->replaceSqlType('DECIMAL(5,6)');
@@ -498,7 +523,7 @@ DROP TABLE IF EXISTS `Woopah`.`foo`;
 
     public function testGetPrimaryKeyDDLSimpleKey()
     {
-        $entity = new Entity('foo');
+        $entity = new Entity('Foo');
         $entity->setIdentifierQuoting(true);
         $column = new Field('bar');
         $column->setPrimaryKey(true);
@@ -509,7 +534,7 @@ DROP TABLE IF EXISTS `Woopah`.`foo`;
 
     public function testGetPrimaryKeyDDLCompositeKey()
     {
-        $entity = new Entity('foo');
+        $entity = new Entity('Foo');
         $entity->setIdentifierQuoting(true);
         $column1 = new Field('bar1');
         $column1->setPrimaryKey(true);
@@ -589,7 +614,7 @@ DROP INDEX `babar` ON `foo`;
 
     public function testGetIndexDDLKeySize()
     {
-        $entity = new Entity('foo');
+        $entity = new Entity('Foo');
         $entity->setIdentifierQuoting(true);
         $column1 = new Field('bar1');
         $column1->getDomain()->copy($this->getPlatform()->getDomainForType('VARCHAR'));
@@ -598,13 +623,13 @@ DROP INDEX `babar` ON `foo`;
         $index = new Index('bar_index');
         $index->addField($column1);
         $entity->addIndex($index);
-        $expected = 'INDEX `bar_index` (`bar1`(5))';
+        $expected = 'INDEX `bar_index` (`bar1`)';
         $this->assertEquals($expected, $this->getPlatform()->getIndexDDL($index));
     }
 
     public function testGetIndexDDLFulltext()
     {
-        $entity = new Entity('foo');
+        $entity = new Entity('Foo');
         $entity->setIdentifierQuoting(true);
         $column1 = new Field('bar1');
         $column1->getDomain()->copy($this->getPlatform()->getDomainForType('LONGVARCHAR'));
@@ -613,7 +638,7 @@ DROP INDEX `babar` ON `foo`;
         $index->addField($column1);
         $vendor = new Vendor('mysql');
         $vendor->setParameter('Index_type', 'FULLTEXT');
-        $index->addVendorInfo($vendor);
+        $index->addVendor($vendor);
         $entity->addIndex($index);
         $expected = 'FULLTEXT INDEX `bar_index` (`bar1`)';
         $this->assertEquals($expected, $this->getPlatform()->getIndexDDL($index));
@@ -705,18 +730,18 @@ DROP INDEX `babar` ON `foo`;
     {
         $schema = '
 <database name="test1" identifierQuoting="true">
-  <entity name="foo">
+  <entity name="Foo">
     <behavior name="AutoAddPk"/>
     <field name="name" type="VARCHAR"/>
     <field name="subid" type="INTEGER"/>
   </entity>
-  <entity name="bar">
+  <entity name="Bar">
     <behavior name="AutoAddPk"/>
 
     <field name="name" type="VARCHAR"/>
     <field name="subid" type="INTEGER"/>
 
-    <relation target="foo">
+    <relation target="Foo">
       <reference local="id" foreign="id"/>
       <reference local="subid" foreign="subid"/>
     </relation>
@@ -727,7 +752,7 @@ DROP INDEX `babar` ON `foo`;
         $expectedRelationSql = "
 CREATE TABLE `bar`
 (
-    `name` VARCHAR(255),
+    `name` VARCHAR,
     `subid` INTEGER,
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     PRIMARY KEY (`id`),
@@ -735,7 +760,7 @@ CREATE TABLE `bar`
 ) ENGINE=MyISAM;
 ";
 
-        $entity = $this->getDatabaseFromSchema($schema)->getEntity('bar');
+        $entity = $this->getDatabaseFromSchema($schema)->getEntityByName('Bar');
         $relationTableSql = $this->getPlatform()->getAddEntityDDL($entity);
 
         $this->assertEquals($expectedRelationSql, $relationTableSql);

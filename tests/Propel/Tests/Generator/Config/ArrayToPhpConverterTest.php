@@ -33,7 +33,7 @@ class ArrayToPhpConverterTest extends TestCase
         $expected = <<<EOF
 \$configuration = \Propel\Runtime\Configuration::getCurrentConfigurationOrCreate();
 
-\$configuration->checkVersion('2.0.0-dev');
+\$configuration->checkVersion('3.0.0-dev');
 \$configuration->setAdapterClass('bookstore', 'mysql');
 \$manager = new \Propel\Runtime\Connection\ConnectionManagerSingle(\$configuration->getAdapter('bookstore'));
 \$manager->setConfiguration(array (
@@ -75,7 +75,7 @@ EOF;
         $expected = <<<'EOF'
 $configuration = \Propel\Runtime\Configuration::getCurrentConfigurationOrCreate();
 
-$configuration->checkVersion('2.0.0-dev');
+$configuration->checkVersion('3.0.0-dev');
 $configuration->setAdapterClass('bookstore-cms', 'mysql');
 $manager = new \Propel\Runtime\Connection\ConnectionManagerMasterSlave($configuration->getAdapter('bookstore-cms'));
 $manager->setReadConfiguration(array (
@@ -112,7 +112,7 @@ EOF;
         $expected = <<<'EOF'
 $configuration = \Propel\Runtime\Configuration::getCurrentConfigurationOrCreate();
 
-$configuration->checkVersion('2.0.0-dev');
+$configuration->checkVersion('3.0.0-dev');
 $configuration->setProfilerClass('\Propel\Runtime\Util\Profiler');
 $configuration->setProfilerConfiguration(array (
   'slowTreshold' => 0.2,
@@ -144,7 +144,7 @@ EOF;
         $expected = <<<'EOF'
 $configuration = \Propel\Runtime\Configuration::getCurrentConfigurationOrCreate();
 
-$configuration->checkVersion('2.0.0-dev');
+$configuration->checkVersion('3.0.0-dev');
 $configuration->setLoggerConfiguration('defaultLogger', array (
   'type' => 'stream',
   'level' => '300',
@@ -171,7 +171,7 @@ EOF;
         $expected = <<<'EOF'
 $configuration = \Propel\Runtime\Configuration::getCurrentConfigurationOrCreate();
 
-$configuration->checkVersion('2.0.0-dev');
+$configuration->checkVersion('3.0.0-dev');
 $configuration->setLoggerConfiguration('defaultLogger', array (
   'type' => 'stream',
   'path' => '/var/log/propel.log',
@@ -225,7 +225,7 @@ EOF;
         $expected = <<<'EOF'
 $configuration = \Propel\Runtime\Configuration::getCurrentConfigurationOrCreate();
 
-$configuration->checkVersion('2.0.0-dev');
+$configuration->checkVersion('3.0.0-dev');
 $configuration->setAdapterClass('bookstore', 'mysql');
 $manager = new \Propel\Runtime\Connection\ConnectionManagerSingle($configuration->getAdapter('bookstore'));
 $manager->setConfiguration(array (

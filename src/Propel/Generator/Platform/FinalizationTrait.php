@@ -14,6 +14,7 @@ namespace Propel\Generator\Platform;
 
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Model\Database;
+use Propel\Generator\Model\Domain;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\Index;
@@ -30,43 +31,25 @@ use Propel\Generator\Model\Schema;
 trait FinalizationTrait
 {
     /**
-     * @var bool
-     */
-    private $isInitialized;
-
-    /**
      * Do final initialization of the whole schema.
      *
      * @param Schema $schema
      */
     public function doFinalInitialization(Schema $schema)
     {
-        if (!$this->isInitialized) {
-            foreach ($schema->getDatabases() as $database) {
-                $this->doFinalizeDatabase($database);
+        foreach ($schema->getDatabases() as $database) {
+            // execute database behaviors
+            foreach ($database->getBehaviors() as $behavior) {
+                $behavior->modifyDatabase();
             }
-            $this->isInitialized = true;
-        }
-    }
+            // execute entity behaviors (may add new entities and new behaviors)
+            while ($behavior = $database->getNextEntityBehavior()) {
+                $behavior->getEntityModifier()->modifyEntity();
+                $behavior->setEntityModified(true);
+            }
 
-    /**
-     * Do the final initialization on Database object
-     *
-     * @param Database $database
-     */
-    public function doFinalizeDatabase(Database $database)
-    {
-        // execute database behaviors
-        foreach ($database->getBehaviors() as $behavior) {
-            $behavior->modifyDatabase();
+            $this->finalizeDefinition($database);
         }
-        // execute entity behaviors (may add new entities and new behaviors)
-        while ($behavior = $database->getNextEntityBehavior()) {
-            $behavior->getEntityModifier()->modifyEntity();
-            $behavior->setEntityModified(true);
-        }
-
-        $this->finalizeDefinition($database);
     }
 
     /**
@@ -77,6 +60,7 @@ trait FinalizationTrait
     public function finalizeDefinition(Database $database)
     {
         foreach ($database->getEntities() as $entity) {
+
             // Heavy indexing must wait until after all columns composing
             // a entity's primary key have been parsed.
             if ($entity->isHeavyIndexing()) {
@@ -91,12 +75,20 @@ trait FinalizationTrait
                     $anyAutoInc = true;
                 }
             }
+
             if (Model::ID_METHOD_NATIVE === $entity->getIdMethod() && !$anyAutoInc) {
                 $entity->setIdMethod(Model::ID_METHOD_NONE);
             }
 
-            $this->setupReferrers($entity);
             $this->setupRelationReferences($entity);
+            $this->setupReferrers($entity);
+
+            //MyISAM engine doesn't create foreign key indices automatically
+            if ($this instanceof MysqlPlatform) {
+                if ('MyISAM' === $this->getMysqlEntityType($entity)) {
+                    $this->addExtraIndices($entity);
+                }
+            }
         }
     }
 
@@ -124,7 +116,10 @@ trait FinalizationTrait
     {
         $entity = $relation->getEntity();
         // entity referrers
-        $hasEntity = $entity->getDatabase()->hasEntityByName($relation->getForeignEntityName());
+        $hasEntity = $entity->getDatabase()->hasEntityByName($relation->getForeignEntityName()) ?
+            true :
+            $entity->getDatabase()->hasEntityByFullName($relation->getForeignEntityName())
+        ;
         if (!$hasEntity) {
             throw new BuildException(
                 sprintf(
@@ -136,7 +131,9 @@ trait FinalizationTrait
             );
         }
 
-        $foreignEntity = $entity->getDatabase()->getEntityByName($relation->getForeignEntityName());
+        $foreignEntity = $entity->getDatabase()->getEntityByName($relation->getForeignEntityName()) ??
+            $entity->getDatabase()->getEntityByFullName($relation->getForeignEntityName())
+        ;
         $referrers = $foreignEntity->getReferrers();
         if (null === $referrers || !in_array($relation, $referrers, true)) {
             $foreignEntity->addReferrer($relation);
@@ -198,7 +195,7 @@ trait FinalizationTrait
             if ($relation->getField()) {
                 $relationName = $relation->getField();
             } else {
-                $relationName = $relation->getForeignEntity()->getName();
+                $relationName = $relation->getForeignEntityName();
             }
 
             if (!$relation->getLocalFieldObjects()) {
@@ -219,7 +216,7 @@ trait FinalizationTrait
                     $field->setDomain($pk->getDomain());
                     $field->setImplementationDetail(true);
 
-                    if ($entity->hasField($localFieldName, true)) {
+                    if ($entity->hasField($localFieldName)) {
                         throw new BuildException(sprintf(
                             'Unable to setup automatic relation from %s to %s due to no unique field name. Please specify <relation field="here"> a name'
                         ), $entity->getName(), $relation->getForeignEntity()->getName());
@@ -230,18 +227,20 @@ trait FinalizationTrait
                 }
             } else {
                 //we have references, make sure all those columns are marked as implementationDetail
-//                if ($relation->isLocalPrimaryKey()) {
-//                    //one-to-one relation are not marked as implementation detail
-//                    continue;
-//                }
-//                foreach ($relation->getFieldObjectsMapArray() as $fields) {
-//                    /** @var Field $local */
-//                    /** @var Field $foreign */
-//                    list($local, $foreign) = $fields;
-//                    if ($local->isPrimaryKey()) {
-//                        $foreign->setImplementationDetail(true);
-//                    }
-//                }
+                if ($relation->isLocalPrimaryKey()) {
+                    //one-to-one relation are not marked as implementation detail
+                    continue;
+                }
+
+                foreach ($relation->getFieldObjectsMapArray() as $fields) {
+                    /** @var Field $local */
+                    /** @var Field $foreign */
+                    list($local, $foreign) = $fields;
+                    if ($local->isPrimaryKey() && !$foreign->isPrimaryKey()) {
+                        $foreign->setImplementationDetail(true);
+                    }
+                }
+
                 foreach ($relation->getLocalFieldObjects() as $field) {
                     $field->setImplementationDetail(true);
                 }

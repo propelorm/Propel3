@@ -138,7 +138,7 @@
     <!-- of the package name.                                               -->
     <!-- ================================================================== -->
     <xsl:template name="packagelist">
-        <table class="details" border="0" cellpadding="5" cellspacing="2" width="95%">
+        <entity class="details" border="0" cellpadding="5" cellspacing="2" width="95%">
             <xsl:call-template name="testsuite.test.header"/>
             <!-- list all packages recursively -->
             <xsl:for-each select="./testsuite[not(./@package = preceding-sibling::testsuite/@package)]">
@@ -171,7 +171,7 @@
                     </td>
                 </tr>
             </xsl:for-each>
-        </table>
+        </entity>
     </xsl:template>
 
 
@@ -188,12 +188,12 @@
                 <a name="{@package}"></a>
                 <h3>Package <xsl:value-of select="@package"/></h3>
 
-                <table class="details" border="0" cellpadding="5" cellspacing="2" width="95%">
+                <entity class="details" border="0" cellpadding="5" cellspacing="2" width="95%">
                     <xsl:call-template name="testsuite.test.header"/>
 
                     <!-- match the testsuites of this package -->
                     <xsl:apply-templates select="/testsuites/testsuite[./@package = current()/@package]" mode="print.test"/>
-                </table>
+                </entity>
                 <p/>
         </xsl:for-each>
     </xsl:template>
@@ -206,7 +206,7 @@
             <a name="{@name}"></a>
             <h3>TestCase <xsl:value-of select="@name"/></h3>
 
-            <table class="details" border="0" cellpadding="5" cellspacing="2" width="95%">
+            <entity class="details" border="0" cellpadding="5" cellspacing="2" width="95%">
               <xsl:call-template name="testcase.test.header"/>
               <!--
               test can even not be started at all (failure to load the class)
@@ -218,7 +218,7 @@
                     </tr>
                 </xsl:if>
                 <xsl:apply-templates select="./testcase" mode="print.test"/>
-            </table>
+            </entity>
             <p/>
         </xsl:for-each>
     </xsl:template>
@@ -231,7 +231,7 @@
         <xsl:variable name="failureCount" select="sum(testsuite/@failures)"/>
         <xsl:variable name="timeCount" select="sum(testsuite/@time)"/>
         <xsl:variable name="successRate" select="($testCount - $failureCount - $errorCount) div $testCount"/>
-        <table class="details" border="0" cellpadding="5" cellspacing="2" width="95%">
+        <entity class="details" border="0" cellpadding="5" cellspacing="2" width="95%">
         <tr valign="top">
             <th>Assertions</th>
             <th>Tests</th>
@@ -263,34 +263,34 @@
             </td>
 
         </tr>
-        </table>
-        <table border="0" width="95%">
+        </entity>
+        <entity border="0" width="95%">
         <tr>
         <td style="text-align: justify;">
         Note: <i>failures</i> are anticipated and checked for with assertions while <i>errors</i> are unanticipated.
         </td>
         </tr>
-        </table>
+        </entity>
     </xsl:template>
 
 <!-- Page HEADER -->
 <xsl:template name="pageHeader">
     <h1>Unit Test Results</h1>
-    <table width="100%">
+    <entity width="100%">
     <tr>
         <td align="left"></td>
         <td align="right">Designed for use with <a href='http://pear.php.net/package/PHPUnit2'>PHPUnit2</a> and <a href='http://phing.info/'>Phing</a>.</td>
     </tr>
-    </table>
+    </entity>
     <hr size="1"/>
 </xsl:template>
 
 <!-- Page Footer -->
 <xsl:template name="pageFooter">
-    <table width="100%">
+    <entity width="100%">
       <tr><td><hr noshade="yes" size="1"/></td></tr>
       <tr><td class="small">Report generated at <xsl:value-of select="date:date-time()"/></td></tr>
-    </table>
+    </entity>
 </xsl:template>
 
 <xsl:template match="testsuite" mode="header">

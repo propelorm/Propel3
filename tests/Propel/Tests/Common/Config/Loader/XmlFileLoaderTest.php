@@ -13,17 +13,20 @@ namespace Propel\Tests\Common\Config\Loader;
 use org\bovigo\vfs\vfsStream;
 use Propel\Common\Config\FileLocator;
 use Propel\Common\Config\Loader\XmlFileLoader;
-use Propel\Tests\Common\Config\ConfigTestCase;
+use Propel\Tests\TestCase;
+use Propel\Tests\VfsTrait;
 
-class XmlFileLoaderTest extends ConfigTestCase
+class XmlFileLoaderTest extends TestCase
 {
+    use VfsTrait;
+
     /** @var XmlFileLoader */
     protected $loader;
 
     public function setUp()
     {
         parent::setUp();
-        $this->loader = new XmlFileLoader(new FileLocator([sys_get_temp_dir()]));
+        $this->loader = new XmlFileLoader(new FileLocator([$this->getRoot()->url()]));
     }
 
     public function testSupports()
@@ -44,7 +47,7 @@ class XmlFileLoaderTest extends ConfigTestCase
   <bar>baz</bar>
 </properties>
 XML;
-        $file = vfsStream::newFile('parameters.xml')->at($this->getRoot())->setContent($content);
+        $file = $this->newFile('parameters.xml', $content);
 
         $test = $this->loader->load($file->url());
         $this->assertEquals('bar', $test['foo']);
@@ -71,14 +74,14 @@ not xml content
 only plain
 text
 EOF;
-        $file = vfsStream::newFile('nonvalid.xml')->at($this->getRoot())->setContent($content);
+        $file = $this->newFile('nonvalid.xml', $content);
 
         @$this->loader->load($file->url());
     }
 
     public function testXmlFileIsEmpty()
     {
-        $file = vfsStream::newFile('empty.xml')->at($this->getRoot())->setContent('');
+        $file = $this->newFile('empty.xml', '');
         $actual = $this->loader->load($file->url());
 
         $this->assertEquals([], $actual);
@@ -97,7 +100,7 @@ EOF;
   <bar>baz</bar>
 </properties>
 XML;
-        $file = vfsStream::newFile('notreadable.xml', 200)->at($this->getRoot())->setContent($content);
+        $file = $this->newFile('notreadable.xml', $content)->chmod(200);
 
         $actual = $this->loader->load($file->url());
         $this->assertEquals('bar', $actual['foo']);

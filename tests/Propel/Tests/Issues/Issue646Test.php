@@ -27,18 +27,18 @@ class Issue646Test extends TestCaseFixtures
             $schema = '
             <database name="test" defaultIdMethod="native" activeRecord="true"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-           <table name="pk_date">
-           <column name="created_at" type="DATE" primaryKey="true" />
-           <column name="name" type="VARCHAR"/>
-            </table>
-            <table name="pk_time">
-           <column name="created_at" type="TIME" primaryKey="true" />
-           <column name="name" type="VARCHAR"/>
-            </table>
-            <table name="pk_timestamp">
-           <column name="created_at" type="TIMESTAMP" primaryKey="true" />
-           <column name="name" type="VARCHAR"/>
-            </table>';
+           <entity name="pk_date">
+           <field name="created_at" type="DATE" primaryKey="true" />
+           <field name="name" type="VARCHAR"/>
+            </entity>
+            <entity name="pk_time">
+           <field name="created_at" type="TIME" primaryKey="true" />
+           <field name="name" type="VARCHAR"/>
+            </entity>
+            <entity name="pk_timestamp">
+           <field name="created_at" type="TIMESTAMP" primaryKey="true" />
+           <field name="name" type="VARCHAR"/>
+            </entity>';
             QuickBuilder::buildSchema($schema);
         }
     }

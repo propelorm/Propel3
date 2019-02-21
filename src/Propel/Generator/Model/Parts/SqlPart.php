@@ -43,7 +43,7 @@ trait SqlPart
 
     protected function initSql()
     {
-        $this->idMethodParameters = new Set();
+        $this->idMethodParameters = new Set([], IdMethodParameter::class);
     }
 
     /**
@@ -130,9 +130,13 @@ trait SqlPart
      * @param bool $heavyIndexing
      * @return $this
      */
-    public function setHeavyIndexing(bool $heavyIndexing)
+    public function setHeavyIndexing(?bool $heavyIndexing = null)
     {
+        if (null === $heavyIndexing) {
+            $heavyIndexing = true;
+        }
         $this->heavyIndexing = $heavyIndexing;
+
         return $this;
     }
 

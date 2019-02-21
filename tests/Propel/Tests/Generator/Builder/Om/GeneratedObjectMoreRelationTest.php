@@ -33,12 +33,12 @@ class GeneratedObjectMoreRelationTest extends TestCase
             $schema = <<<EOF
 <database name="more_relation_test" namespace="MoreRelationTest" activeRecord="true">
 
-    <table name="more_relation_test_page" phpName="Page">
+    <entity name="more_relation_test_page" phpName="Page">
         <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
         <field name="title" type="VARCHAR" size="100" primaryString="true" />
-    </table>
+    </entity>
 
-    <table name="more_relation_test_content" phpName="Content">
+    <entity name="more_relation_test_content" phpName="Content">
         <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
         <field name="title" type="VARCHAR" size="100" />
         <field name="content" type="LONGVARCHAR" required="false" />
@@ -46,25 +46,25 @@ class GeneratedObjectMoreRelationTest extends TestCase
         <relation target="Page" onDelete="cascade">
           <reference local="pageId" foreign="id"/>
         </relation>
-    </table>
+    </entity>
 
-    <table name="more_relation_test_comment" phpName="Comment">
+    <entity name="more_relation_test_comment" phpName="Comment">
         <field name="userId" required="true" primaryKey="true" type="INTEGER" />
         <field name="pageId" required="true" primaryKey="true" type="INTEGER" />
         <field name="comment" type="VARCHAR" size="100" />
         <relation target="Page" onDelete="cascade">
           <reference local="pageId" foreign="id"/>
         </relation>
-    </table>
+    </entity>
 
-    <table name="more_relation_test_content_comment" phpName="ContentComment">
+    <entity name="more_relation_test_content_comment" phpName="ContentComment">
         <field name="id" required="true" autoIncrement="true" primaryKey="true" type="INTEGER" />
         <field name="contentId" type="INTEGER" />
         <field name="comment" type="VARCHAR" size="100" />
         <relation target="Content" onDelete="setnull">
           <reference local="contentId" foreign="id"/>
         </relation>
-    </table>
+    </entity>
 
 </database>
 EOF;

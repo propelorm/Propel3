@@ -34,7 +34,7 @@ class EntityFieldComparatorTest extends TestCase
         $c1 = new Field('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t1->addField($c1);
@@ -42,7 +42,7 @@ class EntityFieldComparatorTest extends TestCase
         $c2 = new Field('Foo');
         $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c2->getDomain()->replaceScale(2);
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t2->addField($c2);
@@ -70,7 +70,7 @@ class EntityFieldComparatorTest extends TestCase
         $c2 = new Field('Foo');
         $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c2->getDomain()->replaceScale(2);
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t2->addField($c2);
@@ -91,7 +91,7 @@ class EntityFieldComparatorTest extends TestCase
         $c1 = new Field('Bar');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t1->addField($c1);
@@ -112,14 +112,14 @@ class EntityFieldComparatorTest extends TestCase
         $t1 = new Entity();
         $c1 = new Field('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c1->getDomain()->replaceSize(255);
+        $c1->getDomain()->setSize(255);
         $c1->setNotNull(false);
         $t1->addField($c1);
         $t2 = new Entity();
         $c2 = new Field('Foo');
         $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c2->getDomain()->replaceScale(2);
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t2->addField($c2);
@@ -141,7 +141,7 @@ class EntityFieldComparatorTest extends TestCase
         $c1 = new Field('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t1->addField($c1);
@@ -149,7 +149,7 @@ class EntityFieldComparatorTest extends TestCase
         $c2 = new Field('Bar');
         $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c2->getDomain()->replaceScale(2);
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t2->addField($c2);
@@ -171,7 +171,7 @@ class EntityFieldComparatorTest extends TestCase
         $t1 = new Entity();
         $c1 = new Field('col1');
         $c1->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c1->getDomain()->replaceSize(255);
+        $c1->getDomain()->setSize(255);
         $c1->setNotNull(false);
         $t1->addField($c1);
         $c2 = new Field('col2');
@@ -180,14 +180,14 @@ class EntityFieldComparatorTest extends TestCase
         $t1->addField($c2);
         $c3 = new Field('col3');
         $c3->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c3->getDomain()->replaceSize(255);
+        $c3->getDomain()->setSize(255);
         $t1->addField($c3);
 
         $t2 = new Entity();
         $c4 = new Field('col1');
         $c4->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c4->getDomain()->replaceScale(2);
-        $c4->getDomain()->replaceSize(3);
+        $c4->getDomain()->setSize(3);
         $c4->setNotNull(true);
         $c4->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t2->addField($c4);
@@ -219,29 +219,29 @@ class EntityFieldComparatorTest extends TestCase
         $t1 = new Entity();
         $c1 = new Field('col1');
         $c1->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c1->getDomain()->replaceSize(255);
+        $c1->getDomain()->setSize(255);
         $t1->addField($c1);
         $c2 = new Field('col2');
         $c2->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c2->getDomain()->replaceSize(255);
+        $c2->getDomain()->setSize(255);
         $t1->addField($c2);
         $c3 = new Field('col3');
         $c3->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c3->getDomain()->replaceSize(255);
+        $c3->getDomain()->setSize(255);
         $t1->addField($c3);
 
         $t2 = new Entity();
         $c4 = new Field('col4');
         $c4->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c4->getDomain()->replaceSize(255);
+        $c4->getDomain()->setSize(255);
         $t2->addField($c4);
         $c5 = new Field('col5');
         $c5->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c5->getDomain()->replaceSize(255);
+        $c5->getDomain()->setSize(255);
         $t2->addField($c5);
         $c6 = new Field('col3');
         $c6->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c6->getDomain()->replaceSize(255);
+        $c6->getDomain()->setSize(255);
         $t2->addField($c6);
 
         // col1 and col2 were renamed

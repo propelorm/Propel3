@@ -104,6 +104,7 @@ class DelegateBehavior extends Behavior
                 $field = clone $field;
                 $field->setAutoIncrement(false);
                 $delegateEntity->addField($field);
+                $field->setImplementationDetail(true);
             }
         }
         // Add a one-to-one fk

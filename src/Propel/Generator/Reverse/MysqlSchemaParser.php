@@ -12,6 +12,7 @@ namespace Propel\Generator\Reverse;
 
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\Database;
+use Propel\Generator\Model\Model;
 use Propel\Generator\Model\Relation;
 use Propel\Generator\Model\Index;
 use Propel\Generator\Model\Entity;
@@ -242,7 +243,7 @@ class MysqlSchemaParser extends AbstractSchemaParser
         if ($sqlType) {
             $field->getDomain()->replaceSqlType($sqlType);
         }
-        $field->getDomain()->replaceSize($size);
+        $field->getDomain()->setSize($size);
         $field->getDomain()->replaceScale($scale);
         if ($default !== null) {
             if ($propelType == PropelTypes::BOOLEAN) {
@@ -306,15 +307,15 @@ class MysqlSchemaParser extends AbstractSchemaParser
 
                 // typical for mysql is RESTRICT
                 $fkactions = [
-                    'ON DELETE' => Relation::RESTRICT,
-                    'ON UPDATE' => Relation::RESTRICT,
+                    'ON DELETE' => Model::RELATION_RESTRICT,
+                    'ON UPDATE' => Model::RELATION_RESTRICT,
                 ];
 
                 if ($fkey) {
                     // split foreign key information -> search for ON DELETE and afterwords for ON UPDATE action
                     foreach (array_keys($fkactions) as $fkaction) {
                         $result = null;
-                        preg_match('/' . $fkaction . ' (' . Relation::CASCADE . '|' . Relation::SETNULL . ')/', $fkey, $result);
+                        preg_match('/' . $fkaction . ' (' . Model::RELATION_CASCADE . '|' . Model::RELATION_SETNULL . ')/', $fkey, $result);
                         if ($result && is_array($result) && isset($result[1])) {
                             $fkactions[$fkaction] = $result[1];
                         }
@@ -323,7 +324,7 @@ class MysqlSchemaParser extends AbstractSchemaParser
 
                 // restrict is the default
                 foreach ($fkactions as $key => $action) {
-                    if (Relation::RESTRICT === $action) {
+                    if (Model::RELATION_RESTRICT === $action) {
                         $fkactions[$key] = null;
                     }
                 }

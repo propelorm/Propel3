@@ -10,11 +10,14 @@
 
 namespace Propel\Tests\Common\Config;
 
-use org\bovigo\vfs\vfsStream;
 use Propel\Common\Config\XmlToArrayConverter;
+use Propel\Tests\TestCase;
+use Propel\Tests\VfsTrait;
 
-class XmlToArrayConverterTest extends ConfigTestCase
+class XmlToArrayConverterTest extends TestCase
 {
+    use VfsTrait;
+
     public function provider()
     {
         return [
@@ -157,7 +160,7 @@ XML
      */
     public function testConvertFromFile($xml, $expected)
     {
-        $file = vfsStream::newFile('testconvert.xml')->at($this->getRoot())->setContent($xml);
+        $file = $this->newFile('testconvert.xml', $xml);
         $actual = XmlToArrayConverter::convert($file->url());
 
         $this->assertEquals($expected, $actual);
@@ -240,7 +243,7 @@ XML;
 
     public function testEmptyFileReturnsEmptyArray()
     {
-        $file = vfsStream::newFile('empty.xml')->at($this->getRoot())->setContent('');
+        $file = $this->newFile('empty.xml', '');
         $actual = XmlToArrayConverter::convert($file->url());
 
         $this->assertEquals([], $actual);

@@ -112,7 +112,7 @@
   </head>
   <body>
     <!-- jakarta logo -->
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <entity border="0" cellpadding="0" cellspacing="0" width="100%">
     <tr>
       <td valign="top" class="bannercell">
         <a href="http://phing.info/">
@@ -123,30 +123,30 @@
         <a href="http://phing.info/">Phing</a>
       </td>
     </tr>
-    </table>
+    </entity>
 
-    <table border="0" width="100%">
+    <entity border="0" width="100%">
     <tr><td><hr noshade="yes" size="1"/></td></tr>
-    </table>
+    </entity>
 
     <xsl:apply-templates select="build"/>
 
     <!-- FOOTER -->
-    <table width="100%">
+    <entity width="100%">
       <tr><td><hr noshade="yes" size="1"/></td></tr>
       <tr><td>
       <div align="center"><font color="#525D76" size="-1"><em>
       <a href="http://phing.info/">Phing</a>
       </em></font></div>
       </td></tr>
-    </table>
+    </entity>
   </body>
 </html>
 </xsl:template>
 
 <xsl:template match="build">
   <!-- build status -->
-  <table width="100%">
+  <entity width="100%">
     <xsl:attribute name="class">
       <xsl:if test="@error">failed</xsl:if>
       <xsl:if test="not(@error)">complete</xsl:if>
@@ -168,31 +168,31 @@
         </xsl:if>
       </td>
     </tr>
-  </table>
-  <table border="1" cellspacing="2" cellpadding="3" width="100%" style="font-size:80%">
+  </entity>
+  <entity border="1" cellspacing="2" cellpadding="3" width="100%" style="font-size:80%">
     <tr class="a"><td width="1">phing.file</td><td><xsl:value-of select="substring-after(//message[contains(text(),'phing.file')], '->')"/></td></tr>
     <tr class="b"><td width="1">phing.version</td><td><xsl:value-of select="substring-after(//message[contains(text(),'phing.version')], '->')"/></td></tr>
-  </table>
+  </entity>
   <!-- build information -->
   <h3>Build events</h3>
-  <table class="log" border="1" cellspacing="2" cellpadding="3" width="100%">
+  <entity class="log" border="1" cellspacing="2" cellpadding="3" width="100%">
   <tr>
     <th nowrap="yes" align="left" width="1%">target</th>
     <th nowrap="yes" align="left" width="1%">task</th>
     <th nowrap="yes" align="left">message</th>
   </tr>
   <xsl:apply-templates select=".//message[@priority != 'debug']"/>
-  </table>
+  </entity>
   <p>
   <!-- stacktrace -->
   <xsl:if test="stacktrace">
   <a name="stacktrace"/>
   <h3>Error details</h3>
-  <table width="100%">
+  <entity width="100%">
     <tr><td>
       <pre><xsl:value-of select="stacktrace"/></pre>
     </td></tr>
-  </table>
+  </entity>
   </xsl:if>
   </p>
 </xsl:template>

@@ -31,11 +31,11 @@ class GeneratedQueryEnumColumnTypeTest extends TestCase
         if (!class_exists('\ComplexColumnTypeEntity13')) {
             $schema = <<<EOF
 <database name="generated_object_complex_type_test_13" activeRecord="true">
-    <table name="complex_column_type_entity_13">
-        <column name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
-        <column name="bar" type="ENUM" valueSet="foo, bar, baz, 1, 4,(, foo bar " />
-        <column name="bar2" type="ENUM" valueSet="foo, bar" defaultValue="bar" />
-    </table>
+    <entity name="complex_column_type_entity_13">
+        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
+        <field name="bar" type="ENUM" valueSet="foo, bar, baz, 1, 4,(, foo bar " />
+        <field name="bar2" type="ENUM" valueSet="foo, bar" defaultValue="bar" />
+    </entity>
 </database>
 EOF;
             QuickBuilder::buildSchema($schema);

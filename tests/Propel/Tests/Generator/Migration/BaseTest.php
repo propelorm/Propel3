@@ -11,18 +11,18 @@ class BaseTest extends MigrationTestCase
     {
         $originXml = '
 <database>
-    <table name="migration_test_0">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-    </table>
+    <entity name="migration_test_0">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+    </entity>
 </database>
 ';
 
         $targetXml = '
 <database>
-    <table name="migration_test_0">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="charfield" type="CHAR" size="1" />
-    </table>
+    <entity name="migration_test_0">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="charfield" type="CHAR" size="1" />
+    </entity>
 </database>
 ';
         $this->applyXmlAndTest($originXml);
@@ -33,19 +33,19 @@ class BaseTest extends MigrationTestCase
     {
         $originXml = '
 <database>
-    <table name="migration_test_0">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="title" type="VARCHAR" size="50" />
-    </table>
+    <entity name="migration_test_0">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="title" type="VARCHAR" size="50" />
+    </entity>
 </database>
 ';
 
         $targetXml = '
 <database>
-    <table name="migration_test_0">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="title" type="VARCHAR" size="250" />
-    </table>
+    <entity name="migration_test_0">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="title" type="VARCHAR" size="250" />
+    </entity>
 </database>
 ';
         $this->applyXmlAndTest($originXml);
@@ -56,19 +56,19 @@ class BaseTest extends MigrationTestCase
     {
         $originXml = '
 <database>
-    <table name="migration_test_1">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="charfield" type="CHAR" size="1" />
-    </table>
+    <entity name="migration_test_1">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="charfield" type="CHAR" size="1" />
+    </entity>
 </database>
 ';
 
         $targetXml = '
 <database>
-    <table name="migration_test_1">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="charfield" type="CHAR" size="1" />
-    </table>
+    <entity name="migration_test_1">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="charfield" type="CHAR" size="1" />
+    </entity>
 </database>
 ';
 
@@ -80,31 +80,31 @@ class BaseTest extends MigrationTestCase
     {
         $originXml = '
 <database>
-    <table name="migration_test_1">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="credits" phpName="Credits" type="DECIMAL" size="9" scale="2" required="true"/>
+    <entity name="migration_test_1">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="credits" phpName="Credits" type="DECIMAL" size="9" scale="2" required="true"/>
 
-    </table>
+    </entity>
 </database>
 ';
 
         $targetXml = '
 <database>
-    <table name="migration_test_1">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="credits" phpName="Credits" type="DECIMAL" scale="2" required="true"/>
+    <entity name="migration_test_1">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="credits" phpName="Credits" type="DECIMAL" scale="2" required="true"/>
 
-    </table>
+    </entity>
 </database>
 ';
 
         $target2Xml = '
 <database>
-    <table name="migration_test_1">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="credits" phpName="Credits" type="DECIMAL" size="10" scale="2" required="true"/>
+    <entity name="migration_test_1">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="credits" phpName="Credits" type="DECIMAL" size="10" scale="2" required="true"/>
 
-    </table>
+    </entity>
 </database>
 ';
         $this->applyXmlAndTest($originXml);
@@ -116,19 +116,19 @@ class BaseTest extends MigrationTestCase
     {
         $originXml = '
 <database>
-    <table name="migration_test_1">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="title" required="true" />
-    </table>
+    <entity name="migration_test_1">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="title" required="true" />
+    </entity>
 </database>
 ';
 
         $targetXml = '
 <database>
-    <table name="migration_test_1">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="title" />
-    </table>
+    <entity name="migration_test_1">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="title" />
+    </entity>
 </database>
 ';
 
@@ -139,21 +139,21 @@ class BaseTest extends MigrationTestCase
     {
         $originXml = '
 <database>
-    <table name="migration_test_2">
-        <column name="field1" type="VARCHAR" />
-        <column name="field2" type="INTEGER" />
-        <column name="field3" type="BOOLEAN" />
-    </table>
+    <entity name="migration_test_2">
+        <field name="field1" type="VARCHAR" />
+        <field name="field2" type="INTEGER" />
+        <field name="field3" type="BOOLEAN" />
+    </entity>
 </database>
 ';
 
         $targetXml = '
 <database>
-    <table name="migration_test_2">
-        <column name="field1" type="INTEGER" />
-        <column name="field2" type="VARCHAR" />
-        <column name="field3" type="VARCHAR" />
-    </table>
+    <entity name="migration_test_2">
+        <field name="field1" type="INTEGER" />
+        <field name="field2" type="VARCHAR" />
+        <field name="field3" type="VARCHAR" />
+    </entity>
 </database>
 ';
         $this->migrateAndTest($originXml, $targetXml);
@@ -163,32 +163,32 @@ class BaseTest extends MigrationTestCase
     {
         $originXml = '
 <database>
-    <table name="migration_test_complex">
-        <column name="field1" type="CHAR" />
-        <column name="field2" type="LONGVARCHAR" />
-        <column name="field3" type="CLOB" />
+    <entity name="migration_test_complex">
+        <field name="field1" type="CHAR" />
+        <field name="field2" type="LONGVARCHAR" />
+        <field name="field3" type="CLOB" />
 
-        <column name="field4" type="NUMERIC" />
-        <column name="field5" type="DECIMAL" />
-        <column name="field6" type="TINYINT" />
-        <column name="field7" type="SMALLINT" />
+        <field name="field4" type="NUMERIC" />
+        <field name="field5" type="DECIMAL" />
+        <field name="field6" type="TINYINT" />
+        <field name="field7" type="SMALLINT" />
 
-        <column name="field_object" type="object" />
-    </table>
+        <field name="field_object" type="object" />
+    </entity>
 </database>
 ';
 
         $targetXml = '
 <database>
-    <table name="migration_test_complex">
-        <column name="field1" type="LONGVARCHAR" />
+    <entity name="migration_test_complex">
+        <field name="field1" type="LONGVARCHAR" />
 
-        <column name="field4" type="DECIMAL" />
-        <column name="field5" type="TINYINT" />
-        <column name="field6" type="SMALLINT" />
+        <field name="field4" type="DECIMAL" />
+        <field name="field5" type="TINYINT" />
+        <field name="field6" type="SMALLINT" />
 
-        <column name="field_object" type="object" />
-    </table>
+        <field name="field_object" type="object" />
+    </entity>
 </database>
 ';
         $this->migrateAndTest($originXml, $targetXml);
@@ -198,51 +198,51 @@ class BaseTest extends MigrationTestCase
     {
         $originXml = '
 <database>
-    <table name="migration_test_3">
-        <column name="field1" type="CHAR" size="5" />
+    <entity name="migration_test_3">
+        <field name="field1" type="CHAR" size="5" />
 
-        <column name="field2" type="INTEGER" size="6" />
-        <column name="field3" type="BIGINT" />
-        <column name="field4" type="REAL" />
-        <column name="field5" type="FLOAT" />
-        <column name="field6" type="DOUBLE" />
+        <field name="field2" type="INTEGER" size="6" />
+        <field name="field3" type="BIGINT" />
+        <field name="field4" type="REAL" />
+        <field name="field5" type="FLOAT" />
+        <field name="field6" type="DOUBLE" />
 
-        <column name="field7" type="BINARY" />
-        <column name="field8" type="VARBINARY" />
-        <column name="field9" type="LONGVARBINARY" />
-        <column name="field10" type="BLOB" />
+        <field name="field7" type="BINARY" />
+        <field name="field8" type="VARBINARY" />
+        <field name="field9" type="LONGVARBINARY" />
+        <field name="field10" type="BLOB" />
 
-        <column name="field11" type="DATE" />
-        <column name="field12" type="TIME" />
-        <column name="field13" type="TIMESTAMP" />
+        <field name="field11" type="DATE" />
+        <field name="field12" type="TIME" />
+        <field name="field13" type="TIMESTAMP" />
 
-        <column name="field14" type="ENUM" />
-    </table>
+        <field name="field14" type="ENUM" />
+    </entity>
 </database>
 ';
 
         $targetXml = '
 <database>
-    <table name="migration_test_3">
-        <column name="field1" type="CHAR" size="5" />
+    <entity name="migration_test_3">
+        <field name="field1" type="CHAR" size="5" />
 
-        <column name="field2" type="INTEGER" size="12" />
-        <column name="field3" type="REAL" />
-        <column name="field4" type="FLOAT" />
-        <column name="field5" type="DOUBLE" />
-        <column name="field6" type="BIGINT" />
+        <field name="field2" type="INTEGER" size="12" />
+        <field name="field3" type="REAL" />
+        <field name="field4" type="FLOAT" />
+        <field name="field5" type="DOUBLE" />
+        <field name="field6" type="BIGINT" />
 
-        <column name="field7" type="VARBINARY" />
-        <column name="field8" type="LONGVARBINARY" />
-        <column name="field9" type="BLOB" />
-        <column name="field10" type="BINARY" />
+        <field name="field7" type="VARBINARY" />
+        <field name="field8" type="LONGVARBINARY" />
+        <field name="field9" type="BLOB" />
+        <field name="field10" type="BINARY" />
 
-        <column name="field11" type="TIME" />
-        <column name="field12" type="TIMESTAMP" />
-        <column name="field13" type="DATE" />
+        <field name="field11" type="TIME" />
+        <field name="field12" type="TIMESTAMP" />
+        <field name="field13" type="DATE" />
 
-        <column name="field14" type="VARCHAR" size="200" />
-    </table>
+        <field name="field14" type="VARCHAR" size="200" />
+    </entity>
 </database>
 ';
         $this->migrateAndTest($originXml, $targetXml);
@@ -252,55 +252,55 @@ class BaseTest extends MigrationTestCase
     {
         $originXml = '
 <database>
-    <table name="migration_test_5">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="title" required="true" />
-    </table>
+    <entity name="migration_test_5">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="title" required="true" />
+    </entity>
 </database>
 ';
 
         $targetXml = '
 <database>
-    <table name="migration_test_5">
-        <column name="id" type="integer" />
-        <column name="title" />
-    </table>
+    <entity name="migration_test_5">
+        <field name="id" type="integer" />
+        <field name="title" />
+    </entity>
 </database>
 ';
 
         $target2Xml = '
 <database>
-    <table name="migration_test_5">
-        <column name="id" type="integer" primaryKey="true" />
-        <column name="title" />
-    </table>
+    <entity name="migration_test_5">
+        <field name="id" type="integer" primaryKey="true" />
+        <field name="title" />
+    </entity>
 </database>
 ';
 
         $target3Xml = '
 <database>
-    <table name="migration_test_5">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true"  />
-        <column name="title" />
-    </table>
+    <entity name="migration_test_5">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true"  />
+        <field name="title" />
+    </entity>
 </database>
 ';
 
         $target4Xml = '
 <database>
-    <table name="migration_test_5">
-        <column name="id" type="integer" primaryKey="true" />
-        <column name="title" />
-    </table>
+    <entity name="migration_test_5">
+        <field name="id" type="integer" primaryKey="true" />
+        <field name="title" />
+    </entity>
 </database>
 ';
 
         $target5Xml = '
 <database>
-    <table name="migration_test_5">
-        <column name="id" type="varchar" size="200" primaryKey="true" />
-        <column name="title" required="true" type="integer" />
-    </table>
+    <entity name="migration_test_5">
+        <field name="id" type="varchar" size="200" primaryKey="true" />
+        <field name="title" required="true" type="integer" />
+    </entity>
 </database>
 ';
         $this->applyXmlAndTest($originXml);
