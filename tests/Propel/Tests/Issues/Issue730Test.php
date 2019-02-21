@@ -19,13 +19,12 @@ class Issue730Test extends TestCaseFixtures
     public function testNamespace()
     {
         $schema = <<<EOF
-<?xml version="1.0" encoding="utf-8"?>
 <database name="default" defaultIdMethod="native" namespace="Tests\\Issue730\\" activeRecord="true">
     <entity name="Group" tableName="issue730_group">
-        <field name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <field name="name" phpName="Name" type="VARCHAR" size="100" required="true"/>
+        <field name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <field name="name" type="VARCHAR" size="100" required="true"/>
     </entity>
-    <entity tableName="issue730_department_group" idMethod="native" name="Group" namespace="\Tests\Issue730\Department">
+    <entity tableName="issue730_department_group" idMethod="native" name="Group" namespace="Tests\\Issue730\\Department">
         <field name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <field name="name" type="VARCHAR" size="100" required="true"/>
         <field name="groupId" type="INTEGER"/>

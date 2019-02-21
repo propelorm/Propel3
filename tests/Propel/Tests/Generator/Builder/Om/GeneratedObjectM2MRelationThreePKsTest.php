@@ -30,10 +30,10 @@ class GeneratedObjectM2MRelationThreePKsTest extends PlatformDatabaseBuildTimeBa
         if (!class_exists('\Relation2UserQuery')) {
             $schema = '
     <database name="migration" schema="migration">
-        <table name="relation2_user_group" isCrossRef="true">
-            <column name="user_id" type="integer" primaryKey="true"/>
-            <column name="group_id" type="integer" primaryKey="true"/>
-            <column name="position_id" type="integer" primaryKey="true"/>
+        <entity name="relation2_user_group" isCrossRef="true">
+            <field name="user_id" type="integer" primaryKey="true"/>
+            <field name="group_id" type="integer" primaryKey="true"/>
+            <field name="position_id" type="integer" primaryKey="true"/>
 
             <foreign-key foreignTable="relation2_user" phpName="User" onDelete="cascade">
                 <reference local="user_id" foreign="id"/>
@@ -46,22 +46,22 @@ class GeneratedObjectM2MRelationThreePKsTest extends PlatformDatabaseBuildTimeBa
             <foreign-key foreignTable="relation2_position" phpName="Position" onDelete="cascade">
                 <reference local="position_id" foreign="id"/>
             </foreign-key>
-        </table>
+        </entity>
 
-        <table name="relation2_user">
-            <column name="id" type="integer" primaryKey="true" autoIncrement="true"/>
-            <column name="name" />
-        </table>
+        <entity name="relation2_user">
+            <field name="id" type="integer" primaryKey="true" autoIncrement="true"/>
+            <field name="name" />
+        </entity>
 
-        <table name="relation2_group">
-            <column name="id" type="integer" primaryKey="true" autoIncrement="true"/>
-            <column name="name" />
-        </table>
+        <entity name="relation2_group">
+            <field name="id" type="integer" primaryKey="true" autoIncrement="true"/>
+            <field name="name" />
+        </entity>
 
-        <table name="relation2_position">
-            <column name="id" type="integer" primaryKey="true" autoIncrement="true"/>
-            <column name="name" />
-        </table>
+        <entity name="relation2_position">
+            <field name="id" type="integer" primaryKey="true" autoIncrement="true"/>
+            <field name="name" />
+        </entity>
     </database>
         ';
 
@@ -588,11 +588,11 @@ class GeneratedObjectM2MRelationThreePKsTest extends PlatformDatabaseBuildTimeBa
     {
         $schema = '
     <database name="migration" schema="migration">
-        <table name="relation3_user_group" isCrossRef="true">
-            <column name="user_id" type="integer" primaryKey="true"/>
-            <column name="group_id" type="integer" primaryKey="true"/>
-            <column name="group_id2" type="integer" primaryKey="true"/>
-            <column name="relation_id" type="integer" primaryKey="true"/>
+        <entity name="relation3_user_group" isCrossRef="true">
+            <field name="user_id" type="integer" primaryKey="true"/>
+            <field name="group_id" type="integer" primaryKey="true"/>
+            <field name="group_id2" type="integer" primaryKey="true"/>
+            <field name="relation_id" type="integer" primaryKey="true"/>
 
             <foreign-key foreignTable="relation3_user" phpName="User">
                 <reference local="user_id" foreign="id"/>
@@ -606,23 +606,23 @@ class GeneratedObjectM2MRelationThreePKsTest extends PlatformDatabaseBuildTimeBa
             <foreign-key foreignTable="relation3_relation" phpName="Relation">
                 <reference local="relation_id" foreign="id"/>
             </foreign-key>
-        </table>
+        </entity>
 
-        <table name="relation3_user">
-            <column name="id" type="integer" primaryKey="true" autoIncrement="true"/>
-            <column name="name" />
-        </table>
+        <entity name="relation3_user">
+            <field name="id" type="integer" primaryKey="true" autoIncrement="true"/>
+            <field name="name" />
+        </entity>
 
-        <table name="relation3_group">
-            <column name="id" type="integer" primaryKey="true" autoIncrement="true"/>
-            <column name="id2" type="integer" primaryKey="true"/>
-            <column name="name" />
-        </table>
+        <entity name="relation3_group">
+            <field name="id" type="integer" primaryKey="true" autoIncrement="true"/>
+            <field name="id2" type="integer" primaryKey="true"/>
+            <field name="name" />
+        </entity>
 
-        <table name="relation3_relation">
-            <column name="id" type="integer" primaryKey="true" autoIncrement="true"/>
-            <column name="name" />
-        </table>
+        <entity name="relation3_relation">
+            <field name="id" type="integer" primaryKey="true" autoIncrement="true"/>
+            <field name="name" />
+        </entity>
     </database>
         ';
 
@@ -668,11 +668,11 @@ class GeneratedObjectM2MRelationThreePKsTest extends PlatformDatabaseBuildTimeBa
     {
         $schema = '
     <database name="migration" schema="migration">
-        <table name="relation4_user_group" isCrossRef="true">
-            <column name="user_id" type="integer" primaryKey="true"/>
-            <column name="group_id" type="integer" primaryKey="true"/>
-            <column name="group_id2" type="integer" primaryKey="true"/>
-            <column name="relation" type="varchar" primaryKey="true"/>
+        <entity name="relation4_user_group" isCrossRef="true">
+            <field name="user_id" type="integer" primaryKey="true"/>
+            <field name="group_id" type="integer" primaryKey="true"/>
+            <field name="group_id2" type="integer" primaryKey="true"/>
+            <field name="relation" type="varchar" primaryKey="true"/>
 
             <foreign-key foreignTable="relation4_user" phpName="User">
                 <reference local="user_id" foreign="id"/>
@@ -682,18 +682,18 @@ class GeneratedObjectM2MRelationThreePKsTest extends PlatformDatabaseBuildTimeBa
                 <reference local="group_id" foreign="id"/>
                 <reference local="group_id2" foreign="id2"/>
             </foreign-key>
-        </table>
+        </entity>
 
-        <table name="relation4_user">
-            <column name="id" type="integer" primaryKey="true" autoIncrement="true"/>
-            <column name="name" />
-        </table>
+        <entity name="relation4_user">
+            <field name="id" type="integer" primaryKey="true" autoIncrement="true"/>
+            <field name="name" />
+        </entity>
 
-        <table name="relation4_group">
-            <column name="id" type="integer" primaryKey="true" autoIncrement="true"/>
-            <column name="id2" type="integer" primaryKey="true"/>
-            <column name="name" />
-        </table>
+        <entity name="relation4_group">
+            <field name="id" type="integer" primaryKey="true" autoIncrement="true"/>
+            <field name="id2" type="integer" primaryKey="true"/>
+            <field name="name" />
+        </entity>
 
     </database>
         ';
@@ -735,11 +735,11 @@ class GeneratedObjectM2MRelationThreePKsTest extends PlatformDatabaseBuildTimeBa
     {
         $schema = '
     <database name="migration" schema="migration">
-        <table name="relation5_user_group" isCrossRef="true">
-            <column name="user_id" type="integer" primaryKey="true"/>
-            <column name="group_id" type="integer" primaryKey="true"/>
-            <column name="relation" type="varchar" primaryKey="true"/>
-            <column name="group_id2" type="integer" primaryKey="true"/>
+        <entity name="relation5_user_group" isCrossRef="true">
+            <field name="user_id" type="integer" primaryKey="true"/>
+            <field name="group_id" type="integer" primaryKey="true"/>
+            <field name="relation" type="varchar" primaryKey="true"/>
+            <field name="group_id2" type="integer" primaryKey="true"/>
 
             <foreign-key foreignTable="relation5_group" phpName="Group">
                 <reference local="group_id" foreign="id"/>
@@ -749,18 +749,18 @@ class GeneratedObjectM2MRelationThreePKsTest extends PlatformDatabaseBuildTimeBa
             <foreign-key foreignTable="relation5_user" phpName="User">
                 <reference local="user_id" foreign="id"/>
             </foreign-key>
-        </table>
+        </entity>
 
-        <table name="relation5_user">
-            <column name="id" type="integer" primaryKey="true" autoIncrement="true"/>
-            <column name="name" />
-        </table>
+        <entity name="relation5_user">
+            <field name="id" type="integer" primaryKey="true" autoIncrement="true"/>
+            <field name="name" />
+        </entity>
 
-        <table name="relation5_group">
-            <column name="id" type="integer" primaryKey="true" autoIncrement="true"/>
-            <column name="id2" type="integer" primaryKey="true"/>
-            <column name="name" />
-        </table>
+        <entity name="relation5_group">
+            <field name="id" type="integer" primaryKey="true" autoIncrement="true"/>
+            <field name="id2" type="integer" primaryKey="true"/>
+            <field name="name" />
+        </entity>
 
     </database>
         ';
@@ -802,10 +802,10 @@ class GeneratedObjectM2MRelationThreePKsTest extends PlatformDatabaseBuildTimeBa
     {
         $schema = '
     <database name="migration" schema="migration">
-        <table name="relation6_user_group" isCrossRef="true">
-            <column name="user_id" type="integer" primaryKey="true"/>
-            <column name="group_id" type="integer" primaryKey="true"/>
-            <column name="group_id2" type="integer" primaryKey="true"/>
+        <entity name="relation6_user_group" isCrossRef="true">
+            <field name="user_id" type="integer" primaryKey="true"/>
+            <field name="group_id" type="integer" primaryKey="true"/>
+            <field name="group_id2" type="integer" primaryKey="true"/>
 
             <foreign-key foreignTable="relation6_group" phpName="Group">
                 <reference local="group_id" foreign="id"/>
@@ -815,18 +815,18 @@ class GeneratedObjectM2MRelationThreePKsTest extends PlatformDatabaseBuildTimeBa
             <foreign-key foreignTable="relation6_user" phpName="User">
                 <reference local="user_id" foreign="id"/>
             </foreign-key>
-        </table>
+        </entity>
 
-        <table name="relation6_user">
-            <column name="id" type="integer" primaryKey="true" autoIncrement="true"/>
-            <column name="name" />
-        </table>
+        <entity name="relation6_user">
+            <field name="id" type="integer" primaryKey="true" autoIncrement="true"/>
+            <field name="name" />
+        </entity>
 
-        <table name="relation6_group">
-            <column name="id" type="integer" primaryKey="true" autoIncrement="true"/>
-            <column name="id2" type="integer" primaryKey="true"/>
-            <column name="name" />
-        </table>
+        <entity name="relation6_group">
+            <field name="id" type="integer" primaryKey="true" autoIncrement="true"/>
+            <field name="id2" type="integer" primaryKey="true"/>
+            <field name="name" />
+        </entity>
 
     </database>
         ';

@@ -46,7 +46,7 @@ class FilterByFieldMethods extends BuildComponent
         $fieldPhpName = NamingTool::toStudlyCase($field->getName());
         $fieldName = $field->getName();
         $variableName = NamingTool::toCamelCase($field->getName());
-        $qualifiedName = $field->getFQConstantName();
+        $qualifiedName = $field->getFullConstantName();
 
         $variableParameter = new PhpParameter($variableName);
         $variableParameter->setType('mixed');
@@ -223,7 +223,7 @@ return \$this->addUsingAlias($qualifiedName, \$$variableName, \$comparison);
         $singularPhpName = ucfirst($field->getSingularName());
         $fieldName = $field->getName();
         $variableName = NamingTool::toCamelCase($field->getName());
-        $qualifiedName = $field->getFQConstantName();
+        $qualifiedName = $field->getFullConstantName();
 
         $description = "Filter the query on the $fieldName column";
 

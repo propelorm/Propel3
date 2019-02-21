@@ -11,32 +11,32 @@ class ForeignKeyTest extends MigrationTestCase
     {
         $originXml = '
 <database>
-    <table name="migration_test_6">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="title" required="true" />
-    </table>
-    <table name="migration_test_7">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="title" required="true" />
-        <column name="test_6_id" />
-    </table>
+    <entity name="migration_test_6">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="title" required="true" />
+    </entity>
+    <entity name="migration_test_7">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="title" required="true" />
+        <field name="test_6_id" />
+    </entity>
 </database>
 ';
 
         $targetXml = '
 <database>
-    <table name="migration_test_6">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="title" required="true" />
-    </table>
-    <table name="migration_test_7">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="title" required="true" />
-        <column name="test_6_id" type="integer" />
+    <entity name="migration_test_6">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="title" required="true" />
+    </entity>
+    <entity name="migration_test_7">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="title" required="true" />
+        <field name="test_6_id" type="integer" />
         <foreign-key foreignTable="migration_test_6" onDelete="cascade" onUpdate="cascade">
             <reference local="test_6_id" foreign="id" />
         </foreign-key>
-    </table>
+    </entity>
 </database>
 ';
         $this->migrateAndTest($originXml, $targetXml);
@@ -46,28 +46,28 @@ class ForeignKeyTest extends MigrationTestCase
     {
         $originXml = '
 <database>
-    <table name="migration_test_6_1">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="title" required="true" />
-    </table>
+    <entity name="migration_test_6_1">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="title" required="true" />
+    </entity>
 </database>
 ';
 
         $targetXml = '
 <database>
-    <table name="migration_test_6_1">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="id2" type="integer"/>
-        <column name="title" required="true" />
-    </table>
-    <table name="migration_test_7_1">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="title" required="true" />
-        <column name="test_6_id" type="integer" />
+    <entity name="migration_test_6_1">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="id2" type="integer"/>
+        <field name="title" required="true" />
+    </entity>
+    <entity name="migration_test_7_1">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="title" required="true" />
+        <field name="test_6_id" type="integer" />
         <foreign-key foreignTable="migration_test_6_1" onDelete="cascade" onUpdate="cascade">
             <reference local="test_6_id" foreign="id2" />
         </foreign-key>
-    </table>
+    </entity>
 </database>
 ';
         $this->migrateAndTest($originXml, $targetXml);
@@ -77,32 +77,32 @@ class ForeignKeyTest extends MigrationTestCase
     {
         $originXml = '
 <database>
-    <table name="migration_test_6">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="title" required="true" />
-    </table>
-    <table name="migration_test_7">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="title" required="true" />
-        <column name="test_6_id" type="integer" />
+    <entity name="migration_test_6">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="title" required="true" />
+    </entity>
+    <entity name="migration_test_7">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="title" required="true" />
+        <field name="test_6_id" type="integer" />
         <foreign-key foreignTable="migration_test_6" onDelete="cascade" onUpdate="cascade">
             <reference local="test_6_id" foreign="id" />
         </foreign-key>
-    </table>
+    </entity>
 </database>
 ';
 
         $targetXml = '
 <database>
-    <table name="migration_test_6">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="title" required="true" />
-    </table>
-    <table name="migration_test_7">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="title" required="true" />
-        <column name="test_6_id" />
-    </table>
+    <entity name="migration_test_6">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="title" required="true" />
+    </entity>
+    <entity name="migration_test_7">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="title" required="true" />
+        <field name="test_6_id" />
+    </entity>
 </database>
 ';
         $this->migrateAndTest($originXml, $targetXml);
@@ -112,37 +112,37 @@ class ForeignKeyTest extends MigrationTestCase
     {
         $originXml = '
 <database>
-    <table name="migration_test_6">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="id2" type="integer" primaryKey="true"/>
-        <column name="title" required="true" />
-    </table>
-    <table name="migration_test_7">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="title" required="true" />
-        <column name="test_6_id" type="integer" />
-        <column name="test_6_id2" type="integer" />
+    <entity name="migration_test_6">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="id2" type="integer" primaryKey="true"/>
+        <field name="title" required="true" />
+    </entity>
+    <entity name="migration_test_7">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="title" required="true" />
+        <field name="test_6_id" type="integer" />
+        <field name="test_6_id2" type="integer" />
         <foreign-key foreignTable="migration_test_6" onDelete="cascade" onUpdate="cascade">
             <reference local="test_6_id" foreign="id" />
             <reference local="test_6_id2" foreign="id2" />
         </foreign-key>
-    </table>
+    </entity>
 </database>
 ';
 
         $targetXml = '
 <database>
-    <table name="migration_test_6">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="id2" type="integer" primaryKey="true"/>
-        <column name="title" required="true" />
-    </table>
-    <table name="migration_test_7">
-        <column name="id" type="integer" primaryKey="true" autoIncrement="true" />
-        <column name="title" required="true" />
-        <column name="test_6_id" />
-        <column name="test_6_id2" />
-    </table>
+    <entity name="migration_test_6">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="id2" type="integer" primaryKey="true"/>
+        <field name="title" required="true" />
+    </entity>
+    <entity name="migration_test_7">
+        <field name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <field name="title" required="true" />
+        <field name="test_6_id" />
+        <field name="test_6_id2" />
+    </entity>
 </database>
 ';
         $this->migrateAndTest($originXml, $targetXml);

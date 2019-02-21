@@ -65,7 +65,7 @@ class InitializeMethod extends BuildComponent
         \$this->setSingleEntityInheritance(true);";
         }
 
-        if ($this->getEntity()->getIsCrossRef()) {
+        if ($this->getEntity()->isCrossRef()) {
             $body .= "
         \$this->setIsCrossRef(true);";
         }

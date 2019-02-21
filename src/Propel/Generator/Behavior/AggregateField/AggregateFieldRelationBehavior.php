@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Behavior\AggregateField;
 
 use Propel\Generator\Builder\Om\Component\ComponentTrait;

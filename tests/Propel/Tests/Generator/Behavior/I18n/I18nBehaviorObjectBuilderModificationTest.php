@@ -27,7 +27,7 @@ class I18nBehaviorObjectBuilderModificationTest extends TestCase
             $schema = <<<EOF
 <database name="i18n_behavior_test_1" activeRecord="true">
     <entity name="I18nBehaviorTest1">
-        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
+        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" required="true"/>
         <field name="foo" type="INTEGER" />
         <field name="bar" type="VARCHAR" size="100" />
         <behavior name="i18n">
@@ -48,7 +48,7 @@ class I18nBehaviorObjectBuilderModificationTest extends TestCase
         </behavior>
     </entity>
     <entity name="Movie">
-        <field name="id" type="integer" required="true" primaryKey="true" autoincrement="true" />
+        <field name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
         <field name="director" type="varchar" size="255" />
         <field name="title" type="varchar" primaryString="true" />
         <behavior name="i18n">
@@ -57,7 +57,7 @@ class I18nBehaviorObjectBuilderModificationTest extends TestCase
         </behavior>
     </entity>
     <entity name="Toy">
-        <field name="id" type="integer" required="true" primaryKey="true" autoincrement="true" />
+        <field name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
         <field name="ref" type="varchar" size="255" />
         <field name="name" type="varchar" size="255" />
         <behavior name="i18n">

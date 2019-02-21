@@ -51,8 +51,6 @@ propel:
       - bookstore
       - bookstore-cms
       - bookstore-behavior
-    targetPackage: bookstore
-    packageObjectModel: false
 
   runtime:
     defaultConnection: bookstore

@@ -79,7 +79,7 @@ class Properties extends BuildComponent
                 $property->setValue($defaultValue);
 
                 if ($field->isPhpArrayType()) {
-                    $defaultValue = $this->getDefaultValueString($field);
+                    $defaultValue = array_map('trim', explode(',', $field->getDefaultValue()->getValue()));
                     $property->setExpression(var_export($defaultValue, true));
                 }
             }

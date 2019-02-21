@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,6 +6,8 @@
  *
  * @license MIT License
  */
+
+declare(strict_types=1);
 
 namespace Propel\Generator\Model;
 
@@ -40,6 +41,13 @@ class Domain
     private $defaultValue;
 
     /**
+     * If a property was manually replaced.
+     *
+     * @var bool
+     */
+    private $replaced = false;
+
+    /**
      * Creates a new Domain object.
      *
      * If this domain needs a name, it must be specified manually.
@@ -49,7 +57,7 @@ class Domain
      * @param integer $size
      * @param integer $scale
      */
-    public function __construct($type = null, $sqlType = null, $size = null, $scale = null)
+    public function __construct(string $type = null, string $sqlType = null, int $size = null, int $scale = null)
     {
         if (null !== $type) {
             $this->setType($type);
@@ -63,7 +71,11 @@ class Domain
             $this->setScale($scale);
         }
 
-        $this->setSqlType(null !== $sqlType ? $sqlType : $type);
+        if (null !== $sqlType) {
+            $this->setSqlType($sqlType);
+        } elseif (null !== $type) {
+            $this->setSqlType($type);
+        }
     }
 
     /**
@@ -117,21 +129,19 @@ class Domain
      *
      * @param integer $scale
      */
-    public function setScale($scale)
+    public function setScale(int $scale)
     {
-        $this->scale = null === $scale ? null : (int) $scale;
+        $this->scale = $scale;
     }
 
     /**
-     * Replaces the size if the new value is not null.
+     * Replaces the size.
      *
      * @param integer $scale
      */
-    public function replaceScale($scale)
+    public function replaceScale(int $scale)
     {
-        if (null !== $scale) {
-            $this->scale = (int) $scale;
-        }
+        $this->setScale($scale);
     }
 
     /**
@@ -149,21 +159,9 @@ class Domain
      *
      * @param integer $size
      */
-    public function setSize($size)
+    public function setSize(int $size)
     {
-        $this->size = null === $size ? null : (int) $size;
-    }
-
-    /**
-     * Replaces the size if the new value is not null.
-     *
-     * @param integer $size
-     */
-    public function replaceSize($size)
-    {
-        if (null !== $size) {
-            $this->size = $size;
-        }
+        $this->size = $size;
     }
 
     /**
@@ -181,21 +179,9 @@ class Domain
      *
      * @param string $mappingType
      */
-    public function setType($mappingType)
+    public function setType(string $mappingType)
     {
         $this->mappingType = $mappingType;
-    }
-
-    /**
-     * Replaces the mapping type if the new value is not null.
-     *
-     * @param string $mappingType
-     */
-    public function replaceType($mappingType)
-    {
-        if (null !== $mappingType) {
-            $this->mappingType = $mappingType;
-        }
     }
 
     /**
@@ -207,7 +193,6 @@ class Domain
     {
         return $this->defaultValue;
     }
-
 
     /**
      * Returns the default value, type-casted for use in PHP OM.
@@ -227,6 +212,7 @@ class Domain
         if (in_array($this->mappingType, [ PropelTypes::BOOLEAN, PropelTypes::BOOLEAN_EMU ])) {
             return PropelTypes::booleanValue($this->defaultValue->getValue());
         }
+
         if (PropelTypes::PHP_ARRAY === $this->mappingType) {
             return $this->getDefaultValueForArray($this->defaultValue->getValue());
         }
@@ -242,18 +228,6 @@ class Domain
     public function setDefaultValue(FieldDefaultValue $value)
     {
         $this->defaultValue = $value;
-    }
-
-    /**
-     * Replaces the default value if the new value is not null.
-     *
-     * @param FieldDefaultValue $value
-     */
-    public function replaceDefaultValue(FieldDefaultValue $value = null)
-    {
-        if (null !== $value) {
-            $this->defaultValue = $value;
-        }
     }
 
     /**
@@ -275,7 +249,7 @@ class Domain
      *
      * @param string $sqlType
      */
-    public function setSqlType($sqlType)
+    public function setSqlType(string $sqlType)
     {
         $this->sqlType = $sqlType;
     }
@@ -285,11 +259,10 @@ class Domain
      *
      * @param string $sqlType
      */
-    public function replaceSqlType($sqlType)
+    public function replaceSqlType(string $sqlType)
     {
-        if (null !== $sqlType) {
-            $this->sqlType = $sqlType;
-        }
+        $this->setSqlType($sqlType);
+        $this->replaced = true;
     }
 
     /**
@@ -308,6 +281,11 @@ class Domain
         }
 
         return sprintf('(%u)', $this->size);
+    }
+
+    public function isReplaced(): bool
+    {
+        return $this->replaced;
     }
 
     public function __clone()

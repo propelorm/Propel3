@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Platform;
 
 /**
@@ -20,7 +22,7 @@ class SqlsrvPlatform extends MssqlPlatform
     /**
      * @see Platform#getMaxFieldNameLength()
      */
-    public function getMaxFieldNameLength()
+    public function getMaxFieldNameLength(): int
     {
         return 128;
     }

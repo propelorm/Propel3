@@ -38,7 +38,7 @@ if ($objectName) {";
                 $condName = "'pruneCond" . $i . "'";
                 $conditions[]= $condName;
                 $body .= "
-    \$this->addCond(". $condName . ", \$this->getAliasedColName({$col->getFQConstantName()}), " . $objectName . "->get" . ucfirst($col->getName()) . "(), Criteria::NOT_EQUAL);";
+    \$this->addCond(". $condName . ", \$this->getAliasedColName({$col->getFullConstantName()}), " . $objectName . "->get" . ucfirst($col->getName()) . "(), Criteria::NOT_EQUAL);";
                 $i++;
             }
             $conditionsString = implode(', ', $conditions);
@@ -47,7 +47,7 @@ if ($objectName) {";
         } elseif ($entity->hasPrimaryKey()) {
             $col = $pks[0];
             $body .= "
-    \$this->addUsingAlias({$col->getFQConstantName()}, " . $objectName . "->get" . ucfirst($col->getName()) . "(), Criteria::NOT_EQUAL);";
+    \$this->addUsingAlias({$col->getFullConstantName()}, " . $objectName . "->get" . ucfirst($col->getName()) . "(), Criteria::NOT_EQUAL);";
         } else {
             $this->getDefinition()->addUseStatement('Propel\\Runtime\\Exception\\LogicException');
             $body .= "

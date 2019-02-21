@@ -15,6 +15,7 @@ use Propel\Generator\Model\FieldDefaultValue;
 use Propel\Generator\Model\IdMethod;
 use Propel\Generator\Model\IdMethodParameter;
 use Propel\Generator\Model\Entity;
+use Propel\Generator\Model\Model;
 use Propel\Generator\Platform\SqlitePlatform;
 use Propel\Runtime\Adapter\AdapterFactory;
 use Propel\Runtime\Connection\ConnectionFactory;
@@ -89,7 +90,7 @@ CREATE TABLE [book]
     FOREIGN KEY ([author_id]) REFERENCES [author] ([id])
 );
 
-CREATE INDEX [book_i_639136] ON [book] ([title]);
+CREATE INDEX [book_i_853ae9] ON [book] ([title]);
 
 -----------------------------------------------------------------------
 -- author
@@ -203,7 +204,7 @@ DROP TABLE IF EXISTS [foo];
         $c = new Field('foo');
         $c->getDomain()->copy($this->getPlatform()->getDomainForType('DOUBLE'));
         $c->getDomain()->replaceScale(2);
-        $c->getDomain()->replaceSize(3);
+        $c->getDomain()->setSize(3);
         $c->setNotNull(true);
         $c->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $expected = '[foo] DOUBLE(3,2) DEFAULT 123 NOT NULL';
@@ -215,7 +216,7 @@ DROP TABLE IF EXISTS [foo];
         $column = new Field('foo');
         $column->getDomain()->copy($this->getPlatform()->getDomainForType('DOUBLE'));
         $column->getDomain()->replaceScale(2);
-        $column->getDomain()->replaceSize(3);
+        $column->getDomain()->setSize(3);
         $column->setNotNull(true);
         $column->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $column->getDomain()->replaceSqlType('DECIMAL(5,6)');

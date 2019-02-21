@@ -27,16 +27,16 @@ abstract class PlatformTestProvider extends PlatformTestBase
     {
         $schema = <<<EOF
 <database name="test" identifierQuoting="true">
-    <entity name="book">
-        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
+    <entity name="Book">
+        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" required="true" />
         <field name="title" type="VARCHAR" size="255" required="true" />
         <index>
             <index-field name="title" />
         </index>
-        <relation target="author" />
+        <relation target="Author" />
     </entity>
-    <entity name="author">
-        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
+    <entity name="Author">
+        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" required="true" />
         <field name="firstName" type="VARCHAR" size="100" />
         <field name="lastName" type="VARCHAR" size="100" />
     </entity>
@@ -50,27 +50,27 @@ EOF;
     {
         $schema = <<<EOF
 <database name="test" schema="x" identifierQuoting="true">
-    <entity name="book">
-        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
+    <entity name="Book">
+        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" required="true"/>
         <field name="title" type="VARCHAR" size="255" required="true" />
         <index>
             <index-field name="title" />
         </index>
         <field name="authorId" type="INTEGER"/>
-        <relation target="author" foreignSchema="y">
+        <relation target="Author" foreignSchema="y">
             <reference local="authorId" foreign="id" />
         </relation>
     </entity>
-    <entity name="author" schema="y">
-        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
+    <entity name="Author" schema="y">
+        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" required="true"/>
         <field name="firstName" type="VARCHAR" size="100" />
         <field name="lastName" type="VARCHAR" size="100" />
     </entity>
-    <entity name="book_summary">
+    <entity name="BookSummary">
         <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
         <field name="bookId" required="true" type="INTEGER" />
         <field name="summary" required="true" type="LONGVARCHAR" />
-        <relation target="book" onDelete="cascade">
+        <relation target="Book" onDelete="cascade">
             <reference local="bookId" foreign="id" />
         </relation>
     </entity>
@@ -84,19 +84,19 @@ EOF;
     {
         $schema = <<<EOF
 <database name="test" identifierQuoting="true">
-    <entity name="book" skipSql="true">
-        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
+    <entity name="Book" skipSql="true">
+        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" required="true"/>
         <field name="title" type="VARCHAR" size="255" required="true" />
         <index>
             <index-field name="title" />
         </index>
         <field name="authorId" type="INTEGER"/>
-        <relation target="author">
+        <relation target="Author">
             <reference local="authorId" foreign="id" />
         </relation>
     </entity>
-    <entity name="author" skipSql="true">
-        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
+    <entity name="Author" skipSql="true">
+        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" required="true"/>
         <field name="first_name" type="VARCHAR" size="100" />
         <field name="last_name" type="VARCHAR" size="100" />
     </entity>
@@ -110,8 +110,8 @@ EOF;
     {
         $schema = <<<EOF
 <database name="test" identifierQuoting="true">
-    <entity name="foo" description="This is foo table">
-        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
+    <entity name="Foo" description="This is foo table">
+        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" required="true"/>
         <field name="bar" type="VARCHAR" size="255" required="true" />
     </entity>
 </database>
@@ -124,8 +124,8 @@ EOF;
     {
         $schema = <<<EOF
 <database name="test" identifierQuoting="true">
-    <entity name="foo" description="This is foo entity">
-        <field name="foo" primaryKey="true" type="VARCHAR" />
+    <entity name="Foo" description="This is foo entity">
+        <field name="foo" primaryKey="true" type="VARCHAR" size="255" />
         <field name="bar" type="VARCHAR" size="255" required="true" />
     </entity>
 </database>
@@ -138,7 +138,7 @@ EOF;
     {
         $schema = <<<EOF
 <database name="test" identifierQuoting="true">
-    <entity name="foo">
+    <entity name="Foo">
         <field name="foo" primaryKey="true" type="INTEGER" />
         <field name="bar" primaryKey="true" type="INTEGER" />
         <field name="baz" type="VARCHAR" size="255" required="true" />
@@ -153,7 +153,7 @@ EOF;
     {
         $schema = <<<EOF
 <database name="test" identifierQuoting="true">
-    <entity name="foo">
+    <entity name="Foo">
         <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
         <field name="bar" type="INTEGER" />
         <unique>
@@ -170,7 +170,7 @@ EOF;
     {
         $schema = <<<EOF
 <database name="test" identifierQuoting="true">
-    <entity name="foo" schema="Woopah">
+    <entity name="Foo" schema="Woopah">
         <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
         <field name="bar" type="INTEGER" />
     </entity>

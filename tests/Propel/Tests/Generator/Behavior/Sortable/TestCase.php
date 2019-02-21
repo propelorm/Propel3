@@ -62,20 +62,6 @@ class TestCase extends BaseTestCase
         <behavior name="sortable">
             <parameter name="rank_field" value="position" />
             <parameter name="use_scope" value="true" />
-            <parameter name="scope_field" value="categoryId" />
-            <parameter name="scope_field" value="subCategoryId" />
-        </behavior>
-    </entity>
-
-    <entity name="SortableMultiCommaScopes">
-        <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
-        <field name="categoryId" required="true" type="INTEGER" />
-        <field name="subCategoryId" type="INTEGER" />
-        <field name="title" type="VARCHAR" size="100" primaryString="true" />
-        <field name="position" type="INTEGER" />
-        <behavior name="sortable">
-            <parameter name="rank_field" value="position" />
-            <parameter name="use_scope" value="true" />
             <parameter name="scope_field" value="categoryId, subCategoryId" />
         </behavior>
     </entity>

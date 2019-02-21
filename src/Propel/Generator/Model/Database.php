@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -60,17 +59,10 @@ class Database
     /** @var Set */
     private $entities;
 
-//     /** @var Map */
-//     private $entitiesByName;
-//     private $entitiesByLowercaseName;
-//     private $entitiesByFullName;
-//     private $entitiesByTableName;
-
     /**
      * @var ArrayList
      */
     private $sequences;
-
 
     /**
      * Constructs a new Database object.
@@ -90,12 +82,8 @@ class Database
 
         // init
         $this->sequences = new ArrayList();
-        $this->domains = new Map();
-        $this->entities = new Set();
-//         $this->entitiesByName = new Map();
-//         $this->entitiesByTableName = new Map();
-//         $this->entitiesByLowercaseName = new Map();
-//         $this->entitiesByFullName = new Map();
+        $this->domains = new Map([], Domain::class);
+        $this->entities = new Set([], Entity::class);
         $this->initBehaviors();
         $this->initSql();
         $this->initVendor();

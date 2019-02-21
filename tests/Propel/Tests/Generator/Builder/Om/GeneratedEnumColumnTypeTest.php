@@ -25,10 +25,10 @@ class GeneratedEnumColumnTypeTest extends TestCase
         if (!class_exists('ComplexColumnTypeEntity103')) {
             $schema = <<<EOF
 <database name="generated_object_complex_type_test_103">
-    <table name="complex_column_type_entity_103">
-        <column name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
-        <column name="bar" type="ENUM" valueSet="foo, bar, baz, 1, 4,(, foo bar " />
-    </table>
+    <entity name="complex_column_type_entity_103">
+        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
+        <field name="bar" type="ENUM" valueSet="foo, bar, baz, 1, 4,(, foo bar " />
+    </entity>
 </database>
 EOF;
             QuickBuilder::buildSchema($schema);

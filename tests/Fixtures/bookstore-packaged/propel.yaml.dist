@@ -48,7 +48,6 @@ propel:
           charset: utf8
 
   generator:
-    targetPackage: bookstore-packaged
     defaultConnection: bookstore-packaged
     connections:
       - bookstore-log

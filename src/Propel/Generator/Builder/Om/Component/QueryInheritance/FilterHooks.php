@@ -38,7 +38,7 @@ class FilterHooks extends BuildComponent
         $child = $builder->getChild();
         $col = $child->getField();
 
-        return "\$this->addUsingAlias(" . $col->getFQConstantName() . ", "
+        return "\$this->addUsingAlias(" . $col->getFullConstantName() . ", "
         . $this->getEntityMapClassName() . "::CLASSKEY_" . strtoupper($child->getKey()) . ");";
     }
 }

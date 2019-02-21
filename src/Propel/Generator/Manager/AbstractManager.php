@@ -252,7 +252,7 @@ abstract class AbstractManager
             $this->dataModelDbMap[$schema->getName()] = $schema->getDatabase(null, false)->getName();
         }
 
-        if (count($schemas) > 1 && $this->getGeneratorConfig()->get()['generator']['packageObjectModel']) {
+        if (count($schemas) > 1) {
             $schema = $this->joinDataModels($schemas);
             $this->dataModels = [$schema];
         } else {

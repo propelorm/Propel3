@@ -16,16 +16,20 @@ use phootwork\collection\Map as BaseMap;
 
 class Map extends BaseMap
 {
-    public function __clone()
+    use CollectionTrait;
+
+    public function set($key, $element)
     {
-        $clonedCollection = [];
-        foreach ($this->collection as $key => $element) {
-            if (is_object($element)) {
-                $clonedCollection[$key] = clone $element;
-                continue;
-            }
-            $clonedCollection[$key] = $element;
+        $this->checkClass($element);
+        parent::set($key, $element);
+    }
+
+    public function get($key, $default = null)
+    {
+        if (null !== $default) {
+            $this->checkClass($default);
         }
-        $this->collection = $clonedCollection;
+
+        return parent::get($key, $default);
     }
 }

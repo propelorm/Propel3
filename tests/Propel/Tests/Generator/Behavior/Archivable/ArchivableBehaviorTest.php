@@ -150,13 +150,13 @@ EOF;
 
     public function testCopiesIndices()
     {
-        $expected = "CREATE INDEX archivable_test1_archive_i_853ae9 ON §archivable_test1_archive (title,age);";
+        $expected = "CREATE INDEX archivable_test1_archive_i_853ae9 ON archivable_test1_archive (title,age);";
         $this->assertContains($expected, self::$generatedSQL);
     }
 
     public function testCopiesUniquesToIndices()
     {
-        $expected = "CREATE INDEX my_old_archivable_test3_i_853ae9 ON §my_old_archivable_test_3 (title);";
+        $expected = "CREATE INDEX my_old_archivable_test_3_i_853ae9 ON my_old_archivable_test_3 (title);";
         $this->assertContains($expected, self::$generatedSQL);
     }
 
@@ -186,7 +186,7 @@ EOF;
         $builder = new QuickBuilder();
         $builder->setSchema($schema);
         $expectedSql = "
-CREATE TABLE §archivable_test01_archive
+CREATE TABLE archivable_test01_archive
 (
     id INTEGER NOT NULL,
     title VARCHAR(100),

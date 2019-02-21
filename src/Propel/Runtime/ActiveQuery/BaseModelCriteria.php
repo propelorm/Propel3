@@ -29,7 +29,7 @@ class BaseModelCriteria extends Criteria implements \IteratorAggregate
      * Creates a new instance with the default capacity which corresponds to
      * the specified database.
      *
-     * @param string $dbName     The dabase name
+     * @param string $dbName     The database name
      * @param string $entityName  The phpName of a model, e.g. 'Book'
      * @param string $entityAlias The alias for the model in this query, e.g. 'b'
      */
@@ -192,6 +192,10 @@ class BaseModelCriteria extends Criteria implements \IteratorAggregate
      */
     public function getModelShortName()
     {
+        if (null === $this->entityName) {
+            return '';
+        }
+
         return NamingTool::shortClassName($this->entityName);
     }
 

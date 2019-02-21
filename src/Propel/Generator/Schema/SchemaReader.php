@@ -18,6 +18,7 @@ use Propel\Generator\Config\GeneratorConfigInterface;
 use Propel\Generator\Config\QuickGeneratorConfig;
 use Propel\Generator\Model\Schema;
 use Propel\Common\Collection\Set;
+use Propel\Generator\Platform\PlatformInterface;
 use Propel\Generator\Schema\Loader\JsonSchemaLoader;
 use Propel\Generator\Schema\Loader\PhpSchemaLoader;
 use Propel\Generator\Schema\Loader\XmlSchemaLoader;
@@ -97,14 +98,18 @@ class SchemaReader
      * Useful only for Quickbuilder.
      *
      * @param string $xmlSchema
+     * @param PlatformInterface $platform
      *
      * @return Schema
      * @throws \Exception
      */
-    public function parseString(string $xmlSchema): Schema
+    public function parseString(string $xmlSchema, PlatformInterface $platform = null): Schema
     {
         $schema = new Schema();
         $schema->setGeneratorConfig($this->getGeneratorConfig());
+        if (null !== $platform) {
+            $schema->setPlatform($platform);
+        }
 
         $schemaArray = XmlToArrayConverter::convert('<propel>' . $xmlSchema . '</propel>');
         $schemaArray = $this->processSchema($schemaArray);

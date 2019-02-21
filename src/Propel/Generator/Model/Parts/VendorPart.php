@@ -29,7 +29,7 @@ trait VendorPart
 
     protected function initVendor()
     {
-        $this->vendor = new Map();
+        $this->vendor = new Map([], Vendor::class);
     }
 
     /**
@@ -46,7 +46,7 @@ trait VendorPart
     }
 
     /**
-     * Returns a vendor object by its type (creates a new one, if type doesn't exist).
+     * Returns a vendor object by its type or create a new one.
      *
      * @param string $type
      * @return Vendor

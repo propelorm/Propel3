@@ -16,12 +16,14 @@ use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Domain;
+use Propel\Generator\Model\Model;
 use Propel\Generator\Model\Relation;
 use Propel\Generator\Model\IdMethod;
 use Propel\Generator\Model\Index;
 use Propel\Generator\Model\PropelTypes;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Unique;
+use Propel\Generator\Model\Vendor;
 
 /**
  * Oracle PlatformInterface implementation.
@@ -39,19 +41,19 @@ class OraclePlatform extends SqlDefaultPlatform
     protected function initialize()
     {
         parent::initialize();
-        $this->schemaDomainMap[PropelTypes::BOOLEAN] = new Domain(PropelTypes::BOOLEAN_EMU, 'NUMBER', '1', '0');
+        $this->schemaDomainMap[PropelTypes::BOOLEAN] = new Domain(PropelTypes::BOOLEAN_EMU, 'NUMBER', 1, 0);
         $this->schemaDomainMap[PropelTypes::CLOB] = new Domain(PropelTypes::CLOB_EMU, 'CLOB');
         $this->schemaDomainMap[PropelTypes::CLOB_EMU] = $this->schemaDomainMap[PropelTypes::CLOB];
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::TINYINT, 'NUMBER', '3', '0'));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::SMALLINT, 'NUMBER', '5', '0'));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::TINYINT, 'NUMBER', 3, 0));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::SMALLINT, 'NUMBER', 5, 0));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::INTEGER, 'NUMBER'));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::BIGINT, 'NUMBER', '20', '0'));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::BIGINT, 'NUMBER', 20, 0));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::REAL, 'NUMBER'));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::DOUBLE, 'FLOAT'));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::DECIMAL, 'NUMBER'));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::NUMERIC, 'NUMBER'));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::VARCHAR, 'NVARCHAR2'));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::LONGVARCHAR, 'NVARCHAR2', '2000'));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::LONGVARCHAR, 'NVARCHAR2', 2000));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::TIME, 'DATE'));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::DATE, 'DATE'));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::TIMESTAMP, 'TIMESTAMP'));
@@ -59,7 +61,7 @@ class OraclePlatform extends SqlDefaultPlatform
         $this->setSchemaDomainMapping(new Domain(PropelTypes::VARBINARY, 'BLOB'));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::LONGVARBINARY, 'LONG RAW'));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::OBJECT, 'LONG RAW'));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::PHP_ARRAY, 'NVARCHAR2', '2000'));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::PHP_ARRAY, 'NVARCHAR2', 2000));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::ENUM, 'NVARCHAR2'));
     }
 
@@ -95,7 +97,7 @@ ALTER SESSION SET NLS_TIMESTAMP_FORMAT='YYYY-MM-DD HH24:MI:SS';
     {
         $ret = $this->getBeginDDL();
         foreach ($database->getEntitiesForSql() as $entity) {
-            $ret .= $this->getCommentBlockDDL($entity->getName());
+            $ret .= $this->getCommentBlockDDL($entity->getTableName());
             $ret .= $this->getDropEntityDDL($entity);
             $ret .= $this->getAddEntityDDL($entity);
             $ret .= $this->getAddIndicesDDL($entity);
@@ -138,7 +140,7 @@ ALTER SESSION SET NLS_TIMESTAMP_FORMAT='YYYY-MM-DD HH24:MI:SS';
         $ret = sprintf(
             $pattern,
             $entityDescription,
-            $this->quoteIdentifier($entity->getName()),
+            $this->quoteIdentifier($entity->getFullTableName()),
             implode($sep, $lines),
             $this->generateBlockStorage($entity)
         );
@@ -158,7 +160,7 @@ ALTER SESSION SET NLS_TIMESTAMP_FORMAT='YYYY-MM-DD HH24:MI:SS';
 
     public function getAddSequencesDDL(Entity $entity): string
     {
-        if ('native' === $entity->getIdMethod()) {
+        if (Model::ID_METHOD_NATIVE === $entity->getIdMethod()) {
             $pattern = "
 CREATE SEQUENCE %s
     INCREMENT BY 1 START WITH 1 NOMAXVALUE NOCYCLE NOCACHE ORDER;
@@ -169,12 +171,14 @@ CREATE SEQUENCE %s
                 $this->quoteIdentifier($this->getSequenceName($entity))
             );
         }
+
+        return '';
     }
 
     public function getDropEntityDDL(Entity $entity): string
     {
         $ret = "
-DROP TABLE " . $this->quoteIdentifier($entity->getName(), $entity) . " CASCADE CONSTRAINTS;
+DROP TABLE " . $this->quoteIdentifier($entity->getFullTableName(), $entity) . " CASCADE CONSTRAINTS;
 ";
         if ($entity->getIdMethod() == Model::ID_METHOD_NATIVE) {
             $ret .= "
@@ -187,11 +191,11 @@ DROP SEQUENCE " . $this->quoteIdentifier($this->getSequenceName($entity)) . ";
 
     public function getPrimaryKeyName(Entity $entity): string
     {
-        $entityName = $entity->getName();
+        $tableName = $entity->getTableName();
         // pk constraint name must be 30 chars at most
-        $entityName = substr($entityName, 0, min(27, strlen($entityName)));
+        $tableName = substr($tableName, 0, min(27, strlen($tableName)));
 
-        return $entityName . '_pk';
+        return $tableName . '_pk';
     }
 
     public function getPrimaryKeyDDL(Entity $entity): string
@@ -213,7 +217,7 @@ DROP SEQUENCE " . $this->quoteIdentifier($this->getSequenceName($entity)) . ";
         return sprintf(
             'CONSTRAINT %s UNIQUE (%s)',
             $this->quoteIdentifier($unique->getName()),
-            $this->getFieldListDDL($unique->getFieldObjects())
+            $this->getFieldListDDL($unique->getFields()->toArray())
         );
     }
 
@@ -352,7 +356,7 @@ CREATE %sINDEX %s ON %s (%s)%s;
             $pattern,
             $index->isUnique() ? 'UNIQUE ' : '',
             $this->quoteIdentifier($index->getName()),
-            $this->quoteIdentifier($index->getEntity()->getName()),
+            $this->quoteIdentifier($index->getEntity()->getTableName()),
             $this->getFieldListDDL($index->getFields()->toArray()),
             $this->generateBlockStorage($index)
         );

@@ -10,6 +10,7 @@
 
 namespace Propel\Tests\Generator\Platform;
 
+use Propel\Common\Collection\Map;
 use Propel\Generator\Model\Column;
 use Propel\Generator\Model\Diff\DatabaseComparator;
 use Propel\Generator\Platform\OraclePlatform;
@@ -90,9 +91,9 @@ ALTER TABLE foo1 RENAME TO foo2;
     public function testGetModifyEntityDDL($tableDiff)
     {
         $expected = "
-ALTER TABLE foo DROP CONSTRAINT foo1_fk_2;
-
 ALTER TABLE foo DROP CONSTRAINT foo1_fk_1;
+
+ALTER TABLE foo DROP CONSTRAINT foo1_fk_2;
 
 DROP INDEX bar_baz_fk;
 
@@ -261,10 +262,10 @@ ALTER TABLE foo MODIFY bar FLOAT(3);
 ALTER TABLE foo MODIFY
 (
     bar1 FLOAT(3),
-    bar2 INTEGER NOT NULL
+    bar2 NUMBER NOT NULL
 );
 ";
-        $this->assertEquals($expected, $this->getPlatform()->getModifyFieldsDDL($columnDiffs));
+        $this->assertEquals($expected, $this->getPlatform()->getModifyFieldsDDL(new Map($columnDiffs)));
     }
 
     /**
@@ -357,7 +358,7 @@ EOF;
         <field name="lkdjfsh" type="INTEGER" />
         <field name="dfgdsgf" type="CLOB" />
         <index name="lkdjfsh_IDX">
-            <index-column name="lkdjfsh"/>
+            <index-field name="lkdjfsh"/>
             <vendor type="oracle">
                 <parameter name="PCTFree" value="20"/>
                 <parameter name="InitTrans" value="4"/>

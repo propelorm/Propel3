@@ -10,16 +10,20 @@
 
 namespace Propel\Tests\Generator\Platform;
 
+use Propel\Common\Collection\Map;
 use Propel\Generator\Config\GeneratorConfig;
-use Propel\Generator\Model\Column;
 use Propel\Generator\Model\Diff\DatabaseComparator;
 use Propel\Generator\Platform\MysqlPlatform;
+use Propel\Tests\VfsTrait;
 
 /**
  *
  */
 class MysqlPlatformMigrationTest extends PlatformMigrationTestProvider
 {
+    use VfsTrait;
+
+    /** @var MysqlPlatform */
     protected $platform;
 
     /**
@@ -29,7 +33,7 @@ class MysqlPlatformMigrationTest extends PlatformMigrationTestProvider
      */
     protected function getPlatform()
     {
-        if (!$this->platform) {
+        if (null === $this->platform) {
             $this->platform = new MysqlPlatform();
 
             $configFileContent = <<<EOF
@@ -57,9 +61,8 @@ propel:
       - bookstore
 EOF;
 
-            $configFile = sys_get_temp_dir().'/propel.yaml';
-            file_put_contents($configFile, $configFileContent);
-            $config = new GeneratorConfig($configFile);
+            $file = $this->newFile('propel.yaml', $configFileContent);
+            $config = new GeneratorConfig($file->url());
 
             $this->platform->setGeneratorConfig($config);
         }
@@ -123,13 +126,11 @@ RENAME TABLE `foo1` TO `foo2`;
     public function testGetModifyEntityDDL($tableDiff)
     {
         $expected = "
-ALTER TABLE `foo` DROP FOREIGN KEY `foo1_fk_2`;
-
 ALTER TABLE `foo` DROP FOREIGN KEY `foo1_fk_1`;
 
-DROP INDEX `bar_baz_fk` ON `foo`;
+ALTER TABLE `foo` DROP FOREIGN KEY `foo1_fk_2`;
 
-DROP INDEX `foo1_fi_2` ON `foo`;
+DROP INDEX `bar_baz_fk` ON `foo`;
 
 DROP INDEX `bar_fk` ON `foo`;
 
@@ -351,14 +352,14 @@ ALTER TABLE `foo` ADD
         $diff = DatabaseComparator::computeDiff($d1, $d2);
 
         $tables = $diff->getModifiedEntities();
-        $this->assertEquals('Foo', key($tables));
-        $fooChanges = array_shift($tables);
-        $this->assertInstanceOf('\Propel\Generator\Model\Diff\EntityDiff', $fooChanges);
+        $this->assertTrue($tables->has('Foo'));
+        $this->assertInstanceOf('\Propel\Generator\Model\Diff\EntityDiff', $tables->get('Foo'));
 
-        $renamedColumns = $fooChanges->getRenamedFields();
+        /** @var Map $renamedColumns */
+        $renamedColumns = $tables->get('Foo')->getRenamedFields();
 
-        $firstPair = array_shift($renamedColumns);
-        $secondPair = array_shift($renamedColumns);
+        $firstPair = $renamedColumns->get('bar1');
+        $secondPair = $renamedColumns->get('bar2');
 
         $this->assertEquals('bar1', $firstPair[0]->getName());
         $this->assertEquals('bar_la1', $firstPair[1]->getName());
@@ -371,12 +372,12 @@ ALTER TABLE `foo` ADD
     {
         $schema1 = '
 <database name="test">
-    <entity name="foo">
+    <entity name="Foo">
         <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
         <field name="bar1" type="INTEGER" />
         <field name="bar2" type="INTEGER" />
     </entity>
-    <entity name="foo2">
+    <entity name="Foo2">
         <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
         <field name="bar1" type="INTEGER" />
         <field name="bar2" type="INTEGER" />
@@ -385,12 +386,12 @@ ALTER TABLE `foo` ADD
 ';
         $schema2 = '
 <database name="test">
-    <entity name="foo_bla">
+    <entity name="FooBla">
         <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
         <field name="bar1" type="INTEGER" />
         <field name="bar2" type="INTEGER" />
     </entity>
-    <entity name="foo_bla2">
+    <entity name="FooBla2">
         <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
         <field name="bar1" type="INTEGER" />
         <field name="bar2" type="INTEGER" />
@@ -401,20 +402,15 @@ ALTER TABLE `foo` ADD
         $d1 = $this->getDatabaseFromSchema($schema1);
         $d2 = $this->getDatabaseFromSchema($schema2);
 
-        $diff = DatabaseComparator::computeDiff($d1, $d2, false, true);
+        $diff = DatabaseComparator::computeDiff($d1, $d2, true, true);
         $renamedTables = $diff->getRenamedEntities();
+        $this->assertTrue($renamedTables->has('Foo'));
+        $this->assertEquals('FooBla', $renamedTables->get('Foo'));
 
-        $firstPair = [key($renamedTables), current($renamedTables)];
-        next($renamedTables);
-        $secondPair = [key($renamedTables), current($renamedTables)];
-
-        $this->assertEquals('foo', $firstPair[0]);
-        $this->assertEquals('foo_bla', $firstPair[1]);
-
-        $this->assertEquals('foo2', $secondPair[0]);
+        $this->assertTrue($renamedTables->has('Foo2'));
         $this->assertEquals(
-            'foo_bla2',
-            $secondPair[1],
+            'FooBla2',
+            $renamedTables->get('Foo2'),
             'Table `Foo2` should not renamed to `foo_bla` since we have already renamed a table to this name.'
         );
     }

@@ -62,7 +62,7 @@ version 0.5 (2008-01-25) - added ENUM, GEOMETRY as BLOB, scale for DECIMAL; fixe
 
 <!-- ============================================================ TABLES template -->
 <xsl:template match="/DBMODEL/METADATA/TABLES/TABLE">
-	<table>
+	<entity>
 		<xsl:attribute name="name">
 			<xsl:value-of select="@Tablename"/>
 		</xsl:attribute>
@@ -72,13 +72,13 @@ version 0.5 (2008-01-25) - added ENUM, GEOMETRY as BLOB, scale for DECIMAL; fixe
 			</xsl:attribute>
 		</xsl:if>
 		<xsl:apply-templates />
-	</table>
+	</entity>
 </xsl:template>
 
 
 <!-- ============================================================ COLUMNS template -->
 <xsl:template match="COLUMNS/COLUMN">
-	<column>
+	<field>
 		<!-- get data type -->
 		<xsl:variable name="datatype">
 			<xsl:call-template name="get_datatype">
@@ -157,7 +157,7 @@ version 0.5 (2008-01-25) - added ENUM, GEOMETRY as BLOB, scale for DECIMAL; fixe
 			</xsl:attribute>
 		</xsl:if>
 
-	</column>
+	</field>
 </xsl:template>
 
 <!-- ============================================================ RELATIONS template -->

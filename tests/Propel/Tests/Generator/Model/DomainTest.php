@@ -44,9 +44,9 @@ class DomainTest extends ModelTestCase
         $value = $this->getFieldDefaultValueMock();
 
         $domain = new Domain('FLOAT', 'DOUBLE');
-        $domain->replaceType('BOOLEAN');
+        $domain->setType('BOOLEAN');
         $domain->replaceSqlType('INT');
-        $domain->replaceDefaultValue($value);
+        $domain->setDefaultValue($value);
 
         $this->assertSame('BOOLEAN', $domain->getType());
         $this->assertSame('INT', $domain->getSqlType());

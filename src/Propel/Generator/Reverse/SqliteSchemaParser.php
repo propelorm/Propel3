@@ -210,7 +210,7 @@ class SqliteSchemaParser extends AbstractSchemaParser
             $column->setDomainForType($propelType);
             // We may want to provide an option to include this:
             // $column->getDomain()->replaceSqlType($type);
-            $column->getDomain()->replaceSize($size);
+            $column->getDomain()->setSize($size);
             $column->getDomain()->replaceScale($scale);
 
             if (null !== $default) {

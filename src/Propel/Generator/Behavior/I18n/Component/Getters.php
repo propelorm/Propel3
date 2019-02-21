@@ -34,7 +34,7 @@ class Getters extends BuildComponent
 
     private function addGetLocale($behavior)
     {
-        $this->addMethod('get' . NamingTool::toUpperCamelCase($behavior->getLocaleField()->getName()))
+        $this->addMethod('get' . NamingTool::toStudlyCase($behavior->getLocaleField()->getName()))
             ->setDescription('Gets the locale for translations')
             ->setType('string', "Locale to use for the translation, e.g. 'fr_FR'")
             ->setBody(
@@ -46,7 +46,7 @@ return \$this->currentLocale;
 
     private function addGetLocaleAlias($alias, $behavior)
     {
-        $aliasMethod = 'get' . NamingTool::toUpperCamelCase($alias);
+        $aliasMethod = 'get' . NamingTool::toStudlyCase($alias);
         $method = ucfirst($behavior->getLocaleField()->getName());
 
         $this->addMethod($aliasMethod)
@@ -101,12 +101,12 @@ return \$this->currentTranslations[\$locale];
             ->addParameter(
                 PhpParameter::create('locale')
                 ->setType('string', "Locale to use for the translation, e.g. 'fr_FR'")
-                ->setDefaultValue($behavior->getDefaultLocale())
+                ->setValue($behavior->getDefaultLocale())
             )
             ->addParameter(
                 PhpParameter::create('con')
                 ->setType('ConnectionInterface', 'an optional connection object')
-                ->setDefaultValue(null)
+                ->setValue(null)
             )
             ->setType($this->getClassNameFromEntity($behavior->getI18nEntity()))
             ->setBody($body);
@@ -119,7 +119,7 @@ return \$this->currentTranslations[\$locale];
             ->addParameter(
                 PhpParameter::create('con')
                 ->setType('ConnectionInterface', 'An optional connection object')
-                ->setDefaultValue(null)
+                ->setValue(null)
             )
             ->setType($this->getClassNameFromEntity($behavior->getI18nEntity()))
             ->setBody("return \$this->getTranslation(\$this->get{$behavior->getLocaleField()->getName()}(), \$con);");
@@ -129,7 +129,7 @@ return \$this->currentTranslations[\$locale];
     {
         foreach ($behavior->getI18nFieldNamesFromConfig() as $fieldName) {
             $field = $behavior->getI18nEntity()->getField($fieldName);
-            $methodName = 'get' . NamingTool::toUpperCamelCase(($fieldName));
+            $methodName = 'get' . NamingTool::toStudlyCase(($fieldName));
             $this->addMethod($methodName, $field->getAccessorVisibility())
                 ->setType($field->getPhpType())
                 ->setDescription("Returns the value of $fieldName.")

@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Model;
 
-use Propel\Common\Collection\Set;
+use Propel\Common\Collection\Map;
 use Propel\Generator\Model\Parts\EntityPart;
 use Propel\Generator\Model\Parts\FieldsPart;
 use Propel\Generator\Model\Parts\NamePart;
@@ -36,13 +36,20 @@ class Index
     protected $autoNaming = false;
 
     /**
+     * @var Map Map of `fieldname => size` to use for indexes creation.
+     */
+    protected $fieldSizes;
+
+    /**
      * Creates a new Index instance.
      *
      * @param string $name Name of the index
      */
     public function __construct(string $name = null)
     {
-        $this->fields = new Set();
+        $this->initFields();
+        $this->initVendor();
+        $this->fieldSizes = new Map();
 
         if (null !== $name) {
             $this->setName($name);
@@ -105,28 +112,13 @@ class Index
             }
 
             if ($this->entity) {
-                $newName = $this->getEntity()->getName() . '_' . $newName;
+                $newName = $this->getEntity()->getTableName() . '_' . $newName;
             }
 
             $this->name = $newName;
             $this->autoNaming = true;
         }
     }
-
-    //Used only in SqlDefaultPlatform:730
-//    public function getFQName()
-//    {
-//        $entity = $this->getEntity();
-//        if ($entity->getDatabase()
-//            && ($entity->getSchema() || $entity->getDatabase()->getSchema())
-//            && $entity->getDatabase()->getPlatform()
-//            && $entity->getDatabase()->getPlatform()->supportsSchemas()
-//        ) {
-//            return ($entity->getSchema() ?: $entity->getDatabase()->getSchema()) . '.' . $this->getName();
-//        }
-//
-//        return $this->getName();
-//    }
 
     /**
      * Returns whether or not this index has a given field at a given position.
@@ -156,5 +148,10 @@ class Index
         }
 
         return true;
+    }
+
+    public function getFieldSizes(): Map
+    {
+        return $this->fieldSizes;
     }
 }

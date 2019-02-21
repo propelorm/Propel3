@@ -10,13 +10,11 @@
 <!ATTLIST database
   name CDATA #IMPLIED
   defaultIdMethod (native|none) "none"
-  package CDATA #IMPLIED
   schema CDATA #IMPLIED
   namespace CDATA #IMPLIED
   baseClass CDATA #IMPLIED
   heavyIndexing (true|false) "false"
   identifierQuoting (true|false) "false"
-  tablePrefix CDATA #IMPLIED
   defaultStringFormat CDATA #IMPLIED
   xmlns:xsi CDATA #IMPLIED
   xsi:noNamespaceSchemaLocation CDATA #IMPLIED

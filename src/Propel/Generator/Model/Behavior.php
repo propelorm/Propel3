@@ -153,7 +153,11 @@ class Behavior
      */
     public function setParameter(string $name, $value): Behavior
     {
-        $this->parameters->set(strtolower($name), $value);
+        //Don't want override a default parameter with a null value
+        if (null !== $value) {
+            $this->parameters->set(strtolower($name), $value);
+        }
+
         return $this;
     }
 

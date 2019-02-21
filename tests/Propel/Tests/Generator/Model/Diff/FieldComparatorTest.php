@@ -27,13 +27,13 @@ class FieldComparatorTest extends TestCase
         $c1 = new Field();
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $c2 = new Field();
         $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c2->getDomain()->replaceScale(2);
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $this->assertTrue(FieldComparator::compareFields($c1, $c2)->isEmpty());
@@ -65,9 +65,9 @@ class FieldComparatorTest extends TestCase
     public function testCompareSize()
     {
         $c1 = new Field();
-        $c1->getDomain()->replaceSize(2);
+        $c1->getDomain()->setSize(2);
         $c2 = new Field();
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setSize(3);
         $expectedChangedProperties = ['size' => [2, 3]];
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
@@ -171,7 +171,7 @@ class FieldComparatorTest extends TestCase
         $c2 = new Field();
         $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c2->getDomain()->replaceScale(2);
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $expectedChangedProperties = [

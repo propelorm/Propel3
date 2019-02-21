@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -13,6 +12,7 @@ declare(strict_types=1);
 namespace Propel\Generator\Platform;
 
 use Propel\Generator\Model\Domain;
+use Propel\Generator\Model\Model;
 use Propel\Generator\Model\Relation;
 use Propel\Generator\Model\PropelTypes;
 use Propel\Generator\Model\Entity;
@@ -165,10 +165,10 @@ END
             $this->quoteIdentifier($relation->getForeignEntity()->getFullTableName()),
             $this->getFieldListDDL($relation->getForeignFieldObjects())
         );
-        if ($relation->hasOnUpdate() && $relation->getOnUpdate() != Relation::SETNULL) {
+        if ($relation->hasOnUpdate() && $relation->getOnUpdate() != Model::RELATION_SETNULL) {
             $script .= ' ON UPDATE ' . $relation->getOnUpdate();
         }
-        if ($relation->hasOnDelete() && $relation->getOnDelete() != Relation::SETNULL) {
+        if ($relation->hasOnDelete() && $relation->getOnDelete() != Model::RELATION_SETNULL) {
             $script .= ' ON DELETE '.  $relation->getOnDelete();
         }
 

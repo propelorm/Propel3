@@ -34,8 +34,6 @@ class ModelFactory
         'activeRecord' => 'setActiveRecord',
         'schema' => 'setSchemaName',
         'namespace' => 'setNamespace',
-        'package' => 'setPackage',
-        'tablePrefix' => 'setTablePrefix'
 
     ]];
 
@@ -57,11 +55,13 @@ class ModelFactory
         'isCrossRef' => 'setCrossRef',
         'defaultStringFormat' => 'setStringFormat',
         'heavyIndexing' => 'setHeavyIndexing',
-        'schema' => 'setSchemaName'
+        'schema' => 'setSchemaName',
+        'namespace' => 'setNamespace'
     ]];
 
     private $field = ['map' => [
         'name' => 'setName',
+        'required' => 'setNotNull',
         'primaryKey' => 'setPrimaryKey',
         'type' => 'setType',
         'description' => 'setDescription',
@@ -71,20 +71,23 @@ class ModelFactory
         'size' => 'setSize',
         'scale' => 'setScale',
         'defaultValue' => 'setDefaultValue',
+        'default' => 'setDefaultValue',
+        'defaultExpression' => 'setDefaultExpression',
         'autoIncrement' => 'setAutoIncrement',
         'lazyLoad' => 'setLazyLoad',
         'primaryString' => 'setPrimaryString',
         'valueSet' => 'setValueSet',
-        'inheritance' => 'setInheritanceType',
-        'required' => 'setNotNull'
+        'inheritance' => 'setInheritanceType'
     ]];
 
-    private $vendor = ['map' => ['type' => 'setType']];
+    private $vendor = ['map' => [
+        'type' => 'setType',
+        'parameters' => 'setParameters'
+    ]];
 
     private $inheritance = ['map' => [
         'key' => 'setKey',
         'class' => 'setClassName',
-        'package' => 'setPackage',
         'extends' => 'setAncestor'
     ]];
 
@@ -132,6 +135,12 @@ class ModelFactory
      */
     public function createVendor(array $attributes): Vendor
     {
+        $params = [];
+        foreach($attributes['parameters'] as $key => $parameter) {
+            $params[$parameter['name']] = $parameter['value'];
+        }
+        $attributes['parameters'] = $params;
+
         return $this->load(new Vendor(), $attributes, $this->vendor);
     }
 

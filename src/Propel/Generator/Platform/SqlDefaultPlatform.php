@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -12,6 +11,7 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Platform;
 
+use Propel\Common\Collection\Map;
 use Propel\Generator\Config\GeneratorConfigInterface;
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Model\Field;
@@ -86,13 +86,8 @@ class SqlDefaultPlatform implements PlatformInterface
         } elseif ($object instanceof Field) {
             return $object->getColumnName();
         } else {
-            return $this->toUnderscore($object->getName());
+            return NamingTool::toSnakeCase($object->getName());
         }
-    }
-
-    protected function toUnderscore(string $v): string
-    {
-        return NamingTool::toSnakeCase($v);
     }
 
     public function getRepositoryBuilder(Entity $entity): Repository
@@ -115,7 +110,7 @@ class SqlDefaultPlatform implements PlatformInterface
      *
      * @return ConnectionInterface
      */
-    public function getConnection(): ConnectionInterface
+    public function getConnection(): ?ConnectionInterface
     {
         return $this->con;
     }
@@ -276,7 +271,7 @@ class SqlDefaultPlatform implements PlatformInterface
         if (Model::ID_METHOD_NATIVE === $entity->getIdMethod()) {
             $idMethodParams = $entity->getIdMethodParameters();
             $maxIdentifierLength = $this->getMaxFieldNameLength();
-            $entityName = $this->getName($entity);
+            $entityName = $entity->getTableName();
             if (empty($idMethodParams)) {
                 if (strlen($entityName . '_SEQ') > $maxIdentifierLength) {
                     if (!isset($longNamesMap[$entity->getName()])) {
@@ -403,12 +398,17 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
      */
     public function getFieldDDL(Field $col): string
     {
-        $domain = $col->getDomain();
-
         $ddl = [$this->quoteIdentifier($this->getName($col))];
-        $sqlType = $domain->getSqlType();
-        if ($this->hasSize($sqlType) && $col->isDefaultSqlType($this)) {
-            $ddl[] = $sqlType . $col->getSizeDefinition();
+        $sqlType = $col->getDomain()->getSqlType();
+        if (!$col->isDefaultSqlType($this) && !$col->getDomain()->isReplaced()) {
+            $sqlType = $this->getDomainForType($col->getType())->getSqlType();
+        }
+        if ($this->hasSize($sqlType) && !$col->getDomain()->isReplaced()) {
+            $ddl[] = $sqlType . (
+                $col->getSizeDefinition() !== '' ?
+                    $col->getSizeDefinition() :
+                    $this->getDomainForType($col->getType())->getSizeDefinition()
+                );
         } else {
             $ddl[] = $sqlType;
         }
@@ -417,6 +417,8 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
         }
         if ($col->isNotNull()) {
             $ddl[] = $this->getNotNullString();
+        } elseif ('' !== $nullString = $this->getNullString()) {
+            $ddl[] = $this->getNullString();
         }
         if ($autoIncrement = $col->getAutoIncrementString()) {
             $ddl[] = $autoIncrement;
@@ -441,7 +443,7 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($this->getName($entity)) . ";
                 $default .= $defaultValue->getValue();
             } else {
                 if ($col->isTextType()) {
-                    $default .= $this->quote($defaultValue->getValue());
+                    $default .= $this->quote((string) $defaultValue->getValue());
                 } elseif (in_array($col->getType(), [PropelTypes::BOOLEAN, PropelTypes::BOOLEAN_EMU])) {
                     $default .= $this->getBooleanString($defaultValue->getValue());
                 } elseif ($col->getType() == PropelTypes::ENUM) {
@@ -609,8 +611,7 @@ DROP INDEX %s;
 
         return sprintf(
             $pattern,
-            //$this->quoteIdentifier($index->getFQName())
-            $this->quoteIdentifier($index->getEntity()->getDatabase()->getSchema() . '.' . $index->getName())
+            $this->quoteIdentifier($this->getName($index))
         );
     }
 
@@ -816,8 +817,8 @@ ALTER TABLE %s RENAME TO %s;
 
         return sprintf(
             $pattern,
-            $this->quoteIdentifier($fromEntityName),
-            $this->quoteIdentifier($toEntityName)
+            $this->quoteIdentifier(NamingTool::toSnakeCase($fromEntityName)),
+            $this->quoteIdentifier(NamingTool::toSnakeCase($toEntityName))
         );
     }
 
@@ -863,7 +864,7 @@ ALTER TABLE %s RENAME TO %s;
             $fieldChanges .= $this->getModifyFieldsDDL($modifiedFields);
         }
         if ($addedFields = $entityDiff->getAddedFields()) {
-            $fieldChanges .= $this->getAddFieldsDDL($addedFields);
+            $fieldChanges .= $this->getAddFieldsDDL($addedFields->toArray());
         }
         foreach ($entityDiff->getRemovedFields() as $field) {
             $fieldChanges .= $this->getRemoveFieldDDL($field);
@@ -949,7 +950,7 @@ ALTER TABLE %s%s;
         }
 
         if ($modifiedFields = $entityDiff->getModifiedFields()) {
-            $ret .= $this->getModifyFieldsDDL($modifiedFields->toArray());
+            $ret .= $this->getModifyFieldsDDL($modifiedFields);
         }
 
         if ($addedFields = $entityDiff->getAddedFields()) {
@@ -1102,7 +1103,7 @@ ALTER TABLE %s MODIFY %s;
      * @param  FieldDiff[] $fieldDiffs
      * @return string
      */
-    public function getModifyFieldsDDL(array $fieldDiffs): string
+    public function getModifyFieldsDDL(Map $fieldDiffs): string
     {
         $lines = [];
         $entity = null;

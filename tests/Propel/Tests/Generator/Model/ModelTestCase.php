@@ -23,15 +23,18 @@ use Propel\Generator\Model\Schema;
 use Propel\Generator\Model\Unique;
 use Propel\Generator\Platform\PlatformInterface;
 use Propel\Common\Collection\UniqueList;
-use Propel\Tests\VfsTestCase;
+use Propel\Tests\TestCase;
+use Propel\Tests\VfsTrait;
 
 /**
  * This class provides methods for mocking Entity, Database and Platform objects.
  *
  * @author Hugo Hamon <webmaster@apprendre-php.com>
  */
-abstract class ModelTestCase extends VfsTestCase
+abstract class ModelTestCase extends TestCase
 {
+    use VfsTrait;
+
     /**
      * Returns a dummy Behavior object.
      *

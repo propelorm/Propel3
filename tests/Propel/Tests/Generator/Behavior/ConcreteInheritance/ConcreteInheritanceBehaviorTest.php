@@ -43,20 +43,20 @@ class ConcreteInheritanceBehaviorTest extends BookstoreTestBase
         if (!class_exists('ConcreteContentSetPkQuery')) {
             $schema = <<<EOF
 <database name="concrete_content_set_pk" activeRecord="true">
-    <table name="concrete_content_set_pk" phpName="ConcreteContentSetPk" allowPkInsert="true">
+    <entity name="concrete_content_set_pk" phpName="ConcreteContentSetPk" allowPkInsert="true">
         <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
         <field name="title" type="VARCHAR" size="100" primaryString="true" />
         <index>
             <index-field name="title" />
         </index>
-    </table>
-    <table name="concrete_article_set_pk" allowPkInsert="true">
+    </entity>
+    <entity name="concrete_article_set_pk" allowPkInsert="true">
         <field name="body" type="longvarchar" />
         <field name="author_id" required="false" type="INTEGER" />
         <behavior name="concrete_inheritance">
             <parameter name="extends" value="ConcreteContentSetPk" />
         </behavior>
-    </table>
+    </entity>
 </database>
 EOF;
 

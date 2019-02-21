@@ -307,7 +307,7 @@ class DatabaseTest extends ModelTestCase
 
         $db = new Database();
         for ($i = 0; $i <= 4; $i++ ) {
-            $db->addEntity($this->getEntityMock("Entity$i", ['database' => $db]));
+            $db->addEntity(new Entity("Entity$i"));
         }
         $db->setPlatform($this->getPlatformMock());
         $db->setGeneratorConfig($generatorConfig);

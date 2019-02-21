@@ -42,6 +42,7 @@ class Schema
 
     /** @var Set */
     protected $schemas;
+
     protected $filename;
     protected $referenceOnly = true;
 
@@ -57,15 +58,14 @@ class Schema
         }
 
         // init
-        $this->databases = new ArrayList();
-        $this->schemas = new Set();
+        $this->databases = new ArrayList([], Database::class);
+        $this->schemas = new Set([], Schema::class);
     }
 
     protected function getSuperordinate()
     {
         return $this->schema;
     }
-
 
     /**
      * Sets the filename when reading this schema
@@ -88,17 +88,6 @@ class Schema
     {
         return $this->filename;
     }
-
-    /**
-     * @TODO what's this?
-     * Returns the schema short name (without the '-schema' postfix).
-     *
-     * @return string
-     */
-    //public function getShortName(): string
-    //{
-    //    return str_replace('-schema', '', $this->name);
-    //}
 
     protected function registerSchema(Schema $schema)
     {

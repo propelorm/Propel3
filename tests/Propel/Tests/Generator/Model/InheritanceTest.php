@@ -41,12 +41,4 @@ class InheritanceTest extends TestCase
         $this->assertSame('baz', $inheritance->getKey());
         $this->assertSame('Foo\Bar', $inheritance->getClassName());
     }
-
-    public function testSetPackage()
-    {
-        $inheritance = new Inheritance();
-        $inheritance->setPackage('myPackage');
-
-        $this->assertEquals('myPackage', $inheritance->getPackage());
-    }
 }

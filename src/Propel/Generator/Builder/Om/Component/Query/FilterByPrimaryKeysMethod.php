@@ -44,7 +44,7 @@ class FilterByPrimaryKeysMethod extends BuildComponent
         if (1 === count($pks)) {
             // simple primary key
             $field = $pks[0];
-            $const = $field->getFQConstantName();
+            $const = $field->getFullConstantName();
             $body .= "
 
     return \$this->addUsingAlias($const, \$keys, Criteria::IN);";
@@ -57,7 +57,7 @@ class FilterByPrimaryKeysMethod extends BuildComponent
     foreach (\$keys as \$key) {";
             $i = 0;
             foreach ($pks as $field) {
-                $const = $field->getFQConstantName();
+                $const = $field->getFullConstantName();
                 $body .= "
     \$cton$i = \$this->getNewCriterion($const, \$key[$i], Criteria::EQUAL);";
                 if ($i > 0) {

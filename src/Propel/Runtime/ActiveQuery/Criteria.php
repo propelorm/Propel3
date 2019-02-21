@@ -1877,7 +1877,11 @@ class Criteria
         // joins of a specified type: the LEFT side will be added to the fromClause and the RIGHT to the joinClause
         foreach ($this->getJoins() as $join) {
             $join->setAdapter($adapter);
-
+            if (method_exists($join, 'getEntityMap')) {
+                $join->getEntityMap()->setIdentifierQuoting($this->isIdentifierQuotingEnabled());
+            } else {
+                $join->setIdentifierQuoting($this->isIdentifierQuotingEnabled());
+            }
             if (!$fromClause) {
                 $fromClause[] = $join->getLeftTableWithAlias();
             }
@@ -2151,6 +2155,7 @@ class Criteria
 
         return $string;
     }
+
     /**
      * Replaces complete field names (like Article.AuthorId) in an SQL clause
      * by their exact Propel field fully qualified name (e.g. article.author_id)

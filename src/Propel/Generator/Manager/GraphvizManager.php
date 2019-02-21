@@ -31,7 +31,7 @@ class GraphvizManager extends AbstractManager
             // print the tables
             foreach ($database->getEntities() as $entity) {
                 $this->log("\t+ " . $entity->getName());
-                $dotSyntax .= 'node'.$entity->getName().' [label="{<table>'.$entity->getName().'|<cols>';
+                $dotSyntax .= 'node'.$entity->getName().' [label="{<entity>'.$entity->getName().'|<cols>';
 
                 foreach ($entity->getFields() as $field) {
                     $dotSyntax .= $field->getName() . ' (' . $field->getType()  . ')';

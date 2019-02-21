@@ -11,15 +11,18 @@
 namespace Propel\Tests\Generator\Config;
 
 use Propel\Generator\Config\GeneratorConfig;
-use Propel\Tests\Common\Config\ConfigTestCase;
+use Propel\Tests\TestCase;
+use Propel\Tests\VfsTrait;
 
 /**
  * @author William Durand <william.durand1@gmail.com>
  * @author Cristiano Cinotti
  * @package	propel.generator.config
  */
-class GeneratorConfigTest extends ConfigTestCase
+class GeneratorConfigTest extends TestCase
 {
+    use VfsTrait;
+
     /**
      * @var GeneratorConfig
      */
@@ -68,9 +71,9 @@ class GeneratorConfigTest extends ConfigTestCase
         )
 );
 ";
-        $this->dumpTempFile('propel.php.dist', $php);
+        $file = $this->newFile('propel.php.dist', $php);
 
-        $this->generatorConfig = new GeneratorConfig(sys_get_temp_dir() . '/propel.php.dist');
+        $this->generatorConfig = new GeneratorConfig($file->url());
     }
 
     public function testGetConfiguredPlatformDeafult()
@@ -313,10 +316,10 @@ class GeneratorConfigTest extends ConfigTestCase
         $actual = $this->generatorConfig->getConnection('badsource');
     }
 
-    public function testGetBehaviorLocator()
+    public function testGetBehaviorManager()
     {
-        $actual = $this->generatorConfig->getBehaviorLocator();
+        $actual = $this->generatorConfig->getBehaviorManager();
 
-        $this->assertInstanceOf('\\Propel\\Generator\\Util\\BehaviorLocator', $actual);
+        $this->assertInstanceOf('\\Propel\\Generator\\Manager\\BehaviorManager', $actual);
     }
 }

@@ -45,7 +45,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $c1 = new Field('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t1->addField($c1);
@@ -59,7 +59,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $c3 = new Field('Foo');
         $c3->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c3->getDomain()->replaceScale(2);
-        $c3->getDomain()->replaceSize(3);
+        $c3->getDomain()->setSize(3);
         $c3->setNotNull(true);
         $c3->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t3->addField($c3);
@@ -90,7 +90,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $c1 = new Field('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t1->addField($c1);
@@ -101,7 +101,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $c3 = new Field('Foo');
         $c3->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c3->getDomain()->replaceScale(2);
-        $c3->getDomain()->replaceSize(3);
+        $c3->getDomain()->setSize(3);
         $c3->setNotNull(true);
         $c3->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t3->addField($c3);
@@ -126,7 +126,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $c1 = new Field('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t1->addField($c1);
@@ -137,7 +137,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $c3 = new Field('Foo');
         $c3->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c3->getDomain()->replaceScale(2);
-        $c3->getDomain()->replaceSize(3);
+        $c3->getDomain()->setSize(3);
         $c3->setNotNull(true);
         $c3->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t3->addField($c3);
@@ -160,7 +160,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $c1 = new Field('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t1->addField($c1);
@@ -173,7 +173,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $c3 = new Field('Foo');
         $c3->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c3->getDomain()->replaceScale(2);
-        $c3->getDomain()->replaceSize(3);
+        $c3->getDomain()->setSize(3);
         $c3->setNotNull(true);
         $c3->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t3->addField($c3);
@@ -196,7 +196,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $c1 = new Field('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t1->addField($c1);
@@ -210,7 +210,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $c3 = new Field('Foo');
         $c3->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c3->getDomain()->replaceScale(2);
-        $c3->getDomain()->replaceSize(3);
+        $c3->getDomain()->setSize(3);
         $c3->setNotNull(true);
         $c3->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t3->addField($c3);
@@ -231,7 +231,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $c1 = new Field('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t1->addField($c1);
@@ -247,7 +247,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $c3 = new Field('Foo');
         $c3->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c3->getDomain()->replaceScale(2);
-        $c3->getDomain()->replaceSize(3);
+        $c3->getDomain()->setSize(3);
         $c3->setNotNull(true);
         $c3->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t3->addField($c3);
@@ -273,7 +273,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $c1 = new Field('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t1->addField($c1);
@@ -286,7 +286,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $c3 = new Field('Foo');
         $c3->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c3->getDomain()->replaceScale(2);
-        $c3->getDomain()->replaceSize(3);
+        $c3->getDomain()->setSize(3);
         $c3->setNotNull(true);
         $c3->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t3->addField($c3);
@@ -315,7 +315,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $c1 = new Field('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t1->addField($c1);
@@ -333,7 +333,7 @@ class PropelDatabaseEntityComparatorTest extends TestCase
         $c3 = new Field('Foo1');
         $c3->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
         $c3->getDomain()->replaceScale(2);
-        $c3->getDomain()->replaceSize(3);
+        $c3->getDomain()->setSize(3);
         $c3->setNotNull(true);
         $c3->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $t3->addField($c3);

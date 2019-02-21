@@ -42,13 +42,9 @@ class FieldTest extends ModelTestCase
         $this->assertFalse($field->isEnumeratedClasses());
         $this->assertFalse($field->isLazyLoad());
         $this->assertFalse($field->isNamePlural());
-        $this->assertFalse($field->isNestedSetLeftKey());
-        $this->assertFalse($field->isNestedSetRightKey());
         $this->assertFalse($field->isNotNull());
-        $this->assertFalse($field->isNodeKey());
         $this->assertFalse($field->isPrimaryKey());
         $this->assertFalse($field->isPrimaryString());
-        $this->assertFalse($field->isTreeScopeKey());
         $this->assertFalse($field->isUnique());
         $this->assertFalse($field->requiresTransactionInPostgres());
         $this->assertNull($field->getPlatform());
@@ -202,7 +198,7 @@ class FieldTest extends ModelTestCase
         $platform = $this->getPlatformMock();
         $platform
             ->expects($this->once())
-            ->method('getNullString')
+            ->method('getNotNullString')
             ->will($this->returnValue('NOT NULL'))
         ;
 
@@ -536,7 +532,7 @@ class FieldTest extends ModelTestCase
 
         $this->assertSame('created_at', $field->getColumnName());
         $this->assertSame('FIELD_CREATED_AT', $field->getConstantName());
-        $this->assertSame('ArticleEntityMap::FIELD_CREATED_AT', $field->getFQConstantName());
+        $this->assertSame('ArticleEntityMap::FIELD_CREATED_AT', $field->getFullConstantName());
     }
 
     public function testSetDefaultPhpName()
@@ -631,12 +627,12 @@ class FieldTest extends ModelTestCase
         $this->assertEquals('AUTO_INCREMENT', $field->getAutoIncrementString());
     }
 
-    public function testGetFullyQualifiedName()
+    public function testGetFullName()
     {
         $field = new Field('title');
         $field->setEntity($this->getEntityMock('books'));
 
-        $this->assertSame('books.TITLE', $field->getFullyQualifiedName());
+        $this->assertSame('books.TITLE', $field->getFullName());
     }
 
     public function testIsPhpArrayType()
@@ -728,34 +724,6 @@ class FieldTest extends ModelTestCase
         $field->setDescription('Some description');
 
         $this->assertSame('Some description', $field->getDescription());
-    }
-
-    public function testSetNestedSetLeftKey()
-    {
-        $field = new Field();
-        $field->setNestedSetLeftKey(true);
-        $field->setNodeKeySep(',');
-        $field->setNodeKey(true);
-
-        $this->assertTrue($field->isNestedSetLeftKey());
-        $this->assertTrue($field->isNodeKey());
-        $this->assertSame(',', $field->getNodeKeySep());
-    }
-
-    public function testSetNestedSetRightKey()
-    {
-        $field = new Field();
-        $field->setNestedSetRightKey(true);
-
-        $this->assertTrue($field->isNestedSetRightKey());
-    }
-
-    public function testSetTreeScopeKey()
-    {
-        $field = new Field();
-        $field->setTreeScopeKey(true);
-
-        $this->assertTrue($field->isTreeScopeKey());
     }
 
     public function testSetAutoIncrement()

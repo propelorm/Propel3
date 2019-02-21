@@ -2,7 +2,7 @@
 <phpunit colors="true" bootstrap="bootstrap.php">
 
   <testsuites>
-    <testsuite name="Propel2 Test Suite">
+    <testsuite name="Propel3 Test Suite">
       <directory>Propel/Tests/</directory>
     </testsuite>
   </testsuites>

@@ -20,7 +20,6 @@ propel:
           charset: utf8
 
   generator:
-    targetPackage: quoting
     defaultConnection: quoting
     connections:
       - quoting

@@ -14,33 +14,33 @@ use Propel\Tests\Bookstore\BookstoreEmployeeAccountQuery;
 
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\Map\TableMap;
+use Propel\Runtime\Map\EntityMap;
 use Propel\Tests\Bookstore\AcctAccessRole;
 use Propel\Tests\Bookstore\Author;
 use Propel\Tests\Bookstore\AuthorQuery;
 use Propel\Tests\Bookstore\Book;
 use Propel\Tests\Bookstore\BookQuery;
-use Propel\Tests\Bookstore\Map\BookTableMap;
+use Propel\Tests\Bookstore\Map\BookEntityMap;
 use Propel\Tests\Bookstore\Bookstore;
 use Propel\Tests\Bookstore\BookstoreEmployee;
 use Propel\Tests\Bookstore\BookstoreEmployeeQuery;
-use Propel\Tests\Bookstore\Map\BookstoreEmployeeTableMap;
+use Propel\Tests\Bookstore\Map\BookstoreEmployeeEntityMap;
 use Propel\Tests\Bookstore\BookstoreEmployeeAccount;
-use Propel\Tests\Bookstore\Map\BookstoreEmployeeAccountTableMap;
+use Propel\Tests\Bookstore\Map\BookstoreEmployeeAccountEntityMap;
 use Propel\Tests\Bookstore\BookstoreCashier;
 use Propel\Tests\Bookstore\BookstoreManager;
 use Propel\Tests\Bookstore\BookOpinion;
 use Propel\Tests\Bookstore\BookReader;
 use Propel\Tests\Bookstore\BookstoreContest;
-use Propel\Tests\Bookstore\Map\BookstoreContestTableMap;
+use Propel\Tests\Bookstore\Map\BookstoreContestEntityMap;
 use Propel\Tests\Bookstore\BookstoreContestEntry;
 use Propel\Tests\Bookstore\BookstoreContestEntryQuery;
-use Propel\Tests\Bookstore\Map\BookstoreContestEntryTableMap;
+use Propel\Tests\Bookstore\Map\BookstoreContestEntryEntityMap;
 use Propel\Tests\Bookstore\Contest;
 use Propel\Tests\Bookstore\Customer;
 use Propel\Tests\Bookstore\ReaderFavorite;
 use Propel\Tests\Bookstore\ReaderFavoriteQuery;
-use Propel\Tests\Bookstore\Map\ReaderFavoriteTableMap;
+use Propel\Tests\Bookstore\Map\ReaderFavoriteEntityMap;
 use Propel\Tests\Helpers\Bookstore\BookstoreEmptyTestBase;
 use Propel\Tests\Helpers\Bookstore\BookstoreDataPopulator;
 
@@ -57,6 +57,8 @@ use Propel\Tests\Helpers\Bookstore\BookstoreDataPopulator;
  *
  * @see        BookstoreDataPopulator
  * @author Hans Lellelid <hans@xmpl.org>
+ *
+ * @group database
  */
 class GeneratedQueryDoSelectTest extends BookstoreEmptyTestBase
 {
@@ -74,18 +76,18 @@ class GeneratedQueryDoSelectTest extends BookstoreEmptyTestBase
         $book1 = $books[0];
 
         $c = new Criteria();
-        $c->add(BookTableMap::ID, $book1->getId());
+        $c->add(BookEntityMap::ID, $book1->getId());
         $res = BookQuery::create()->doSelect($c);
         $this->assertEquals([$book1], $res, 'doSelect() accepts a Criteria object with a condition');
 
         $c = new Criteria();
-        $c->add(BookTableMap::ID, $book1->getId());
-        $c->add(BookTableMap::TITLE, $book1->getTitle());
+        $c->add(BookEntityMap::ID, $book1->getId());
+        $c->add(BookEntityMap::TITLE, $book1->getTitle());
         $res = BookQuery::create()->doSelect($c);
         $this->assertEquals([$book1], $res, 'doSelect() accepts a Criteria object with several condition');
 
         $c = new Criteria();
-        $c->add(BookTableMap::ID, 'foo');
+        $c->add(BookEntityMap::ID, 'foo');
         $res = BookQuery::create()->doSelect($c);
         $this->assertEquals([], $res, 'doSelect() accepts an incorrect Criteria');
     }
@@ -122,7 +124,7 @@ class GeneratedQueryDoSelectTest extends BookstoreEmptyTestBase
      */
     public function testDoSelectJoin()
     {
-        BookTableMap::clearInstancePool();
+        BookEntityMap::clearInstancePool();
 
         $c = new Criteria();
 
@@ -130,11 +132,11 @@ class GeneratedQueryDoSelectTest extends BookstoreEmptyTestBase
         $obj = $books[0];
         // $size = strlen(serialize($obj));
 
-        BookTableMap::clearInstancePool();
+        BookEntityMap::clearInstancePool();
 
         $joinBooks = BookQuery::create()->joinWith('Author')->find();
         $obj2 = $joinBooks[0];
-        $obj2Array = $obj2->toArray(TableMap::TYPE_PHPNAME, true, [], true);
+        $obj2Array = $obj2->toArray(EntityMap::TYPE_PHPNAME, true, [], true);
         // $joinSize = strlen(serialize($obj2));
 
         $this->assertEquals(count($books), count($joinBooks), "Expected to find same number of rows in doSelectJoin*() call as doSelect() call.");
@@ -224,8 +226,8 @@ class GeneratedQueryDoSelectTest extends BookstoreEmptyTestBase
 
         // 1) test the pooled instances'
         $c = new Criteria();
-        $c->add(BookstoreEmployeeTableMap::ID, [$managerId, $empId, $cashierId], Criteria::IN);
-        $c->addAscendingOrderByColumn(BookstoreEmployeeTableMap::ID);
+        $c->add(BookstoreEmployeeEntityMap::ID, [$managerId, $empId, $cashierId], Criteria::IN);
+        $c->addAscendingOrderByColumn(BookstoreEmployeeEntityMap::ID);
 
         $objects = BookstoreEmployeeQuery::create()->doSelect($c);
 
@@ -238,7 +240,7 @@ class GeneratedQueryDoSelectTest extends BookstoreEmptyTestBase
         $this->assertSame($o3, $cashier);
 
         // 2) test a forced reload from database
-        BookstoreEmployeeTableMap::clearInstancePool();
+        BookstoreEmployeeEntityMap::clearInstancePool();
 
         list($o1, $o2, $o3) = BookstoreEmployeeQuery::create()->doSelect($c);
 
@@ -253,9 +255,9 @@ class GeneratedQueryDoSelectTest extends BookstoreEmptyTestBase
      */
     public function testHydrationJoinLazyLoad()
     {
-        BookstoreEmployeeAccountTableMap::doDeleteAll();
-        BookstoreEmployeeTableMap::doDeleteAll();
-        AcctAccessRoleTableMap::doDeleteAll();
+        BookstoreEmployeeAccountEntityMap::doDeleteAll();
+        BookstoreEmployeeEntityMap::doDeleteAll();
+        AcctAccessRoleEntityMap::doDeleteAll();
 
         $bemp2 = new BookstoreEmployee();
         $bemp2->setName("Pieter");
@@ -284,9 +286,9 @@ class GeneratedQueryDoSelectTest extends BookstoreEmptyTestBase
      */
     public function testMultiColFk()
     {
-        $con = Propel::getServiceContainer()->getConnection(BookTableMap::DATABASE_NAME);
+        $con = Propel::getServiceContainer()->getConnection(BookEntityMap::DATABASE_NAME);
 
-        ReaderFavoriteTableMap::doDeleteAll();
+        ReaderFavoriteEntityMap::doDeleteAll();
 
         $b1 = new Book();
         $b1->setTitle("Book1");
@@ -309,9 +311,9 @@ class GeneratedQueryDoSelectTest extends BookstoreEmptyTestBase
         $rf1->setBookId($b1->getId());
         $rf1->save();
 
-        $c = new Criteria(ReaderFavoriteTableMap::DATABASE_NAME);
-        $c->add(ReaderFavoriteTableMap::BOOK_ID, $b1->getId());
-        $c->add(ReaderFavoriteTableMap::READER_ID, $r1->getId());
+        $c = new Criteria(ReaderFavoriteEntityMap::DATABASE_NAME);
+        $c->add(ReaderFavoriteEntityMap::BOOK_ID, $b1->getId());
+        $c->add(ReaderFavoriteEntityMap::READER_ID, $r1->getId());
 
         $results = ReaderFavoriteQuery::create(null, $c)->joinWith('BookOpinion')->find();
         $this->assertEquals(1, count($results), "Expected 1 result");
@@ -323,8 +325,8 @@ class GeneratedQueryDoSelectTest extends BookstoreEmptyTestBase
      */
     public function testMultiColJoin()
     {
-        BookstoreContestTableMap::doDeleteAll();
-        BookstoreContestEntryTableMap::doDeleteAll();
+        BookstoreContestEntityMap::doDeleteAll();
+        BookstoreContestEntryEntityMap::doDeleteAll();
 
         $bs = new Bookstore();
         $bs->setStoreName("Test1");
@@ -395,7 +397,7 @@ class GeneratedQueryDoSelectTest extends BookstoreEmptyTestBase
         */
 
         $c = new Criteria();
-        $c->addJoin([BookstoreContestEntryTableMap::BOOKSTORE_ID, BookstoreContestEntryTableMap::CONTEST_ID], [BookstoreContestTableMap::BOOKSTORE_ID, BookstoreContestTableMap::CONTEST_ID]);
+        $c->addJoin([BookstoreContestEntryEntityMap::BOOKSTORE_ID, BookstoreContestEntryEntityMap::CONTEST_ID], [BookstoreContestEntityMap::BOOKSTORE_ID, BookstoreContestEntityMap::CONTEST_ID]);
 
         $results = BookstoreContestEntryQuery::create(null, $c)->find();
         $this->assertEquals(2, count($results));

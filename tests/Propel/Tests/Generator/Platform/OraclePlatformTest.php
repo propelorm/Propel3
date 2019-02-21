@@ -84,7 +84,7 @@ ALTER TABLE book ADD CONSTRAINT book_pk PRIMARY KEY (id);
 CREATE SEQUENCE book_SEQ
     INCREMENT BY 1 START WITH 1 NOMAXVALUE NOCYCLE NOCACHE ORDER;
 
-CREATE INDEX book_i_639136 ON book (title);
+CREATE INDEX book_i_853ae9 ON book (title);
 
 -----------------------------------------------------------------------
 -- author
@@ -182,7 +182,7 @@ CREATE TABLE foo
 (
     id NUMBER NOT NULL,
     bar NUMBER,
-    CONSTRAINT foo_u_14f552 UNIQUE (bar)
+    CONSTRAINT foo_u_853ae9 UNIQUE (bar)
 );
 
 ALTER TABLE foo ADD CONSTRAINT foo_pk PRIMARY KEY (id);
@@ -193,9 +193,21 @@ CREATE SEQUENCE foo_SEQ
         $this->assertEquals($expected, $this->getPlatform()->getAddEntityDDL($entity));
     }
 
-    public function testGetDropEntityDDL()
+    public function testGetDropEntityDDLDefault()
     {
-        $entity = new Entity('foo');
+        $entity = new Entity('Foo');
+        $expected = "
+DROP TABLE foo CASCADE CONSTRAINTS;
+
+DROP SEQUENCE foo_SEQ;
+";
+        $this->assertEquals($expected, $this->getPlatform()->getDropEntityDDL($entity));
+    }
+
+    public function testGetDropEntityDDLNoSequence()
+    {
+        $entity = new Entity('Foo');
+        $entity->setIdMethod(Model::ID_METHOD_NONE);
         $expected = "
 DROP TABLE foo CASCADE CONSTRAINTS;
 ";
@@ -222,7 +234,7 @@ DROP SEQUENCE foo_sequence;
         $column = new Field('foo');
         $column->getDomain()->copy($this->getPlatform()->getDomainForType('DOUBLE'));
         $column->getDomain()->replaceScale(2);
-        $column->getDomain()->replaceSize(3);
+        $column->getDomain()->setSize(3);
         $column->setNotNull(true);
         $column->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
         $column->getDomain()->replaceSqlType('DECIMAL(5,6)');
@@ -434,7 +446,7 @@ ALTER TABLE foo DROP CONSTRAINT foo_bar_fk;
         <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
         <field name="title" type="VARCHAR" size="255" required="true" />
         <index>
-            <index-column name="title" />
+            <index-field name="title" />
             <vendor type="oracle">
                 <parameter name="PCTFree" value="20"/>
                 <parameter name="InitTrans" value="4"/>
@@ -494,11 +506,11 @@ ALTER SESSION SET NLS_TIMESTAMP_FORMAT='YYYY-MM-DD HH24:MI:SS';
 -- book
 -----------------------------------------------------------------------
 
-DROP TABLE book CASCADE CONSTRAINTS;
+DROP TABLE x.book CASCADE CONSTRAINTS;
 
 DROP SEQUENCE book_SEQ;
 
-CREATE TABLE book
+CREATE TABLE x.book
 (
     id NUMBER NOT NULL,
     title NVARCHAR2(255) NOT NULL,
@@ -514,7 +526,7 @@ STORAGE
 )
 TABLESPACE L_128K;
 
-ALTER TABLE book ADD CONSTRAINT book_pk PRIMARY KEY (id)
+ALTER TABLE x.book ADD CONSTRAINT book_pk PRIMARY KEY (id)
 USING INDEX
 PCTFREE 20
 INITRANS 4
@@ -529,7 +541,7 @@ TABLESPACE IL_128K;
 CREATE SEQUENCE book_SEQ
     INCREMENT BY 1 START WITH 1 NOMAXVALUE NOCYCLE NOCACHE ORDER;
 
-CREATE INDEX book_i_639136 ON book (title)
+CREATE INDEX book_i_853ae9 ON book (title)
 PCTFREE 20
 INITRANS 4
 STORAGE
@@ -544,11 +556,11 @@ TABLESPACE IL_128K;
 -- author
 -----------------------------------------------------------------------
 
-DROP TABLE author CASCADE CONSTRAINTS;
+DROP TABLE y.author CASCADE CONSTRAINTS;
 
 DROP SEQUENCE author_SEQ;
 
-CREATE TABLE author
+CREATE TABLE y.author
 (
     id NUMBER NOT NULL,
     first_name NVARCHAR2(100),
@@ -564,7 +576,7 @@ STORAGE
 )
 TABLESPACE L_128K;
 
-ALTER TABLE author ADD CONSTRAINT author_pk PRIMARY KEY (id)
+ALTER TABLE y.author ADD CONSTRAINT author_pk PRIMARY KEY (id)
 USING INDEX
 PCTFREE 20
 INITRANS 4
@@ -583,8 +595,8 @@ CREATE SEQUENCE author_SEQ
 -- Foreign Keys
 -----------------------------------------------------------------------
 
-ALTER TABLE book ADD CONSTRAINT book_fk_82ae3e
-    FOREIGN KEY (author_id) REFERENCES author (id);
+ALTER TABLE x.book ADD CONSTRAINT book_fk_4444ca
+    FOREIGN KEY (author_id) REFERENCES y.author (id);
 
 EOF;
 

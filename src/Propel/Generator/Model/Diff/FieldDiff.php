@@ -154,7 +154,7 @@ class FieldDiff
     public function __toString()
     {
         $ret = '';
-        $ret .= sprintf("      %s:\n", $this->fromField->getFullyQualifiedName());
+        $ret .= sprintf("      %s:\n", $this->fromField->getFullName());
         $ret .= "        modifiedProperties:\n";
         foreach ($this->changedProperties as $key => $value) {
             $ret .= sprintf("          %s: %s\n", $key, json_encode($value));

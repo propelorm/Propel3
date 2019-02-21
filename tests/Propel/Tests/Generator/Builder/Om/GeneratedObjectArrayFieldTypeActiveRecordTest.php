@@ -35,7 +35,7 @@ class GeneratedObjectArrayFieldTypeActiveRecordTest extends TestCase
         <field name="tags" type="ARRAY" />
         <field name="value_set" type="ARRAY" />
         <field name="defaults" type="ARRAY" defaultValue="FOO" />
-        <field name="multiple_defaults" type="ARRAY" defaultValue="FOO, BAR,BAZ" />
+        <field name="multiple_defaults" type="ARRAY" defaultValue="FOO,BAR,BAZ" />
     </entity>
 </database>
 EOF;

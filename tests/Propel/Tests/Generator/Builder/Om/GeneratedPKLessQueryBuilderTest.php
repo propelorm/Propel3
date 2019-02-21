@@ -21,16 +21,16 @@ class GeneratedPKLessQueryBuilderTest extends TestCase
 
     /**
      * @expectedException           \Propel\Runtime\Exception\PropelException
-     * @expectedExceptionMessage    The entity Stuff does not have a primary key.
+     * @expectedExceptionMessage    does not have a primary key.
      */
     public function testThrowsAnError()
     {
         $schema = <<<SCHEMA
 <database name="primarykey_less_test">
-    <table name="stuff">
-        <column name="key" type="VARCHAR" />
-        <column name="value" type="VARCHAR" />
-    </table>
+    <entity name="stuff">
+        <field name="key" type="VARCHAR" />
+        <field name="value" type="VARCHAR" />
+    </entity>
 </database>
 SCHEMA;
 

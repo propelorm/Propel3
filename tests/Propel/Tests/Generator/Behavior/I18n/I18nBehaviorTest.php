@@ -373,7 +373,7 @@ EOF;
         $schema1 = <<<EOF
 <database name="i18n_behavior_test_custom_pk_0">
     <entity name="I18nBehaviorTestCustomPk0">
-        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
+        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" required="true" />
         <field name="foo" type="INTEGER" />
         <field name="bar" type="VARCHAR" size="100" />
         <behavior name="i18n">
@@ -386,13 +386,13 @@ EOF;
         $schema2 = <<<EOF
 <database name="i18n_behavior_test_custom_pk_0">
     <entity name="I18nBehaviorTestCustomPk0">
-        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
+        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" required="true" />
         <field name="foo" type="INTEGER" />
         <behavior name="i18n" />
     </entity>
     <entity name="I18nBehaviorTestCustomPk0I18n">
-        <field name="custom_id" primaryKey="true" type="INTEGER" />
-        <field name="locale" primaryKey="true" type="VARCHAR" size="5" default="en_US" />
+        <field name="custom_id" primaryKey="true" type="INTEGER" required="true" />
+        <field name="locale" primaryKey="true" type="VARCHAR" size="5" default="en_US" required="true" />
         <field name="bar" type="VARCHAR" size="100" />
         <relation target="I18nBehaviorTestCustomPk0">
             <reference local="custom_id" foreign="id" />

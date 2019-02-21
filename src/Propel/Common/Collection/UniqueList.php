@@ -26,7 +26,10 @@ class UniqueList extends ArrayList
      * @param int $index
      * @return $this
      */
-    public function add($element, $index = null) {
+    public function add($element, $index = null)
+    {
+        $this->checkClass($element);
+
         if (!in_array($element, $this->collection, true)) {
             if ($index === null) {
                 $this->collection[$this->size()] = $element;

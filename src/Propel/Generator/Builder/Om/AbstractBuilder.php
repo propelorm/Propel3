@@ -67,7 +67,7 @@ abstract class AbstractBuilder extends DataModelBuilder
         $this->definition = new ClassDefinition($this->getFullClassName());
 
         if (!$this->getEntity()->getPrimaryKey()) {
-            throw new PropelException(sprintf('The table %s does not have a primary key.', $this->getFullClassName()));
+            throw new PropelException(sprintf('The entity %s does not have a primary key.', $this->getFullClassName()));
         }
 
         if (false === $this->buildClass()) {

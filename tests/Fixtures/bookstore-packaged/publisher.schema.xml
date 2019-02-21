@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE database SYSTEM "../dtd/database.dtd">
 
-<database package="core.publisher" name="bookstore" defaultIdMethod="native" namespace="Propel\Tests\BookstorePackaged">
+<database name="bookstore" defaultIdMethod="native" namespace="Propel\Tests\BookstorePackaged">
 
   <entity name="Publisher" description="Publisher Table">
     <behavior name="auto_add_pk" />

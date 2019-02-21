@@ -166,12 +166,12 @@ class Entity
         }
 
         // init
-        $this->fields = new Set();
-        $this->relations = new Set();
+        $this->relations = new Set([], Relation::class);
         $this->foreignEntityNames = new Set();
-        $this->indices = new Set();
-        $this->referrers = new Set();
-        $this->unices = new Set();
+        $this->indices = new Set([], Index::class);
+        $this->referrers = new Set([], Relation::class);
+        $this->unices = new Set([], Unique::class);
+        $this->initFields();
         $this->initBehaviors();
         $this->initSql();
         $this->initVendor();
@@ -270,8 +270,8 @@ class Entity
     {
         $fqTableName = $this->getScopedTableName();
 
-        if ($this->hasSchema()) {
-            $fqTableName = $this->guessSchemaName() . $this->getPlatform()->getSchemaDelimiter() . $fqTableName;
+        if (null !== $schemaName = $this->getSchemaName()) {
+            $fqTableName = "$schemaName{$this->getPlatform()->getSchemaDelimiter()}$fqTableName";
         }
 
         return $fqTableName;
@@ -425,29 +425,6 @@ class Entity
         return $this;
     }
 
-//    /**
-//     * MOVED into SqlDefaultPlatform class
-//     *
-//     * Returns a delimiter-delimited string list of field names.
-//     *
-//     * @see SqlDefaultPlatform::getFieldList() if quoting is required
-//     *
-//     * @param array
-//     * @param string $delimiter
-//     * @return string
-//     */
-//    public function getFieldList(array $columns, string $delimiter = ','): string
-//    {
-//        $list = [];
-//        foreach ($columns as $col) {
-//            if ($col instanceof Field) {
-//                $col = $col->getName();
-//            }
-//            $list[] = $col;
-//        }
-//        return implode($delimiter, $list);
-//    }
-
     /**
      * @TODO check consistency with naming size/num/count methods
      *
@@ -494,14 +471,6 @@ class Entity
 
         return false;
     }
-
-//    Never used: remove?
-//
-//    private function getFieldPosition(Field $field): int
-//    {
-//        return $this->fields->indexOf($field);
-//    }
-
 
     // relations
     // -----------------------------------------
@@ -1341,39 +1310,12 @@ class Entity
     }
 
     /**
-     * Alias for Entity::setCrossRef.
-     *
-     * @see Entity::setCrossRef
-     *
-     * @param bool $flag
-     * @return $this;
-     * @deprecated use setCrossRef
-     */
-    public function setIsCrossRef(bool $flag = true): Entity
-    {
-        return $this->setCrossRef($flag);
-    }
-
-    /**
      * Returns whether or not there is a cross reference status for this foreign
      * key.
      *
      * @return bool
      */
     public function isCrossRef(): bool
-    {
-        return $this->isCrossRef;
-    }
-
-    /**
-     * Alias for Entity::getIsCrossRef.
-     *
-     * @see Entity::isCrossRef
-     *
-     * @return bool
-     * @deprecated use isCrossRef
-     */
-    public function getIsCrossRef(): bool
     {
         return $this->isCrossRef;
     }
@@ -1445,7 +1387,7 @@ class Entity
      *
      * @return string
      */
-    public function getAlias(): string
+    public function getAlias(): ?string
     {
         return $this->alias;
     }

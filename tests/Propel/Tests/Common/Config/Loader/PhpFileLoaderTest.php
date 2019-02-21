@@ -13,17 +13,20 @@ namespace Propel\Tests\Common\Config\Loader;
 use org\bovigo\vfs\vfsStream;
 use Propel\Common\Config\Loader\PhpFileLoader;
 use Propel\Common\Config\FileLocator;
-use Propel\Tests\Common\Config\ConfigTestCase;
+use Propel\Tests\TestCase;
+use Propel\Tests\VfsTrait;
 
-class PhpFileLoaderTest extends ConfigTestCase
+class PhpFileLoaderTest extends TestCase
 {
+    use VfsTrait;
+
     /** @var PhpFileLoader */
     protected $loader;
 
     public function setUp()
     {
         parent::setUp();
-        $this->loader = new PhpFileLoader(new FileLocator([sys_get_temp_dir()]));
+        $this->loader = new PhpFileLoader(new FileLocator([$this->getRoot()->url()]));
     }
 
     public function testSupports()
@@ -44,7 +47,7 @@ class PhpFileLoaderTest extends ConfigTestCase
     return array('foo' => 'bar', 'bar' => 'baz');
 
 EOF;
-        $file = vfsStream::newFile('parameters.php')->at($this->getRoot())->setContent($content);
+        $file = $this->newFile('parameters.php', $content);
         $test = $this->loader->load($file->url());
         $this->assertEquals('bar', $test['foo']);
         $this->assertEquals('baz', $test['bar']);
@@ -70,7 +73,7 @@ not php content
 only plain
 text
 EOF;
-        $file = vfsStream::newFile('nonvalid.php')->at($this->getRoot())->setContent($content);
+        $file = $this->newFile('nonvalid.php', $content);
         $this->loader->load($file->url());
     }
 
@@ -80,7 +83,7 @@ EOF;
      */
     public function testPhpFileIsEmpty()
     {
-        $file = vfsStream::newFile('empty.php')->at($this->getRoot())->setContent('');
+        $file = $this->newFile('empty.php', '');
 
         $this->loader->load($file->url());
     }
@@ -97,7 +100,7 @@ EOF;
     return array('foo' => 'bar', 'bar' => 'baz');
 
 EOF;
-        $file = vfsStream::newFile('notreadable.php', 200)->at($this->getRoot())->setContent($content);
+        $file = $this->newFile('notreadable.php', $content)->chmod(200);
 
         $actual = $this->loader->load($file->url());
         $this->assertEquals('bar', $actual['foo']);

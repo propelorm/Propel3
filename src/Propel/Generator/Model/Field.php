@@ -41,7 +41,7 @@ use Propel\Generator\Platform\PlatformInterface;
  */
 class Field
 {
-    use NodePart, DomainPart, NamePart, GeneratorPart, EntityPart, PlatformAccessorPart, DescriptionPart, VendorPart;
+    use DomainPart, NamePart, GeneratorPart, EntityPart, PlatformAccessorPart, DescriptionPart, VendorPart;
 
     const CONSTANT_PREFIX    = 'FIELD_';
 
@@ -146,18 +146,15 @@ class Field
         $this->isAutoIncrement            = false;
         $this->isEnumeratedClasses        = false;
         $this->isLazyLoad                 = false;
-        $this->isNestedSetLeftKey         = false;
-        $this->isNestedSetRightKey        = false;
-        $this->isNodeKey                  = false;
         $this->isNotNull                  = false;
         $this->isPrimaryKey               = false;
         $this->isPrimaryString            = false;
-        $this->isTreeScopeKey             = false;
         $this->isUnique                   = false;
         $this->needsTransactionInPostgres = false;
         $this->valueSet = new Set();
         $this->inheritanceList = new Set();
         $this->referrers =  new Set();
+        $this->vendor = new Map([], Vendor::class);
         $this->mutatorVisibility = Model::VISIBILITY_PUBLIC;
         $this->accessorVisibility = Model::VISIBILITY_PUBLIC;
     }
@@ -176,7 +173,7 @@ class Field
      *
      * @return string
      */
-    public function getFullyQualifiedName(): string
+    public function getFullName(): string
     {
         return $this->getEntity()->getName() . '.' . strtoupper($this->getName());
     }
@@ -251,7 +248,7 @@ class Field
      *
      * @return string A column constant name for insertion into PHP code
      */
-    public function getFQConstantName(): string
+    public function getFullConstantName(): string
     {
         $classname = $this->getEntity()->getName() . 'EntityMap';
         $const = $this->getConstantName();
@@ -278,7 +275,7 @@ class Field
      */
     public function getPhpType(): string
     {
-        return $this->phpType ? $this->phpType : $this->getPhpNative();
+        return $this->phpType ? $this->phpType : PropelTypes::getPhpNative($this->getType());
     }
 
     /**
@@ -435,7 +432,12 @@ class Field
      */
     public function setPrimaryKey(bool $flag = true)
     {
-        $this->isPrimaryKey = (Boolean) $flag;
+        $this->isPrimaryKey = $flag;
+
+        //Primary key can't be null
+        if (true === $flag) {
+            $this->setNotNull(true);
+        }
     }
 
     /**
@@ -858,7 +860,6 @@ class Field
      * Sets a string that will give this column a default value.
      *
      * @param  FieldDefaultValue|mixed $defaultValue The column's default value
-     * @return Field
      */
     public function setDefaultValue($defaultValue)
     {
@@ -867,6 +868,20 @@ class Field
         }
 
         $this->domain->setDefaultValue($defaultValue);
+    }
+
+    /**
+     * Sets a string that will give this column a default expression.
+     *
+     * @param  FieldDefaultValue|string $defaultExpression The column's default value
+     */
+    public function setDefaultExpression($defaultExpression)
+    {
+        if (!$defaultExpression instanceof FieldDefaultValue) {
+            $defaultExpression = new FieldDefaultValue($defaultExpression, FieldDefaultValue::TYPE_EXPR);
+        }
+
+        $this->domain->setDefaultValue($defaultExpression);
     }
 
     /**
@@ -1022,15 +1037,26 @@ class Field
         return PropelTypes::isPhpObjectType($this->getPhpType());
     }
 
+    public function setSqlType(string $sqlType)
+    {
+        $this->getDomain()->replaceSqlType($sqlType);
+    }
+
     /**
      * Clones the current object.
      *
      */
     public function __clone()
     {
-        $this->referrers = clone $this->referrers;
-        $this->valueSet = clone $this->valueSet;
-        $this->inheritanceList = clone $this->inheritanceList;
+        if ($this->referrers) {
+            $this->referrers = clone $this->referrers;
+        }
+        if ($this->valueSet) {
+            $this->valueSet = clone $this->valueSet;
+        }
+        if ($this->inheritanceList) {
+            $this->inheritanceList = clone $this->inheritanceList;
+        }
         if ($this->vendor) {
             $this->vendor = clone $this->vendor;
         }
@@ -1038,18 +1064,4 @@ class Field
             $this->domain = clone $this->domain;
         }
     }
-
-// if still used, move it to pluralizer. Create a standalone library to pluralize/
-// singularize names.
-//
-//    /**
-//     * Generates the singular form of a PHP name.
-//     *
-//     * @param  string $phpname
-//     * @return string
-//     */
-//    public static function generatePhpSingularName(string $phpname): string
-//    {
-//        return rtrim($phpname, 's');
-//    }
 }

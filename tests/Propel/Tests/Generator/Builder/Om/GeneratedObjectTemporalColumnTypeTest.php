@@ -30,13 +30,13 @@ class GeneratedObjectTemporalColumnTypeTest extends TestCase
         if (!class_exists('ComplexColumnTypeEntity5')) {
             $schema = <<<EOF
 <database name="generated_object_complex_type_test_5" activeRecord="true">
-    <table name="complex_column_type_entity_5">
-        <column name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
-        <column name="bar1" type="DATE" />
-        <column name="bar2" type="TIME"  />
-        <column name="bar3" type="TIMESTAMP" />
-        <column name="bar4" type="TIMESTAMP" default="2011-12-09" />
-    </table>
+    <entity name="complex_column_type_entity_5">
+        <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
+        <field name="bar1" type="DATE" />
+        <field name="bar2" type="TIME"  />
+        <field name="bar3" type="TIMESTAMP" />
+        <field name="bar4" type="TIMESTAMP" default="2011-12-09" />
+    </entity>
 </database>
 EOF;
             QuickBuilder::buildSchema($schema);
@@ -155,12 +155,12 @@ EOF;
     {
         $schema = <<<EOF
 <database name="generated_object_complex_type_test_6">
-<table name="complex_column_type_entity_6">
-    <column name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
-    <column name="bar1" type="DATE" />
-    <column name="bar2" type="TIME"  />
-    <column name="bar3" type="TIMESTAMP" />
-</table>
+<entity name="complex_column_type_entity_6">
+    <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
+    <field name="bar1" type="DATE" />
+    <field name="bar2" type="TIME"  />
+    <field name="bar3" type="TIMESTAMP" />
+</entity>
 </database>
 EOF;
         $builder = new QuickBuilder();

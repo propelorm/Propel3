@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<database name="acme_blog" defaultIdMethod="native" package="Acme" schema="acme" namespace="Acme\Model" heavyIndexing="true" tablePrefix="acme_">
+<database name="acme_blog" defaultIdMethod="native" schema="acme" namespace="Acme\Model" heavyIndexing="true">
   <vendor type="mysql">
     <parameter name="Engine" value="InnoDB"/>
     <parameter name="Charset" value="utf8"/>
   </vendor>
-  <entity name="BlogPost" tableName="blog_post" package="Acme.Blog" namespace="Blog" description="The list of posts">
-    <field name="id" columnName="id" type="integer" size="7" primaryKey="true" autoIncrement="true" required="true"/>
-    <field name="authorId" columnName="author_id" type="smallint" size="3" required="true"/>
-    <field name="categoryId" columnName="category_id" type="tinyint" size="2" required="true"/>
-    <field name="title" columnName="title" type="varchar" size="100" required="true"/>
-    <field name="body" columnName="body" type="clob"/>
-    <field name="averageRating" columnName="average_rating" type="float" size="2" scale="2" description="The post rating in percentage"/>
-    <foreign-key target="BlogAuthor" name="fk_post_has_author" field="author" refField="posts" defaultJoin="Criteria::LEFT_JOIN" onDelete="CASCADE">
+  <entity name="BlogPost" tableName="blog_post" namespace="Blog" description="The list of posts">
+    <field name="id" type="INTEGER" size="7" primaryKey="true" autoIncrement="true" required="true"/>
+    <field name="authorId" type="SMALLINT" size="3" required="true"/>
+    <field name="categoryId" type="TINYINT" size="2" required="true"/>
+    <field name="title" type="VARCHAR" size="100" required="true"/>
+    <field name="body" type="CLOB" sqlType="LONGTEXT"/>
+    <field name="averageRating" type="FLOAT" size="2" scale="2" description="The post rating in percentage"/>
+    <relation target="BlogAuthor" name="fk_post_has_author" field="author" refField="posts" defaultJoin="Criteria::LEFT_JOIN" onDelete="CASCADE">
       <reference local="authorId" foreign="id"/>
-    </foreign-key>
-    <foreign-key target="BlogCategory" name="fk_post_has_category" field="category" refField="posts" defaultJoin="Criteria::INNER_JOIN" onDelete="SET NULL">
+    </relation>
+    <relation target="BlogCategory" name="fk_post_has_category" field="category" refField="posts" defaultJoin="Criteria::INNER_JOIN" onDelete="SET NULL">
       <reference local="categoryId" foreign="id"/>
-    </foreign-key>
+    </relation>
     <behavior name="timestampable">
       <parameter name="create_field" value="createdAt"/>
       <parameter name="update_field" value="updatedAt"/>
@@ -33,42 +33,42 @@
       <parameter name="scope_field" value=""/>
     </behavior>
   </entity>
-  <entity name="BlogAuthor" tableName="blog_author" package="Acme.Blog" namespace="Blog" description="The list of authors">
-    <field name="id" columnName="id" type="smallint" size="3" primaryKey="true" autoIncrement="true" required="true"/>
-    <field name="username" columnName="username" type="varchar" size="15" required="true"/>
-    <field name="password" columnName="password" type="varchar" size="40" required="true"/>
+  <entity name="BlogAuthor" tableName="blog_author" namespace="Blog" description="The list of authors">
+    <field name="id" type="SMALLINT" size="3" primaryKey="true" autoIncrement="true" required="true"/>
+    <field name="username" type="VARCHAR" size="15" required="true"/>
+    <field name="password" type="VARCHAR" size="40" required="true"/>
     <unique name="author_password_unique_idx">
       <unique-field name="username" size="8"/>
     </unique>
   </entity>
-  <entity name="BlogCategory" tableName="blog_category" package="Acme.Blog" namespace="Blog" description="The list of categories">
-    <field name="id" columnName="id" type="tinyint" size="2" primaryKey="true" autoIncrement="true" required="true"/>
-    <field name="name" columnName="name" type="varchar" size="40" required="true"/>
+  <entity name="BlogCategory" tableName="blog_category" namespace="Blog" description="The list of categories">
+    <field name="id" type="TINYINT" size="2" primaryKey="true" autoIncrement="true" required="true"/>
+    <field name="name" type="VARCHAR" size="40" required="true"/>
   </entity>
-  <entity name="BlogTag" tableName="blog_tag" package="Acme.Blog" namespace="Blog" description="The list of tags">
-    <field name="id" columnName="id" type="integer" size="7" primaryKey="true" autoIncrement="true" required="true"/>
-    <field name="name" columnName="name" type="varchar" size="40" required="true"/>
+  <entity name="BlogTag" tableName="blog_tag" namespace="Blog" description="The list of tags">
+    <field name="id" type="INTEGER" size="7" primaryKey="true" autoIncrement="true" required="true"/>
+    <field name="name" type="VARCHAR" size="40" required="true"/>
   </entity>
-  <entity name="BlogPostTag" tableName="blog_post_tag" package="Acme.Blog" namespace="Blog" isCrossRef="true">
-    <field name="postId" columnName="post_id" type="integer" size="7" primaryKey="true" required="true"/>
-    <field name="tagId" columnName="tag_id" type="integer" size="7" primaryKey="true" required="true"/>
-    <foreign-key target="BlogPost" name="fk_post_has_tags" field="post" defaultJoin="Criteria::LEFT_JOIN" onDelete="CASCADE">
+  <entity name="BlogPostTag" tableName="blog_post_tag" namespace="Blog" isCrossRef="true">
+    <field name="postId" type="INTEGER" size="7" primaryKey="true" required="true"/>
+    <field name="tagId" type="INTEGER" size="7" primaryKey="true" required="true"/>
+    <relation target="BlogPost" name="fk_post_has_tags" field="post" defaultJoin="Criteria::LEFT_JOIN" onDelete="CASCADE">
       <reference local="postId" foreign="id"/>
-    </foreign-key>
-    <foreign-key target="BlogTag" name="fk_tag_has_posts" field="tag" defaultJoin="Criteria::LEFT_JOIN" onDelete="CASCADE">
+    </relation>
+    <relation target="BlogTag" name="fk_tag_has_posts" field="tag" defaultJoin="Criteria::LEFT_JOIN" onDelete="CASCADE">
       <reference local="tagId" foreign="id"/>
-    </foreign-key>
+    </relation>
   </entity>
-  <entity name="Page" tableName="cms_page" package="Acme.Cms" namespace="Cms">
-    <field name="id" columnName="id" type="integer" size="5" primaryKey="true" autoIncrement="true" required="true"/>
-    <field name="title" columnName="title" type="varchar" size="150" required="true"/>
-    <field name="content" columnName="content" type="clob">
+  <entity name="Page" tableName="cms_page" namespace="Cms">
+    <field name="id" type="INTEGER" size="5" primaryKey="true" autoIncrement="true" required="true"/>
+    <field name="title" type="VARCHAR" size="150" required="true"/>
+    <field name="content" type="CLOB" sqlType="LONGTEXT">
       <vendor type="mysql">
         <parameter name="Charset" value="latin1"/>
         <parameter name="Collate" value="latin1_general_ci"/>
       </vendor>
     </field>
-    <field name="isPublished" columnName="is_published" type="boolean" required="true" defaultValue="false"/>
+    <field name="isPublished" type="BOOLEAN" sqlType="TINYINT" required="true" defaultValue="false"/>
     <index name="page_content_fulltext_idx">
       <index-field name="content"/>
       <vendor type="mysql">

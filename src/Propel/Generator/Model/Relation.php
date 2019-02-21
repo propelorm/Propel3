@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Propel\Generator\Model;
 
 use Propel\Common\Collection\ArrayList;
+use Propel\Common\Collection\Map;
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Model\Parts\DatabasePart;
 use Propel\Generator\Model\Parts\EntityPart;
@@ -46,11 +47,6 @@ class Relation
      * @var Entity|null
      */
     private $foreignEntity;
-//
-//    /**
-//     * @var string
-//     */
-//    private $foreignSchemaName;
 
     /**
      * @var string
@@ -91,7 +87,7 @@ class Relation
     /**
      * @var bool
      */
-    private $skipSql;
+    private $skipSql = false;
 
     /**
      * @var bool
@@ -124,7 +120,7 @@ class Relation
         $this->defaultJoin = 'INNER JOIN';
         $this->localFields = new UniqueList();
         $this->foreignFields = new ArrayList();
-        $this->skipSql = false;
+        $this->initVendor();
     }
 
     /**
@@ -174,6 +170,7 @@ class Relation
     {
         $this->refField = $refField;
     }
+
     /**
      * Returns the normalized input of onDelete and onUpdate behaviors.
      *
@@ -388,18 +385,6 @@ class Relation
         $this->defaultJoin = $join;
     }
 
-
-    /**
-     * Never used: remove?
-     * Returns the PlatformInterface instance.
-     *
-     * @return PlatformInterface
-     */
-    /*private function getPlatform()
-    {
-        return $this->parentEntity->getPlatform();
-    }*/
-
     /**
      * Returns the foreign table name of the FK, aka 'target'.
      *
@@ -450,7 +435,8 @@ class Relation
         }
 
         if (($database = $this->getEntity()->getDatabase()) && $this->getForeignEntityName()) {
-            return $database->getEntityByName($this->getForeignEntityName());
+            return $database->getEntityByName($this->getForeignEntityName()) ??
+                $database->getEntityByFullName($this->getForeignEntityName());
         }
 
         return null;

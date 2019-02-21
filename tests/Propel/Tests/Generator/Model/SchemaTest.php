@@ -34,13 +34,11 @@ class SchemaTest extends ModelTestCase
 
     public function testJoinMultipleSchemasWithSameEntityTwice()
     {
-        $booksEntity = $this->getEntityMock('books');
-
         $database1 = new Database('bookstore');
-        $database1->addEntity(clone $booksEntity);
+        $database1->addEntity($this->getEntityMock('books'));
 
         $database2 = new Database('bookstore');
-        $database2->addEntity(clone $booksEntity);
+        $database2->addEntity($this->getEntityMock('books'));
 
         $subSchema1 = new Schema();
         $subSchema1->addDatabase($database1);

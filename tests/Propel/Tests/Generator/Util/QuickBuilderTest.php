@@ -54,7 +54,7 @@ EOF;
         $database = $builder->getDatabase();
         $this->assertEquals('TestQuickBuild2', $database->getName());
         $this->assertEquals(1, count($database->getEntities()));
-        $this->assertEquals(2, count($database->getEntity('QuickBuildFoo1')->getFields()));
+        $this->assertEquals(2, $database->getEntityByName('QuickBuildFoo1')->getFields()->size());
     }
 
     /**

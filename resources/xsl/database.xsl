@@ -95,7 +95,7 @@
     Normalize a table, add some attribute with default values if ommitted and normalize all attribute and childnodes
     -->
     <xsl:template match='table'>
-        <table>
+        <entity>
             <xsl:if test='not(boolean(@skipSql))'>
                 <xsl:attribute name='skipSql'>false</xsl:attribute>
             </xsl:if>
@@ -110,7 +110,7 @@
             <xsl:apply-templates select='id-method-parameter'/>
             <xsl:apply-templates select='vendor'/>
             <xsl:apply-templates select='behavior'/>
-        </table>
+        </entity>
     </xsl:template>
 
     <!--
@@ -225,7 +225,7 @@
     Normalize a column node, add default values for missing attributes and copy the content
     -->
     <xsl:template match='column'>
-        <column>
+        <field>
             <xsl:if test='not(boolean(@primaryKey))'>
                 <xsl:attribute name='primaryKey'>false</xsl:attribute>
             </xsl:if>
@@ -247,7 +247,7 @@
             <xsl:apply-templates select='@*'/>
             <xsl:apply-templates select='inheritance'/>
             <xsl:apply-templates select='vendor'/>
-        </column>
+        </field>
     </xsl:template>
 
     <!--

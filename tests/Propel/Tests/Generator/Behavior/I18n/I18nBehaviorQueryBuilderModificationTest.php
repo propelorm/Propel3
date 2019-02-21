@@ -26,7 +26,7 @@ class I18nBehaviorQueryBuilderModificationTest extends TestCase
     {
         if (!class_exists('\I18nBehaviorTest11')) {
             $schema = <<<EOF
-<database name="i18n_behavior_test_10" identifierQuoting="true" activeRecord="true">
+<database name="i18n_behavior_test_10" activeRecord="true">
     <entity name="I18nBehaviorTest11">
         <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
         <field name="foo" type="INTEGER" />
@@ -58,7 +58,6 @@ EOF;
     {
         $q = \I18nBehaviorTest11Query::create();
         $q->setIdentifierQuoting(true);
-
         $q->joinI18n();
         $params = [];
         $sql = $q->createSelectSQL($params);

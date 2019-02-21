@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,9 +7,13 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Tests\Generator\Platform;
 
-use Propel\Generator\Builder\Util\SchemaReader;
+use Propel\Generator\Model\Database;
+use Propel\Generator\Model\Entity;
+use Propel\Generator\Schema\SchemaReader;
 use Propel\Tests\TestCase;
 
 /**
@@ -18,17 +21,16 @@ use Propel\Tests\TestCase;
  */
 abstract class PlatformTestBase extends TestCase
 {
-    protected function getDatabaseFromSchema($schema)
+    protected function getDatabaseFromSchema(string $schema): Database
     {
         $xtad = new SchemaReader();
-        $xtad->setPlatform($this->getPlatform());
-        $appData = $xtad->parseString($schema);
+        $appData = $xtad->parseString($schema, $this->getPlatform());
 
         return $appData->getDatabase();
     }
 
-    protected function getEntityFromSchema($schema, $entityName = 'foo')
+    protected function getEntityFromSchema(string $schema, $entityName = 'Foo'): Entity
     {
-        return $this->getDatabaseFromSchema($schema)->getEntity($entityName);
+        return $this->getDatabaseFromSchema($schema)->getEntityByName($entityName);
     }
 }

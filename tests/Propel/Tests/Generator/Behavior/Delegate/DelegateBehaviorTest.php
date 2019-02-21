@@ -8,14 +8,15 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Tests\Generator\Behavior\Delegate;
 
-use Map\DelegateDelegateEntityMap;
+use \Map\DelegateDelegateEntityMap;
 use Propel\Generator\Behavior\Delegate\DelegateBehavior;
 use Propel\Generator\Util\QuickBuilder;
 
 use Propel\Runtime\Configuration;
-use Propel\Runtime\Propel;
 use Propel\Tests\TestCase;
 
 /**
@@ -27,7 +28,7 @@ class DelegateBehaviorTest extends TestCase
 {
     public function setUp()
     {
-        if (!class_exists('DelegateDelegate')) {
+        if (!class_exists('\DelegateDelegate')) {
             $schema = <<<EOF
 <database name="delegate_behavior_test_1" activeRecord="true">
 
@@ -247,7 +248,7 @@ EOF;
 //        $schema = <<<EOF
 //<database name="testTablePrefixSameDatabase_database" tablePrefix="foo">
 //
-//    <table name="testTablePrefixSameDatabase_main">
+//    <entity name="testTablePrefixSameDatabase_main">
 //        <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
 //        <field name="title" type="VARCHAR" size="100" primaryString="true" />
 //        <field name="delegateId" type="INTEGER" />
@@ -257,12 +258,12 @@ EOF;
 //        <behavior name="delegate">
 //            <parameter name="to" value="testTablePrefixSameDatabase_delegate" />
 //        </behavior>
-//    </table>
+//    </entity>
 //
-//    <table name="testTablePrefixSameDatabase_delegate">
+//    <entity name="testTablePrefixSameDatabase_delegate">
 //        <field name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
 //        <field name="subtitle" type="VARCHAR" size="100" primaryString="true" />
-//    </table>
+//    </entity>
 //
 //</database>
 //EOF;

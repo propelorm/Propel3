@@ -10,12 +10,13 @@
 
 namespace Propel\Tests\Generator\Platform;
 
-use Propel\Generator\Builder\Util\SchemaReader;
+use Propel\Common\Collection\Map;
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\FieldDefaultValue;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Diff\FieldComparator;
 use Propel\Generator\Platform\PgsqlPlatform;
+use Propel\Generator\Schema\SchemaReader;
 
 /**
  *
@@ -82,9 +83,9 @@ ALTER TABLE "foo1" RENAME TO "foo2";
     {
         $expected = <<<END
 
-ALTER TABLE "foo" DROP CONSTRAINT "foo1_fk_2";
-
 ALTER TABLE "foo" DROP CONSTRAINT "foo1_fk_1";
+
+ALTER TABLE "foo" DROP CONSTRAINT "foo1_fk_2";
 
 DROP INDEX "bar_baz_fk";
 
@@ -255,13 +256,13 @@ ALTER TABLE "foo" ALTER COLUMN "bar" TYPE DOUBLE PRECISION;
         $t1->setIdentifierQuoting(true);
         $c1 = new Field('bar');
         $c1->getDomain()->copy($this->getPlatform()->getDomainForType('DOUBLE'));
-        $c1->getDomain()->replaceSize(2);
+        $c1->getDomain()->setSize(2);
         $t1->addField($c1);
         $t2 = new Entity('foo');
         $t2->setIdentifierQuoting(true);
         $c2 = new Field('bar');
         $c2->getDomain()->copy($this->getPlatform()->getDomainForType('DOUBLE'));
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setSize(3);
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue(-100, FieldDefaultValue::TYPE_VALUE));
         $t2->addField($c2);
         $columnDiff = FieldComparator::computeDiff($c1, $c2);
@@ -287,7 +288,7 @@ ALTER TABLE "foo" ALTER COLUMN "bar1" TYPE DOUBLE PRECISION;
 ALTER TABLE "foo" ALTER COLUMN "bar2" SET NOT NULL;
 
 END;
-        $this->assertEquals($expected, $this->getPlatform()->getModifyFieldsDDL($columnDiffs));
+        $this->assertEquals($expected, $this->getPlatform()->getModifyFieldsDDL(new Map($columnDiffs)));
     }
 
     /**
@@ -323,8 +324,6 @@ END;
         $c1 = new Field('bar');
         $c1->setEntity($t1);
         $c1->getDomain()->copy($this->getPlatform()->getDomainForType('VARCHAR'));
-        $c1->getDomain()->replaceSize(null);
-        $c1->getDomain()->replaceScale(null);
         $t1->addField($c1);
 
         $schema = <<<EOF
@@ -336,11 +335,9 @@ END;
 </database>
 EOF;
 
-        $table = $this->getDatabaseFromSchema($schema)->getEntity('foo');
+        $table = $this->getDatabaseFromSchema($schema)->getEntityByName('Foo');
         $c2 = $table->getField('bar');
-        $columnDiff = FieldComparator::computeDiff($c1, $c2);
-        $expected = false;
-        $this->assertSame($expected, $columnDiff);
+        $this->assertNull(FieldComparator::computeDiff($c1, $c2));
     }
 
     public function testGetModifyFieldDDLWithVarcharWithoutSizeAndPlatform()
@@ -350,27 +347,23 @@ EOF;
         $c1 = new Field('bar');
         $c1->setEntity($t1);
         $c1->getDomain()->copy($this->getPlatform()->getDomainForType('VARCHAR'));
-        $c1->getDomain()->replaceSize(null);
-        $c1->getDomain()->replaceScale(null);
         $t1->addField($c1);
 
         $schema = <<<EOF
 <database name="test" identifierQuoting="true">
     <entity name="foo">
         <field name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
-        <field name="bar"/>
+        <field name="bar" type="varchar" />
     </entity>
 </database>
 EOF;
 
-        $xtad = new SchemaReader(null);
-        $appData = $xtad->parseString($schema);
+        $xtad = new SchemaReader();
+        $appData = $xtad->parseString($schema, $this->getPlatform());
         $db = $appData->getDatabase();
-        $table = $db->getEntity('foo');
+        $table = $db->getEntityByName('Foo');
         $c2 = $table->getField('bar');
-        $columnDiff = FieldComparator::computeDiff($c1, $c2);
-        $expected = false;
-        $this->assertSame($expected, $columnDiff);
+        $this->assertNull(FieldComparator::computeDiff($c1, $c2));
     }
 
     /**
@@ -391,7 +384,7 @@ EOF;
      */
     public function testGetModifyEntityRelationsSkipSql3DDL($databaseDiff)
     {
-        $this->assertFalse($databaseDiff);
+        $this->assertNull($databaseDiff);
     }
 
     /**
@@ -399,6 +392,6 @@ EOF;
      */
     public function testGetModifyEntityRelationsSkipSql4DDL($databaseDiff)
     {
-        $this->assertFalse($databaseDiff);
+        $this->assertNull($databaseDiff);
     }
 }

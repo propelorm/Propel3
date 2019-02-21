@@ -149,9 +149,19 @@ trait ActiveRecordTrait
      *
      * @return array
      */
-    public function toArray($keyType = EntityMap::TYPE_FIELDNAME, $includeLazyLoadColumns = true, $includeForeignObjects = false, $alreadyDumpedObjectsWatcher = null)
+    public function toArray(
+        $keyType = EntityMap::TYPE_FIELDNAME,
+        $includeLazyLoadColumns = true,
+        $includeForeignObjects = false,
+        $alreadyDumpedObjectsWatcher = null)
     {
-        return Configuration::getCurrentConfiguration()->getEntityMapForEntity($this)->toArray($this, $keyType, $includeLazyLoadColumns, $includeForeignObjects, $alreadyDumpedObjectsWatcher);
+        return Configuration::getCurrentConfiguration()->getEntityMapForEntity($this)->toArray(
+            $this,
+            $keyType,
+            $includeLazyLoadColumns,
+            $includeForeignObjects,
+            $alreadyDumpedObjectsWatcher
+        );
     }
 
     /**
