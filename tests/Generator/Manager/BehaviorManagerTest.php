@@ -26,13 +26,13 @@ class BehaviorManagerTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
-        require_once(__DIR__ . '/../../../../Fixtures/behavior-installer/src/gossi/propel/behavior/l10n/L10nBehavior.php');
-        require_once(__DIR__ . '/../../../../Fixtures/behavior-development/src/CollectionBehavior.php');
+        require_once(__DIR__ . '/../../Fixtures/behavior-installer/src/gossi/propel/behavior/l10n/L10nBehavior.php');
+        require_once(__DIR__ . '/../../Fixtures/behavior-development/src/CollectionBehavior.php');
     }
 
     public function testBehaviorManagerWithComposerLock()
     {
-        $configOptions['propel']['paths']['composerDir'] = __DIR__ . '/../../../../Fixtures/behavior-installer';
+        $configOptions['propel']['paths']['composerDir'] = __DIR__ . '/../../Fixtures/behavior-installer';
         $config = new QuickGeneratorConfig($configOptions);
         $manager = new BehaviorManager($config);
         
@@ -49,7 +49,7 @@ class BehaviorManagerTest extends TestCase
     
     public function testBehaviorManagerWithComposerJson()
     {
-        $configOptions['propel']['paths']['composerDir'] = __DIR__ . '/../../../../Fixtures/behavior-development';
+        $configOptions['propel']['paths']['composerDir'] = __DIR__ . '/../../Fixtures/behavior-development';
         $config = new QuickGeneratorConfig($configOptions);
         $manager = new BehaviorManager($config);
     

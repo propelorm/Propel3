@@ -7,12 +7,11 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
-         bootstrap="tests/bootstrap.php"
     >
 
   <testsuites>
     <testsuite name="Propel3 Test Suite">
-      <directory>tests/Propel/Tests/</directory>
+      <directory>tests/</directory>
     </testsuite>
   </testsuites>
 
@@ -31,7 +30,7 @@
 
   <filter>
     <whitelist>
-      <directory>src/Propel/</directory>
+      <directory>src/</directory>
     </whitelist>
   </filter>
 </phpunit>

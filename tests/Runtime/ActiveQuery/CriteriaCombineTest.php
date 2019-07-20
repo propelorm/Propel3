@@ -42,7 +42,7 @@ class CriteriaCombineTest extends BaseTestCase
 //
     protected function setUp()
     {
-        require __DIR__ . '/../../../../Fixtures/bookstore/build/conf/bookstore-conf.php';
+        require __DIR__ . '/../../Fixtures/bookstore/build/conf/bookstore-conf.php';
 //        parent::setUp();
         $this->c = new ModelCriteria();
 //        $defaultDatasource = Propel::getServiceContainer()->getDefaultDatasource();

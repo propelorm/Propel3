@@ -30,7 +30,7 @@ class PgsqlSchemaParserTest extends TestCaseFixturesDatabase
     protected function setUp()
     {
         parent::setUp();
-        Propel::init(__DIR__ . '/../../../../Fixtures/reverse/pgsql/build/conf/reverse-bookstore-conf.php');
+        Propel::init(__DIR__ . '/../../Fixtures/reverse/pgsql/build/conf/reverse-bookstore-conf.php');
 
         $this->con = Propel::getConnection('reverse-bookstore');
         $this->con->beginTransaction();
@@ -47,7 +47,7 @@ class PgsqlSchemaParserTest extends TestCaseFixturesDatabase
         }
 
         parent::tearDown();
-        Propel::init(__DIR__ . '/../../../../Fixtures/bookstore/build/conf/bookstore-conf.php');
+        Propel::init(__DIR__ . '/../../Fixtures/bookstore/build/conf/bookstore-conf.php');
     }
 
     public function parseDataProvider()

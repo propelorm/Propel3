@@ -45,8 +45,21 @@
         "monolog/monolog" : "The recommended logging library to use with Propel."
     },
     "autoload" : {
-        "psr-0" : {
-            "Propel" : "src/"
+        "psr-4" : {
+            "Propel\\" : "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Propel\\Tests\\": [
+                "tests/",
+                "tests/Fixtures/bookstore/build/classes/Propel/Tests/",
+                "tests/Fixtures/schemas/build/classes/Propel/Tests/",
+                "tests/Fixtures/quoting/build/classes/Propel/Tests/",
+                "tests/Fixtures/bookstore-packaged/build/classes/Propel/Tests/"
+            ],
+            "Foo\\": "tests/Fixtures/namespaced/build/classes/Foo/",
+            "Baz\\": "tests/Fixtures/namespaced/build/classes/Baz/"
         }
     },
     "bin" : [

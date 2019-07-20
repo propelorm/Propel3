@@ -38,7 +38,7 @@ class MigrationTestCase extends TestCaseFixturesDatabase
     {
         parent::setUp();
         if (!$this->con) {
-            require_once __DIR__ . '/../../../../Fixtures/migration/build/conf/migration-conf.php';
+            require_once __DIR__ . '/../../Fixtures/migration/build/conf/migration-conf.php';
             $this->con = Propel::getConnection('migration');
 
             $adapterClass = Propel::getServiceContainer()->getAdapterClass('migration');
