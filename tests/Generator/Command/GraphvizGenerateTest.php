@@ -15,11 +15,11 @@ class GraphvizGenerateTest extends TestCaseFixtures
         $command = new GraphvizGenerateCommand();
         $app->add($command);
 
-        $outputDir = __DIR__.'/../../../../graphviztest';
+        $outputDir = __DIR__.'/../../graphviztest';
 
         $input = new \Symfony\Component\Console\Input\ArrayInput([
             'command' => 'graphviz:generate',
-            '--input-dir' => __DIR__ . '/../../../../Fixtures/bookstore',
+            '--input-dir' => __DIR__ . '/../../Fixtures/bookstore',
             '--output-dir' => $outputDir,
             '--verbose' => true
         ]);

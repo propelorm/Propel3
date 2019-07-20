@@ -19,7 +19,7 @@ class SchemaReaderTest extends ReaderTestCase
     {
         $reader = new SchemaReader();
         
-        $schema = $reader->parse(__DIR__ . '/../../../../Fixtures/bookstore/schema.xml');
+        $schema = $reader->parse(__DIR__ . '/../../Fixtures/bookstore/schema.xml');
         
         $this->assertEquals(34, count($schema->getDatabase()->getEntities()), 'Correct number of entities');
         $this->assertEquals(1, count($schema->getDatabases()), 'Only one database');
@@ -60,7 +60,7 @@ class SchemaReaderTest extends ReaderTestCase
     public function testBehaviors()
     {
         $reader = new SchemaReader();
-        $schema = $reader->parse(__DIR__ . '/../../../../Fixtures/bookstore/behavior-auto-add-pk-schema.xml');
+        $schema = $reader->parse(__DIR__ . '/../../Fixtures/bookstore/behavior-auto-add-pk-schema.xml');
 
         $this->assertEquals(3, count($schema->getDatabase()->getEntities()), 'Correct number of entities');
         $this->assertEquals(1, count($schema->getDatabases()), 'Only one database');

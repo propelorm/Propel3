@@ -2,7 +2,6 @@ vendor/
 composer.phar
 composer.lock
 !tests/Fixtures/behavior-installer/composer.lock
-autoload.php
 phpunit.xml
 
 tests/Fixtures/namespaced/build/

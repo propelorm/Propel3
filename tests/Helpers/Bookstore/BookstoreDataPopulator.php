@@ -32,7 +32,7 @@ use Propel\Tests\Bookstore\Review;
 use Propel\Tests\Bookstore\RecordLabel;
 use Propel\Tests\Bookstore\ReleasePool;
 
-define('_LOB_SAMPLE_FILE_PATH', __DIR__ . '/../../../../Fixtures/etc/lob');
+define('_LOB_SAMPLE_FILE_PATH', __DIR__ . '/../../Fixtures/etc/lob');
 
 /**
  * Populates data needed by the bookstore unit tests.

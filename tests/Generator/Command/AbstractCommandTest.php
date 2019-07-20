@@ -47,7 +47,7 @@ class AbstractCommandTest extends TestCase
         $tester->execute(
             [
                 'command' => 'testable-command',
-                '--input-dir' =>  realpath(__DIR__ . '/../../../../Fixtures/recursive'),
+                '--input-dir' =>  realpath(__DIR__ . '/../../Fixtures/recursive'),
                 '--recursive' => true
             ]
         );
@@ -57,7 +57,7 @@ class AbstractCommandTest extends TestCase
         $tester->execute(
             [
                 'command' => 'testable-command',
-                '--input-dir' =>  realpath(__DIR__ . '/../../../../Fixtures/recursive'),
+                '--input-dir' =>  realpath(__DIR__ . '/../../Fixtures/recursive'),
                 '--recursive' => false
             ]
         );
