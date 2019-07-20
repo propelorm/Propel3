@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Propel package.
@@ -8,7 +8,6 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
 
 namespace Propel\Common\Types\SQL;
 
