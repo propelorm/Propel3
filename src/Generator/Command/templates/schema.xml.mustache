@@ -1,7 +1,7 @@
 <!--
     Awesome, your propel set up is nearly done! You just have to describe how you want your database to look like.
 
-    You can let propel set up your <?php echo $rdbms ?> database by running `vendor/bin/propel database:create && vendor/bin/propel database:insert-sql`.
+    You can let propel set up your {{ rdbms }} database by running `vendor/bin/propel database:create && vendor/bin/propel database:insert-sql`.
     This will create your database including all the tables.
 -->
 
@@ -21,7 +21,7 @@
 <database name="default" defaultIdMethod="native"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/propelorm/Propel3/master/resources/xsd/database.xsd"
-          namespace="<?php echo $namespace?>"
+          namespace="{{ namespace }}"
         >
     <!-- Within the <database> tag, Propel expects one <entity> tag for each table -->
 
@@ -86,7 +86,7 @@
 
     <!--
         When you're done with editing, open a terminal and run
-            `$ cd <?php echo $schemaDir ?>`
+            `$ cd {{ schemaDir }}`
             `$ vendor/bin/propel build`
         to generate the model classes.
 

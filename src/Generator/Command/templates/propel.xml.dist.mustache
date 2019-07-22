@@ -12,21 +12,21 @@
     <propel>
         <paths>
             <!-- The directory where Propel expects to find your `schema.xml` file. -->
-            <schemaDir><?php echo $schemaDir ?></schemaDir>
+            <schemaDir>{{ schemaDir }}</schemaDir>
             <!-- The directory where Propel should output generated object model classes. -->
-            <phpDir><?php echo $phpDir ?></phpDir>
+            <phpDir>{{ phpDir }}</phpDir>
         </paths>
 
         <!--
         <database>
             <connections>
                 <connection id="default">
-                    <adapter><?php echo $rdbms ?></adapter>
-                    <dsn><?php echo $dsn ?></dsn>
-                    <user><?php echo $user ?></user>
+                    <adapter>{{ rdbms }}</adapter>
+                    <dsn>{{ dsn }}</dsn>
+                    <user>{{ user }}</user>
                     <password></password>
                     <settings>
-                        <charset><?php echo $charset ?></charset>
+                        <charset>{{ charset }}</charset>
                     </settings>
                 </connection>
             </connections>

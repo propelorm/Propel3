@@ -10,7 +10,7 @@
 
 namespace Propel\Generator\Command;
 
-use Propel\Generator\Builder\Util\PropelTemplate;
+use Propel\Generator\Builder\Om\Component\SimpleTemplateTrait;
 use Propel\Runtime\Adapter\AdapterFactory;
 use Propel\Runtime\Connection\ConnectionFactory;
 use Propel\Runtime\Connection\Exception\ConnectionException;
@@ -26,6 +26,8 @@ use Symfony\Component\Finder\Finder;
  */
 class InitCommand extends AbstractCommand
 {
+    use SimpleTemplateTrait;
+
     private $defaultSchemaDir;
     private $defaultPhpDir;
 
@@ -201,22 +203,17 @@ class InitCommand extends AbstractCommand
 
     private function generateProject(StyleInterface $io, array $options)
     {
-        $schema = new PropelTemplate();
-        $schema->setTemplateFile(__DIR__ . '/templates/schema.xml.php');
-
-        $config = new PropelTemplate();
-        $config->setTemplateFile(__DIR__ . '/templates/propel.' . $options['format'] . '.php');
-
-        $distConfig = new PropelTemplate();
-        $distConfig->setTemplateFile(__DIR__ . '/templates/propel.' . $options['format'] . '.dist.php');
+        $schema = __DIR__ . '/templates/schema.xml.mustache';
+        $config = __DIR__ . '/templates/propel.' . $options['format'] . '.mustache';
+        $distConfig = __DIR__ . '/templates/propel.' . $options['format'] . '.dist.mustache';
 
         if (!isset($options['schema'])) {
-            $options['schema'] = $schema->render($options);
+            $options['schema'] = $this->renderTemplate($options, $schema);
         }
 
         $this->writeFile($io, sprintf('%s/schema.xml', $options['schemaDir']), $options['schema']);
-        $this->writeFile($io, sprintf('%s/propel.%s', getcwd(), $options['format']), $config->render($options));
-        $this->writeFile($io, sprintf('%s/propel.%s.dist', getcwd(), $options['format']), $distConfig->render($options));
+        $this->writeFile($io, sprintf('%s/propel.%s', getcwd(), $options['format']), $this->renderTemplate($options, $config));
+        $this->writeFile($io, sprintf('%s/propel.%s.dist', getcwd(), $options['format']), $this->renderTemplate($options, $distConfig));
 
         $this->buildSqlAndModelsAndConvertConfig();
     }
