@@ -4,12 +4,12 @@
         <database>
             <connections>
                 <connection id="default">
-                    <adapter><?php echo $rdbms ?></adapter>
-                    <dsn><?php echo $dsn ?></dsn>
-                    <user><?php echo $user ?></user>
-                    <password><?php echo $password ?></password>
+                    <adapter>{{ rdbms }}</adapter>
+                    <dsn>{{ dsn }}</dsn>
+                    <user>{{ user }}</user>
+                    <password>{{ password }}</password>
                     <settings>
-                        <charset><?php echo $charset ?></charset>
+                        <charset>{{ charset }}</charset>
                     </settings>
                 </connection>
             </connections>

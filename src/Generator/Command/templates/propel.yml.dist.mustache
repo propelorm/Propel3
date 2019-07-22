@@ -9,17 +9,17 @@
 propel:
     paths:
         # The directory where Propel expects to find your `schema.xml` file.
-        schemaDir: <?php echo $schemaDir . PHP_EOL; ?>
+        schemaDir: {{ schemaDir }}
 
         # The directory where Propel should output generated object model classes.
-        phpDir: <?php echo $phpDir . PHP_EOL; ?>
+        phpDir: {{ phpDir }}
 
 #   database:
 #       connections:
 #           default:
-#               adapter: <?php echo $rdbms . PHP_EOL ?>
-#               dsn: <?php echo $dsn . PHP_EOL ?>
-#               user: <?php echo $user . PHP_EOL ?>
+#               adapter: {{ rdbms }}
+#               dsn: {{ dsn }}
+#               user: {{ user }}
 #               password:
 #               settings:
-#                   charset: <?php echo $charset . PHP_EOL ?>
+#                   charset: {{ charset }}

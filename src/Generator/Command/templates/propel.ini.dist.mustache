@@ -7,13 +7,13 @@
 ; For a complete references see: http://propelorm.org/documentation/reference/configuration-file.html
 
 ; The directory where Propel expects to find your `schema.xml` file.
-propel.paths.schemaDir: <?php echo $schemaDir . PHP_EOL; ?>
+propel.paths.schemaDir: {{ schemaDir }}
 
 ; The directory where Propel should output generated object model classes.
-propel.paths.phpDir: <?php echo $phpDir . PHP_EOL; ?>
+propel.paths.phpDir: {{ phpDir }}
 
-; propel.database.connections.default.adapter: <?php echo $rdbms . PHP_EOL ?>
-; propel.database.connections.default.dsn: <?php echo $dsn . PHP_EOL ?>
-; propel.database.connections.default.user: <?php echo $user . PHP_EOL ?>
+; propel.database.connections.default.adapter: {{ rdbms }}
+; propel.database.connections.default.dsn: {{ dsn }}
+; propel.database.connections.default.user: {{ user }}
 ; propel.database.connections.default.password:
-; propel.database.connections.default.settings.charset: <?php echo $charset . PHP_EOL ?>
+; propel.database.connections.default.settings.charset: {{ charset }}

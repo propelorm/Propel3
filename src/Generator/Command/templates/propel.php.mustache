@@ -1,15 +1,15 @@
-<?php echo "<?php\n"; ?>
+<?php
 return [
     'propel' => [
         'database' => [
             'connections' => [
                 'default' => [
-                    'adapter' => '<?php echo $rdbms ?>',
-                    'dsn' => '<?php echo $dsn ?>',
-                    'user' => '<?php echo $user ?>',
+                    'adapter' => '{{ rdbms }}',
+                    'dsn' => '{{ dsn }}',
+                    'user' => '{{ user }}',
                     'password' => '',
                     'settings' => [
-                        'charset' => '<?php echo $charset ?>'
+                        'charset' => '{{ charset }}'
                     ]
                 ]
             ]
