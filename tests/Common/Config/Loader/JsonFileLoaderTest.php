@@ -61,7 +61,7 @@ EOF;
     }
 
     /**
-     * @expectedException        Propel\Common\Config\Exception\JsonParseException
+     * @expectedException       phootwork\json\JsonException
      */
     public function testJsonFileHasInvalidContent()
     {

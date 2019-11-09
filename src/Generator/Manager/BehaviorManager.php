@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Manager;
 
+use phootwork\json\Json;
+use phootwork\json\JsonException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Propel\Generator\Config\GeneratorConfigInterface;
@@ -167,7 +169,7 @@ class BehaviorManager
             $json = $this->findComposerJson();
             
             if (null !== $json) {
-                $behavior = $this->loadBehavior(json_decode($json->getContents(), true));
+                $behavior = $this->loadBehavior(Json::decode($json->getContents()));
                 
                 if (null !== $behavior) {
                     $this->behaviors[$behavior['name']] = $behavior;
@@ -220,13 +222,15 @@ class BehaviorManager
         
         return sprintf('\\Propel\\Generator\\Behavior\\%s\\%sBehavior', $phpName, $phpName);
     }
-    
+
     /**
      * Finds all behaviors by parsing composer.lock file
      *
      * @param SplFileInfo $composerLock
+     * @return array
+     * @throws JsonException
      */
-    private function loadBehaviors($composerLock)
+    private function loadBehaviors($composerLock): array
     {
         $behaviors = [];
         
@@ -234,7 +238,7 @@ class BehaviorManager
             return $behaviors;
         }
         
-        $json = json_decode($composerLock->getContents(), true);
+        $json = Json::decode($composerLock->getContents(), true);
         
         if (isset($json['packages'])) {
             foreach ($json['packages'] as $package) {
