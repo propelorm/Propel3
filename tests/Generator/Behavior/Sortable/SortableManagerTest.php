@@ -19,7 +19,7 @@ namespace Propel\Tests\Generator\Behavior\Sortable;
  */
 class SortableManagerTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

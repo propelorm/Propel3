@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,6 +9,9 @@
 
 namespace Propel\Common\Config;
 
+use phootwork\file\exception\FileException;
+use phootwork\file\File;
+use phootwork\lang\Text;
 use Propel\Common\Config\Exception\InvalidArgumentException;
 use Propel\Common\Config\Exception\XmlParseException;
 
@@ -21,36 +23,34 @@ class XmlToArrayConverter
     /**
      * Create a PHP array from the XML file
      *
-     * @param string $xmlToParse The XML file or a string containing xml to parse
+     * @param string|Text $xmlToParse The XML file or a string containing xml to parse
      *
      * @return array
      *
-     * @throws \Propel\Common\Config\Exception\XmlParseException        if parse errors occur
-     * @throws \Propel\Common\Config\Exception\InvalidArgumentException if an error occurs while reading xml file
+     * @throws XmlParseException        if parse errors occur
+     * @throws FileException if an error occurs whilereading xml file
      */
-    public static function convert(string $xmlToParse): array
+    public static function convert($xmlToParse): array
     {
-        if (file_exists($xmlToParse)) {
-            $xmlToParse = file_get_contents($xmlToParse);
-        }
-
-        if (false === $xmlToParse) {
-            throw new InvalidArgumentException('Error while reading configuration file');
+        $xmlToParse = $xmlToParse instanceof Text ? $xmlToParse : new Text($xmlToParse);
+        $file = new File($xmlToParse);
+        if ($file->exists()) {
+            $xmlToParse = $file->read();
         }
 
         //Empty xml file returns empty array
-        if ('' === $xmlToParse) {
+        if ($xmlToParse->isEmpty()) {
             return [];
         }
 
-        if ($xmlToParse[0] !== '<') {
+        if (!$xmlToParse->startsWith('<')) {
             throw new InvalidArgumentException('Invalid xml content');
         }
 
         $currentEntityLoader = libxml_disable_entity_loader(true);
         $currentInternalErrors = libxml_use_internal_errors(true);
 
-        $xml = simplexml_load_string($xmlToParse);
+        $xml = simplexml_load_string($xmlToParse->toString());
         $errors = libxml_get_errors();
 
         libxml_clear_errors();
@@ -62,9 +62,7 @@ class XmlToArrayConverter
             throw new XmlParseException($errors);
         }
 
-        $conf = self::simpleXmlToArray($xml);
-
-        return $conf;
+        return self::simpleXmlToArray($xml);
     }
 
     /**

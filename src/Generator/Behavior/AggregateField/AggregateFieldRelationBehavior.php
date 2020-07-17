@@ -29,7 +29,7 @@ class AggregateFieldRelationBehavior extends Behavior
     use ComponentTrait;
 
     // default parameters value
-    protected $defaultParameters = [
+    protected array $defaultParameters = [
         'foreign_entity' => '',
         'update_method' => '',
         'aggregate_name' => '',

@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -23,7 +22,7 @@ class UniqueTest extends ModelTestCase
      * @dataProvider provideEntitySpecificAttributes
      *
      */
-    public function testCreateDefaultUniqueIndexName($entityName, $maxFieldNameLength, $indexName)
+    public function testCreateDefaultUniqueIndexName(string $entityName, int $maxFieldNameLength, string $indexName): void
     {
         $platform = $this->getPlatformMock(true, ['max_field_name_length' => $maxFieldNameLength]);
         $database = $this->getDatabaseMock('bookstore', ['platform' => $platform]);
@@ -38,10 +37,10 @@ class UniqueTest extends ModelTestCase
         $index->setEntity($entity);
 
         $this->assertTrue($index->isUnique());
-        $this->assertSame($indexName, $index->getName());
+        $this->assertEquals($indexName, $index->getName());
     }
 
-    public function provideEntitySpecificAttributes()
+    public function provideEntitySpecificAttributes(): array
     {
         return [
             [ 'books', 64, 'books_u_no_fields' ],

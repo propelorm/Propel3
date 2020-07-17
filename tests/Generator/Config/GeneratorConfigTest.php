@@ -11,6 +11,7 @@
 namespace Propel\Tests\Generator\Config;
 
 use Propel\Generator\Config\GeneratorConfig;
+use Propel\Generator\Exception\InvalidArgumentException;
 use Propel\Tests\TestCase;
 use Propel\Tests\VfsTrait;
 
@@ -36,7 +37,7 @@ class GeneratorConfigTest extends TestCase
         $refProp->setValue($this->generatorConfig, $config);
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         $php = "
 <?php
@@ -97,12 +98,11 @@ class GeneratorConfigTest extends TestCase
         $this->assertInstanceOf('\\Propel\\Generator\\Platform\\PgsqlPlatform', $actual);
     }
 
-    /**
-     * @expectedException Propel\Generator\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid database name: no configured connection named `badsource`.
-     */
     public function testGetConfiguredPlatformGivenBadDatabaseNameThrowsException()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid database name: no configured connection named `badsource`.");
+
         $this->generatorConfig->createPlatformForDatabase('badsource');
     }
 

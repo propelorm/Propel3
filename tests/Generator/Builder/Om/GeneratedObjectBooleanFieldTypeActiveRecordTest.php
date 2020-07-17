@@ -18,7 +18,7 @@ use \Propel\Tests\TestCase;
  */
 class GeneratedObjectBooleanFieldTypeActiveRecordTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         if (!class_exists('ComplexFieldTypeEntity4')) {
             $schema = <<<EOF

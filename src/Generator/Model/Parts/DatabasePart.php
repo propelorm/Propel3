@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -19,21 +18,14 @@ use Propel\Generator\Model\Database;
  */
 trait DatabasePart
 {
-    /**
-     * @var Database
-     */
-    protected $database;
+    protected Database $database;
 
     /**
      * @param Database $database
-     *
-     * @return $this
      */
-    public function setDatabase(Database $database)
+    public function setDatabase(Database $database): void
     {
         $this->database = $database;
-
-        return $this;
     }
 
     /**
@@ -44,6 +36,6 @@ trait DatabasePart
      */
     public function getDatabase(): ?Database
     {
-        return $this->database;
+        return $this->database ?? null;
     }
 }

@@ -35,7 +35,7 @@ class I18nBehavior extends Behavior
     const DEFAULT_LOCALE = 'en_US';
 
     // default parameters value
-    protected $defaultParameters = [
+    protected array $defaultParameters = [
         'i18n_entity'      => '%ENTITYNAME%I18n',
         'i18n_fields'      => '',
         'i18n_relation_field' => null,
@@ -52,7 +52,7 @@ class I18nBehavior extends Behavior
      */
     protected $i18nEntity;
 
-    public function modifyDatabase()
+    public function modifyDatabase(): void
     {
         foreach ($this->getDatabase()->getEntities() as $entity) {
             if ($entity->hasBehavior('i18n') && !$entity->getBehavior('i18n')->getParameter('default_locale')) {

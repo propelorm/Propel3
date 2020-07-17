@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,12 +7,11 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Generator\Model;
 
-use Propel\Common\Collection\Map;
-use Propel\Common\Collection\Set;
+use phootwork\collection\Map;
+use phootwork\collection\Set;
+use phootwork\lang\Text;
 use Propel\Common\Types\BuildableFieldTypeInterface;
 use Propel\Common\Types\FieldTypeInterface;
 use Propel\Generator\Exception\EngineException;
@@ -22,7 +20,6 @@ use Propel\Generator\Model\Parts\DomainPart;
 use Propel\Generator\Model\Parts\EntityPart;
 use Propel\Generator\Model\Parts\GeneratorPart;
 use Propel\Generator\Model\Parts\NamePart;
-use Propel\Generator\Model\Parts\NodePart;
 use Propel\Generator\Model\Parts\PlatformAccessorPart;
 use Propel\Generator\Model\Parts\VendorPart;
 use Propel\Generator\Platform\PlatformInterface;
@@ -38,10 +35,11 @@ use Propel\Generator\Platform\PlatformInterface;
  * @author Byron Foster <byron_foster@yahoo.com> (Torque)
  * @author Bernd Goldschmidt <bgoldschmidt@rapidsoft.de>
  * @author Hugo Hamon <webmaster@apprendre-php.com> (Propel)
+ * @author Cristiano Cinotti
  */
 class Field
 {
-    use DomainPart, NamePart, GeneratorPart, EntityPart, PlatformAccessorPart, DescriptionPart, VendorPart;
+    use DescriptionPart, DomainPart, EntityPart, GeneratorPart, NamePart, PlatformAccessorPart, VendorPart;
 
     const CONSTANT_PREFIX    = 'FIELD_';
 
@@ -50,44 +48,24 @@ class Field
     // ---------------------------------
 
     /**
-     * @var string The name of the mapped column
+     * @var Text The name of the mapped column
      */
-    private $columnName;
-
-    /** @var string */
-    private $singularName;
-
-    /** @var bool  */
-    private $isNotNull;
+    private Text $columnName;
+    private Text $singularName;
+    private bool $isNotNull = false;
 
     /**
      * Native PHP type (scalar or class name)
      * @var string "string", "boolean", "int", "double"
      */
-    private $phpType;
-
-    /** @var int */
-    private $position;
-
-    /** @var bool  */
-    private $isPrimaryKey;
-
-    /** @var bool  */
-    private $isUnique;
-
-    /** @var bool  */
-    private $isAutoIncrement;
-
-    /** @var bool  */
-    private $skipCodeGeneration = false;
-
-    /** @var bool  */
-    private $isLazyLoad;
-
-    /**
-     * @var bool
-     */
-    private $isPrimaryString;
+    private string $phpType;
+    private int $position;
+    private bool $isPrimaryKey = false;
+    private bool $isUnique = false;
+    private bool $isAutoIncrement = false;
+    private bool $skipCodeGeneration = false;
+    private bool $isLazyLoad = false;
+    private bool $isPrimaryString = false;
 
     // only one type is supported currently, which assumes the
     // column either contains the classnames or a key to
@@ -95,33 +73,16 @@ class Field
     // supported later.
 
     /** @var string 'single' or 'false' are accepted values */
-    private $inheritanceType;
-
-    /** @var bool  */
-    private $isEnumeratedClasses;
-
-    /**
-     * @var Map
-     */
-    private $inheritanceList;
-
-    /**
-     * @var bool
-     */
-    private $implementationDetail = false;
+    private string $inheritanceType = '';
+    private bool $isEnumeratedClasses = false;
+    private Set $inheritanceList;
+    private bool $implementationDetail = false;
 
     // maybe this can be retrieved from vendor specific information
-    private $needsTransactionInPostgres;
+    private bool $needsTransactionInPostgres = false;
 
-    /**
-     * @var Set
-     */
-    protected $valueSet;
-
-    /**
-     * @var Set
-     */
-    protected $referrers;
+    protected Set $valueSet;
+    protected Set $referrers;
 
     /**
      * Creates a new column and set the name.
@@ -143,20 +104,14 @@ class Field
             $this->setSize($size);
         }
 
-        $this->isAutoIncrement            = false;
-        $this->isEnumeratedClasses        = false;
-        $this->isLazyLoad                 = false;
-        $this->isNotNull                  = false;
-        $this->isPrimaryKey               = false;
-        $this->isPrimaryString            = false;
-        $this->isUnique                   = false;
-        $this->needsTransactionInPostgres = false;
         $this->valueSet = new Set();
         $this->inheritanceList = new Set();
         $this->referrers =  new Set();
-        $this->vendor = new Map([], Vendor::class);
+        $this->vendor = new Map();
         $this->mutatorVisibility = Model::VISIBILITY_PUBLIC;
         $this->accessorVisibility = Model::VISIBILITY_PUBLIC;
+        $this->columnName = new Text();
+        $this->singularName = new Text();
     }
 
     /**
@@ -165,50 +120,44 @@ class Field
      */
     protected function getSuperordinate(): ?Entity
     {
-        return $this->entity;
+        return $this->getEntity();
     }
 
     /**
      * Returns the fully qualified column name (table.column).
      *
-     * @return string
+     * @return Text
      */
-    public function getFullName(): string
+    public function getFullName(): Text
     {
-        return $this->getEntity()->getName() . '.' . strtoupper($this->getName());
+        return $this->getName()->toUpperCase()->prepend('.')->prepend($this->getEntity()->getName());
     }
 
-    /**
-     * @return string
-     */
-    public function getMethodName(): string
+    public function getMethodName(): Text
     {
-        return NamingTool::toStudlyCase($this->getName());
+        return $this->getName()->toStudlyCase();
     }
 
-    /**
-     * @return mixed
-     */
-    public function getColumnName(): string
+    public function getColumnName(): Text
     {
-        if (null == $this->columnName) {
-            return NamingTool::toSnakeCase($this->getName());
+        if ($this->columnName->isEmpty()) {
+            $this->columnName = $this->getName()->toSnakeCase();
         }
 
         return $this->columnName;
     }
 
     /**
-     * @param string $columnName
+     * @param string|Text $columnName
      */
-    public function setColumnName(string $columnName)
+    public function setColumnName($columnName): void
     {
-        $this->columnName = $columnName;
+        $this->columnName = new Text($columnName);
     }
 
-    public function setPhpType(string $phptype)
+    public function setPhpType(string $phpType): void
     {
-        $this->phpType = $phptype;
+        $this->phpType = $phpType;
     }
 
     /**
@@ -218,52 +167,45 @@ class Field
      */
     public function isNamePlural(): bool
     {
-        return $this->getSingularName() !== $this->name;
+        return $this->getSingularName()->compare($this->getName()) !== 0;
     }
 
     /**
      * Returns the column singular name.
      *
-     * @return string
+     * @return Text
      */
-    public function getSingularName(): string
+    public function getSingularName(): Text
     {
-        if ($this->singularName) {
-            return $this->singularName;
-        }
-
-        return rtrim($this->name, 's');
+        return $this->singularName->isEmpty() ? $this->getName()->toSingular() : $this->singularName;
     }
 
     /**
-     * @param string $singularName
+     * @param string|Text $singularName
      */
-    public function setSingularName(string $singularName)
+    public function setSingularName($singularName): void
     {
-        $this->singularName = $singularName;
+        $this->singularName = new Text($singularName);
     }
 
     /**
      * Returns the full column constant name (e.g. EntityMapName::FIELD_COLUMN_NAME).
      *
-     * @return string A column constant name for insertion into PHP code
+     * @return Text A column constant name for insertion into PHP code
      */
-    public function getFullConstantName(): string
+    public function getFullConstantName(): Text
     {
-        $classname = $this->getEntity()->getName() . 'EntityMap';
-        $const = $this->getConstantName();
-
-        return $classname.'::'.$const;
+        return $this->getEntity()->getName()->append('EntityMap::')->append($this->getConstantName());
     }
 
     /**
      * Returns the column constant name.
      *
-     * @return string
+     * @return Text
      */
-    public function getConstantName(): string
+    public function getConstantName(): Text
     {
-        return self::CONSTANT_PREFIX . strtoupper(NamingTool::toSnakeCase($this->getName()));
+        return $this->getName()->toSnakeCase()->toUpperCase()->prepend(self::CONSTANT_PREFIX);
     }
 
     /**
@@ -275,7 +217,7 @@ class Field
      */
     public function getPhpType(): string
     {
-        return $this->phpType ? $this->phpType : PropelTypes::getPhpNative($this->getType());
+        return $this->phpType ?? PropelTypes::getPhpNative($this->getType());
     }
 
     /**
@@ -293,9 +235,9 @@ class Field
      *
      * @param integer $position
      */
-    public function setPosition(int $position)
+    public function setPosition(int $position): void
     {
-        $this->position = (int) $position;
+        $this->position = $position;
     }
 
     /**
@@ -303,15 +245,12 @@ class Field
      * parent column of the inheritance to the current column.
      *
      * @param  Inheritance $inheritance
-     * @return Inheritance
      */
-    public function addInheritance(Inheritance $inheritance): Inheritance
+    public function addInheritance(Inheritance $inheritance): void
     {
         $inheritance->setField($this);
         $this->inheritanceList->add($inheritance);
         $this->isEnumeratedClasses = true;
-
-        return $inheritance;
     }
 
     /**
@@ -333,6 +272,8 @@ class Field
      * Returns the inheritance list.
      *
      * @return Set
+     *
+     * @deprecated Use `getChildren()` instead
      */
     public function getInheritanceList(): Set
     {
@@ -430,7 +371,7 @@ class Field
      *
      * @param boolean $flag
      */
-    public function setPrimaryKey(bool $flag = true)
+    public function setPrimaryKey(bool $flag = true): void
     {
         $this->isPrimaryKey = $flag;
 
@@ -477,7 +418,7 @@ class Field
      */
     public function isRelation(): bool
     {
-        return count($this->getRelations()) > 0;
+        return !$this->getRelations()->isEmpty();
     }
 
     /**
@@ -487,7 +428,7 @@ class Field
      */
     public function hasMultipleFK(): bool
     {
-        return count($this->getRelations()) > 1;
+        return $this->getRelations()->count() > 1;
     }
 
     /**
@@ -495,11 +436,11 @@ class Field
      *
      * Only if it is a foreign key or part of a foreign key.
      *
-     * @return Relation[]
+     * @return Set
      */
-    public function getRelations(): array
+    public function getRelations(): Set
     {
-        return $this->getEntity()->getFieldRelations($this->name);
+        return $this->getEntity()->getFieldRelations($this->getName()->toString());
     }
 
     /**
@@ -524,7 +465,7 @@ class Field
     /**
      * @param boolean $implementationDetail
      */
-    public function setImplementationDetail(bool $implementationDetail)
+    public function setImplementationDetail(bool $implementationDetail): void
     {
         $this->implementationDetail = $implementationDetail;
     }
@@ -534,7 +475,7 @@ class Field
      *
      * @param Relation $fk
      */
-    public function addReferrer(Relation $fk)
+    public function addReferrer(Relation $fk): void
     {
        $this->referrers->add($fk);
     }
@@ -567,7 +508,7 @@ class Field
      * @param  Relation $fk
      * @return boolean
      */
-    public function hasReferrer(Relation $fk)
+    public function hasReferrer(Relation $fk): bool
     {
         return $this->getReferrers()->contains($fk);
     }
@@ -576,7 +517,7 @@ class Field
      * Clears all referrers.
      *
      */
-    public function clearReferrers()
+    public function clearReferrers(): void
     {
         $this->getReferrers()->clear();
     }
@@ -585,9 +526,9 @@ class Field
      * Clears all inheritance children.
      *
      */
-    public function clearInheritanceList()
+    public function clearInheritanceList(): void
     {
-        $this->getInheritanceList()->clear();
+        $this->getChildren()->clear();
     }
 
     /**
@@ -598,7 +539,7 @@ class Field
      *
      * @param string $mappingType
      */
-    public function setDomainForType(string $mappingType)
+    public function setDomainForType(string $mappingType): void
     {
         $this->getDomain()->copy($this->getPlatform()->getDomainForType($mappingType));
     }
@@ -609,7 +550,7 @@ class Field
      * @param string $mappingType
      * @see Domain::setType()
      */
-    public function setType(string $mappingType)
+    public function setType(string $mappingType): void
     {
         $this->getDomain()->setType($mappingType);
 
@@ -739,9 +680,9 @@ class Field
     /**
      * Sets the list of possible values for an ENUM column.
      *
-     * @param Set
+     * @param Set|array|string
      */
-    public function setValueSet($valueSet)
+    public function setValueSet($valueSet): void
     {
         if (is_string($valueSet)) {
             $valueSet = explode(',', $valueSet);
@@ -772,7 +713,7 @@ class Field
      */
     public function getSize(): ?int
     {
-        return $this->domain->getSize();
+        return $this->getDomain()->getSize();
     }
 
     /**
@@ -780,9 +721,9 @@ class Field
      *
      * @param integer $size
      */
-    public function setSize(int $size)
+    public function setSize(int $size): void
     {
-        $this->domain->setSize($size);
+        $this->getDomain()->setSize($size);
     }
 
     /**
@@ -792,7 +733,7 @@ class Field
      */
     public function getScale(): int
     {
-        return $this->domain->getScale();
+        return $this->getDomain()->getScale();
     }
 
     /**
@@ -800,9 +741,9 @@ class Field
      *
      * @param integer $scale
      */
-    public function setScale(int $scale)
+    public function setScale(int $scale): void
     {
-        $this->domain->setScale($scale);
+        $this->getDomain()->setScale($scale);
     }
 
     /**
@@ -814,7 +755,7 @@ class Field
      */
     public function getSizeDefinition(): string
     {
-        return $this->domain->getSizeDefinition();
+        return $this->getDomain()->getSizeDefinition();
     }
 
     /**
@@ -861,13 +802,13 @@ class Field
      *
      * @param  FieldDefaultValue|mixed $defaultValue The column's default value
      */
-    public function setDefaultValue($defaultValue)
+    public function setDefaultValue($defaultValue): void
     {
         if (!$defaultValue instanceof FieldDefaultValue) {
             $defaultValue = new FieldDefaultValue($defaultValue, FieldDefaultValue::TYPE_VALUE);
         }
 
-        $this->domain->setDefaultValue($defaultValue);
+        $this->getDomain()->setDefaultValue($defaultValue);
     }
 
     /**
@@ -875,13 +816,13 @@ class Field
      *
      * @param  FieldDefaultValue|string $defaultExpression The column's default value
      */
-    public function setDefaultExpression($defaultExpression)
+    public function setDefaultExpression($defaultExpression): void
     {
         if (!$defaultExpression instanceof FieldDefaultValue) {
             $defaultExpression = new FieldDefaultValue($defaultExpression, FieldDefaultValue::TYPE_EXPR);
         }
 
-        $this->domain->setDefaultValue($defaultExpression);
+        $this->getDomain()->setDefaultValue($defaultExpression);
     }
 
     /**
@@ -892,7 +833,7 @@ class Field
      */
     public function getDefaultValue(): ?FieldDefaultValue
     {
-        return $this->domain->getDefaultValue();
+        return $this->getDomain()->getDefaultValue();
     }
 
     /**
@@ -903,7 +844,7 @@ class Field
      */
     public function getPhpDefaultValue()
     {
-        return $this->domain->getPhpDefaultValue();
+        return $this->getDomain()->getPhpDefaultValue();
     }
 
     /**
@@ -931,7 +872,7 @@ class Field
         return $this->isLazyLoad;
     }
 
-    public function setLazyLoad(bool $lazyLoad = false)
+    public function setLazyLoad(bool $lazyLoad = false): void
     {
         $this->isLazyLoad = $lazyLoad;
     }
@@ -949,8 +890,8 @@ class Field
 
         if ($this->isAutoIncrement()) {
             throw new EngineException(sprintf(
-                'You have specified autoIncrement for column "%s", but you have not specified idMethod="native" for table "%s".',
-                $this->name,
+                'You have specified autoIncrement for column "%s", but you have not specified idMethod="native" for entity "%s".',
+                $this->getName(),
                 $this->getEntity()->getName()
             ));
         }
@@ -967,7 +908,7 @@ class Field
      */
     public function setAutoIncrement(bool $flag = true): void
     {
-        $this->isAutoIncrement = (Boolean) $flag;
+        $this->isAutoIncrement = $flag;
     }
 
     /**
@@ -981,7 +922,7 @@ class Field
     /**
      * @param boolean $skipCodeGeneration
      */
-    public function setSkipCodeGeneration(bool $skipCodeGeneration)
+    public function setSkipCodeGeneration(bool $skipCodeGeneration): void
     {
         $this->skipCodeGeneration = $skipCodeGeneration;
     }
@@ -1037,31 +978,8 @@ class Field
         return PropelTypes::isPhpObjectType($this->getPhpType());
     }
 
-    public function setSqlType(string $sqlType)
+    public function setSqlType(string $sqlType): void
     {
         $this->getDomain()->replaceSqlType($sqlType);
-    }
-
-    /**
-     * Clones the current object.
-     *
-     */
-    public function __clone()
-    {
-        if ($this->referrers) {
-            $this->referrers = clone $this->referrers;
-        }
-        if ($this->valueSet) {
-            $this->valueSet = clone $this->valueSet;
-        }
-        if ($this->inheritanceList) {
-            $this->inheritanceList = clone $this->inheritanceList;
-        }
-        if ($this->vendor) {
-            $this->vendor = clone $this->vendor;
-        }
-        if ($this->domain) {
-            $this->domain = clone $this->domain;
-        }
     }
 }

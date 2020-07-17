@@ -55,13 +55,13 @@ class TimestampableBehavior extends Behavior
     {
         $entity = $this->getEntity();
 
-        if ($this->withCreatedAt() && !$entity->hasField($this->getParameter('create_field'))) {
+        if ($this->withCreatedAt() && !$entity->hasFieldByName($this->getParameter('create_field'))) {
             $createField = new Field();
             $createField->setName($this->getParameter('create_field'));
             $createField->setType('TIMESTAMP');
             $entity->addField($createField);
         }
-        if ($this->withUpdatedAt() && !$entity->hasField($this->getParameter('update_field'))) {
+        if ($this->withUpdatedAt() && !$entity->hasFieldByName($this->getParameter('update_field'))) {
             $updateField = new Field();
             $updateField->setName($this->getParameter('update_field'));
             $updateField->setType('TIMESTAMP');
@@ -72,7 +72,7 @@ class TimestampableBehavior extends Behavior
     public function preUpdate(RepositoryBuilder $repositoryBuilder): string
     {
         if ($this->withUpdatedAt()) {
-            $field = $this->getEntity()->getField($this->getParameter('update_field'))->getName();
+            $field = $this->getEntity()->getFieldByName($this->getParameter('update_field'))->getName();
 
             return "
 \$writer = \$this->getEntityMap()->getPropWriter();
@@ -95,7 +95,7 @@ foreach (\$event->getEntities() as \$entity) {
 
 
         if ($this->withCreatedAt()) {
-            $createdAtField = $this->getEntity()->getField($this->getParameter('create_field'))->getName();
+            $createdAtField = $this->getEntity()->getFieldByName($this->getParameter('create_field'))->getName();
             $script .= "
     if (!\$this->getEntityMap()->isFieldModified(\$entity, '$createdAtField')) {
         \$writer(\$entity, '$createdAtField', \\Propel\\Runtime\\Util\\PropelDateTime::createHighPrecision());
@@ -103,7 +103,7 @@ foreach (\$event->getEntities() as \$entity) {
         }
 
         if ($this->withUpdatedAt()) {
-            $updatedAtField = $this->getEntity()->getField($this->getParameter('update_field'))->getName();
+            $updatedAtField = $this->getEntity()->getFieldByName($this->getParameter('update_field'))->getName();
             $script .= "
     if (!\$this->getEntityMap()->isFieldModified(\$entity, '$updatedAtField')) {
         \$writer(\$entity, '$updatedAtField', \\Propel\\Runtime\\Util\\PropelDateTime::createHighPrecision());

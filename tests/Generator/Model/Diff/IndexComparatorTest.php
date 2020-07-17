@@ -1,4 +1,12 @@
-<?php
+<?php declare(strict_types=1);
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ *
+ */
 
 namespace Propel\Tests\Generator\Model\Diff;
 
@@ -14,7 +22,7 @@ use \Propel\Tests\TestCase;
  */
 class IndexComparatorTest extends TestCase
 {
-    public function testCompareNoDifference()
+    public function testCompareNoDifference(): void
     {
         $c1 = new Field('Foo');
         $i1 = new Index('Foo_Index');
@@ -37,7 +45,7 @@ class IndexComparatorTest extends TestCase
         $this->assertFalse(IndexComparator::computeDiff($i1, $i2));
     }
 
-    public function testCompareType()
+    public function testCompareType(): void
     {
         $c1 = new Field('Foo');
         $i1 = new Index('Foo_Index');
@@ -48,7 +56,7 @@ class IndexComparatorTest extends TestCase
         $this->assertTrue(IndexComparator::computeDiff($i1, $i2));
     }
 
-    public function testCompareDifferentFields()
+    public function testCompareDifferentFields(): void
     {
         $c1 = new Field('Foo');
         $i1 = new Index('Foo_Index');
@@ -58,7 +66,7 @@ class IndexComparatorTest extends TestCase
         $this->assertTrue(IndexComparator::computeDiff($i1, $i2));
     }
 
-    public function testCompareDifferentOrder()
+    public function testCompareDifferentOrder(): void
     {
         $c1 = new Field('Foo');
         $c2 = new Field('Bar');

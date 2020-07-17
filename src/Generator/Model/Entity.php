@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,10 +7,10 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Generator\Model;
 
+use phootwork\collection\Set;
+use phootwork\lang\Text;
 use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Parts\ActiveRecordPart;
 use Propel\Generator\Model\Parts\BehaviorPart;
@@ -28,7 +27,6 @@ use Propel\Generator\Model\Parts\SuperordinatePart;
 use Propel\Generator\Model\Parts\VendorPart;
 use Propel\Generator\Platform\PlatformInterface;
 use Propel\Runtime\Exception\RuntimeException;
-use Propel\Common\Collection\Set;
 
 /**
  * Data about a entity used in an application.
@@ -42,116 +40,65 @@ use Propel\Common\Collection\Set;
  * @author Byron Foster <byron_foster@yahoo.com> (Torque)
  * @author Hugo Hamon <webmaster@apprendre-php.com> (Propel)
  * @author Thomas Gossmann
+ * @author Cristiano Cinotti
  */
 class Entity
 {
-    use SuperordinatePart;
-    use PlatformAccessorPart;
-    use ActiveRecordPart;
-    use ScopePart;
-    use BehaviorPart;
-    use NamespacePart;
-    use SchemaNamePart;
-    use SqlPart;
-    use GeneratorPart;
-    use VendorPart;
-    use DatabasePart;
-    use DescriptionPart;
-    use FieldsPart;
+    use ActiveRecordPart, BehaviorPart, DatabasePart, DescriptionPart, FieldsPart, GeneratorPart, NamespacePart,
+        PlatformAccessorPart, SchemaNamePart, ScopePart, SqlPart, SuperordinatePart, VendorPart;
 
     //
     // Model properties
     // ------------------------------------------------------------
-    /** @var string */
-    private $tableName;
-
-    /** @var string */
-    private $alias;
-
-
+    private Text $tableName;
+    private Text $alias;
 
     //
     // References to other models
     // ------------------------------------------------------------
 
     /** @var bool|string */
-    private $repository;
-
-    /** @var Field */
-    private $inheritanceField;
-
-
+    private string $repository;
+    private Field $inheritanceField;
 
     //
     // Collections to other models
     // ------------------------------------------------------------
-
-    /** @var Set */
-    private $relations;
-
-    /** @var Set */
-    private $referrers;
-
-    /** @var Set */
-    private $foreignEntityNames;
-
-    /** @var Set */
-    private $indices;
-
-    /** @var Set */
-    private $unices;
-
-
+    private Set $relations;
+    private Set $referrers;
+    private Set $indices;
+    private Set $unices;
 
     //
     // Database related options/properties
     // ------------------------------------------------------------
-
-    /** @var bool */
-    private $allowPkInsert;
-
-    /** @var bool */
-    private $containsForeignPK = false;
+    private bool $allowPkInsert = false;
+    private bool $containsForeignPK = false;
 
     /**
      * Whether this entity is an implementation detail. Implementation details are entities that are only
      * relevant in the current persister api, like implicit pivot tables in n-n relations, or foreign key columns.
      * @var bool
      */
-    private $implementationDetail = false;
-
-    /** @var bool */
-    private $needsTransactionInPostgres;
-
-    /** @var bool */
-    private $forReferenceOnly;
-
-    /** @var bool */
-    private $reloadOnInsert;
-
-    /** @var bool */
-    private $reloadOnUpdate;
-
+    private bool $implementationDetail = false;
+    private bool $needsTransactionInPostgres = false;
+    private bool $forReferenceOnly = false;
+    private bool $reloadOnInsert = false;
+    private bool $reloadOnUpdate = false;
 
     //
     // Generator options
     // ------------------------------------------------------------
-
-    /** @var bool */
-    private $readOnly;
-
-    /** @var bool */
-    private $isAbstract;
-
-    /** @var bool */
-    private $skipSql;
+    private bool $readOnly = false;
+    private bool $isAbstract = false;
+    private bool $skipSql = false;
 
     /**
      * @TODO maybe move this to database related options/props section ;)
      *
      * @var bool
      */
-    private $isCrossRef;
+    private bool $isCrossRef = false;
 
 
     /**
@@ -159,63 +106,32 @@ class Entity
      *
      * @param string $name entity name
      */
-    public function __construct($name = null)
+    public function __construct(string $name = null)
     {
         if ($name) {
             $this->setName($name);
         }
 
         // init
-        $this->relations = new Set([], Relation::class);
-        $this->foreignEntityNames = new Set();
-        $this->indices = new Set([], Index::class);
-        $this->referrers = new Set([], Relation::class);
-        $this->unices = new Set([], Unique::class);
+        $this->alias = new Text();
+        $this->relations = new Set();
+        $this->indices = new Set();
+        $this->referrers = new Set();
+        $this->tableName = new Text();
+        $this->unices = new Set();
         $this->initFields();
         $this->initBehaviors();
         $this->initSql();
         $this->initVendor();
-
-        // default values
-        $this->allowPkInsert = false;
-        $this->isAbstract = false;
-        $this->isCrossRef = false;
-        $this->readOnly = false;
-        $this->reloadOnInsert = false;
-        $this->reloadOnUpdate = false;
-        $this->skipSql = false;
-        $this->forReferenceOnly = false;
-    }
-
-    public function __clone()
-    {
-        $this->fields = clone $this->fields;
-        $this->behaviors = clone $this->behaviors;
-        $this->idMethodParameters = clone $this->idMethodParameters;
-        $this->vendor = clone $this->vendor;
-        //Circular reference. Which strategy? Leave the reference to the original database
-        //or set it to null?
-        //$this->database = clone $this->database;
-        $this->relations = clone $this->relations;
-        $this->referrers = clone $this->referrers;
-        $this->foreignEntityNames = clone $this->foreignEntityNames;
-        $this->indices = clone $this->indices;
-        $this->unices = clone $this->unices;
-        foreach ($this->fields as $field) {
-            if ($field->isInheritance()) {
-                $this->inheritanceField = $field;
-                break;
-            }
-        }
     }
 
     /**
      * @inheritdoc
-     * @return Database
+     * @return Database|null
      */
     protected function getSuperordinate(): ?Database
     {
-        return $this->database;
+        return $this->getDatabase();
     }
 
     //
@@ -223,58 +139,56 @@ class Entity
     // ------------------------------------------------------------
 
     /**
-     * @param string $tableName
-     * @return $this
+     * @param string|Text $tableName
      */
-    public function setTableName(string $tableName): Entity
+    public function setTableName($tableName): void
     {
-        $this->tableName = $tableName;
-        return $this;
+        $this->tableName = new Text($tableName);
     }
 
     /**
      * Returns the blank table name.
      *
-     * @return string
+     * @return Text
      */
-    public function getTableName(): string
+    public function getTableName(): Text
     {
-        $tableName = !$this->tableName ? NamingTool::toSnakeCase($this->name) : $this->tableName;
+        if ($this->tableName->isEmpty()) {
+            $this->setTableName($this->getName()->toSnakeCase());
+        }
 
-        return $tableName;
+        return $this->tableName;
     }
 
     /**
      * The table name with database scope.
      *
-     * @return string
+     * @return Text
      */
-    public function getScopedTableName(): string
+    public function getScopedTableName(): Text
     {
-        $tableName = !$this->tableName ? NamingTool::toSnakeCase($this->name) : $this->tableName;
-        $scope = $this->getScope();
-
-        if ($scope) {
-            $tableName = $scope . $tableName;
-        }
-
-        return $tableName;
+        return $this->getTableName()->prepend($this->getScope());
     }
 
     /**
      * Returns the scoped table name with possible schema.
      *
-     * @return string
+     * @return Text
      */
-    public function getFullTableName(): string
+    public function getFullTableName(): Text
     {
-        $fqTableName = $this->getScopedTableName();
+        $delimiter = $this->getPlatform()->getSchemaDelimiter();
 
-        if (null !== $schemaName = $this->getSchemaName()) {
-            $fqTableName = "$schemaName{$this->getPlatform()->getSchemaDelimiter()}$fqTableName";
-        }
+        return $this->getScopedTableName()
+            ->prepend($delimiter)
+            ->prepend($this->getSchemaName())
+            ->trimStart($delimiter) //if the schemaName is '', the delimiter is the first character and must be removed
+        ;
+    }
 
-        return $fqTableName;
+    protected function getEntity(): self
+    {
+        return $this;
     }
 
     //
@@ -282,17 +196,17 @@ class Entity
     // ------------------------------------------------------------
 
     /**
-     * @param bool|string $repository
+     * @param string $repository
      */
-    public function setRepository($repository)
+    public function setRepository(string $repository): void
     {
         $this->repository = $repository;
     }
 
     /**
-     * @return bool|string
+     * @return string
      */
-    public function getRepository()
+    public function getRepository(): string
     {
         return $this->repository;
     }
@@ -301,17 +215,14 @@ class Entity
      * Set the database that contains this entity.
      *
      * @param Database $database
-     * @return $this
      */
-    public function setDatabase(Database $database): Entity
+    public function setDatabase(Database $database): void
     {
-        if ($this->database !== null && $this->database !== $database) {
+        if (isset($this->database) && $this->database !== $database) {
             $this->database->removeEntity($this);
         }
         $this->database = $database;
         $this->database->addEntity($this);
-
-        return $this;
     }
 
     /**
@@ -321,18 +232,18 @@ class Entity
      */
     public function getPlatform(): ?PlatformInterface
     {
-        return $this->database ? $this->database->getPlatform() : null;
+        return isset($this->database) ? $this->database->getPlatform() : null;
     }
 
     /**
      * Returns the field that subclasses the class representing this
      * entity can be produced from.
      *
-     * @return null|Field
+     * @return Field
      */
     public function getChildrenField(): ?Field
     {
-        return $this->inheritanceField;
+        return $this->inheritanceField ?? null;
     }
 
     /**
@@ -342,7 +253,7 @@ class Entity
      */
     public function getChildrenNames(): array
     {
-        if (null === $this->inheritanceField || !$this->inheritanceField->isEnumeratedClasses()) {
+        if (!isset($this->inheritanceField) || !$this->inheritanceField->isEnumeratedClasses()) {
             return [];
         }
 
@@ -354,38 +265,19 @@ class Entity
         return $names;
     }
 
-
-
     //
     // Collections to other models
     // ------------------------------------------------------------
 
-
     // behaviors
     // -----------------------------------------
 
-    /**
-     * @TODO can it be externalized?
-     *
-     * Executes behavior entity modifiers.
-     * This is only for testing purposes. Model\Database calls already `modifyEntity` on each behavior.
-     */
-    public function applyBehaviors()
-    {
-        foreach ($this->behaviors as $behavior) {
-            if (!$behavior->isEntityModified()) {
-                $behavior->getEntityModifier()->modifyEntity();
-                $behavior->setEntityModified(true);
-            }
-        }
-    }
-
-    protected function registerBehavior(Behavior $behavior)
+    protected function registerBehavior(Behavior $behavior): void
     {
         $behavior->setEntity($this);
     }
 
-    protected function unregisterBehavior(Behavior $behavior)
+    protected function unregisterBehavior(Behavior $behavior): void
     {
         $behavior->setEntity(null);
     }
@@ -400,13 +292,12 @@ class Entity
      * @param Field $field
      *
      * @throws EngineException
-     * @return $this
      */
-    public function addField(Field $field): Entity
+    public function addField(Field $field): void
     {
         //The field must be unique
-        if (null !== $this->getFieldByName($field->getName())) {
-            throw new EngineException(sprintf('Field "%s" declared twice in entity "%s"', $field->getName(), $this->getName()));
+        if ($this->hasFieldByName($field->getName()->toString())) {
+            throw new EngineException("Field `{$field->getName()}` declared twice in entity `{$this->getName()}`");
         }
 
         $field->setEntity($this);
@@ -421,40 +312,47 @@ class Entity
         if ($field->isInheritance()) {
             $this->inheritanceField = $field;
         }
-
-        return $this;
     }
 
     /**
-     * @TODO check consistency with naming size/num/count methods
-     *
      * Returns the number of fields in this entity.
      *
      * @return int
      */
-    public function getNumFields(): int
+    public function countFields(): int
     {
         return $this->fields->size();
     }
 
     /**
-     * @TODO check consistency with naming size/num/count methods
-     *
+     * @deprecated Use `Entity::countFields()` instead
+     * @return int
+     */
+    public function getNumFields(): int
+    {
+        return $this->countFields();
+    }
+
+
+    /**
      * Returns the number of lazy loaded fields in this entity.
      *
      * @return int
      */
+    public function countLazyLoadFields(): int
+    {
+        return $this->fields->findAll(fn(Field $element): bool => $element->isLazyLoad())->count();
+    }
+
+    /**
+     * @deprecated Use `Entity::countLazyLoadFields()` instead
+     * @return int
+     */
     public function getNumLazyLoadFields(): int
     {
-        $count = 0;
-        foreach ($this->fields as $col) {
-            if ($col->isLazyLoad()) {
-                $count++;
-            }
-        }
-
-        return $count;
+        return $this->countLazyLoadFields();
     }
+
 
     /**
      * Returns whether or not one of the fields is of type ENUM.
@@ -463,13 +361,7 @@ class Entity
      */
     public function hasEnumFields(): bool
     {
-        foreach ($this->fields as $col) {
-            if ($col->isEnumType()) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->fields->search(fn(Field $element): bool => $element->isEnumType());
     }
 
     // relations
@@ -479,17 +371,11 @@ class Entity
      * Adds a new relation to this entity.
      *
      * @param Relation $relation The relation
-     *
-     * @return $this
      */
-    public function addRelation(Relation $relation): Entity
+    public function addRelation(Relation $relation): void
     {
         $relation->setEntity($this);
-
         $this->relations->add($relation);
-        $this->foreignEntityNames->add($relation->getForeignEntityName());
-
-        return $this;
     }
 
     /**
@@ -521,7 +407,7 @@ class Entity
      */
     public function hasCrossRelations(): bool
     {
-        return count($this->getCrossRelations()) > 0;
+        return $this->getCrossRelations()->count() > 0;
     }
 
     /**
@@ -531,19 +417,19 @@ class Entity
      */
     public function getRelation(string $fieldName): Relation
     {
-        return $this->relations->find($fieldName, function(Relation $element, string $query) {
-            return $element->getName() === $query;
-        });
+        return $this->relations->find($fieldName,
+            fn(Relation $element, string $query): bool => $element->getName()->toString() === $query
+        );
     }
 
     /**
      * Returns the list of all foreign keys.
      *
-     * @return Relation[]
+     * @return Set
      */
-    public function getRelations(): array
+    public function getRelations(): Set
     {
-        return $this->relations->toArray();
+        return $this->relations;
     }
 
     /**
@@ -552,13 +438,13 @@ class Entity
      *
      * @param string $entityName
      *
-     * @return Relation[]
+     * @return Set
      */
-    public function getRelationsReferencingEntity(string $entityName): array
+    public function getRelationsReferencingEntity(string $entityName): Set
     {
-        return $this->relations->filter(function (Relation $relation) use ($entityName) {
-            return $relation->getForeignEntityName() === $entityName;
-        })->toArray();
+        return $this->relations->findAll($entityName,
+            fn(Relation $relation, string $query): bool => $relation->getForeignEntityName() === $entityName
+        );
     }
 
     /**
@@ -570,40 +456,35 @@ class Entity
      *
      * @param string $fieldName Name of the field
      *
-     * @return Relation[]
+     * @return Set
      */
-    public function getFieldRelations(string $fieldName): array
+    public function getFieldRelations(string $fieldName): Set
     {
-        return $this->relations->filter(function (Relation $relation) use ($fieldName) {
-            return in_array($fieldName, $relation->getLocalFields()->toArray());
-        })->toArray();
+        return $this->relations->findAll($fieldName,
+            fn(Relation $relation, string $query): bool => $relation->getLocalFields()->contains($fieldName)
+        );
     }
 
     /**
      * Returns the list of cross relations.
-     *
-     * @return CrossRelation[]
      */
-    public function getCrossRelations()
+    public function getCrossRelations(): Set
     {
-        $crossFks = [];
-        foreach ($this->referrers as $refRelation) {
-            if ($refRelation->getEntity()->isCrossRef()) {
+        return $this->referrers
+            ->filter(fn(Relation $element): bool => $element->getEntity()->isCrossRef())
+            ->map(function(Relation $refRelation): CrossRelation {
                 $crossRelation = new CrossRelation($refRelation, $this);
-                /** @var Relation $relation */
                 foreach ($refRelation->getOtherFks() as $relation) {
                     if ($relation->isAtLeastOneLocalPrimaryKeyIsRequired() &&
                         $crossRelation->isAtLeastOneLocalPrimaryKeyNotCovered($relation)) {
                         $crossRelation->addRelation($relation);
                     }
                 }
-                if ($crossRelation->hasRelations()) {
-                    $crossFks[] = $crossRelation;
-                }
-            }
-        }
 
-        return $crossFks;
+                return $crossRelation;
+            })
+            ->filter(fn(CrossRelation $element): bool => $element->hasRelations())
+            ;
     }
 
     /**
@@ -613,7 +494,7 @@ class Entity
      */
     public function getForeignEntityNames(): Set
     {
-        return $this->foreignEntityNames;
+        return $this->relations->map(fn(Relation $element): string => $element->getForeignEntityName());
     }
 
 
@@ -624,22 +505,20 @@ class Entity
      * Adds the foreign key from another entity that refers to this entity.
      *
      * @param Relation $relation
-     * @return $this
      */
-    public function addReferrer(Relation $relation): Entity
+    public function addReferrer(Relation $relation): void
     {
         $this->referrers->add($relation);
-        return $this;
     }
 
     /**
      * Returns the list of references to this entity.
      *
-     * @return Relation[]
+     * @return Set
      */
-    public function getReferrers(): array
+    public function getReferrers(): Set
     {
-        return $this->referrers->toArray();
+        return $this->referrers;
     }
 
 
@@ -671,12 +550,10 @@ class Entity
      * @param  Index $index
      *
      * @throw  InvalidArgumentException
-     *
-     * @return $this
      */
-    public function addIndex(Index $index): Entity
+    public function addIndex(Index $index): void
     {
-        if ($this->hasIndex($index->getName())) {
+        if ($this->hasIndex($index->getName()->toString())) {
             throw new \InvalidArgumentException(sprintf('Index "%s" already exist.', $index->getName()));
         }
 
@@ -686,10 +563,8 @@ class Entity
 
         $index->setEntity($this);
         // @TODO $index->getName() ? we can do better here. Under investigation
-//         $index->getName();
+        $index->getName(); // we call this method so that the name is created now if it doesn't already exist.
         $this->indices->add($index);
-
-        return $this;
     }
 
     /**
@@ -699,15 +574,9 @@ class Entity
      *
      * @return bool
      */
-    public function hasIndex($name): bool
+    public function hasIndex(string $name): bool
     {
-        foreach ($this->indices as $idx) {
-            if ($idx->getName() == $name) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->indices->search($name, fn(Index $elem, string $query): bool => $elem->getName()->toString() === $name);
     }
 
     /**
@@ -718,11 +587,12 @@ class Entity
      */
     public function isIndex(array $keys): bool
     {
+        /** @var Index $index */
         foreach ($this->indices as $index) {
             if (count($keys) === $index->getFields()->size()) {
                 $allAvailable = true;
                 foreach ($keys as $key) {
-                    if (!$index->hasField($key instanceof Field ? $key->getName() : $key)) {
+                    if (!$index->hasFieldByName($key instanceof Field ? $key->getName()->toString() : $key)) {
                         $allAvailable = false;
                         break;
                     }
@@ -739,33 +609,30 @@ class Entity
     /**
      * Returns the list of all indices of this entity.
      *
-     * @return Index[]
+     * @return Set
      */
-    public function getIndices(): array
+    public function getIndices(): Set
     {
-        return $this->indices->toArray();
+        return $this->indices;
     }
 
     /**
      * Removes an index off this entity
      *
      * @param Index|string $index
-     * @return $this
      */
-    public function removeIndex($index): Entity
+    public function removeIndex($index): void
     {
         if (is_string($index)) {
-            $index = $this->indices->find($index, function (Index $index, string $query) {
-                return $index->getName() === $query;
-            });
+            $index = $this->indices->find($index,
+                fn(Index $index, string $query): bool => $index->getName()->toString() === $query
+            );
         }
 
         if ($index instanceof Index && $index->getEntity() === $this) {
             $index->setEntity(null);
             $this->indices->remove($index);
         }
-
-        return $this;
     }
 
 
@@ -777,17 +644,13 @@ class Entity
      * parent entity of the field to the current entity.
      *
      * @param Unique $unique
-     *
-     * @return $this
      */
-    public function addUnique(Unique $unique): Entity
+    public function addUnique(Unique $unique): void
     {
         $unique->setEntity($this);
         $unique->getName(); // we call this method so that the name is created now if it doesn't already exist.
 
         $this->unices->add($unique);
-
-        return $this;
     }
 
     /**
@@ -801,7 +664,7 @@ class Entity
     public function isUnique(array $keys): bool
     {
         if (1 === count($keys)) {
-            $field = $keys[0] instanceof Field ? $keys[0] : $this->getField($keys[0]);
+            $field = $keys[0] instanceof Field ? $keys[0] : $this->getFieldByName($keys[0]);
             if ($field) {
                 if ($field->isUnique()) {
                     return true;
@@ -816,15 +679,14 @@ class Entity
         // check if pk == $keys
         if (count($this->getPrimaryKey()) === count($keys)) {
             $allPk = true;
-            $stringArray = is_string($keys[0]);
             foreach ($this->getPrimaryKey() as $pk) {
-                if ($stringArray) {
-                    if (!in_array($pk->getName(), $keys)) {
+                if (is_string($keys[0])) {
+                    if (!in_array((string) $pk->getName(), $keys)) {
                         $allPk = false;
                         break;
                     }
                 } else {
-                    if (!in_array($pk, $keys)) {
+                    if (!in_array($pk, $keys, true)) {
                         $allPk = false;
                         break;
                     }
@@ -841,7 +703,7 @@ class Entity
             if (count($unique->getFields()->toArray()) === count($keys)) {
                 $allAvailable = true;
                 foreach ($keys as $key) {
-                    if (!$unique->hasField($key instanceof Field ? $key->getName() : $key)) {
+                    if (!$unique->hasFieldByName($key instanceof Field ? (string) $key->getName() : $key)) {
                         $allAvailable = false;
                         break;
                     }
@@ -860,36 +722,31 @@ class Entity
     /**
      * Returns the list of all unique indices of this entity.
      *
-     * @return Unique[]
+     * @return Set
      */
-    public function getUnices(): array
+    public function getUnices(): Set
     {
-        return $this->unices->toArray();
+        return $this->unices;
     }
 
     /**
      * Removes an unique index off this entity
      *
      * @param Unique|string $unique
-     * @return $this
      */
-    public function removeUnique($unique): Entity
+    public function removeUnique($unique): void
     {
         if (is_string($unique)) {
-            $unique = $this->unices->find($unique, function (Unique $index, string $query) {
-                return $index->getName() == $query;
-            });
+            $unique = $this->unices->find($unique,
+                fn(Unique $index, string $query): bool => $index->getName()->toString() === $query
+            );
         }
 
         if ($unique instanceof Unique && $unique->getEntity() === $this) {
             $unique->setEntity(null);
             $this->unices->remove($unique);
         }
-
-        return $this;
     }
-
-
 
     //
     // Database related options/properties
@@ -906,7 +763,7 @@ class Entity
     /**
      * @param bool $implementationDetail
      */
-    public function setImplementationDetail(bool $implementationDetail)
+    public function setImplementationDetail(bool $implementationDetail): void
     {
         $this->implementationDetail = $implementationDetail;
     }
@@ -921,31 +778,7 @@ class Entity
         return $this->needsTransactionInPostgres;
     }
 
-    /**
-     * @param bool $identifierQuoting
-     * @return $this
-     */
-    public function setIdentifierQuoting(bool $identifierQuoting): Entity
-    {
-        $this->identifierQuoting = $identifierQuoting;
-        return $this;
-    }
-
-    /**
-     * Checks if identifierQuoting is enabled. Looks up to its database->isIdentifierQuotingEnabled
-     * if identifierQuoting is null hence undefined.
-     *
-     * Use getIdentifierQuoting() if you need the raw value.
-     *
-     * @return bool
-     */
-    public function isIdentifierQuotingEnabled(): bool
-    {
-        return (null !== $this->identifierQuoting || !$this->database)
-            ? $this->identifierQuoting
-            : $this->database->isIdentifierQuotingEnabled();
-    }
-
+    //@todo useful?
     /**
      * Quotes a identifier depending on identifierQuotingEnabled.
      *
@@ -971,23 +804,13 @@ class Entity
     }
 
     /**
-     * @return bool|null
-     */
-    public function getIdentifierQuoting(): ?bool
-    {
-        return $this->identifierQuoting;
-    }
-
-    /**
      * Makes this database reload on insert statement.
      *
      * @param bool $flag True by default
-     * @return $this
      */
-    public function setReloadOnInsert(bool $flag = true): Entity
+    public function setReloadOnInsert(bool $flag = true): void
     {
         $this->reloadOnInsert = $flag;
-        return $this;
     }
 
     /**
@@ -1004,13 +827,10 @@ class Entity
      * Makes this database reload on update statement.
      *
      * @param bool $flag True by default
-     * @return $this
      */
-    public function setReloadOnUpdate(bool $flag = true): Entity
+    public function setReloadOnUpdate(bool $flag = true): void
     {
         $this->reloadOnUpdate = $flag;
-
-        return $this;
     }
 
     /**
@@ -1028,12 +848,10 @@ class Entity
      * Entity will be skipped, if set to true.
      *
      * @param bool $flag
-     * @return $this
      */
-    public function setForReferenceOnly(bool $flag = true): Entity
+    public function setForReferenceOnly(bool $flag = true): void
     {
         $this->forReferenceOnly = $flag;
-        return $this;
     }
 
     /**
@@ -1074,12 +892,10 @@ class Entity
      * Sets whether or not this entity should have its SQL DDL code generated.
      *
      * @param bool $skip
-     * @return $this
      */
-    public function setSkipSql(bool $skip): Entity
+    public function setSkipSql(bool $skip): void
     {
         $this->skipSql = $skip;
-        return $this;
     }
 
 
@@ -1094,9 +910,7 @@ class Entity
      */
     public function getPrimaryKey(): array
     {
-        return $this->fields->filter(function (Field $field) {
-            return $field->isPrimaryKey();
-        })->toArray();
+        return $this->fields->filter(fn(Field $field): bool => $field->isPrimaryKey())->toArray();
     }
 
     /**
@@ -1122,29 +936,21 @@ class Entity
     /**
      * Returns the first primary key field.
      *
-     * Useful for entitys with a PK using a single field.
+     * Useful for entities with a PK using a single field.
      *
      * @return Field
      */
     public function getFirstPrimaryKeyField(): ?Field
     {
-        foreach ($this->fields as $field) {
-            if ($field->isPrimaryKey()) {
-                return $field;
-            }
-        }
-
-        return null;
+        return $this->fields->find(fn(Field $elem): bool => $elem->isPrimaryKey());
     }
 
     /**
      * Sets whether or not this entity contains a foreign primary key.
      *
      * @param $containsForeignPK
-     *
-     * @return bool
      */
-    public function setContainsForeignPK(bool $containsForeignPK)
+    public function setContainsForeignPK(bool $containsForeignPK): void
     {
         $this->containsForeignPK = $containsForeignPK;
     }
@@ -1190,19 +996,12 @@ class Entity
         return null !== $this->getAutoIncrementPrimaryKey();
     }
 
-    /**
-     * @return string[]
-     */
-    public function getAutoIncrementFieldNames(): array
+    public function getAutoIncrementFieldNames(): Set
     {
-        $names = [];
-        foreach ($this->getFields() as $field) {
-            if ($field->isAutoIncrement()) {
-                $names[] = $field->getName();
-            }
-        }
-
-        return $names;
+        return $this->fields
+            ->filter(fn(Field $elem): bool => $elem->isAutoIncrement())
+            ->map(fn(Field $elem): Text => $elem->getName())
+            ;
     }
 
     /**
@@ -1230,16 +1029,8 @@ class Entity
      */
     public function hasAutoIncrement(): bool
     {
-        foreach ($this->getFields() as $field) {
-            if ($field->isAutoIncrement()) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->fields->search(fn(Field $elem): bool => $elem->isAutoIncrement());
     }
-
-
 
     //
     // Generator options
@@ -1260,12 +1051,10 @@ class Entity
      * Makes this database in read-only mode.
      *
      * @param bool $flag True by default
-     * @return $this
      */
-    public function setReadOnly(bool $flag = true): Entity
+    public function setReadOnly(bool $flag = true): void
     {
         $this->readOnly = $flag;
-        return $this;
     }
 
 
@@ -1289,24 +1078,20 @@ class Entity
      * declared abstract. This helps support class hierarchies
      *
      * @param bool $flag
-     * @return $this
      */
-    public function setAbstract(bool $flag = true): Entity
+    public function setAbstract(bool $flag = true): void
     {
         $this->isAbstract = $flag;
-        return $this;
     }
 
     /**
      * Sets a cross reference status for this foreign key.
      *
      * @param bool $flag
-     * @return $this
      */
-    public function setCrossRef(bool $flag = true): Entity
+    public function setCrossRef(bool $flag = true): void
     {
         $this->isCrossRef = $flag;
-        return $this;
     }
 
     /**
@@ -1327,13 +1112,7 @@ class Entity
      */
     public function hasAdditionalBuilders(): bool
     {
-        foreach ($this->behaviors as $behavior) {
-            if ($behavior->hasAdditionalBuilders()) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->behaviors->search(fn(Behavior $elem): bool => $elem->hasAdditionalBuilders());
     }
 
     /**
@@ -1357,10 +1136,10 @@ class Entity
 
     /**
      * Returns the schema name from this entity or from its database.
-     *
-     * @return string
+     * @deprecated Use `getSchemaName()` instead
+     * @return Text
      */
-    public function guessSchemaName(): string
+    public function guessSchemaName(): Text
     {
         if (null === $this->schemaName) {
             return $this->database->getSchema()->getName();
@@ -1376,8 +1155,8 @@ class Entity
      */
     public function hasSchema(): bool
     {
-        return $this->database
-        && ($this->database->getSchema() ?: $this->database->getSchema())
+        return $this->getDatabase()
+        && $this->database->getSchema()
         && ($platform = $this->getPlatform())
         && $platform->supportsSchemas();
     }
@@ -1385,9 +1164,9 @@ class Entity
     /**
      * Returns the PHP name of an active record object this entry references.
      *
-     * @return string
+     * @return Text
      */
-    public function getAlias(): ?string
+    public function getAlias(): Text
     {
         return $this->alias;
     }
@@ -1400,19 +1179,17 @@ class Entity
      */
     public function isAlias(): bool
     {
-        return null !== $this->alias;
+        return !$this->alias->isEmpty();
     }
 
     /**
      * Sets whether or not this entity is specified in the schema or if there is
      * just a foreign key reference to it.
      *
-     * @param string $alias
-     * @return $this
+     * @param string|Text $alias
      */
-    public function setAlias(string $alias): Entity
+    public function setAlias($alias): void
     {
-        $this->alias = $alias;
-        return $this;
+        $this->alias = new Text($alias);
     }
 }

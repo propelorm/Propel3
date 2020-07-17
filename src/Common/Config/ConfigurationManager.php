@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -31,14 +30,16 @@ class ConfigurationManager
      *
      * @var array
      */
-    private $config = [];
+    private array $config = [];
 
     /**
      * Load and validate configuration values from a file.
      *
-     * @param string $filename  Configuration file name or directory in which resides the configuration file.
-     * @param array  $extraConf Array of configuration properties, to be merged with those loaded from file.
+     * @param string $filename Configuration file name or directory in which resides the configuration file.
+     * @param array $extraConf Array of configuration properties, to be merged with those loaded from file.
      *                          It's useful when passing configuration parameters from command line.
+     *
+     * @throws \Exception
      */
     public function __construct(string $filename = './', array $extraConf = [])
     {
@@ -50,47 +51,26 @@ class ConfigurationManager
     }
 
     /**
-     * Return the whole configuration array
-     *
-     * @return array
-     */
-    public function get(): array
-    {
-        return $this->config;
-    }
-
-    /**
-     * Return a specific section of the configuration array.
-     * It ca be useful to get, in example, only 'buildtime' values.
-     *
-     * @param  string $section the section to be returned
-     * @return array
-     */
-    public function getSection(string $section): array
-    {
-        if (!array_key_exists($section, $this->config)) {
-            return null;
-        }
-
-        return $this->config[$section];
-    }
-
-    /**
      * Return a specific configuration property.
      * The name of the requested property must be given as a string, representing its hierarchy in the configuration
      * array, with each level separated by a dot. I.e.:
      * <code> $config['database']['adapter']['mysql']['tableType']</code>
      * is expressed by:
      * <code>'database.adapter.mysql.tableType'</code>
+     * If nothing has passed, return the whole configuration array.
      *
      * @param string $name The name of property, expressed as a dot separated level hierarchy
-     * @throws \Propel\Common\Config\Exception\InvalidArgumentException
-     * @return mixed The configuration property
+     * @throws InvalidArgumentException
+     * @return mixed The configuration property or null if the property does not exist
      */
-    public function getConfigProperty(string $name)
+    public function get(string $name = '')
     {
+        if ('' === $name) {
+            return $this->config;
+        }
+
         $keys = explode('.', $name);
-        $output = $this->get();
+        $output = $this->config;
         foreach ($keys as $key) {
             if (!array_key_exists($key, $output)) {
                 return null;
@@ -108,7 +88,7 @@ class ConfigurationManager
      * @param  string     $section `runtime` or `generator` section
      * @return array|null
      */
-    public function getConnectionParametersArray(string $section = 'runtime'):? array
+    public function getConnectionParametersArray(string $section = 'runtime'): ?array
     {
         if (!in_array($section, ['runtime', 'generator'])) {
             return null;
@@ -130,10 +110,12 @@ class ConfigurationManager
      * Only one configuration file is supposed to be found.
      * This method also looks for a '.dist' configuration file and loads it.
      *
-     * @param string $fileName  Configuration file name or directory in which resides the configuration file.
-     * @param array  $extraConf Array of configuration properties, to be merged with those loaded from file.
+     * @param string $fileName Configuration file name or directory in which resides the configuration file.
+     * @param array $extraConf Array of configuration properties, to be merged with those loaded from file.
+     *
+     * @throws \Exception if something went wrong
      */
-    protected function load(string $fileName = '', array $extraConf): void
+    protected function load(string $fileName = '', array $extraConf = []): void
     {
         $currentDir = getcwd();
 
@@ -144,10 +126,6 @@ class ConfigurationManager
         if (is_dir($fileName)) {
             $currentDir = $fileName;
             $fileName = 'propel';
-        }
-
-        if (null === $extraConf) {
-            $extraConf = [];
         }
 
         if ('propel' === $fileName) {

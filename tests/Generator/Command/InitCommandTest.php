@@ -33,7 +33,7 @@ class InitCommandTest extends TestCaseFixtures
     /** @var  Filesystem */
     private $fileSystem;
 
-    public function setUp()
+    public function setup(): void
     {
         parent::setUp();
 
@@ -45,7 +45,7 @@ class InitCommandTest extends TestCaseFixtures
         chdir($this->tempDir);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         chdir($this->currentDir);
         parent::tearDown();

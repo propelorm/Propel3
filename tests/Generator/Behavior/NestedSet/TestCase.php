@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Propel package.
@@ -25,7 +25,7 @@ class TestCase extends TestCaseFixturesDatabase
     /**
      * @return Configuration
      */
-    public function getConfiguration()
+    public function getConfiguration(): Configuration
     {
         return Configuration::getCurrentConfiguration();
     }

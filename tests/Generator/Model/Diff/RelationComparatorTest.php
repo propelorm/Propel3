@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -23,7 +23,7 @@ use \Propel\Tests\TestCase;
  */
 class RelationComparatorTest extends TestCase
 {
-    public function testCompareNoDifference()
+    public function testCompareNoDifference(): void
     {
         $c1 = new Field('Foo');
         $c2 = new Field('Bar');
@@ -40,7 +40,7 @@ class RelationComparatorTest extends TestCase
         $this->assertFalse(RelationComparator::computeDiff($fk1, $fk2));
     }
 
-    public function testCompareLocalField()
+    public function testCompareLocalField(): void
     {
         $c1 = new Field('Foo');
         $c2 = new Field('Bar');
@@ -57,7 +57,7 @@ class RelationComparatorTest extends TestCase
         $this->assertTrue(RelationComparator::computeDiff($fk1, $fk2));
     }
 
-    public function testCompareForeignField()
+    public function testCompareForeignField(): void
     {
         $c1 = new Field('Foo');
         $c2 = new Field('Bar');
@@ -74,7 +74,7 @@ class RelationComparatorTest extends TestCase
         $this->assertTrue(RelationComparator::computeDiff($fk1, $fk2));
     }
 
-    public function testCompareFieldMappings()
+    public function testCompareFieldMappings(): void
     {
         $c1 = new Field('Foo');
         $c2 = new Field('Bar');
@@ -94,7 +94,7 @@ class RelationComparatorTest extends TestCase
         $this->assertTrue(RelationComparator::computeDiff($fk1, $fk2));
     }
 
-    public function testCompareOnUpdate()
+    public function testCompareOnUpdate(): void
     {
         $c1 = new Field('Foo');
         $c2 = new Field('Bar');
@@ -113,7 +113,7 @@ class RelationComparatorTest extends TestCase
         $this->assertTrue(RelationComparator::computeDiff($fk1, $fk2));
     }
 
-    public function testCompareOnDelete()
+    public function testCompareOnDelete(): void
     {
         $c1 = new Field('Foo');
         $c2 = new Field('Bar');
@@ -132,7 +132,7 @@ class RelationComparatorTest extends TestCase
         $this->assertTrue(RelationComparator::computeDiff($fk1, $fk2));
     }
 
-    public function testCompareSort()
+    public function testCompareSort(): void
     {
         $c1 = new Field('Foo');
         $c2 = new Field('Bar');

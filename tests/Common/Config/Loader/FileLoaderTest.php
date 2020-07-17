@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,16 +9,17 @@
 
 namespace Propel\Tests\Common\Config\Loader;
 
+use Propel\Common\Config\Exception\InvalidArgumentException;
+use Propel\Common\Config\Exception\RuntimeException;
 use Propel\Common\Config\Loader\FileLoader as BaseFileLoader;
 use Propel\Common\Config\Loader\FileLoader;
 use Propel\Tests\TestCase;
 
 class FileLoaderTest extends TestCase
 {
-    /** @var FileLoader */
-    private $loader;
+    private FileLoader $loader;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->loader = new TestableFileLoader();
     }
@@ -100,12 +100,15 @@ class FileLoaderTest extends TestCase
         ];
     }
 
-    public function testInitialResolveValueIsFalse()
+    public function testInitialResolveValueIsFalse(): void
     {
-        $this->assertAttributeEquals(false, 'resolved', $this->loader);
+        $prop = (new \ReflectionObject($this->loader))->getParentClass()->getProperty('resolved');
+        $prop->setAccessible(true);
+
+        $this->assertEquals(false, $prop->getValue($this->loader));
     }
 
-    public function testResolveParams()
+    public function testResolveParams(): void
     {
         putenv('host=127.0.0.1');
         putenv('user=root');
@@ -157,7 +160,7 @@ class FileLoaderTest extends TestCase
         $this->assertEquals($expected, $this->loader->resolveParams($conf), $message);
     }
 
-    public function testResolveReplaceWithoutCasting()
+    public function testResolveReplaceWithoutCasting(): void
     {
         $conf = $this->loader->resolveParams(['foo'=>true, 'expfoo' => '%foo%', 'bar' => null, 'expbar' => '%bar%']);
 
@@ -165,43 +168,39 @@ class FileLoaderTest extends TestCase
         $this->assertNull($conf['expbar'], '->resolve() replaces arguments that are just a placeholder by their value without casting them to strings');
     }
 
-    /**
-     * @expectedException Propel\Common\Config\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Parameter 'baz' not found in configuration file.
-     */
-    public function testResolveThrowsExceptionIfInvalidPlaceholder()
+    public function testResolveThrowsExceptionIfInvalidPlaceholder(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Parameter 'baz' not found in configuration file.");
+
         $this->loader->resolveParams(['foo' => 'bar', '%baz%']);
     }
 
-    /**
-     * @expectedException Propel\Common\Config\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Parameter 'foobar' not found in configuration file.
-     */
-    public function testResolveThrowsExceptionIfNonExistentParameter()
+    public function testResolveThrowsExceptionIfNonExistentParameter(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Parameter 'foobar' not found in configuration file.");
+
         $this->loader->resolveParams(['foo %foobar% bar']);
     }
 
-    /**
-     * @expectedException Propel\Common\Config\Exception\RuntimeException
-     * @expectedExceptionMessage Circular reference detected for parameter 'bar'.
-     */
-    public function testResolveThrowsRuntimeExceptionIfCircularReference()
+    public function testResolveThrowsRuntimeExceptionIfCircularReference(): void
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage("Circular reference detected for parameter 'bar'.");
+
         $this->loader->resolveParams(['foo' => '%bar%', 'bar' => '%foobar%', 'foobar' => '%foo%']);
     }
 
-    /**
-     * @expectedException Propel\Common\Config\Exception\RuntimeException
-     * @expectedExceptionMessage Circular reference detected for parameter 'bar'.
-     */
-    public function testResolveThrowsRuntimeExceptionIfCircularReferenceMixed()
+    public function testResolveThrowsRuntimeExceptionIfCircularReferenceMixed(): void
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage("Circular reference detected for parameter 'bar'.");
+
         $this->loader->resolveParams(['foo' => 'a %bar%', 'bar' => 'a %foobar%', 'foobar' => 'a %foo%']);
     }
 
-    public function testResolveEnvironmentVariable()
+    public function testResolveEnvironmentVariable(): void
     {
         putenv('home=myHome');
         putenv('schema=mySchema');

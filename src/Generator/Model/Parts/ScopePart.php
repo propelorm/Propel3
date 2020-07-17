@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,6 +9,8 @@
 
 namespace Propel\Generator\Model\Parts;
 
+use phootwork\lang\Text;
+
 /**
  * Trait ScopePart
  *
@@ -19,37 +20,33 @@ trait ScopePart
 {
     use SuperordinatePart;
 
-    /**
-     * @var string
-     */
-    private $scope;
+    private Text $scope;
 
     /**
      * Sets scope
      *
-     * @param string $scope
-     * @return $this
+     * @param string|Text $scope
      */
-    public function setScope(string $scope)
+    public function setScope($scope)
     {
-        $this->scope = $scope;
-
-        return $this;
+        $this->scope = new Text($scope);
     }
 
     /**
      * Returns scope
      *
-     * @return string
+     * @return Text
      */
-    public function getScope(): string
+    public function getScope(): Text
     {
-        $scope = $this->scope;
-
-        if (null === $scope && $this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getScope')) {
-            $scope = $this->getSuperordinate()->getScope();
+        if (!isset($this->scope)) {
+            $this->scope = new Text();
         }
 
-        return null === $scope ? '' : $scope;
+        if ($this->scope->isEmpty() && $this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getScope')) {
+            return $this->getSuperordinate()->getScope();
+        }
+
+        return $this->scope;
     }
 }

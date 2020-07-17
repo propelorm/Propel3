@@ -18,7 +18,7 @@ namespace Propel\Tests\Generator\Behavior\Sortable;
  */
 class SortableManagerWithScopeTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

@@ -80,7 +80,7 @@ class QuickGeneratorConfig extends GeneratorConfig implements GeneratorConfigInt
      */
     public function getConfiguredBuilder(Entity $entity, string $type): AbstractBuilder
     {
-        $class = $this->getConfigProperty('generator.objectModel.builders.' . $type);
+        $class = $this->get("generator.objectModel.builders.$type");
 
         if (null === $class) {
             throw new InvalidArgumentException("Invalid data model builder type `$type`");

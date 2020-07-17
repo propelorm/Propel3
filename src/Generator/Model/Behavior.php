@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,19 +7,19 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Generator\Model;
 
+use phootwork\collection\Map;
+use phootwork\collection\Set;
 use Propel\Generator\Builder\Om\ActiveRecordTraitBuilder;
 use Propel\Generator\Builder\Om\EntityMapBuilder;
 use Propel\Generator\Builder\Om\ObjectBuilder;
 use Propel\Generator\Builder\Om\QueryBuilder;
 use Propel\Generator\Builder\Om\RepositoryBuilder;
-use Propel\Common\Collection\Map;
 use Propel\Generator\Model\Parts\DatabasePart;
 use Propel\Generator\Model\Parts\EntityPart;
 use Propel\Generator\Model\Parts\NamePart;
+use function DeepCopy\deep_copy;
 
 /**
  * Information about behaviors of a entity.
@@ -31,61 +30,52 @@ use Propel\Generator\Model\Parts\NamePart;
  */
 class Behavior
 {
-    use NamePart, EntityPart, DatabasePart;
+    use NamePart {
+        setName as namePartSetName;
+    }
+    use EntityPart, DatabasePart;
 
     /**
      * The behavior id.
      *
      * @var string
      */
-    protected $id;
+    protected string $id;
 
     /**
      * A collection of parameters.
-     *
-     * @var Map
      */
-    protected $parameters;
+    protected Map $parameters;
 
     /**
      * Array of default parameters.
      * Usually override by subclasses.
-     *
-     * @var array
      */
-    protected $defaultParameters = [];
+    protected array $defaultParameters = [];
 
     /**
      * Whether or not the entity has been
      * modified by the behavior.
-     *
-     * @var bool
      */
-    protected $isEntityModified = false;
+    protected bool $isEntityModified = false;
 
     /**
      * The absolute path to the directory
      * that contains the behavior's templates
      * files.
-     *
-     * @var string
      */
-    protected $dirname;
+    protected string $dirname;
 
     /**
      * A collection of additional builders.
-     *
-     * @var array
      */
-    protected $additionalBuilders = [];
+    protected array $additionalBuilders = [];
 
     /**
      * The order in which the behavior must
      * be applied.
-     *
-     * @var int
      */
-    protected $entityModificationOrder = 50;
+    protected int $entityModificationOrder = 50;
 
     public function __construct()
     {
@@ -97,30 +87,24 @@ class Behavior
      * Sets the name of the Behavior
      *
      * @param string $name the name of the behavior
-     * @return $this
      */
-    public function setName(string $name): Behavior
+    public function setName(string $name): void
     {
-        if ($this->id === null) {
+        if (!isset($this->id)) {
             $this->setId($name);
         }
 
-        $this->name = $name;
-
-        return $this;
+        $this->namePartSetName($name);
     }
 
     /**
      * Sets the id of the Behavior
      *
      * @param string $id The id of the behavior
-     * @return $this
      */
-    public function setId(string $id): Behavior
+    public function setId(string $id): void
     {
         $this->id = $id;
-
-        return $this;
     }
 
     /**
@@ -149,16 +133,13 @@ class Behavior
      *
      * @param string $name
      * @param mixed $value
-     * @return $this
      */
-    public function setParameter(string $name, $value): Behavior
+    public function setParameter(string $name, $value): void
     {
         //Don't want override a default parameter with a null value
         if (null !== $value) {
             $this->parameters->set(strtolower($name), $value);
         }
-
-        return $this;
     }
 
     /**
@@ -168,13 +149,10 @@ class Behavior
      * ['name' => 'foo', 'value' => 'bar']
      *
      * @param array $parameter
-     * @return $this
      */
-    public function addParameter(array $parameter): Behavior
+    public function addParameter(array $parameter): void
     {
         $this->parameters->set(strtolower($parameter['name']), $parameter['value']);
-
-        return $this;
     }
 
     /**
@@ -183,14 +161,11 @@ class Behavior
      * Expects an associative array looking like [ 'foo' => 'bar' ].
      *
      * @param array $parameters
-     * @return $this
      */
-    public function setParameters(array $parameters): Behavior
+    public function setParameters(array $parameters): void
     {
         $this->parameters->clear();
         $this->parameters->setAll($parameters);
-
-        return $this;
     }
 
     /**
@@ -219,11 +194,11 @@ class Behavior
     /**
      * Returns the associative array of parameters.
      *
-     * @return array
+     * @return Map
      */
-    public function getParameters(): array
+    public function getParameters(): Map
     {
-        return $this->parameters->toArray();
+        return $this->parameters;
     }
 
     /**
@@ -234,13 +209,10 @@ class Behavior
      * Default is 50.
      *
      * @param integer $entityModificationOrder
-     * @return $this
      */
-    public function setEntityModificationOrder(int $entityModificationOrder): Behavior
+    public function setEntityModificationOrder(int $entityModificationOrder): void
     {
         $this->entityModificationOrder = $entityModificationOrder;
-
-        return $this;
     }
 
     /**
@@ -264,14 +236,14 @@ class Behavior
      * Propagates the behavior to the entities of the database and override this
      * method to have a database behavior do something special.
      */
-    public function modifyDatabase()
+    public function modifyDatabase(): void
     {
         foreach ($this->getEntities() as $entity) {
             if ($entity->hasBehavior($this->getId())) {
                 // don't add the same behavior twice
                 continue;
             }
-            $behavior = clone $this;
+            $behavior = deep_copy($this);
             $entity->addBehavior($behavior);
         }
     }
@@ -279,9 +251,9 @@ class Behavior
     /**
      * Returns the list of all entities in the same database.
      *
-     * @return Entity[] A collection of Entity instance
+     * @return Set A collection of Entity instance
      */
-    protected function getEntities(): array
+    protected function getEntities(): Set
     {
         return $this->database->getEntities();
     }
@@ -299,12 +271,10 @@ class Behavior
      * Sets whether or not the entity has been modified.
      *
      * @param bool $modified
-     * @return $this
      */
-    public function setEntityModified(bool $modified): Behavior
+    public function setEntityModified(bool $modified): void
     {
         $this->isEntityModified = $modified;
-        return $this;
     }
 
     /**
@@ -326,7 +296,7 @@ class Behavior
      */
     public function getFieldForParameter(string $name): Field
     {
-        return $this->entity->getField($this->getParameter($name));
+        return $this->entity->getFieldByName($this->getParameter($name));
     }
 
     /**

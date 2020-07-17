@@ -27,7 +27,7 @@ class GeneratedObjectLazyLoadTest extends TestCase
     /** @var  Configuration */
     private $config;
 
-    public function setUp()
+    public function setUp(): void
     {
         if (!class_exists('\LazyLoadEntity')) {
             $schema = <<<EOF

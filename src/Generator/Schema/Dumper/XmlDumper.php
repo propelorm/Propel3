@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -36,7 +35,7 @@ class XmlDumper implements DumperInterface
      *
      * @var \DOMDocument
      */
-    private $document;
+    private \DOMDocument $document;
 
     /**
      * Constructor.
@@ -59,7 +58,7 @@ class XmlDumper implements DumperInterface
      * @param  Database $database The database model
      * @return string   The dumped XML formatted output
      */
-    public function dump(Database $database)
+    public function dump(Database $database): string
     {
         $this->appendDatabaseNode($database, $this->document);
 
@@ -72,7 +71,7 @@ class XmlDumper implements DumperInterface
      * @param  Schema  $schema                The schema object
      * @return string
      */
-    public function dumpSchema(Schema $schema)
+    public function dumpSchema(Schema $schema): string
     {
         $rootNode = $this->document->createElement('app-data');
         $this->document->appendChild($rootNode);
@@ -89,18 +88,18 @@ class XmlDumper implements DumperInterface
      * @param Database $database   The Database model instance
      * @param \DOMNode $parentNode The parent DOMNode object
      */
-    private function appendDatabaseNode(Database $database, \DOMNode $parentNode)
+    private function appendDatabaseNode(Database $database, \DOMNode $parentNode): void
     {
         $databaseNode = $parentNode->appendChild($this->document->createElement('database'));
-        $databaseNode->setAttribute('name', $database->getName());
+        $databaseNode->setAttribute('name', $database->getName()->toString());
         $databaseNode->setAttribute('defaultIdMethod', $database->getIdMethod());
 
         if ($schema = $database->getSchemaName()) {
-            $databaseNode->setAttribute('schema', $schema);
+            $databaseNode->setAttribute('schema', $schema->toString());
         }
 
         if ($namespace = $database->getNamespace()) {
-            $databaseNode->setAttribute('namespace', $namespace);
+            $databaseNode->setAttribute('namespace', $namespace->toString());
         }
 
         $defaultAccessorVisibility = $database->getAccessorVisibility();
@@ -146,10 +145,10 @@ class XmlDumper implements DumperInterface
      * @param Vendor $vendorInfo The VendorInfo model instance
      * @param \DOMNode   $parentNode The parent DOMNode object
      */
-    private function appendVendorInformationNode(Vendor $vendorInfo, \DOMNode $parentNode)
+    private function appendVendorInformationNode(Vendor $vendorInfo, \DOMNode $parentNode): void
     {
         //It's an empty Vendor created by VendorPart::getVendorByType method
-        if ([] === $vendorInfo->getParameters()) {
+        if ($vendorInfo->getParameters()->isEmpty()) {
             return;
         }
 
@@ -170,10 +169,10 @@ class XmlDumper implements DumperInterface
      * @param Entity    $entity      The Entity model instance
      * @param \DOMNode $parentNode The parent DOMNode object
      */
-    private function appendEntityNode(Entity $entity, \DOMNode $parentNode)
+    private function appendEntityNode(Entity $entity, \DOMNode $parentNode): void
     {
         $entityNode = $parentNode->appendChild($this->document->createElement('entity'));
-        $entityNode->setAttribute('name', $entity->getName());
+        $entityNode->setAttribute('name', $entity->getName()->toString());
 
         $database = $entity->getDatabase();
         $schema = $entity->getSchemaName();
@@ -186,11 +185,11 @@ class XmlDumper implements DumperInterface
         }
 
         if ($tableName = $entity->getTableName()) {
-            $entityNode->setAttribute('tableName', $tableName);
+            $entityNode->setAttribute('tableName', $tableName->toString());
         }
 
         if ($namespace = $entity->getNamespace()) {
-            $entityNode->setAttribute('namespace', $namespace);
+            $entityNode->setAttribute('namespace', $namespace->toString());
         }
 
         if ($entity->isSkipSql()) {
@@ -217,12 +216,12 @@ class XmlDumper implements DumperInterface
             $entityNode->setAttribute('forReferenceOnly', $referenceOnly ? 'true' : 'false');
         }
 
-        if ($alias = $entity->getAlias()) {
-            $entityNode->setAttribute('alias', $alias);
+        if (!$entity->getAlias()->isEmpty()) {
+            $entityNode->setAttribute('alias', $entity->getAlias()->toString());
         }
 
-        if ($description = $entity->getDescription()) {
-            $entityNode->setAttribute('description', $description);
+        if ($entity->hasDescription()) {
+            $entityNode->setAttribute('description', $entity->getDescription()->toString());
         }
 
         $defaultStringFormat = $entity->getStringFormat();
@@ -275,10 +274,10 @@ class XmlDumper implements DumperInterface
      * @param Behavior $behavior   The Behavior model instance
      * @param \DOMNode $parentNode The parent DOMNode object
      */
-    private function appendBehaviorNode(Behavior $behavior, \DOMNode $parentNode)
+    private function appendBehaviorNode(Behavior $behavior, \DOMNode $parentNode): void
     {
         $behaviorNode = $parentNode->appendChild($this->document->createElement('behavior'));
-        $behaviorNode->setAttribute('name', $behavior->getName());
+        $behaviorNode->setAttribute('name', $behavior->getName()->toString());
 
         if ($behavior->allowMultiple()) {
             $behaviorNode->setAttribute('id', $behavior->getId());
@@ -297,20 +296,20 @@ class XmlDumper implements DumperInterface
      * @param Field   $field     The Field model instance
      * @param \DOMNode $parentNode The parent DOMNode object
      */
-    private function appendFieldNode(Field $field, \DOMNode $parentNode)
+    private function appendFieldNode(Field $field, \DOMNode $parentNode): void
     {
         $fieldNode = $parentNode->appendChild($this->document->createElement('field'));
-        $fieldNode->setAttribute('name', $field->getName());
+        $fieldNode->setAttribute('name', $field->getName()->toString());
 
         $fieldNode->setAttribute('type', $field->getType());
 
         $domain = $field->getDomain();
         if ($size = $domain->getSize()) {
-            $fieldNode->setAttribute('size', $size);
+            $fieldNode->setAttribute('size', (string) $size);
         }
 
         if ($scale = $domain->getScale()) {
-            $fieldNode->setAttribute('scale', $scale);
+            $fieldNode->setAttribute('scale', (string) $scale);
         }
 
         $platform = $field->getPlatform();
@@ -318,8 +317,8 @@ class XmlDumper implements DumperInterface
             $fieldNode->setAttribute('sqlType', $platform->getDomainForType($field->getType())->getSqlType());
         }
 
-        if ($description = $field->getDescription()) {
-            $fieldNode->setAttribute('description', $description);
+        if ($field->hasDescription()) {
+            $fieldNode->setAttribute('description', $field->getDescription()->toString());
         }
 
         if ($field->isPrimaryKey()) {
@@ -342,7 +341,7 @@ class XmlDumper implements DumperInterface
 
         if ($field->isInheritance()) {
             $fieldNode->setAttribute('inheritance', $field->getInheritanceType());
-            foreach ($field->getInheritanceList() as $inheritance) {
+            foreach ($field->getChildren() as $inheritance) {
                 $this->appendInheritanceNode($inheritance, $fieldNode);
             }
         }
@@ -358,7 +357,7 @@ class XmlDumper implements DumperInterface
      * @param Inheritance $inheritance The Inheritance model instance
      * @param \DOMNode    $parentNode  The parent DOMNode object
      */
-    private function appendInheritanceNode(Inheritance $inheritance, \DOMNode $parentNode)
+    private function appendInheritanceNode(Inheritance $inheritance, \DOMNode $parentNode): void
     {
         $inheritanceNode = $parentNode->appendChild($this->document->createElement('inheritance'));
         $inheritanceNode->setAttribute('key', $inheritance->getKey());
@@ -375,13 +374,13 @@ class XmlDumper implements DumperInterface
      * @param Relation $relation The Relation model instance
      * @param \DOMNode   $parentNode The parent DOMNode object
      */
-    private function appendRelationNode(Relation $relation, \DOMNode $parentNode)
+    private function appendRelationNode(Relation $relation, \DOMNode $parentNode): void
     {
         $relationNode = $parentNode->appendChild($this->document->createElement('relation'));
         $relationNode->setAttribute('target', $relation->getForeignEntityName());
 
         if ($relation->hasName()) {
-            $relationNode->setAttribute('name', $relation->getName());
+            $relationNode->setAttribute('name', $relation->getName()->toString());
         }
         $relationNode->setAttribute('field', $relation->getField());
 
@@ -403,7 +402,7 @@ class XmlDumper implements DumperInterface
 
         for ($i = 0, $size = $relation->getLocalFields()->size(); $i < $size; $i++) {
             $refNode = $relationNode->appendChild($this->document->createElement('reference'));
-            $refNode->setAttribute('local', $relation->getLocalField($i)->getName());
+            $refNode->setAttribute('local', $relation->getLocalField($i)->getName()->toString());
             $refNode->setAttribute('foreign', $relation->getForeignFields()->get($i));
         }
 
@@ -418,7 +417,7 @@ class XmlDumper implements DumperInterface
      * @param IdMethodParameter $parameter  The IdMethodParameter model instance
      * @param \DOMNode          $parentNode The parent DOMNode object
      */
-    private function appendIdMethodParameterNode(IdMethodParameter $parameter, \DOMNode $parentNode)
+    private function appendIdMethodParameterNode(IdMethodParameter $parameter, \DOMNode $parentNode): void
     {
         $idMethodParameterNode = $parentNode->appendChild($this->document->createElement('id-method-parameter'));
         $idMethodParameterNode->setAttribute('value', $parameter->getValue());
@@ -430,7 +429,7 @@ class XmlDumper implements DumperInterface
      * @param Index    $index      The Index model instance
      * @param \DOMNode $parentNode The parent DOMNode object
      */
-    private function appendIndexNode(Index $index, \DOMNode $parentNode)
+    private function appendIndexNode(Index $index, \DOMNode $parentNode): void
     {
         $this->appendGenericIndexNode('index', $index, $parentNode);
     }
@@ -441,7 +440,7 @@ class XmlDumper implements DumperInterface
      * @param Unique   $index     The Unique model instance
      * @param \DOMNode $parentNode The parent DOMNode object
      */
-    private function appendUniqueIndexNode(Unique $index, \DOMNode $parentNode)
+    private function appendUniqueIndexNode(Unique $index, \DOMNode $parentNode): void
     {
         $this->appendGenericIndexNode('unique', $index, $parentNode);
     }
@@ -453,17 +452,17 @@ class XmlDumper implements DumperInterface
      * @param Index    $index      The Index model instance
      * @param \DOMNode $parentNode The parent DOMNode object
      */
-    private function appendGenericIndexNode($nodeType, Index $index, \DOMNode $parentNode)
+    private function appendGenericIndexNode($nodeType, Index $index, \DOMNode $parentNode): void
     {
         $indexNode = $parentNode->appendChild($this->document->createElement($nodeType));
-        $indexNode->setAttribute('name', $index->getName());
+        $indexNode->setAttribute('name', $index->getName()->toString());
 
         foreach ($index->getFields() as $field) {
             $indexFieldNode = $indexNode->appendChild($this->document->createElement($nodeType.'-field'));
-            $indexFieldNode->setAttribute('name', $field->getName());
+            $indexFieldNode->setAttribute('name', $field->getName()->toString());
 
-            if ($size = $index->getFieldSizes()->get($field->getName())) {
-                $indexFieldNode->setAttribute('size', $size);
+            if ($size = $index->getFieldSizes()->get($field->getName()->toString())) {
+                $indexFieldNode->setAttribute('size', (string) $size);
             }
         }
 

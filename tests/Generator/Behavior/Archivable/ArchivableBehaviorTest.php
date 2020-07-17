@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Propel package.
@@ -25,7 +25,7 @@ class ArchivableBehaviorTest extends TestCase
 {
     protected static $generatedSQL;
 
-    public function setUp()
+    public function setUp(): void
     {
         if (!class_exists('\ArchivableTest1')) {
             $schema = <<<EOF

@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,11 +7,9 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Generator\Model\Diff;
 
-use Propel\Common\Collection\Set;
+use phootwork\collection\Set;
 use Propel\Generator\Model\Database;
 
 /**
@@ -22,20 +19,9 @@ use Propel\Generator\Model\Database;
  */
 class DatabaseComparator
 {
-    /**
-     * @var DatabaseDiff
-     */
-    protected $databaseDiff;
-
-    /**
-     * @var Database
-     */
-    protected $fromDatabase;
-
-    /**
-     * @var Database
-     */
-    protected $toDatabase;
+    protected DatabaseDiff $databaseDiff;
+    protected Database $fromDatabase;
+    protected Database $toDatabase;
 
     /**
      * Whether we should detect renamings and track it via `addRenamedEntity` at the
@@ -43,21 +29,13 @@ class DatabaseComparator
      *
      * @var bool
      */
-    protected $withRenaming = false;
+    protected bool $withRenaming = false;
+    protected bool $removeEntity = true;
+    protected Set $excludedEntities;
 
-    /**
-     * @var boolean
-     */
-    protected $removeEntity = true;
-
-    /**
-     * @var Set list of excluded entities
-     */
-    protected $excludedEntities;
-
-    public function __construct(?DatabaseDiff $databaseDiff = null)
+    public function __construct(DatabaseDiff $databaseDiff = null)
     {
-        $this->databaseDiff = (null === $databaseDiff) ? new DatabaseDiff() : $databaseDiff;
+        $this->databaseDiff = $databaseDiff ?? new DatabaseDiff();
         $this->excludedEntities = new Set();
     }
 
@@ -76,17 +54,6 @@ class DatabaseComparator
         $this->fromDatabase = $fromDatabase;
     }
 
-    //@todo never used: remove?
-    /**
-     * Returns the fromDatabase property.
-     *
-     * @return Database
-     */
-//    public function getFromDatabase(): Database
-//    {
-//        return $this->fromDatabase;
-//    }
-
     /**
      * Sets the toDatabase property.
      *
@@ -96,17 +63,6 @@ class DatabaseComparator
     {
         $this->toDatabase = $toDatabase;
     }
-
-    //@todo never used: remove?
-    /**
-     * Returns the toDatabase property.
-     *
-     * @return Database
-     */
-//    public function getToDatabase(): Database
-//    {
-//        return $this->toDatabase;
-//    }
 
     /**
      * Set true to handle removed tables or false to ignore them
@@ -129,15 +85,12 @@ class DatabaseComparator
     /**
      * Set the list of tables excluded from the comparison
      *
-     * @param Set $excludedEntities set the list of table name
+     * @param array $excludedEntities set the list of table name
      */
-    public function setExcludedEntities(?Set $excludedEntities): void
+    public function addExcludedEntities(?array $excludedEntities = null): void
     {
-        if (null === $excludedEntities) {
-            $excludedEntities = [];
-        }
-        $this->excludedEntities->clear();
-        $this->excludedEntities->addAll($excludedEntities);
+        $excludedEntities = $excludedEntities ?? [];
+        $this->excludedEntities->add(...$excludedEntities);
     }
 
     /**
@@ -153,11 +106,11 @@ class DatabaseComparator
     /**
      * Returns the computed difference between two database objects.
      *
-     * @param  Database  $fromDatabase
-     * @param  Database  $toDatabase
-     * @param  bool      $withRenaming
-     * @param  bool      $removeEntity
-     * @param  Set     $excludedEntities Entities to exclude from the difference computation
+     * @param  Database $fromDatabase
+     * @param  Database $toDatabase
+     * @param  bool $withRenaming
+     * @param  bool $removeEntity
+     * @param  array $excludedEntities Entities to exclude from the difference computation
      *
      * @return DatabaseDiff
      */
@@ -166,16 +119,16 @@ class DatabaseComparator
         Database $toDatabase,
         bool $withRenaming = false,
         bool $removeEntity = true,
-        ?Set $excludedEntities = null): ?DatabaseDiff
+        ?array $excludedEntities = null): ?DatabaseDiff
     {
         $databaseComparator = new self();
         $databaseComparator->setFromDatabase($fromDatabase);
         $databaseComparator->setToDatabase($toDatabase);
         $databaseComparator->setWithRenaming($withRenaming);
         $databaseComparator->setRemoveEntity($removeEntity);
-        $databaseComparator->setExcludedEntities($excludedEntities);
+        $databaseComparator->addExcludedEntities($excludedEntities);
 
-        $platform = $toDatabase->getPlatform() ?: $fromDatabase->getPlatform();
+        $platform = $toDatabase->getPlatform() ?? $fromDatabase->getPlatform();
 
         if ($platform) {
             foreach ($fromDatabase->getEntities() as $table) {
@@ -224,11 +177,11 @@ class DatabaseComparator
 
         // check for new tables in $toDatabase
         foreach ($toDatabaseEntities as $table) {
-            if ($this->excludedEntities->contains($table->getName())) {
+            if ($this->excludedEntities->contains($table->getName()->toString())) {
                 continue;
             }
-            if (!$this->fromDatabase->hasEntityByName($table->getName()) && !$table->isSkipSql()) {
-                $this->databaseDiff->getAddedEntities()->set($table->getName(), $table);
+            if (!$this->fromDatabase->hasEntityByName($table->getName()->toString()) && !$table->isSkipSql()) {
+                $this->databaseDiff->getAddedEntities()->set($table->getName()->toString(), $table);
                 $databaseDifferences++;
             }
         }
@@ -236,11 +189,11 @@ class DatabaseComparator
         // check for removed tables in $toDatabase
         if ($this->getRemoveEntity()) {
             foreach ($fromDatabaseEntities as $table) {
-                if ($this->excludedEntities->contains($table->getName())) {
+                if ($this->excludedEntities->contains($table->getName()->toString())) {
                     continue;
                 }
-                if (!$this->toDatabase->hasEntityByName($table->getName()) && !$table->isSkipSql()) {
-                    $this->databaseDiff->getRemovedEntities()->set($table->getName(), $table);
+                if (!$this->toDatabase->hasEntityByName($table->getName()->toString()) && !$table->isSkipSql()) {
+                    $this->databaseDiff->getRemovedEntities()->set($table->getName()->toString(), $table);
                     $databaseDifferences++;
                 }
             }
@@ -248,14 +201,14 @@ class DatabaseComparator
 
         // check for table differences
         foreach ($fromDatabaseEntities as $fromEntity) {
-            if ($this->excludedEntities->contains($fromEntity->getName())) {
+            if ($this->excludedEntities->contains($fromEntity->getName()->toString())) {
                 continue;
             }
-            if ($this->toDatabase->hasEntityByName($fromEntity->getName())) {
-                $toEntity = $this->toDatabase->getEntityByName($fromEntity->getName());
+            if ($this->toDatabase->hasEntityByName($fromEntity->getName()->toString())) {
+                $toEntity = $this->toDatabase->getEntityByName($fromEntity->getName()->toString());
                 $databaseDiff = EntityComparator::computeDiff($fromEntity, $toEntity);
                 if (null !== $databaseDiff) {
-                    $this->databaseDiff->getModifiedEntities()->set($fromEntity->getName(), $databaseDiff);
+                    $this->databaseDiff->getModifiedEntities()->set($fromEntity->getName()->toString(), $databaseDiff);
                     $databaseDifferences++;
                 }
             }

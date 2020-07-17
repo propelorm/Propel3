@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,13 +9,14 @@
 
 namespace Propel\Common\Types\SQL;
 
-use gossi\codegen\model\PhpConstant;
+use phootwork\lang\ArrayObject;
 use Propel\Common\Types\AbstractType;
 use Propel\Common\Types\BuildableFieldTypeInterface;
 use Propel\Generator\Builder\Om\AbstractBuilder;
 use Propel\Generator\Builder\Om\ObjectBuilder;
 use Propel\Generator\Model\Field;
 use Propel\Runtime\Map\FieldMap;
+use Susina\Codegen\Model\PhpConstant;
 
 /**
  * Class EnumType
@@ -60,21 +60,19 @@ class EnumType extends AbstractType implements BuildableFieldTypeInterface
     public function build(AbstractBuilder $builder, Field $field): void
     {
         if ($builder instanceof ObjectBuilder) {
-            $types = [];
+            $types = new ArrayObject();
 
             foreach ($field->getValueSet() as $valueSet) {
-                $constName = strtoupper($field->getName() . '_type_' . $valueSet);
-                $constName = preg_replace('/[^a-zA-z0-9_]+/', '_', $constName);
+                $constName = $field->getName()->append("_type_$valueSet")->toSnakeCase()->toUpperCase();
 
                 $types[] = 'self::' . $constName;
-                $constant = PhpConstant::create($constName, $valueSet);
+                $constant = PhpConstant::create((string) $constName, $valueSet);
                 $constant->setType('string');
                 $builder->getDefinition()->setConstant($constant);
             }
 
-            $all = '[' . implode(', ', $types) . ']';
-            $allConstName = strtoupper($field->getName() . '_types');
-            $constant = PhpConstant::create($allConstName, $all, true);
+            $allConstName = $field->getName()->append('_types')->toUpperCase();
+            $constant = PhpConstant::create((string) $allConstName, $types->join(', ')->ensureEnd(']')->ensureStart('[')->toString(), true);
             $constant->setType('array|string[]');
             $builder->getDefinition()->setConstant($constant);
         }

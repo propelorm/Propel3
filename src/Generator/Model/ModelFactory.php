@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,12 +7,9 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Generator\Model;
 
 use Propel\Generator\Config\GeneratorConfigInterface;
-use Propel\Generator\Exception\LogicException;
 use Propel\Generator\Manager\BehaviorManager;
 
 /**
@@ -23,7 +20,7 @@ use Propel\Generator\Manager\BehaviorManager;
  */
 class ModelFactory
 {
-    private $database = ['map' => [
+    private array $database = ['map' => [
         'name' => 'setName',
         'baseClass' => 'setBaseClass',
         'defaultIdMethod' => 'setDefaultIdMethod',
@@ -37,7 +34,7 @@ class ModelFactory
 
     ]];
 
-    private $entity = ['map' => [
+    private array $entity = ['map' => [
         'name' => 'setName',
         'description' => 'setDescription',
         'tableName' => 'setTableName',
@@ -59,7 +56,7 @@ class ModelFactory
         'namespace' => 'setNamespace'
     ]];
 
-    private $field = ['map' => [
+    private array $field = ['map' => [
         'name' => 'setName',
         'required' => 'setNotNull',
         'primaryKey' => 'setPrimaryKey',
@@ -80,18 +77,18 @@ class ModelFactory
         'inheritance' => 'setInheritanceType'
     ]];
 
-    private $vendor = ['map' => [
+    private array $vendor = ['map' => [
         'type' => 'setType',
         'parameters' => 'setParameters'
     ]];
 
-    private $inheritance = ['map' => [
+    private array $inheritance = ['map' => [
         'key' => 'setKey',
         'class' => 'setClassName',
         'extends' => 'setAncestor'
     ]];
 
-    private $relation = ['map'=> [
+    private array $relation = ['map'=> [
         'target' => 'setForeignEntityName',
         'field' => 'setField',
         'name' => 'setName',
@@ -104,11 +101,8 @@ class ModelFactory
         'foreignSchema' => 'setForeignSchema'
     ]];
 
-    /** @var GeneratorConfigInterface */
-    private $config;
-
-    /** @var BehaviorManager */
-    private $behaviorManager;
+    private ?GeneratorConfigInterface $config;
+    private BehaviorManager $behaviorManager;
 
     /**
      * ModelFactory constructor.
@@ -266,11 +260,7 @@ class ModelFactory
      */
     protected function getBehaviorManager(): BehaviorManager
     {
-        if (null === $this->behaviorManager) {
-            $this->behaviorManager = new BehaviorManager($this->config);
-        }
-
-        return $this->behaviorManager;
+        return $this->behaviorManager ?? $this->behaviorManager = new BehaviorManager($this->config);
     }
 
     /**

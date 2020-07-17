@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,18 +7,16 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Generator\Model;
 
+use phootwork\collection\ArrayList;
+use phootwork\collection\Set;
 use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Parts\PlatformMutatorPart;
 use Propel\Generator\Platform\PlatformInterface;
 use Propel\Generator\Schema\Dumper\XmlDumper;
-use Propel\Common\Collection\Set;
 use Propel\Generator\Model\Parts\NamePart;
 use Propel\Generator\Model\Parts\SchemaPart;
-use Propel\Common\Collection\ArrayList;
 
 /**
  * A class for holding application data structures.
@@ -33,36 +30,30 @@ use Propel\Common\Collection\ArrayList;
  */
 class Schema
 {
-    use PlatformMutatorPart;
-    use NamePart;
-    use SchemaPart;
+    use NamePart, PlatformMutatorPart, SchemaPart;
 
-    /** @var ArrayList */
-    private $databases;
-
-    /** @var Set */
-    protected $schemas;
-
-    protected $filename;
-    protected $referenceOnly = true;
+    private ArrayList $databases;
+    protected Set $schemas;
+    protected string $filename;
+    protected bool $referenceOnly = true;
 
     /**
      * Creates a new instance for the specified database type.
      *
      * @param PlatformInterface $platform
      */
-    public function __construct(?PlatformInterface $platform = null)
+    public function __construct(PlatformInterface $platform = null)
     {
         if (null !== $platform) {
             $this->setPlatform($platform);
         }
 
         // init
-        $this->databases = new ArrayList([], Database::class);
-        $this->schemas = new Set([], Schema::class);
+        $this->databases = new ArrayList();
+        $this->schemas = new Set();
     }
 
-    protected function getSuperordinate()
+    protected function getSuperordinate(): Schema
     {
         return $this->schema;
     }
@@ -71,12 +62,10 @@ class Schema
      * Sets the filename when reading this schema
      *
      * @param string $filename
-     * @return $this
      */
-    public function setFilename(string $filename): Schema
+    public function setFilename(string $filename): void
     {
         $this->filename = $filename;
-        return $this;
     }
 
     /**
@@ -89,7 +78,7 @@ class Schema
         return $this->filename;
     }
 
-    protected function registerSchema(Schema $schema)
+    protected function registerSchema(Schema $schema): void
     {
         $schema->addExternalSchema($this);
     }
@@ -98,15 +87,13 @@ class Schema
      * Adds an external schema
      *
      * @param Schema $schema
-     * @return $this
      */
-    public function addExternalSchema(Schema $schema): Schema
+    public function addExternalSchema(Schema $schema): void
     {
         if (!$this->schemas->contains($schema)) {
             $this->schemas->add($schema);
             $schema->setSchema($this);
         }
-        return $this;
     }
 
     /**
@@ -116,17 +103,17 @@ class Schema
      */
     public function isExternalSchema(): bool
     {
-        return null !== $this->schema;
+        return $this->getSchema() !== null;
     }
 
     /**
      * Returns all external schema
      *
-     * @return Schema[]
+     * @return Set
      */
-    public function getExternalSchemas(): array
+    public function getExternalSchemas(): Set
     {
-        return $this->schemas->toArray();
+        return $this->schemas;
     }
 
     /**
@@ -148,19 +135,17 @@ class Schema
      * Removes an external schema (only relevant if this is an external schema)
      *
      * @param Schema $schema
-     * @return $this
      */
-    public function removeExternalSchema(Schema $schema): Schema
+    public function removeExternalSchema(Schema $schema): void
     {
         if ($this->schemas->contains($schema)) {
             $schema->setSchema(null);
             $this->schemas->remove($schema);
         }
-        return $this;
     }
 
     /**
-     * Retuns the root schema
+     * Returns the root schema
      *
      * @return Schema
      */
@@ -178,12 +163,10 @@ class Schema
      * Set whether this schema is only for reference (only relevant if this is an external schema)
      *
      * @param bool $referenceOnly
-     * @return $this
      */
-    public function setReferenceOnly(bool $referenceOnly): Schema
+    public function setReferenceOnly(bool $referenceOnly): void
     {
         $this->referenceOnly = $referenceOnly;
-        return $this;
     }
 
     /**
@@ -201,16 +184,13 @@ class Schema
      * Schema.
      *
      * @param Database $database
-     * @return $this
      */
-    public function addDatabase(Database $database): Schema
+    public function addDatabase(Database $database): void
     {
         if (!$this->databases->contains($database)) {
             $this->databases->add($database);
             $database->setSchema($this);
         }
-
-        return $this;
     }
 
     /**
@@ -218,13 +198,12 @@ class Schema
      * schema.
      *
      * @param  string  $name
-     * @return boolean
      */
-    public function hasDatabase($name): bool
+    public function hasDatabase(string $name): bool
     {
-        return $this->databases->search($name, function (Database $db, $query) {
-            return $db->getName() === $query;
-        });
+        return $this->databases->search($name,
+            fn(Database $db, string $query): bool => $db->getName()->toString() === $query
+        );
     }
 
     /**
@@ -245,30 +224,27 @@ class Schema
      */
     public function getDatabase(?string $name = null): ?Database
     {
-        if ($this->databases->size() === 0) {
-            return null;
-        }
+//        if ($this->databases->size() === 0) {
+//            return null;
+//        }
 
         if (null === $name) {
             return $this->databases->get(0);
         }
 
         return $this->databases->find($name, function (Database $db, $query) {
-            return $db->getName() === $query;
+            return $db->getName()->toString() === $query;
         });
     }
 
     /**
-     * Returns an array of all databases.
+     * Returns an ArrayList of all databases.
      *
-     * The first boolean parameter tells whether or not to run the
-     * final initialization process.
-     *
-     * @return Database[]
+     * @return ArrayList
      */
-    public function getDatabases()
+    public function getDatabases(): ArrayList
     {
-        return $this->databases->toArray();
+        return $this->databases;
     }
 
     /**
@@ -285,20 +261,20 @@ class Schema
      * Removes the database from this schema
      *
      * @param Database $database
-     * @return $this
      */
-    public function removeDatabase(Database $database): Schema
+    public function removeDatabase(Database $database): void
     {
         if ($this->databases->contains($database)) {
             $database->setSchema(null);
             $this->databases->remove($database);
         }
-        return $this;
     }
 
     /**
      * @TODO
      * Merge other Schema objects together into this Schema object.
+     *
+     * @param array $schemas
      */
     public function joinSchemas(array $schemas)
     {
@@ -306,14 +282,14 @@ class Schema
             /** @var Database $addDb */
             foreach ($schema->getDatabases() as $addDb) {
                 $addDbName = $addDb->getName();
-                if ($this->hasDatabase($addDbName)) {
-                    $db = $this->getDatabase($addDbName);
+                if ($this->hasDatabase((string) $addDbName)) {
+                    $db = $this->getDatabase((string) $addDbName);
                     // temporarily reset database namespace to avoid double namespace decoration (see ticket #1355)
                     $namespace = $db->getNamespace();
                     $db->setNamespace(null);
                     // join tables
                     foreach ($addDb->getEntities() as $addEntity) {
-                        if ($db->hasEntityByFullName($addEntity->getFullName())) {
+                        if ($db->hasEntityByFullName($addEntity->getFullName()->toString())) {
                             throw new EngineException(sprintf('Duplicate entity found: %s.', $addEntity->getName()));
                         }
                         $db->addEntity($addEntity);
@@ -357,6 +333,7 @@ class Schema
     }
 
     /**
+     * @todo externalize (in other formats, too)
      * Creates a string representation of this Schema.
      * The representation is given in xml format.
      *

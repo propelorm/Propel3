@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -11,13 +11,17 @@
 namespace Propel\Tests\Generator\Schema\Loader;
 
 use org\bovigo\vfs\vfsStream;
+use Propel\Generator\Schema\Exception\InputOutputException;
+use Propel\Generator\Schema\Exception\InvalidArgumentException;
 use Propel\Generator\Schema\Loader\PhpSchemaLoader;
 use Propel\Tests\Generator\Schema\ReaderTestCase;
 use Symfony\Component\Config\FileLocator;
 
 class PhpSchemaLoaderTest extends ReaderTestCase
 {
-    public function setUp()
+    private PhpSchemaLoader $loader;
+
+    public function setUp(): void
     {
         parent::setUp();
         $this->addPhpSchema();
@@ -39,21 +43,19 @@ class PhpSchemaLoaderTest extends ReaderTestCase
         $this->assertEquals('Book', $actual['database']['entities'][0]['name']);
     }
 
-    /**
-     * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage The file "vfs://root/inexistent.php" does not exist
-     */
     public function testPhpFileDoesNotExist()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("The file \"vfs://root/inexistent.php\" does not exist");
+
         $this->loader->load(vfsStream::url('root/inexistent.php'));
     }
 
-    /**
-     * @expectedException        Propel\Generator\Schema\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The schema file 'vfs://root/nonvalid.php' has invalid content.
-     */
     public function testPhpFileHasInvalidContent()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("The schema file 'vfs://root/nonvalid.php' has invalid content.");
+
         $content = <<<EOF
 not php content
 only plain
@@ -63,22 +65,20 @@ EOF;
         $this->loader->load(vfsStream::url('root/nonvalid.php'));
     }
 
-    /**
-     * @expectedException        Propel\Generator\Schema\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The schema file 'vfs://root/empty.php' has invalid content.
-     */
     public function testPhpFileIsEmpty()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("The schema file 'vfs://root/empty.php' has invalid content.");
+
         vfsStream::newFile('empty.php')->at($this->getRoot())->setContent('');
         $this->loader->load(vfsStream::url('root/empty.php'));
     }
 
-    /**
-     * @expectedException Propel\Generator\Schema\Exception\InputOutputException
-     * @expectedExceptionMessage You don't have permissions to access schema file
-     */
     public function testSchemaFileNotReadableThrowsException()
     {
+        $this->expectException(InputOutputException::class);
+        $this->expectExceptionMessage("You don't have permissions to access schema file");
+
         $content = <<<EOF
 <?php
 

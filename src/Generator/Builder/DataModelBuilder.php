@@ -508,7 +508,7 @@ abstract class DataModelBuilder
     public function getBuildProperty(string $name)
     {
         if ($this->getGeneratorConfig()) {
-            return $this->getGeneratorConfig()->getConfigProperty($name);
+            return $this->getGeneratorConfig()->get($name);
         }
 
         return null;

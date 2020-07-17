@@ -24,7 +24,7 @@ class GeneratedObjectM2MRelationThreePKs2Test extends PlatformDatabaseBuildTimeB
 {
     protected $databaseName = 'migration';
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->markTestSkipped('Polymorphic many-to-many relations will be supported soon.');
         parent::setUp();

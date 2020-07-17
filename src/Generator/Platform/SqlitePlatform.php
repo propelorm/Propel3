@@ -96,11 +96,11 @@ class SqlitePlatform extends SqlDefaultPlatform
     {
         parent::setGeneratorConfig($generatorConfig);
 
-        if (null !== ($relationSupport = $generatorConfig->getConfigProperty('database.adapter.sqlite.relation'))) {
+        if (null !== ($relationSupport = $generatorConfig->get('database.adapter.sqlite.relation'))) {
             $this->relationSupport = filter_var($relationSupport, FILTER_VALIDATE_BOOLEAN);
             ;
         }
-        if (null !== ($entityAlteringWorkaround = $generatorConfig->getConfigProperty('database.adapter.sqlite.entityAlteringWorkaround'))) {
+        if (null !== ($entityAlteringWorkaround = $generatorConfig->get('database.adapter.sqlite.entityAlteringWorkaround'))) {
             $this->entityAlteringWorkaround = filter_var($entityAlteringWorkaround, FILTER_VALIDATE_BOOLEAN);
             ;
             ;

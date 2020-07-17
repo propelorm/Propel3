@@ -51,7 +51,7 @@ interface SchemaParserInterface
     /**
      * @return \Propel\Generator\Platform\PlatformInterface
      */
-    public function getPlatform();
+    public function getPlatform(): PlatformInterface;
 
     /**
      * @param \Propel\Generator\Platform\PlatformInterface $platform

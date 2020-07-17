@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -11,6 +10,8 @@
 namespace Propel\Tests\Common\Config\Loader;
 
 use org\bovigo\vfs\vfsStream;
+use Propel\Common\Config\Exception\InputOutputException;
+use Propel\Common\Config\Exception\InvalidArgumentException;
 use Propel\Common\Config\Loader\PhpFileLoader;
 use Propel\Common\Config\FileLocator;
 use Propel\Tests\TestCase;
@@ -20,16 +21,15 @@ class PhpFileLoaderTest extends TestCase
 {
     use VfsTrait;
 
-    /** @var PhpFileLoader */
-    protected $loader;
+    protected PhpFileLoader $loader;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->loader = new PhpFileLoader(new FileLocator([$this->getRoot()->url()]));
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $this->assertTrue($this->loader->supports('foo.php'), '->supports() returns true if the resource is loadable');
         $this->assertTrue($this->loader->supports('foo.inc'), '->supports() returns true if the resource is loadable');
@@ -39,7 +39,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertFalse($this->loader->supports('foo.foo.dist'), '->supports() returns true if the resource is loadable');
     }
 
-    public function testPhpFileCanBeLoaded()
+    public function testPhpFileCanBeLoaded(): void
     {
         $content = <<<EOF
 <?php
@@ -53,21 +53,17 @@ EOF;
         $this->assertEquals('baz', $test['bar']);
     }
 
-    /**
-     * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage The file "inexistent.php" does not exist (in:
-     */
     public function testPhpFileDoesNotExist()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("The file \"inexistent.php\" does not exist (in:");
         $this->loader->load('inexistent.php');
     }
 
-    /**
-    * @expectedException        Propel\Common\Config\Exception\InvalidArgumentException
-    * @expectedExceptionMessage The configuration file 'vfs://root/nonvalid.php' has invalid content.
-    */
-    public function testPhpFileHasInvalidContent()
+    public function testPhpFileHasInvalidContent(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("The configuration file 'vfs://root/nonvalid.php' has invalid content.");
         $content = <<<EOF
 not php content
 only plain
@@ -77,23 +73,20 @@ EOF;
         $this->loader->load($file->url());
     }
 
-    /**
-     * @expectedException        Propel\Common\Config\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The configuration file 'vfs://root/empty.php' has invalid content.
-     */
-    public function testPhpFileIsEmpty()
+    public function testPhpFileIsEmpty(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("The configuration file 'vfs://root/empty.php' has invalid content.");
+
         $file = $this->newFile('empty.php', '');
 
         $this->loader->load($file->url());
     }
 
-    /**
-     * @expectedException Propel\Common\Config\Exception\InputOutputException
-     * @expectedExceptionMessage You don't have permissions to access configuration file vfs://root/notreadable.php.
-     */
-    public function testConfigFileNotReadableThrowsException()
+    public function testConfigFileNotReadableThrowsException(): void
     {
+        $this->expectException(InputOutputException::class);
+        $this->expectExceptionMessage("You don't have permissions to access configuration file vfs://root/notreadable.php.");
         $content = <<<EOF
 <?php
 

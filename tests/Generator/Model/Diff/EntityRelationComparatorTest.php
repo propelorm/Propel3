@@ -1,12 +1,11 @@
-<?php
-
-/*
- *	$Id: EntityTest.php 1891 2010-08-09 15:03:18Z francois $
+<?php declare(strict_types=1);
+/**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * @license MIT License
+ *
  */
 namespace Propel\Tests\Generator\Model\Diff;
 
@@ -24,17 +23,14 @@ use \Propel\Tests\TestCase;
  */
 class EntityRelationComparatorTest extends TestCase
 {
-    /**
-     * @var MysqlPlatform
-     */
-    protected $platform;
+    protected MysqlPlatform $platform;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->platform = new MysqlPlatform();
     }
 
-    public function testCompareSameFks()
+    public function testCompareSameFks(): void
     {
         $c1 = new Field('Foo');
         $c2 = new Field('Bar');
@@ -60,7 +56,7 @@ class EntityRelationComparatorTest extends TestCase
         $this->assertNull($diff);
     }
 
-    public function testCompareNotSameFks()
+    public function testCompareNotSameFks(): void
     {
         $c1 = new Field('Foo');
         $c2 = new Field('Bar');
@@ -74,10 +70,10 @@ class EntityRelationComparatorTest extends TestCase
         $t2 = new Entity('Baz');
 
         $diff = EntityComparator::computeDiff($t1, $t2);
-        $this->assertTrue($diff instanceof EntityDiff);
+        $this->assertInstanceOf(EntityDiff::class, $diff);
     }
 
-    public function testCompareAddedFks()
+    public function testCompareAddedFks(): void
     {
         $db1 = new Database();
         $db1->setPlatform($this->platform);
@@ -104,7 +100,7 @@ class EntityRelationComparatorTest extends TestCase
         $this->assertEquals(['baz_fk_4e99e8' => $fk2], $tableDiff->getAddedFks()->toArray());
     }
 
-    public function testCompareRemovedFks()
+    public function testCompareRemovedFks(): void
     {
         $db1 = new Database();
         $db1->setPlatform($this->platform);
@@ -131,7 +127,7 @@ class EntityRelationComparatorTest extends TestCase
         $this->assertEquals(['baz_fk_4e99e8' => $fk1], $tableDiff->getRemovedFks()->toArray());
     }
 
-    public function testCompareModifiedFks()
+    public function testCompareModifiedFks(): void
     {
         $db1 = new Database();
         $db1->setPlatform($this->platform);

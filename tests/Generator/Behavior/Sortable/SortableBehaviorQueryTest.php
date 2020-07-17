@@ -23,7 +23,7 @@ use Propel\Runtime\Collection\ObjectCollection;
  */
 class SortableBehaviorQueryTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

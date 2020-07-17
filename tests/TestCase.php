@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -11,11 +10,14 @@
 namespace Propel\Tests;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
+use Propel\Generator\Platform\PlatformInterface;
+use Propel\Generator\Reverse\SchemaParserInterface;
 use Propel\Runtime\Configuration;
+use Propel\Runtime\Connection\ConnectionInterface;
 
 class TestCase extends BaseTestCase
 {
-    protected function getDriver()
+    protected function getDriver(): string
     {
         return 'sqlite';
     }
@@ -29,7 +31,7 @@ class TestCase extends BaseTestCase
      * @param  string $target
      * @return mixed
      */
-    protected function getSql($sql, $source = 'mysql', $target = null)
+    protected function getSql(string $sql, string $source = 'mysql', string $target = null): string
     {
         if (!$target) {
             $target = $this->getDriver();
@@ -48,7 +50,7 @@ class TestCase extends BaseTestCase
         return $sql;
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         if (Configuration::$globalConfiguration) {
@@ -63,7 +65,7 @@ class TestCase extends BaseTestCase
      * @param  string $db
      * @return bool
      */
-    protected function isDb($db = 'mysql')
+    protected function isDb(string $db = 'mysql'): bool
     {
         return $this->getDriver() == $db;
     }
@@ -71,7 +73,7 @@ class TestCase extends BaseTestCase
     /**
      * @return bool
      */
-    protected function runningOnPostgreSQL()
+    protected function runningOnPostgreSQL(): bool
     {
         return $this->isDb('pgsql');
     }
@@ -79,7 +81,7 @@ class TestCase extends BaseTestCase
     /**
      * @return bool
      */
-    protected function runningOnMySQL()
+    protected function runningOnMySQL(): bool
     {
         return $this->isDb('mysql');
     }
@@ -87,7 +89,7 @@ class TestCase extends BaseTestCase
     /**
      * @return bool
      */
-    protected function runningOnSQLite()
+    protected function runningOnSQLite(): bool
     {
         return $this->isDb('sqlite');
     }
@@ -95,7 +97,7 @@ class TestCase extends BaseTestCase
     /**
      * @return bool
      */
-    protected function runningOnOracle()
+    protected function runningOnOracle(): bool
     {
         return $this->isDb('oracle');
     }
@@ -103,15 +105,15 @@ class TestCase extends BaseTestCase
     /**
      * @return bool
      */
-    protected function runningOnMSSQL()
+    protected function runningOnMSSQL(): bool
     {
         return $this->isDb('mssql');
     }
 
     /**
-     * @return \Propel\Generator\Platform\PlatformInterface
+     * @return PlatformInterface
      */
-    protected function getPlatform()
+    protected function getPlatform(): PlatformInterface
     {
         $className = sprintf('\\Propel\\Generator\\Platform\\%sPlatform', ucfirst($this->getDriver()));
 
@@ -119,9 +121,10 @@ class TestCase extends BaseTestCase
     }
 
     /**
-     * @return \Propel\Generator\Reverse\SchemaParserInterface
+     * @param ConnectionInterface $con
+     * @return SchemaParserInterface
      */
-    protected function getParser($con)
+    protected function getParser(ConnectionInterface $con): SchemaParserInterface
     {
         $className = sprintf('\\Propel\\Generator\\Reverse\\%sSchemaParser', ucfirst($this->getDriver()));
 

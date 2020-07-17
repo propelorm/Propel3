@@ -23,10 +23,11 @@ namespace Propel\Tests\Generator\Platform;
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\FieldDefaultValue;
 use Propel\Generator\Platform\MssqlPlatform;
+use Propel\Generator\Platform\PlatformInterface;
 
 class ProvaTest extends PlatformTestProvider
 {
-    protected function getPlatform()
+    protected function getPlatform(): PlatformInterface
     {
         return new MssqlPlatform();
     }

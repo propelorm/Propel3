@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Config;
 
+use Propel\Common\Config\Exception\InvalidArgumentException;
 use Propel\Common\Pluralizer\PluralizerInterface;
 use Propel\Common\Types\BuildableFieldTypeInterface;
 use Propel\Common\Types\FieldTypeInterface;
@@ -33,13 +34,6 @@ interface GeneratorConfigInterface
      * @return AbstractBuilder
      */
     public function getConfiguredBuilder(Entity $entity, string $type): AbstractBuilder;
-
-    /**
-     * Returns a configured Pluralizer class.
-     *
-     * @return PluralizerInterface
-     */
-    public function getConfiguredPluralizer(): PluralizerInterface;
 
     /**
      * Creates and configures a new Platform class.
@@ -83,8 +77,8 @@ interface GeneratorConfigInterface
      *
      * @param string $name The name of property, expressed as a dot separated level hierarchy
      *
-     * @throws \Propel\Common\Config\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return mixed The configuration property
      */
-    public function getConfigProperty(string $name);
+    public function get(string $name);
 }

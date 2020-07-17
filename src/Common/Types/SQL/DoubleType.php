@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -25,9 +24,9 @@ class DoubleType extends AbstractType
      *
      * @return float
      */
-    public function convertToPHPValue($value): double
+    public function convertToPHPValue($value): float
     {
-        return (double) $value;
+        return (float) $value;
     }
 
     /**
@@ -38,9 +37,9 @@ class DoubleType extends AbstractType
      *
      * @return float
      */
-    public function databaseToProperty($value, FieldMap $fieldMap): double
+    public function databaseToProperty($value, FieldMap $fieldMap): float
     {
-        return (double) $value;
+        return (float) $value;
     }
 
     /**
@@ -53,6 +52,6 @@ class DoubleType extends AbstractType
      */
     public function propertyToDatabase($value, FieldMap $fieldMap): float
     {
-        return (double) $value;
+        return (float) $value;
     }
 }

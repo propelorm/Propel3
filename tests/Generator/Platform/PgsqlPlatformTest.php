@@ -19,6 +19,7 @@ use Propel\Generator\Model\Model;
 use Propel\Generator\Model\PropelTypes;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Platform\PgsqlPlatform;
+use Propel\Generator\Platform\PlatformInterface;
 
 /**
  *
@@ -30,7 +31,7 @@ class PgsqlPlatformTest extends PlatformTestProvider
      *
      * @return PgsqlPlatform
      */
-    protected function getPlatform()
+    protected function getPlatform(): PlatformInterface
     {
         return new PgsqlPlatform();
     }

@@ -16,6 +16,7 @@ use Propel\Generator\Model\IdMethod;
 use Propel\Generator\Model\IdMethodParameter;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Model;
+use Propel\Generator\Platform\PlatformInterface;
 use Propel\Generator\Platform\SqlitePlatform;
 use Propel\Runtime\Adapter\AdapterFactory;
 use Propel\Runtime\Connection\ConnectionFactory;
@@ -30,7 +31,7 @@ class SqlitePlatformTest extends PlatformTestProvider
      *
      * @return SqlitePlatform
      */
-    protected function getPlatform()
+    protected function getPlatform(): PlatformInterface
     {
         return new SqlitePlatform();
     }

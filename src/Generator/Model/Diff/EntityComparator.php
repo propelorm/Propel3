@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,8 +6,6 @@
  *
  * @license MIT License
  */
-
-declare(strict_types=1);
 
 namespace Propel\Generator\Model\Diff;
 
@@ -24,10 +21,8 @@ class EntityComparator
 {
     /**
      * The table difference.
-     *
-     * @var EntityDiff
      */
-    protected $tableDiff;
+    protected EntityDiff $tableDiff;
 
     /**
      * Constructor.
@@ -36,7 +31,7 @@ class EntityComparator
      */
     public function __construct(EntityDiff $tableDiff = null)
     {
-        $this->tableDiff = (null === $tableDiff) ? new EntityDiff() : $tableDiff;
+        $this->tableDiff = $tableDiff ?? new EntityDiff();
     }
 
     /**
@@ -127,27 +122,27 @@ class EntityComparator
 
         // check for new columns in $toEntity
         foreach ($toEntityFields as $column) {
-            if (!$this->getFromEntity()->hasField($column->getName())) {
-                $this->tableDiff->getAddedFields()->set($column->getName(), $column);
+            if (!$this->getFromEntity()->hasFieldByName($column->getName()->toString())) {
+                $this->tableDiff->getAddedFields()->set($column->getName()->toString(), $column);
                 $columnDifferences++;
             }
         }
 
         // check for removed columns in $toEntity
         foreach ($fromEntityFields as $column) {
-            if (!$this->getToEntity()->hasField($column->getName())) {
-                $this->tableDiff->getRemovedFields()->set($column->getName(), $column);
+            if (!$this->getToEntity()->hasFieldByName($column->getName()->toString())) {
+                $this->tableDiff->getRemovedFields()->set($column->getName()->toString(), $column);
                 $columnDifferences++;
             }
         }
 
         // check for column differences
         foreach ($fromEntityFields as $fromField) {
-            if ($this->getToEntity()->hasField($fromField->getName())) {
-                $toField = $this->getToEntity()->getField($fromField->getName());
+            if ($this->getToEntity()->hasFieldByName($fromField->getName()->toString())) {
+                $toField = $this->getToEntity()->getFieldByName($fromField->getName()->toString());
                 $columnDiff = FieldComparator::computeDiff($fromField, $toField);
                 if (null !== $columnDiff) {
-                    $this->tableDiff->getModifiedFields()->set($fromField->getName(), $columnDiff);
+                    $this->tableDiff->getModifiedFields()->set($fromField->getName()->toString(), $columnDiff);
                     $columnDifferences++;
                 }
             }
@@ -187,8 +182,8 @@ class EntityComparator
 
         // check for new pk columns in $toEntity
         foreach ($toEntityPk as $column) {
-            if (!$this->getFromEntity()->hasField($column->getName()) ||
-                !$this->getFromEntity()->getField($column->getName())->isPrimaryKey()) {
+            if (!$this->getFromEntity()->hasFieldByName($column->getName()->toString()) ||
+                !$this->getFromEntity()->getFieldByName($column->getName()->toString())->isPrimaryKey()) {
                 $this->tableDiff->getAddedPkFields()->set($column->getName(), $column);
                 $pkDifferences++;
             }
@@ -196,8 +191,8 @@ class EntityComparator
 
         // check for removed pk columns in $toEntity
         foreach ($fromEntityPk as $column) {
-            if (!$this->getToEntity()->hasField($column->getName()) ||
-                !$this->getToEntity()->getField($column->getName())->isPrimaryKey()) {
+            if (!$this->getToEntity()->hasFieldByName($column->getName()->toString()) ||
+                !$this->getToEntity()->getFieldByName($column->getName()->toString())->isPrimaryKey()) {
                 $this->tableDiff->getRemovedPkFields()->set($column->getName(), $column);
                 $pkDifferences++;
             }
@@ -232,14 +227,14 @@ class EntityComparator
     public function compareIndices(): int
     {
         $indexDifferences = 0;
-        $fromEntityIndices = array_merge($this->getFromEntity()->getIndices(), $this->getFromEntity()->getUnices());
-        $toEntityIndices = array_merge($this->getToEntity()->getIndices(), $this->getToEntity()->getUnices());
+        $fromEntityIndices = array_merge($this->getFromEntity()->getIndices()->toArray(), $this->getFromEntity()->getUnices()->toArray());
+        $toEntityIndices = array_merge($this->getToEntity()->getIndices()->toArray(), $this->getToEntity()->getUnices()->toArray());
 
         /** @var  Index $fromEntityIndex */
         foreach ($fromEntityIndices as $fromEntityIndexPos => $fromEntityIndex) {
             /** @var  Index $toEntityIndex */
             foreach ($toEntityIndices as $toEntityIndexPos => $toEntityIndex) {
-                if ($fromEntityIndex->getName() === $toEntityIndex->getName()) {
+                if ($fromEntityIndex->getName()->compare($toEntityIndex->getName()) === 0) {
                     if (false === IndexComparator::computeDiff($fromEntityIndex, $toEntityIndex)) {
                         //no changes
                         unset($fromEntityIndices[$fromEntityIndexPos]);
@@ -282,17 +277,17 @@ class EntityComparator
         $fromEntityFks = $this->getFromEntity()->getRelations();
         $toEntityFks = $this->getToEntity()->getRelations();
 
-        foreach ($fromEntityFks as $fromEntityFkPos => $fromEntityFk) {
-            foreach ($toEntityFks as $toEntityFkPos => $toEntityFk) {
-                if ($fromEntityFk->getName() === $toEntityFk->getName()) {
+        foreach ($fromEntityFks as $fromEntityFk) {
+            foreach ($toEntityFks as $toEntityFk) {
+                if ($fromEntityFk->getName()->compare($toEntityFk->getName()) === 0) {
                     if (false === RelationComparator::computeDiff($fromEntityFk, $toEntityFk)) {
-                        unset($fromEntityFks[$fromEntityFkPos]);
-                        unset($toEntityFks[$toEntityFkPos]);
+                        $fromEntityFks->remove($fromEntityFk);
+                        $toEntityFks->remove($toEntityFk);
                     } else {
                         // same name, but different columns
                         $this->tableDiff->getModifiedFks()->set($fromEntityFk->getName(), [$fromEntityFk, $toEntityFk]);
-                        unset($fromEntityFks[$fromEntityFkPos]);
-                        unset($toEntityFks[$toEntityFkPos]);
+                        $fromEntityFks->remove($fromEntityFk);
+                        $toEntityFks->remove($toEntityFk);
                         $fkDifferences++;
                     }
                 }
@@ -300,14 +295,14 @@ class EntityComparator
         }
 
         foreach ($fromEntityFks as $fromEntityFk) {
-            if (!$fromEntityFk->isSkipSql() && !in_array($fromEntityFk, $toEntityFks)) {
+            if (!$fromEntityFk->isSkipSql() && !$toEntityFks->contains($fromEntityFk)) {
                 $this->tableDiff->getRemovedFks()->set($fromEntityFk->getName(), $fromEntityFk);
                 $fkDifferences++;
             }
         }
 
         foreach ($toEntityFks as $toEntityFk) {
-            if (!$toEntityFk->isSkipSql() && !in_array($toEntityFk, $fromEntityFks)) {
+            if (!$toEntityFk->isSkipSql() && !$fromEntityFks->contains($toEntityFk)) {
                 $this->tableDiff->getAddedFks()->set($toEntityFk->getName(), $toEntityFk);
                 $fkDifferences++;
             }

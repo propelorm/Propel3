@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,10 +7,9 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Generator\Model;
 
+use phootwork\lang\Text;
 use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Parts\DatabasePart;
 use Propel\Generator\Model\Parts\NamePart;
@@ -26,26 +25,20 @@ class Domain
 {
     use DatabasePart, NamePart;
 
-    /**
-     * @var string
-     */
-    private $description;
-    private $size;
-    private $scale;
-    private $mappingType;
-    private $sqlType;
+    private string $description = '';
+    private int $size;
+    private int $scale;
+    private string $mappingType = '';
+    private string $sqlType = '';
 
-    /**
-     * @var FieldDefaultValue
-     */
-    private $defaultValue;
+    private ?FieldDefaultValue $defaultValue = null;
 
     /**
      * If a property was manually replaced.
      *
      * @var bool
      */
-    private $replaced = false;
+    private bool $replaced = false;
 
     /**
      * Creates a new Domain object.
@@ -88,10 +81,14 @@ class Domain
         $this->defaultValue = $domain->getDefaultValue();
         $this->description = $domain->getDescription();
         $this->name = $domain->getName();
-        $this->scale = $domain->getScale();
-        $this->size = $domain->getSize();
         $this->sqlType = $domain->getSqlType();
         $this->mappingType = $domain->getType();
+        if (null !== $scale = $domain->getScale()) {
+            $this->scale = $scale;
+        }
+        if (null !== $size = $domain->getSize()) {
+            $this->size = $size;
+        }
     }
 
     /**
@@ -99,7 +96,7 @@ class Domain
      *
      * @return string
      */
-    public function getDescription(): ?string
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -109,7 +106,7 @@ class Domain
      *
      * @param string $description
      */
-    public function setDescription(string $description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -121,7 +118,7 @@ class Domain
      */
     public function getScale(): ?int
     {
-        return $this->scale;
+        return $this->scale ?? null;
     }
 
     /**
@@ -129,7 +126,7 @@ class Domain
      *
      * @param integer $scale
      */
-    public function setScale(int $scale)
+    public function setScale(int $scale): void
     {
         $this->scale = $scale;
     }
@@ -139,7 +136,7 @@ class Domain
      *
      * @param integer $scale
      */
-    public function replaceScale(int $scale)
+    public function replaceScale(int $scale): void
     {
         $this->setScale($scale);
     }
@@ -151,7 +148,7 @@ class Domain
      */
     public function getSize(): ?int
     {
-        return $this->size;
+        return $this->size ?? null;
     }
 
     /**
@@ -159,7 +156,7 @@ class Domain
      *
      * @param integer $size
      */
-    public function setSize(int $size)
+    public function setSize(int $size): void
     {
         $this->size = $size;
     }
@@ -179,7 +176,7 @@ class Domain
      *
      * @param string $mappingType
      */
-    public function setType(string $mappingType)
+    public function setType(string $mappingType): void
     {
         $this->mappingType = $mappingType;
     }
@@ -191,7 +188,7 @@ class Domain
      */
     public function getDefaultValue(): ?FieldDefaultValue
     {
-        return $this->defaultValue;
+        return $this->defaultValue ?? null;
     }
 
     /**
@@ -225,7 +222,7 @@ class Domain
      *
      * @param FieldDefaultValue $value
      */
-    public function setDefaultValue(FieldDefaultValue $value)
+    public function setDefaultValue(FieldDefaultValue $value): void
     {
         $this->defaultValue = $value;
     }
@@ -235,9 +232,9 @@ class Domain
      *
      * @return string
      */
-    public function getSqlType(): ?string
+    public function getSqlType(): string
     {
-        if (null === $this->sqlType) {
+        if ('' === $this->sqlType) {
             return $this->getType();
         }
 
@@ -249,7 +246,7 @@ class Domain
      *
      * @param string $sqlType
      */
-    public function setSqlType(string $sqlType)
+    public function setSqlType(string $sqlType): void
     {
         $this->sqlType = $sqlType;
     }
@@ -259,7 +256,7 @@ class Domain
      *
      * @param string $sqlType
      */
-    public function replaceSqlType(string $sqlType)
+    public function replaceSqlType(string $sqlType): void
     {
         $this->setSqlType($sqlType);
         $this->replaced = true;
@@ -272,11 +269,11 @@ class Domain
      */
     public function getSizeDefinition(): string
     {
-        if (null === $this->size) {
+        if (!isset($this->size)) {
             return '';
         }
 
-        if (null !== $this->scale) {
+        if (isset($this->scale)) {
             return sprintf('(%u,%u)', $this->size, $this->scale);
         }
 
@@ -288,31 +285,12 @@ class Domain
         return $this->replaced;
     }
 
-    public function __clone()
-    {
-        if ($this->defaultValue) {
-            $this->defaultValue = clone $this->defaultValue;
-        }
-    }
-
-    protected function getDefaultValueForArray(?string $stringValue): ?string
+    protected function getDefaultValueForArray(string $stringValue): ?Text
     {
         $stringValue = trim($stringValue);
+        $stringValue = $stringValue === '|' ? '' : $stringValue;
+        $textValues = Text::create($stringValue)->split(',')->map('trim')->join(' | ');
 
-        if (empty($stringValue)) {
-            return null;
-        }
-
-        $values = [];
-        foreach (explode(',', $stringValue) as $v) {
-            $values[] = trim($v);
-        }
-
-        $value = implode($values, ' | ');
-        if (empty($value) || '|' === trim($value)) {
-            return null;
-        }
-
-        return sprintf('||%s||', $value);
+        return $textValues->isEmpty() ? null : $textValues->ensureStart('||')->ensureEnd('||');
     }
 }

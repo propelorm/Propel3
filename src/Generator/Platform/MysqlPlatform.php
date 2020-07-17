@@ -62,8 +62,10 @@ class MysqlPlatform extends SqlDefaultPlatform
      * Adds extra indices for reverse foreign keys
      * This is required for MySQL databases,
      * and is called while performing the final initialization of the model.
+     *
+     * @param Entity $entity
      */
-    protected function addExtraIndices(Entity $entity)
+    protected function addExtraIndices(Entity $entity): void
     {
         /**
          * A collection of indexed columns. The keys is the column name
@@ -79,7 +81,7 @@ class MysqlPlatform extends SqlDefaultPlatform
         $this->collectIndexedFields('PRIMARY', $entity->getPrimaryKey(), $indices);
 
         /** @var Index[] $entityIndices */
-        $entityIndices = array_merge($entity->getIndices(), $entity->getUnices());
+        $entityIndices = array_merge($entity->getIndices()->toArray(), $entity->getUnices()->toArray());
         foreach ($entityIndices as $index) {
             $this->collectIndexedFields($this->getName($index), $index->getFields()->toArray(), $indices);
         }
@@ -89,7 +91,7 @@ class MysqlPlatform extends SqlDefaultPlatform
         $counter = 0;
         foreach ($entity->getReferrers() as $relation) {
             $referencedFields = $relation->getForeignFieldObjects();
-            $referencedFieldsHash = $this->getFieldList($referencedFields);
+            $referencedFieldsHash = $this->getFieldList($referencedFields->toArray());
             if (empty($referencedFields) || isset($indices[$referencedFieldsHash])) {
                 continue;
             }
@@ -109,9 +111,10 @@ class MysqlPlatform extends SqlDefaultPlatform
         }
 
         // we're adding indices for this entity foreign keys
+        /** @var Relation $relation */
         foreach ($entity->getRelations() as $relation) {
             $localFields = $relation->getLocalFieldObjects();
-            $localFieldsHash = $this->getFieldList($localFields);
+            $localFieldsHash = $this->getFieldList($localFields->toArray());
             if (empty($localFields) || isset($indices[$localFieldsHash])) {
                 continue;
             }
@@ -120,7 +123,7 @@ class MysqlPlatform extends SqlDefaultPlatform
             // MySQL needs indices on any columns that serve as foreign keys.
             // These are not auto-created prior to 4.1.2.
 
-            $name = substr_replace($relation->getName(), 'fi_', strrpos($relation->getName(), 'fk_'), 3);
+            $name = substr_replace($relation->getName()->toString(), 'fi_', strrpos($relation->getName()->toString(), 'fk_'), 3);
             if ($entity->hasIndex($name)) {
                 // if we already have an index with this name, then it looks like the columns of this index have just
                 // been changed, so remove it and inject it again. This is the case if a referenced entity is handled
@@ -128,8 +131,8 @@ class MysqlPlatform extends SqlDefaultPlatform
                 $entity->removeIndex($name);
             }
 
-            $index = $entity->createIndex($name, $localFields);
-            $this->collectIndexedFields($this->getName($index), $localFields, $indices);
+            $index = $entity->createIndex($name, $localFields->toArray());
+            $this->collectIndexedFields($this->getName($index), $localFields->toArray(), $indices);
         }
     }
 
@@ -892,13 +895,13 @@ ALTER TABLE %s CHANGE %s %s;
     public function getMysqlEntityType(Entity $entity): string
     {
         $vendorSpecific = $entity->getVendorByType('mysql');
-        if ([] === $vendorSpecific->getParameters()) {
+        if ($vendorSpecific->getParameters()->isEmpty()) {
             $vendorSpecific = $entity->getDatabase()->getVendorByType('mysql');
         }
+
         if ($vendorSpecific->hasParameter('Type')) {
             return $vendorSpecific->getParameter('Type');
         }
-
         if ($vendorSpecific->hasParameter('Engine')) {
             return $vendorSpecific->getParameter('Engine');
         }

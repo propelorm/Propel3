@@ -9,6 +9,7 @@
 
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\PropelTypes;
+use Propel\Generator\Platform\PlatformInterface;
 use Propel\Generator\Platform\SqlDefaultPlatform;
 use \Propel\Tests\TestCase;
 
@@ -19,9 +20,9 @@ class DefaultPlatformTest extends TestCase
     /**
      * Get the Platform object for this class
      *
-     * @return \Propel\Generator\Platform\PlatformInterface
+     * @return PlatformInterface
      */
-    protected function getPlatform()
+    protected function getPlatform(): PlatformInterface
     {
         if (null === $this->platform) {
             $this->platform = new SqlDefaultPlatform();
@@ -30,7 +31,7 @@ class DefaultPlatformTest extends TestCase
         return $this->platform;
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->platform = null;
     }

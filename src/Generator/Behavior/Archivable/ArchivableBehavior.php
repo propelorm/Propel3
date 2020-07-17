@@ -32,7 +32,7 @@ class ArchivableBehavior extends Behavior
     use ComponentTrait;
 
     // default parameters value
-    protected $defaultParameters = [
+    protected array $defaultParameters = [
         'archive_entity'       => '',
         'archive_table'        => null,
         'log_archived_at'     => true,
@@ -49,7 +49,7 @@ class ArchivableBehavior extends Behavior
     protected $objectBuilderModifier;
     protected $queryBuilderModifier;
 
-    public function modifyDatabase()
+    public function modifyDatabase(): void
     {
         foreach ($this->getDatabase()->getEntities() as $entity) {
             if ($entity->hasBehavior($this->getId())) {

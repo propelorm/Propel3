@@ -176,7 +176,7 @@ class GeneratorConfig extends ConfigurationManager implements GeneratorConfigInt
      */
     public function getConfiguredBuilder(Entity $entity, string $type): AbstractBuilder
     {
-        $className = $this->getConfigProperty('generator.objectModel.builders.' . $type);
+        $className = $this->get("generator.objectModel.builders.$type");
 
         if (null === $className || !class_exists($className)) {
             throw new InvalidArgumentException(sprintf('Builder for `%s` not found.', $type));
@@ -190,18 +190,6 @@ class GeneratorConfig extends ConfigurationManager implements GeneratorConfigInt
     }
 
     /**
-     * Returns a configured Pluralizer class.
-     *
-     * @return PluralizerInterface
-     */
-    public function getConfiguredPluralizer(): PluralizerInterface
-    {
-        $classname = $this->get()['generator']['objectModel']['pluralizerClass'];
-
-        return $this->getInstance($classname, null, '\\Propel\\Common\\Pluralizer\\PluralizerInterface');
-    }
-
-    /**
      * Return an array of all configured connection properties, from `generator` and `reverse`
      * sections of the configuration.
      *
@@ -212,13 +200,13 @@ class GeneratorConfig extends ConfigurationManager implements GeneratorConfigInt
         if (null === $this->buildConnections) {
             $connectionNames = $this->get()['generator']['connections'];
 
-            $reverseConnection = $this->getConfigProperty('reverse.connection');
+            $reverseConnection = $this->get('reverse.connection');
             if (null !== $reverseConnection && !in_array($reverseConnection, $connectionNames)) {
                 $connectionNames[] = $reverseConnection;
             }
 
             foreach ($connectionNames as $name) {
-                if ($definition = $this->getConfigProperty('database.connections.' . $name)) {
+                if ($definition = $this->get('database.connections.' . $name)) {
                     $this->buildConnections[$name] = $definition;
                 }
             }
