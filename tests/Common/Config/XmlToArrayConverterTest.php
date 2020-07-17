@@ -10,6 +10,8 @@
 
 namespace Propel\Tests\Common\Config;
 
+use Propel\Common\Config\Exception\InvalidArgumentException;
+use Propel\Common\Config\Exception\XmlParseException;
 use Propel\Common\Config\XmlToArrayConverter;
 use Propel\Tests\TestCase;
 use Propel\Tests\VfsTrait;
@@ -166,30 +168,26 @@ XML
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @expectedException \Propel\Common\Config\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid xml content
-     */
     public function testInvalidFileNameThrowsException()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid xml content");
         XmlToArrayConverter::convert(1);
     }
 
-    /**
-     * @expectedException \Propel\Common\Config\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid xml content
-     */
     public function testInexistentFileThrowsException()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid xml content");
+
         XmlToArrayConverter::convert('nonexistent.xml');
     }
 
-    /**
-     * @expectedException \Propel\Common\Config\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid xml content
-     */
     public function testInvalidXmlThrowsException()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid xml content");
+
         $invalidXml = <<< XML
 No xml
 only plain text
@@ -198,12 +196,11 @@ XML;
         XmlToArrayConverter::convert($invalidXml);
     }
 
-    /**
-     * @expectedException \Propel\Common\Config\Exception\XmlParseException
-     * @expectedExceptionMessage An error occurred while parsing XML configuration file:
-     */
     public function testErrorInXmlThrowsException()
     {
+        $this->expectException(XmlParseException::class);
+        $this->expectExceptionMessage("An error occurred while parsing XML configuration file:");
+
         $xmlWithError = <<< XML
 <?xml version='1.0' standalone='yes'?>
 <movies>
@@ -218,15 +215,14 @@ XML;
         XmlToArrayConverter::convert($xmlWithError);
     }
 
-    /**
-     * @expectedException \Propel\Common\Config\Exception\XmlParseException
-     * @expectedExceptionMessage Some errors occurred while parsing XML configuration file:
-    - Fatal Error 76: Opening and ending tag mismatch: titles line 4 and title
-    - Fatal Error 73: expected '>'
-    - Fatal Error 5: Extra content at the end of the document
-     */
     public function testMultipleErrorsInXmlThrowsException()
     {
+        $this->expectException(XmlParseException::class);
+        $this->expectExceptionMessage("Some errors occurred while parsing XML configuration file:
+ - Fatal Error 76: Opening and ending tag mismatch: titles line 4 and title
+ - Fatal Error 76: Opening and ending tag mismatch: movies line 4 and moviess
+");
+
         $xmlWithErrors = <<< XML
 <?xml version='1.0' standalone='yes'?>
 <movies>

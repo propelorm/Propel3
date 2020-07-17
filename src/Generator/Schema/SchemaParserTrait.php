@@ -1,13 +1,20 @@
-<?php
+<?php declare(strict_types=1);
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ *
+ */
+
 namespace Propel\Generator\Schema;
 
 use phootwork\file\File;
-use Propel\Generator\Manager\BehaviorManager;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\Index;
-use Propel\Generator\Model\Model;
 use Propel\Generator\Model\ModelFactory;
 use Propel\Generator\Model\Relation;
 use Propel\Generator\Model\Schema;
@@ -28,18 +35,11 @@ use Propel\Generator\Model\Unique;
  */
 trait SchemaParserTrait
 {
-    /**
-     * @var ModelFactory
-     */
-    private $modelFactory;
+    private ModelFactory $modelFactory;
 
     private function getModelFactory(): ModelFactory
     {
-        if (null === $this->modelFactory) {
-            $this->modelFactory = new ModelFactory($this->getGeneratorConfig());
-        }
-
-        return $this->modelFactory;
+        return $this->modelFactory ?? $this->modelFactory = new ModelFactory($this->getGeneratorConfig());
     }
 
     /**
@@ -126,7 +126,7 @@ trait SchemaParserTrait
         foreach ($indices as $index) {
             $indexObj = $this->getModelFactory()->createIndex($index);
             foreach ($index['index-fields'] as $indexField) {
-                $field = $entity->getField($indexField['name']);
+                $field = $entity->getFieldByName($indexField['name']);
                 if (isset($indexField['size'])) {
                     $index->getFieldSizes()->set($field->getName(), $indexField['size']);
                 }
@@ -150,7 +150,7 @@ trait SchemaParserTrait
         foreach ($uniques as $unique) {
             $uniqueObj = $this->getModelFactory()->createUnique($unique);
             foreach ($unique['unique-fields'] as $uniqueField) {
-                $field = $entity->getField($uniqueField['name']);
+                $field = $entity->getFieldByName($uniqueField['name']);
                 if (isset($uniqueField['size'])) {
                     $field->setSize($uniqueField['size']);
                 }
@@ -259,6 +259,6 @@ trait SchemaParserTrait
             return $schemaFile->getDirname() . DIRECTORY_SEPARATOR . $file->getPathname();
         }
 
-        return $file->getPathname();
+        return $file->getPathname()->toString();
     }
 }

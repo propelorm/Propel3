@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,6 +9,7 @@
 
 namespace Propel\Common\Config\Loader;
 
+use phootwork\lang\Text;
 use Propel\Common\Config\Exception\InputOutputException;
 use Propel\Common\Config\Exception\InvalidArgumentException;
 
@@ -37,10 +37,10 @@ class PhpFileLoader extends FileLoader
      * @return array
      *
      * @throws \InvalidArgumentException                                if configuration file not found
-     * @throws \Propel\Common\Config\Exception\InvalidArgumentException if invalid json file
-     * @throws \Propel\Common\Config\Exception\InputOutputException     if configuration file is not readable
+     * @throws InvalidArgumentException if invalid json file
+     * @throws InputOutputException     if configuration file is not readable
      */
-    public function load($file, $type = null)
+    public function load($file, string $type = null)
     {
         $path = $this->locator->locate($file);
 
@@ -58,9 +58,7 @@ class PhpFileLoader extends FileLoader
             throw new InvalidArgumentException("The configuration file '$file' has invalid content.");
         }
 
-        $content = $this->resolveParams($content); //Resolve parameter placeholders (%name%)
-
-        return $content;
+        return $this->resolveParams($content);
     }
 
     /**
@@ -72,15 +70,11 @@ class PhpFileLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null): bool
+    public function supports($resource, ?string $type = null): bool
     {
-        $info = pathinfo($resource);
-        $extension = $info['extension'];
+        $resource = new Text($resource);
 
-        if ('dist' === $extension) {
-            $extension = pathinfo($info['filename'], PATHINFO_EXTENSION);
-        }
-
-        return is_string($resource) && ('php' === $extension || 'inc' === $extension);
+        return $resource->endsWith('.php') || $resource->endsWith('.php.dist') || $resource->endsWith('.inc') ||
+            $resource->endsWith('.inc.dist');
     }
 }

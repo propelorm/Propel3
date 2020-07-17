@@ -25,7 +25,7 @@ class GeneratedObjectMoreRelationTest extends TestCase
     /**
      * Setup schema und some default data
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

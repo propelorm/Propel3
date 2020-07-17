@@ -9,6 +9,8 @@
 
 namespace Propel\Generator\Model\Parts;
 
+use phootwork\lang\Text;
+
 /**
  * Trait SchemaNamePart
  *
@@ -16,38 +18,31 @@ namespace Propel\Generator\Model\Parts;
  */
 trait SchemaNamePart
 {
-    /**
-     * @var string
-     */
-    protected $schemaName;
+    protected Text $schemaName;
 
     /**
      * Returns the schema name.
      *
-     * @return string|null
+     * @return Text
      */
-    public function getSchemaName(): ?string
+    public function getSchemaName(): Text
     {
-        if (null === $this->schemaName) {
+        if (!isset($this->schemaName)) {
             if ($this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getSchemaName')) {
                 return $this->getSuperordinate()->getSchemaName();
             }
         }
 
-        return $this->schemaName;
+        return $this->schemaName ?? new Text();
     }
 
     /**
      * Sets the schema name.
      *
-     * @param string $schemaName
+     * @param string|Text $schemaName
      */
-    public function setSchemaName(string $schemaName): void
+    public function setSchemaName($schemaName): void
     {
-        if ($schemaName === $this->schemaName) {
-            return;
-        }
-
-        $this->schemaName = $schemaName;
+        $this->schemaName = new Text($schemaName);
     }
 }

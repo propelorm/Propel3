@@ -16,33 +16,30 @@
         }
     ],
     "require": {
-        "php": ">=7.2",
+        "php": ">=7.4",
         "ext-pdo": "*",
         "ext-sqlite3": "*",
-        "symfony/yaml": "^3.0|^4.0",
-        "symfony/console": "^3.0|^4.0",
-        "symfony/finder": "^3.0|^4.0",
-        "symfony/filesystem": "^3.0|^4.0",
-        "symfony/event-dispatcher": "^3.0|^4.0",
-        "symfony/config": "^3.0|^4.0",
+        "symfony/yaml": "^5.0",
+        "symfony/console": "^5.0",
+        "symfony/finder": "^5.0",
+        "symfony/filesystem": "^5.0",
+        "symfony/event-dispatcher": "^5.0",
+        "symfony/config": "^5.0",
         "psr/log": "^1.0",
-        "gossi/php-code-generator": "0.5",
-        "mustache/mustache": "^2.6",
-        "marcj/topsort": "1.1.0",
-        "bramus/monolog-colored-line-formatter": "^2.0",
-        "phootwork/lang": "^0.9.0",
-        "phootwork/file": "^0.2.0",
-        "phootwork/collection": "^1.6",
-        "phootwork/json": "^1.2"
+        "marcj/topsort": "^1.1",
+        "phootwork/lang": "^2.0",
+        "phootwork/collection": "^2.0",
+        "phootwork/json": "^2.0",
+        "phootwork/file": "^2.0",
+        "susina/psr2-code-generator": "^3.0",
+        "monolog/monolog": "^2.0",
+        "bramus/monolog-colored-line-formatter": "^3.0"
     },
     "require-dev" : {
-        "monolog/monolog" : "~1.3",
-        "phpunit/phpunit" : "^6.0|^7.0",
-        "behat/behat" : "^3.3",
-        "mikey179/vfsstream": "^1.6"
-    },
-    "suggest" : {
-        "monolog/monolog" : "The recommended logging library to use with Propel."
+        "mikey179/vfsstream": "^1.6",
+        "behat/behat": "^3.6",
+        "phpunit/phpunit": "^9.1",
+        "susina/coding-standard": "^1.2"
     },
     "autoload" : {
         "psr-4" : {
@@ -69,5 +66,13 @@
         "branch-alias" : {
             "dev-master" : "3.0-dev"
         }
+    },
+    "scripts": {
+        "cs": "php-cs-fixer fix -v --diff --dry-run",
+        "cs-fix": "php-cs-fixer fix -v --diff"
+    },
+    "scripts-descriptions": {
+        "cs": "Run code style analysis, without fixing errors",
+        "cs-fix": "Run code style analysis and fix errors"
     }
 }

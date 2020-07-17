@@ -33,7 +33,7 @@ class ConcreteInheritanceBehavior extends Behavior
     use ComponentTrait;
 
     // default parameters value
-    protected $defaultParameters = [
+    protected array $defaultParameters = [
         'extends' => '',
         'copy_data_to_parent' => true,
         'descendant_field'   => 'descendantClass',

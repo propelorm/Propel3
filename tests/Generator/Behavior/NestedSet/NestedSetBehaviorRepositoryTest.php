@@ -28,7 +28,7 @@ use Propel\Tests\Bookstore\BehaviorNestedSetEntity9;
  */
 class NestedSetBehaviorRepositoryTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->clearEntityPool();
         $this->clearEntityPool(true);

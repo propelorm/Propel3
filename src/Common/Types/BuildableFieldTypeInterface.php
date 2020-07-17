@@ -26,5 +26,5 @@ interface BuildableFieldTypeInterface
      * @param AbstractBuilder $builder
      * @param Field $field
      */
-    public function build(AbstractBuilder $builder, Field $field);
+    public function build(AbstractBuilder $builder, Field $field): void;
 }

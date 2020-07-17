@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,8 +6,6 @@
  *
  * @license MIT License
  */
-
-declare(strict_types=1);
 
 namespace Propel\Generator\Model\Parts;
 
@@ -21,28 +18,15 @@ use Propel\Generator\Model\Entity;
  */
 trait EntityPart
 {
-    /**
-     * @var Entity
-     */
-    protected $entity;
+    protected ?Entity $entity;
 
-    /**
-     * @param Entity $entity
-     *
-     * @return $this
-     */
-    public function setEntity(?Entity $entity)
+    public function setEntity(?Entity $entity): void
     {
         $this->entity = $entity;
-
-        return $this;
     }
 
-    /**
-     * @return Entity
-     */
     public function getEntity(): ?Entity
     {
-        return $this->entity;
+        return $this->entity ?? null;
     }
 }

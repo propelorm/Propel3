@@ -15,6 +15,7 @@ use Propel\Generator\Platform\MysqlPlatform;
 
 use Propel\Runtime\Adapter\Pdo\MysqlAdapter;
 use Propel\Runtime\Configuration;
+use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Propel\Tests\TestCase;
 
@@ -25,7 +26,7 @@ use Propel\Tests\TestCase;
  */
 class GeneratedObjectTemporalColumnTypeTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         if (!class_exists('ComplexColumnTypeEntity5')) {
             $schema = <<<EOF
@@ -74,11 +75,10 @@ EOF;
         $this->assertEquals('1702-02-02', $r->getBar1(null)->format('Y-m-d'));
     }
 
-    /**
-     * @expectedException \Propel\Runtime\Exception\PropelException
-     */
     public function testInvalidValueThrowsPropelException()
     {
+        $this->expectException(PropelException::class);
+
         $r = new \ComplexColumnTypeEntity5();
         $r->setBar1("Invalid Date");
     }

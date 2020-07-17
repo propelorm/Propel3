@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,11 +7,9 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Generator\Model\Diff;
 
-use Propel\Common\Collection\Map;
+use phootwork\collection\Map;
 use Propel\Generator\Model\Model;
 
 /**
@@ -22,33 +19,21 @@ use Propel\Generator\Model\Model;
  */
 class DatabaseDiff
 {
-    /** @var Map */
-    protected $addedEntities;
-
-    /** @var Map */
-    protected $removedEntities;
-
-    /** @var Map */
-    protected $modifiedEntities;
-
-    /** @var Map  */
-    protected $renamedEntities;
-
-    /** @var Map  */
-    protected $possibleRenamedEntities;
+    protected Map $addedEntities;
+    protected Map $removedEntities;
+    protected Map $modifiedEntities;
+    protected Map $renamedEntities;
+    protected Map $possibleRenamedEntities;
 
     public function __construct()
     {
-        $this->addedEntities    = new Map();
-        $this->removedEntities  = new Map();
+        $this->addedEntities = new Map();
+        $this->removedEntities = new Map();
         $this->modifiedEntities = new Map();
-        $this->renamedEntities  = new Map();
-        $this->possibleRenamedEntities  = new Map();
+        $this->renamedEntities = new Map();
+        $this->possibleRenamedEntities = new Map();
     }
 
-    /**
-     * @return Map
-     */
     public function getPossibleRenamedEntities(): Map
     {
         return $this->possibleRenamedEntities;

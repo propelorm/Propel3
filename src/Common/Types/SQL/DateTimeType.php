@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,7 +9,6 @@
 
 namespace Propel\Common\Types\SQL;
 
-use gossi\codegen\model\PhpMethod;
 use Propel\Common\Types\AbstractType;
 use Propel\Common\Types\BuildableFieldTypeInterface;
 use Propel\Generator\Builder\Om\AbstractBuilder;
@@ -19,6 +17,7 @@ use Propel\Generator\Model\Field;
 use Propel\Generator\Model\PropelTypes;
 use Propel\Runtime\Map\FieldMap;
 use Propel\Runtime\Util\PropelDateTime;
+use Susina\Codegen\Model\PhpMethod;
 
 /**
  * Class DateTimeType

@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,16 +7,14 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Generator\Schema;
 
+use phootwork\collection\Set;
 use phootwork\file\File;
 use Propel\Common\Config\XmlToArrayConverter;
 use Propel\Generator\Config\GeneratorConfigInterface;
 use Propel\Generator\Config\QuickGeneratorConfig;
 use Propel\Generator\Model\Schema;
-use Propel\Common\Collection\Set;
 use Propel\Generator\Platform\PlatformInterface;
 use Propel\Generator\Schema\Loader\JsonSchemaLoader;
 use Propel\Generator\Schema\Loader\PhpSchemaLoader;
@@ -33,24 +30,18 @@ use Symfony\Component\Config\Loader\LoaderResolver;
  * PHP object.
  *
  * @author Thomas Gossmann
+ * @author Cristiano Cinotti
  */
 class SchemaReader
 {
     use SchemaParserTrait;
 
-    /** @var Set */
-    private $parsedFiles;
+    private Set $parsedFiles;
+    protected GeneratorConfigInterface $config;
 
-    /** @var GeneratorConfigInterface */
-    protected $config;
-
-    public function __construct(?GeneratorConfigInterface $config = null)
+    public function __construct(GeneratorConfigInterface $config = null)
     {
-        if (null === $config) {
-            $config = new QuickGeneratorConfig();
-        }
-
-        $this->config = $config;
+        $this->config = $config ?? new QuickGeneratorConfig();
         $this->parsedFiles = new Set();
     }
 
@@ -59,9 +50,6 @@ class SchemaReader
         return $this->config;
     }
 
-    /**
-     * @param GeneratorConfigInterface $config
-     */
     public function setGeneratorConfig(GeneratorConfigInterface $config): void
     {
         $this->config = $config;
@@ -76,7 +64,7 @@ class SchemaReader
      * @return Schema
      * @throws \Exception
      */
-    public function parse(string $filename): Schema
+    public function parse(string $filename): ?Schema
     {
         // we don't want infinite recursion
         if ($this->parsedFiles->contains($filename)) {
@@ -94,6 +82,7 @@ class SchemaReader
     }
 
     /**
+     * @todo move into something about tests, since Quickbuilder is for testing only
      * Parse a string containing an xml schema.
      * Useful only for Quickbuilder.
      *
@@ -156,9 +145,8 @@ class SchemaReader
             new PhpSchemaLoader($fileLocator)
         ]);
         $delegatingLoader = new DelegatingLoader($loaderResolver);
-        $schemaArray = $delegatingLoader->load($file->toPath()->getFilename());
 
-        return $schemaArray;
+        return $delegatingLoader->load((string) $file->toPath()->getFilename());
     }
 
     /**

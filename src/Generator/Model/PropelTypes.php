@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,8 +6,6 @@
  *
  * @license MIT License
  */
-
-declare(strict_types=1);
 
 namespace Propel\Generator\Model;
 
@@ -83,7 +80,7 @@ class PropelTypes
      *
      * @var array
      */
-    private static $mappingTypes = [
+    private static array $mappingTypes = [
         self::CHAR,
         self::VARCHAR,
         self::LONGVARCHAR,
@@ -121,7 +118,7 @@ class PropelTypes
      *
      * @var array
      */
-    private static $mappingToPHPNativeMap = [
+    private static array $mappingToPHPNativeMap = [
         self::CHAR          => self::CHAR_NATIVE_TYPE,
         self::VARCHAR       => self::VARCHAR_NATIVE_TYPE,
         self::LONGVARCHAR   => self::LONGVARCHAR_NATIVE_TYPE,
@@ -158,7 +155,7 @@ class PropelTypes
      *
      * @var array
      */
-    private static $mappingTypeToPDOTypeMap = [
+    private static array $mappingTypeToPDOTypeMap = [
         self::CHAR          => \PDO::PARAM_STR,
         self::VARCHAR       => \PDO::PARAM_STR,
         self::LONGVARCHAR   => \PDO::PARAM_STR,
@@ -180,8 +177,6 @@ class PropelTypes
         self::DATE          => \PDO::PARAM_STR,
         self::TIME          => \PDO::PARAM_STR,
         self::TIMESTAMP     => \PDO::PARAM_STR,
-        self::BU_DATE       => \PDO::PARAM_STR,
-        self::BU_TIMESTAMP  => \PDO::PARAM_STR,
         self::BOOLEAN       => \PDO::PARAM_BOOL,
         self::BOOLEAN_EMU   => \PDO::PARAM_INT,
         self::OBJECT        => \PDO::PARAM_STR,
@@ -195,7 +190,7 @@ class PropelTypes
         self::BU_TIMESTAMP  => \PDO::PARAM_STR,
     ];
 
-    private static $pdoTypeNames = [
+    private static array $pdoTypeNames = [
         \PDO::PARAM_BOOL => '\\PDO::PARAM_BOOL',
         \PDO::PARAM_NULL => '\\PDO::PARAM_NULL',
         \PDO::PARAM_INT  => '\\PDO::PARAM_INT',
@@ -218,6 +213,8 @@ class PropelTypes
     /**
      * Returns the PDO type (PDO::PARAM_* constant) value.
      *
+     * @param string $type
+     *
      * @return integer
      */
     public static function getPDOType(string $type): int
@@ -227,6 +224,8 @@ class PropelTypes
 
     /**
      * Returns the PDO type ('PDO::PARAM_*' constant) name.
+     *
+     * @param string $type
      *
      * @return string
      */

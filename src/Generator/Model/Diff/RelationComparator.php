@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,8 +6,6 @@
  *
  * @license MIT License
  */
-
-declare(strict_types=1);
 
 namespace Propel\Generator\Model\Diff;
 
@@ -32,7 +29,7 @@ class RelationComparator
      */
     public static function computeDiff(Relation $fromFk, Relation $toFk): bool
     {
-        if ($fromFk->getEntityName() !== $toFk->getEntityName()) {
+        if ($fromFk->getEntityName()->compare($toFk->getEntityName()) !== 0) {
             return true;
         }
 
@@ -41,37 +38,17 @@ class RelationComparator
         }
 
         // compare columns
-        $fromFkLocalFields = $fromFk->getLocalFields();
-        $fromFkLocalFields = $fromFkLocalFields->sort();
-        $toFkLocalFields = $toFk->getLocalFields();
-        $toFkLocalFields = $toFkLocalFields->sort();
-        //Why case insensitive comparison?
-        $fromFkLocalFields = $fromFkLocalFields->map(function(string $element){
-            return strtolower($element);
-        });
-        $toFkLocalFields = $toFkLocalFields->map(function(string $element){
-            return strtolower($element);
-        });
+        $fromFkLocalFields = $fromFk->getLocalFields()->sort()->map("strtolower");
+        $toFkLocalFields = $toFk->getLocalFields()->sort()->map("strtolower");
 
-        if ($fromFkLocalFields != $toFkLocalFields) {
+        if ($fromFkLocalFields->toArray() !== $toFkLocalFields->toArray()) {
             return true;
         }
 
-        $fromFkForeignFields = $fromFk->getForeignFields();
-        $fromFkForeignFields = $fromFkForeignFields->sort();
-        $toFkForeignFields = $toFk->getForeignFields();
-        $toFkForeignFields = $toFkForeignFields->sort();
-        //Why case insensitive comparison?
-        $fromFkForeignFields = $fromFkForeignFields->map(function(string $element){
-            return strtolower($element);
-        });
-        $toFkForeignFields = $toFkForeignFields->map(function(string $element){
-            return strtolower($element);
-        });
+        $fromFkForeignFields = $fromFk->getForeignFields()->sort()->map("strtolower");
+        $toFkForeignFields = $toFk->getForeignFields()->sort()->map("strtolower");
 
-
-
-        if ($fromFkForeignFields != $toFkForeignFields) {
+        if ($fromFkForeignFields->toArray() !== $toFkForeignFields->toArray()) {
             return true;
         }
 

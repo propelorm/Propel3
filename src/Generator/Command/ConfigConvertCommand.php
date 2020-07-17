@@ -59,9 +59,9 @@ class ConfigConvertCommand extends AbstractCommand
 
         //Create the options array to pass to ArrayToPhpConverter
         $options['connections'] = $configManager->getConnectionParametersArray();
-        $options['defaultConnection'] = $configManager->getSection('runtime')['defaultConnection'];
-        $options['log'] = $configManager->getSection('runtime')['log'];
-        $options['profiler'] = $configManager->getConfigProperty('runtime.profiler');
+        $options['defaultConnection'] = $configManager->get('runtime.defaultConnection');
+        $options['log'] = $configManager->get('runtime.log');
+        $options['profiler'] = $configManager->get('runtime.profiler');
 
         $schemas = $this->getSchemas($input->getOption('input-dir'));
         if ($schemas) {

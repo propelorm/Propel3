@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,16 +8,20 @@
  *
  */
 
-namespace Propel\Tests\Generator\Reader\Loader;
+namespace Propel\Tests\Generator\Schema\Loader;
 
 use org\bovigo\vfs\vfsStream;
+use phootwork\file\exception\FileException;
+use Propel\Generator\Schema\Exception\InvalidArgumentException;
 use Propel\Generator\Schema\Loader\XmlSchemaLoader;
 use Propel\Tests\Generator\Schema\ReaderTestCase;
 use Symfony\Component\Config\FileLocator;
 
 class XmlSchemaLoaderTest extends ReaderTestCase
 {
-    public function setUp()
+    private XmlSchemaLoader $loader;
+
+    public function setUp(): void
     {
         parent::setUp();
         $this->addXmlSchema();
@@ -38,21 +42,19 @@ class XmlSchemaLoaderTest extends ReaderTestCase
         $this->assertEquals('Book', $actual['database']['entity'][0]['name']);
     }
 
-    /**
-     * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage The file "vfs://root/inexistent.xml" does not exist
-     */
     public function testXmlFileDoesNotExist()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The file "vfs://root/inexistent.xml" does not exist');
+
         $this->loader->load(vfsStream::url('root/inexistent.xml'));
     }
 
-    /**
-     * @expectedException        Propel\Generator\Schema\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The schema file 'vfs://root/nonvalid.xml' has invalid content.
-     */
     public function testXmlFileHasInvalidContent()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("The schema file `vfs://root/nonvalid.xml` has invalid content.");
+
         $content = <<<EOF
 not xml content
 only plain
@@ -62,22 +64,20 @@ EOF;
         $this->loader->load(vfsStream::url('root/nonvalid.xml'));
     }
 
-    /**
-     * @expectedException        Propel\Generator\Schema\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The schema file 'vfs://root/empty.xml' has invalid content.
-     */
     public function testXmlFileIsEmpty()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("The schema file `vfs://root/empty.xml` has invalid content.");
+
         vfsStream::newFile('empty.xml')->at($this->getRoot())->setContent('');
         $this->loader->load(vfsStream::url('root/empty.xml'));
     }
 
-    /**
-     * @expectedException phootwork\file\exception\FileException
-     * @expectedExceptionMessage You don't have permissions to access
-     */
     public function testSchemaFileNotReadableThrowsException()
     {
+        $this->expectException(FileException::class);
+        $this->expectExceptionMessage("You don't have permissions to access");
+
         $content = <<<EOF
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <database name="nonreadable">

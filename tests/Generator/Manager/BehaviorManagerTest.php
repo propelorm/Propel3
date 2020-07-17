@@ -23,7 +23,7 @@ use Propel\Generator\Config\QuickGeneratorConfig;
  */
 class BehaviorManagerTest extends TestCase
 {
-    protected function setUp()
+    protected function setup(): void
     {
         parent::setUp();
         require_once(__DIR__ . '/../../Fixtures/behavior-installer/src/gossi/propel/behavior/l10n/L10nBehavior.php');

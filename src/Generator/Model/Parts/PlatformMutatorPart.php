@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -6,8 +6,6 @@
  *
  * @license MIT License
  */
-
-declare(strict_types=1);
 
 namespace Propel\Generator\Model\Parts;
 
@@ -27,26 +25,21 @@ trait PlatformMutatorPart
      * Sets the generator configuration
      *
      * @param GeneratorConfigInterface $generatorConfig
-     * @return $this
      */
-    public function setGeneratorConfig(GeneratorConfigInterface $generatorConfig)
+    public function setGeneratorConfig(GeneratorConfigInterface $generatorConfig): void
     {
         $this->generatorConfig = $generatorConfig;
 
-        if (!$this->platform) {
+        if (!isset($this->platform)) {
             $this->platform = $generatorConfig->createPlatformForDatabase();
         }
-
-        return $this;
     }
 
     /**
      * @param PlatformInterface $platform
-     * @return $this
      */
-    public function setPlatform(PlatformInterface $platform)
+    public function setPlatform(PlatformInterface $platform): void
     {
         $this->platform = $platform;
-        return $this;
     }
 }

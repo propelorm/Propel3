@@ -73,7 +73,7 @@ abstract class BuildComponent
     /**
      * @return PlatformInterface
      */
-    protected function getPlatform()
+    protected function getPlatform(): PlatformInterface
     {
         return $this->builder->getPlatform();
     }

@@ -1,4 +1,12 @@
-<?php
+<?php declare(strict_types=1);
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ *
+ */
 
 namespace Propel\Tests\Generator\Model\Diff;
 
@@ -17,13 +25,9 @@ use \Propel\Tests\TestCase;
  */
 class EntityFieldComparatorTest extends TestCase
 {
+    protected MysqlPlatform $platform;
 
-    /**
-     * @var MysqlPlatform
-     */
-    protected $platform;
-
-    public function setUp()
+    public function setup(): void
     {
         $this->platform = new MysqlPlatform();
     }

@@ -1,4 +1,12 @@
-<?php
+<?php declare(strict_types=1);
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ *
+ */
 
 namespace Propel\Tests\Generator\Model\Diff;
 
@@ -14,15 +22,14 @@ use \Propel\Tests\TestCase;
  */
 class FieldComparatorTest extends TestCase
 {
-    /** @var MysqlPlatform */
-    private $platform;
+    private MysqlPlatform $platform;
 
-    public function setUp()
+    public function setup(): void
     {
         $this->platform = new MysqlPlatform();
     }
 
-    public function testCompareNoDifference()
+    public function testCompareNoDifference(): void
     {
         $c1 = new Field();
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
@@ -39,7 +46,7 @@ class FieldComparatorTest extends TestCase
         $this->assertTrue(FieldComparator::compareFields($c1, $c2)->isEmpty());
     }
 
-    public function testCompareType()
+    public function testCompareType(): void
     {
         $c1 = new Field();
         $c1->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
@@ -52,7 +59,7 @@ class FieldComparatorTest extends TestCase
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
 
-    public function testCompareScale()
+    public function testCompareScale(): void
     {
         $c1 = new Field();
         $c1->getDomain()->replaceScale(2);
@@ -62,7 +69,7 @@ class FieldComparatorTest extends TestCase
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
 
-    public function testCompareSize()
+    public function testCompareSize(): void
     {
         $c1 = new Field();
         $c1->getDomain()->setSize(2);
@@ -72,7 +79,7 @@ class FieldComparatorTest extends TestCase
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
 
-    public function testCompareSqlType()
+    public function testCompareSqlType(): void
     {
         $c1 = new Field();
         $c1->getDomain()->copy($this->platform->getDomainForType('INTEGER'));
@@ -83,7 +90,7 @@ class FieldComparatorTest extends TestCase
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
 
-    public function testCompareNotNull()
+    public function testCompareNotNull(): void
     {
         $c1 = new Field();
         $c1->setNotNull(true);
@@ -93,7 +100,7 @@ class FieldComparatorTest extends TestCase
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
 
-    public function testCompareDefaultValueToNull()
+    public function testCompareDefaultValueToNull(): void
     {
         $c1 = new Field();
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
@@ -105,7 +112,7 @@ class FieldComparatorTest extends TestCase
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
 
-    public function testCompareDefaultValueFromNull()
+    public function testCompareDefaultValueFromNull(): void
     {
         $c1 = new Field();
         $c2 = new Field();
@@ -117,7 +124,7 @@ class FieldComparatorTest extends TestCase
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
 
-    public function testCompareDefaultValueValue()
+    public function testCompareDefaultValueValue(): void
     {
         $c1 = new Field();
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
@@ -129,7 +136,7 @@ class FieldComparatorTest extends TestCase
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
 
-    public function testCompareDefaultValueType()
+    public function testCompareDefaultValueType(): void
     {
         $c1 = new Field();
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
@@ -144,7 +151,7 @@ class FieldComparatorTest extends TestCase
     /**
      * @see http://www.propelorm.org/ticket/1141
      */
-    public function testCompareDefaultExrpCurrentTimestamp()
+    public function testCompareDefaultExrpCurrentTimestamp(): void
     {
         $c1 = new Field();
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue("NOW()", FieldDefaultValue::TYPE_EXPR));
@@ -153,7 +160,7 @@ class FieldComparatorTest extends TestCase
         $this->assertTrue(FieldComparator::compareFields($c1, $c2)->isEmpty());
     }
 
-    public function testCompareAutoincrement()
+    public function testCompareAutoincrement(): void
     {
         $c1 = new Field();
         $c1->setAutoIncrement(true);
@@ -163,7 +170,7 @@ class FieldComparatorTest extends TestCase
         $this->assertEquals($expectedChangedProperties, FieldComparator::compareFields($c1, $c2)->toArray());
     }
 
-    public function testCompareMultipleDifferences()
+    public function testCompareMultipleDifferences(): void
     {
         $c1 = new Field();
         $c1->getDomain()->copy($this->platform->getDomainForType('INTEGER'));

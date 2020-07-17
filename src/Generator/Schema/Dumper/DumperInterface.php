@@ -1,4 +1,12 @@
-<?php
+<?php declare(strict_types=1);
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ *
+ */
 
 namespace Propel\Generator\Schema\Dumper;
 
@@ -13,13 +21,13 @@ interface DumperInterface
      * @param  Database $database The database model
      * @return string   The dumped formatted output (XML, YAML, CSV...)
      */
-    public function dump(Database $database);
+    public function dump(Database $database): string;
 
     /**
      * Dumps a single Schema model into an XML formatted version.
      *
-     * @param  Schema  $schema                The schema model
+     * @param  Schema  $schema The schema model
      * @return string  The dumped formatted output (XML, YAML, CSV...)
      */
-    public function dumpSchema(Schema $schema);
+    public function dumpSchema(Schema $schema): string;
 }

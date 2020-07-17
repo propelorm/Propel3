@@ -14,6 +14,7 @@ use Propel\Common\Collection\Map;
 use Propel\Generator\Model\Column;
 use Propel\Generator\Model\Diff\DatabaseComparator;
 use Propel\Generator\Platform\OraclePlatform;
+use Propel\Generator\Platform\PlatformInterface;
 
 /**
  *
@@ -25,7 +26,7 @@ class OraclePlatformMigrationTest extends PlatformMigrationTestProvider
      *
      * @return OraclePlatform
      */
-    protected function getPlatform()
+    protected function getPlatform(): PlatformInterface
     {
         return new OraclePlatform();
     }

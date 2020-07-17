@@ -21,7 +21,7 @@ use Propel\Generator\Model\Field;
 class AutoAddPkBehavior extends Behavior
 {
     // default parameters value
-    protected $defaultParameters = [
+    protected array $defaultParameters = [
         'name'          => 'id',
         'autoIncrement' => true,
         'type'          => 'INTEGER'
@@ -31,7 +31,7 @@ class AutoAddPkBehavior extends Behavior
      * Copy the behavior to the database entities
      * Only for entities that have no Pk
      */
-    public function modifyDatabase()
+    public function modifyDatabase(): void
     {
         foreach ($this->getDatabase()->getEntities() as $entity) {
             if (!$entity->hasPrimaryKey()) {

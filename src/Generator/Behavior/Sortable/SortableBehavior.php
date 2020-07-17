@@ -32,7 +32,7 @@ class SortableBehavior extends Behavior
     use ComponentTrait;
 
     // default parameters value
-    protected $defaultParameters = [
+    protected array $defaultParameters = [
         'rank_field'  => 'sortable_rank',
         'use_scope'    => false,
         'scope_field' => '',
@@ -235,15 +235,13 @@ class SortableBehavior extends Behavior
     /**
      * {@inheritdoc}
      */
-    public function addParameter(array $parameter): Behavior
+    public function addParameter(array $parameter): void
     {
         if ('scope_field' === $parameter['name']) {
             $this->parameters['scope_field'] .= ($this->parameters['scope_field'] ? ',' : '') . $parameter['value'];
         } else {
             parent::addParameter($parameter);
         }
-
-        return $this;
     }
 
     /**

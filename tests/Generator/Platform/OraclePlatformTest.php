@@ -17,6 +17,7 @@ use Propel\Generator\Model\IdMethodParameter;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Model;
 use Propel\Generator\Platform\OraclePlatform;
+use Propel\Generator\Platform\PlatformInterface;
 
 /**
  *
@@ -28,7 +29,7 @@ class OraclePlatformTest extends PlatformTestProvider
      *
      * @return OraclePlatform
      */
-    protected function getPlatform()
+    protected function getPlatform(): PlatformInterface
     {
         return new OraclePlatform();
     }

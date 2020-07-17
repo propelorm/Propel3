@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,8 +6,6 @@
  *
  * @license MIT License
  */
-
-declare(strict_types=1);
 
 namespace Propel\Generator\Model;
 
@@ -27,12 +24,13 @@ class IdMethodParameter
 {
     use NamePart, EntityPart;
 
+    /** @var mixed */
     private $value;
 
     /**
      * Returns the parameter value.
      *
-     * @param mixed
+     * @return mixed
      */
     public function getValue()
     {
@@ -44,7 +42,7 @@ class IdMethodParameter
      *
      * @param mixed $value
      */
-    public function setValue($value)
+    public function setValue($value): void
     {
         $this->value = $value;
     }

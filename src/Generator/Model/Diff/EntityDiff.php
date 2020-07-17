@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,17 +7,11 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Generator\Model\Diff;
 
-use Propel\Common\Collection\Map;
-use Propel\Common\Collection\Set;
+use phootwork\collection\Map;
 use phootwork\json\Json;
-use Propel\Generator\Exception\DiffException;
-use Propel\Generator\Model\Field;
 use Propel\Generator\Model\Relation;
-use Propel\Generator\Model\Index;
 use Propel\Generator\Model\Entity;
 
 /**
@@ -33,14 +26,14 @@ class EntityDiff
      *
      * @var Entity
      */
-    protected $fromEntity;
+    protected Entity $fromEntity;
 
     /**
      * The second Entity object.
      *
      * @var Entity
      */
-    protected $toEntity;
+    protected Entity $toEntity;
 
     /**
      * The list of added fields.
@@ -51,7 +44,7 @@ class EntityDiff
      *
      * @var Map
      */
-    protected $addedFields;
+    protected Map $addedFields;
 
     /**
      * The list of removed fields.
@@ -62,7 +55,7 @@ class EntityDiff
      *
      * @var Map
      */
-    protected $removedFields;
+    protected Map $removedFields;
 
     /**
      * The list of modified fields.
@@ -73,7 +66,7 @@ class EntityDiff
      *
      * @var Map
      */
-    protected $modifiedFields;
+    protected Map $modifiedFields;
 
     /**
      * The list of renamed fields.
@@ -84,28 +77,28 @@ class EntityDiff
      *
      * @var Map
      */
-    protected $renamedFields;
+    protected Map $renamedFields;
 
     /**
      * The list of added primary key columns.
      *
      * @var Map
      */
-    protected $addedPkFields;
+    protected Map $addedPkFields;
 
     /**
      * The list of removed primary key columns.
      *
      * @var Map
      */
-    protected $removedPkFields;
+    protected Map $removedPkFields;
 
     /**
      * The list of renamed primary key columns.
      *
      * @var Map
      */
-    protected $renamedPkFields;
+    protected Map $renamedPkFields;
 
     /**
      * The list of added indices.
@@ -116,7 +109,7 @@ class EntityDiff
      *
      * @var Map
      */
-    protected $addedIndices;
+    protected Map $addedIndices;
 
     /**
      * The list of removed indices.
@@ -127,7 +120,7 @@ class EntityDiff
      *
      * @var Map
      */
-    protected $removedIndices;
+    protected Map $removedIndices;
 
     /**
      * The list of modified indices.
@@ -138,7 +131,7 @@ class EntityDiff
      *
      * @var Map
      */
-    protected $modifiedIndices;
+    protected Map $modifiedIndices;
 
     /**
      * The list of added relations.
@@ -149,7 +142,7 @@ class EntityDiff
      *
      * @var Map
      */
-    protected $addedFks;
+    protected Map $addedFks;
 
     /**
      * The list of removed foreign keys.
@@ -160,7 +153,7 @@ class EntityDiff
      *
      * @var Map
      */
-    protected $removedFks;
+    protected Map $removedFks;
 
     /**
      * The list of modified columns.
@@ -171,7 +164,7 @@ class EntityDiff
      *
      * @var Map
      */
-    protected $modifiedFks;
+    protected Map $modifiedFks;
 
     /**
      * Constructor.
@@ -703,7 +696,7 @@ class EntityDiff
         if ($this->hasRenamedFields()) {
             $renamedFields = [];
             foreach ($this->renamedFields as $columnRenaming) {
-                $renamedFields[$columnRenaming[1]->getName()] = array_reverse($columnRenaming);
+                $renamedFields[$columnRenaming[1]->getName()->toString()] = array_reverse($columnRenaming);
             }
             $diff->setRenamedFields(new Map($renamedFields));
         }
@@ -728,7 +721,7 @@ class EntityDiff
         if ($this->hasRenamedPkFields()) {
             $renamedPkFields = [];
             foreach ($this->renamedPkFields as $columnRenaming) {
-                $renamedPkFields[$columnRenaming[1]->getName()] = array_reverse($columnRenaming);
+                $renamedPkFields[$columnRenaming[1]->getName()->toString()] = array_reverse($columnRenaming);
             }
             $diff->setRenamedPkFields(new Map($renamedPkFields));
         }
@@ -814,7 +807,7 @@ class EntityDiff
         if ($renamedFields = $this->getRenamedFields()) {
             $ret .= "    renamedFields:\n";
             foreach ($renamedFields as $columnRenaming) {
-                list($fromField, $toField) = $columnRenaming;
+                [$fromField, $toField] = $columnRenaming;
                 $ret .= sprintf("      %s: %s\n", $fromField->getName(), $toField->getName());
             }
         }
@@ -856,7 +849,7 @@ class EntityDiff
                  * @var Relation $fromFk
                  * @var Relation $toFk
                  */
-                list($fromFk, $toFk) = $fkFromTo;
+                [$fromFk, $toFk] = $fkFromTo;
                 $fromLocalFields = Json::encode($fromFk->getLocalFields()->toArray());
                 $toLocalFields = Json::encode($toFk->getLocalFields()->toArray());
 

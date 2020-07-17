@@ -1,12 +1,11 @@
-<?php
-
-/*
- *	$Id: EntityTest.php 1891 2010-08-09 15:03:18Z francois $
+<?php declare(strict_types=1);
+/**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * @license MIT License
+ *
  */
 namespace Propel\Tests\Generator\Model\Diff;
 
@@ -24,17 +23,14 @@ use \Propel\Tests\TestCase;
  */
 class EntityPkFieldComparatorTest extends TestCase
 {
-    /**
-     * @var MysqlPlatform
-     */
-    protected $platform;
+    protected MysqlPlatform $platform;
 
-    public function setUp()
+    public function setup(): void
     {
         $this->platform = new MysqlPlatform();
     }
 
-    public function testCompareSamePks()
+    public function testCompareSamePks(): void
     {
         $t1 = new Entity();
         $c1 = new Field('Foo');
@@ -50,7 +46,7 @@ class EntityPkFieldComparatorTest extends TestCase
         $this->assertNull(EntityComparator::computeDiff($t1, $t2));
     }
 
-    public function testCompareNotSamePks()
+    public function testCompareNotSamePks(): void
     {
         $t1 = new Entity();
         $c1 = new Field('Foo');
@@ -64,7 +60,7 @@ class EntityPkFieldComparatorTest extends TestCase
         $this->assertTrue($diff instanceof EntityDiff);
     }
 
-    public function testCompareAddedPkField()
+    public function testCompareAddedPkField(): void
     {
         $t1 = new Entity();
         $t2 = new Entity();
@@ -86,7 +82,7 @@ class EntityPkFieldComparatorTest extends TestCase
         $this->assertEquals(['Foo' => $c2], $tableDiff->getAddedPkFields()->toArray());
     }
 
-    public function testCompareRemovedPkField()
+    public function testCompareRemovedPkField(): void
     {
         $t1 = new Entity();
         $c1 = new Field('Foo');
@@ -108,7 +104,7 @@ class EntityPkFieldComparatorTest extends TestCase
         $this->assertEquals(['Foo' => $c1], $tableDiff->getRemovedPkFields()->toArray());
     }
 
-    public function testCompareRenamedPkField()
+    public function testCompareRenamedPkField(): void
     {
         $t1 = new Entity();
         $c1 = new Field('Foo');
@@ -141,7 +137,7 @@ class EntityPkFieldComparatorTest extends TestCase
         $this->assertTrue($tableDiff->getRemovedPkFields()->isEmpty());
     }
 
-    public function testCompareSeveralPrimaryKeyDifferences()
+    public function testCompareSeveralPrimaryKeyDifferences(): void
     {
         $t1 = new Entity();
         $c1 = new Field('col1');
@@ -191,7 +187,7 @@ class EntityPkFieldComparatorTest extends TestCase
         $this->assertEquals(['col3' => $c3], $tableDiff->getRemovedPkFields()->toArray());
     }
 
-    public function testCompareSeveralRenamedSamePrimaryKeys()
+    public function testCompareSeveralRenamedSamePrimaryKeys(): void
     {
         $t1 = new Entity();
         $c1 = new Field('col1');

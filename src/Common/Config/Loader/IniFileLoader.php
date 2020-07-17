@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,7 +9,9 @@
 
 namespace Propel\Common\Config\Loader;
 
-use Propel\Common\Config\Exception\InputOutputException;
+use phootwork\file\exception\FileException;
+use phootwork\file\File;
+use phootwork\lang\Text;
 use Propel\Common\Config\Exception\InvalidArgumentException;
 use Propel\Common\Config\Exception\IniParseException;
 
@@ -29,7 +30,7 @@ class IniFileLoader extends FileLoader
      *
      * @var string
      */
-    private $nestSeparator = '.';
+    private string $nestSeparator = '.';
 
     /**
      * Returns true if this class supports the given resource.
@@ -39,47 +40,40 @@ class IniFileLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null): bool
+    public function supports($resource, ?string $type = null): bool
     {
-        $info = pathinfo($resource);
-        $extension = $info['extension'];
+        $resource = new Text($resource);
 
-        if ('dist' === $extension) {
-            $extension = pathinfo($info['filename'], PATHINFO_EXTENSION);
-        }
-
-        return is_string($resource) && ('ini' === $extension || 'properties' === $extension);
+        return ($resource->endsWith('.ini') || $resource->endsWith('.properties') || $resource->endsWith('.ini.dist') ||
+            $resource->endsWith('.properties.dist')
+        );
     }
 
     /**
      * Loads a resource, merge it with the default configuration array and resolve its parameters.
      *
-     * @param  mixed  $file The resource
-     * @param  string $type The resource type
+     * @param mixed $file The resource
+     * @param string $type The resource type
+     *
      * @return array  The configuration array
      *
-     * @throws \InvalidArgumentException                                If configuration file not found
-     * @throws \Propel\Common\Config\Exception\InvalidArgumentException When ini file is not valid
-     * @throws \Propel\Common\Config\Exception\InputOutputException     If configuration file is not readable
+     * @throws \InvalidArgumentException If configuration file not found
+     * @throws InvalidArgumentException When ini file is not valid
+     * @throws FileException If configuration file is not readable
      */
-    public function load($file, $type = null): array
+    public function load($file, string $type = null): array
     {
-        $path = $this->locator->locate($file);
+        $file = new File($this->locator->locate($file));
 
-        if (!is_readable($path)) {
-            throw new InputOutputException("You don't have permissions to access configuration file $file.");
-        }
-
-        $ini = parse_ini_file($path, true);
+        $ini = parse_ini_string($file->read()->toString(), true);
 
         if (false === $ini) {
             throw new InvalidArgumentException("The configuration file '$file' has invalid content.");
         }
 
         $ini = $this->parse($ini); //Parse for nested sections
-        $ini = $this->resolveParams($ini); //Resolve parameter placeholders (%name%)
 
-        return $ini;
+        return $this->resolveParams($ini);
     }
 
     /**
@@ -153,7 +147,7 @@ class IniFileLoader extends FileLoader
      * @param  string $value
      * @param  array  $config
      *
-     * @throws \Propel\Common\Config\Exception\IniParseException
+     * @throws IniParseException
      */
     private function parseKey(string $key, $value, array &$config)
     {

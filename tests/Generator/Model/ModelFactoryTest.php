@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,18 +8,15 @@
  *
  */
 
-declare(strict_types=1);
-
 namespace Propel\Tests\Generator\Model;
 
 use Propel\Generator\Model\ModelFactory;
 
 class ModelFactoryTest extends ModelTestCase
 {
-    /** @var ModelFactory */
-    private $modelFactory;
+    private ModelFactory $modelFactory;
 
-    public function setUp()
+    public function setup(): void
     {
         $this->modelFactory = new ModelFactory();
     }
@@ -27,20 +24,15 @@ class ModelFactoryTest extends ModelTestCase
     /**
      * @dataProvider provideBehaviors
      */
-    public function testCreateBehavior($name, $class)
+    public function testCreateBehavior(string $name, string $class): void
     {
-        $type = sprintf(
-            'Propel\Generator\Behavior\%s\%sBehavior',
-            $class,
-            $class
+        $this->assertInstanceOf(
+            "Propel\\Generator\\Behavior\\{$class}\\{$class}Behavior",
+            $this->modelFactory->createBehavior(['name' => $name])
         );
-
-        $behavior = $this->modelFactory->createBehavior(['name' => $name]);
-
-        $this->assertInstanceOf($type, $behavior);
     }
 
-    public function provideBehaviors()
+    public function provideBehaviors(): array
     {
         return [
             ['aggregate_field', 'AggregateField'],
@@ -54,6 +46,4 @@ class ModelFactoryTest extends ModelTestCase
             ['timestampable', 'Timestampable'],
         ];
     }
-
-
 }

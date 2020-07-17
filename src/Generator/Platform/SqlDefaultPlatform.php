@@ -82,11 +82,11 @@ class SqlDefaultPlatform implements PlatformInterface
     public function getName($object): string
     {
         if ($object instanceof Entity) {
-            return $object->getFullTableName();
+            return $object->getFullTableName()->toString();
         } elseif ($object instanceof Field) {
-            return $object->getColumnName();
+            return $object->getColumnName()->toString();
         } else {
-            return NamingTool::toSnakeCase($object->getName());
+            return $object->getName()->toSnakeCase()->toString();
         }
     }
 
@@ -197,7 +197,7 @@ class SqlDefaultPlatform implements PlatformInterface
      */
     public function getSchemaDelimiter(): string
     {
-        return '.';
+        return $this->supportsSchemas() ? '.' : '';
     }
 
     /**

@@ -14,6 +14,7 @@ use Propel\Common\Collection\Map;
 use Propel\Generator\Config\GeneratorConfig;
 use Propel\Generator\Model\Diff\DatabaseComparator;
 use Propel\Generator\Platform\MysqlPlatform;
+use Propel\Generator\Platform\PlatformInterface;
 use Propel\Tests\VfsTrait;
 
 /**
@@ -31,7 +32,7 @@ class MysqlPlatformMigrationTest extends PlatformMigrationTestProvider
      *
      * @return MysqlPlatform
      */
-    protected function getPlatform()
+    protected function getPlatform(): PlatformInterface
     {
         if (null === $this->platform) {
             $this->platform = new MysqlPlatform();

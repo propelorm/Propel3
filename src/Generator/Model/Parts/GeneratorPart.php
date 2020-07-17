@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -6,8 +6,6 @@
  *
  * @license MIT License
  */
-
-declare(strict_types=1);
 
 namespace Propel\Generator\Model\Parts;
 
@@ -29,7 +27,7 @@ trait GeneratorPart
      *
      * @var string
      */
-    private $accessorVisibility = null;
+    private string $accessorVisibility = Model::DEFAULT_ACCESSOR_ACCESSIBILITY;
 
     /**
      * The mutator visibility.
@@ -38,23 +36,20 @@ trait GeneratorPart
      *
      * @var string
      */
-    private $mutatorVisibility = null;
+    private string $mutatorVisibility = Model::DEFAULT_MUTATOR_ACCESSIBILITY;
 
     /**
      * Sets the visibility for mutators
      *
      * @param string $visibility
-     * @return $this
      */
-    public function setMutatorVisibility(string $visibility)
+    public function setMutatorVisibility(string $visibility): void
     {
         if (!in_array($visibility, [Model::VISIBILITY_PUBLIC, Model::VISIBILITY_PRIVATE, Model::VISIBILITY_PROTECTED])) {
             $visibility = Model::VISIBILITY_PUBLIC;
         }
 
         $this->mutatorVisibility = $visibility;
-
-        return $this;
     }
 
     /**
@@ -64,32 +59,27 @@ trait GeneratorPart
      */
     public function getMutatorVisibility(): string
     {
-        if (null !== $this->mutatorVisibility) {
-            return $this->mutatorVisibility;
+        if ($this->mutatorVisibility === Model::DEFAULT_MUTATOR_ACCESSIBILITY) {
+            if ($this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getMutatorVisibility')) {
+                return $this->getSuperordinate()->getMutatorVisibility();
+            }
         }
 
-        if ($this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getMutatorVisibility')) {
-            return $this->getSuperordinate()->getMutatorVisibility();
-        }
-
-        return Model::DEFAULT_MUTATOR_ACCESSIBILITY;
+        return $this->mutatorVisibility;
     }
 
     /**
      * Sets the visibility for accessors
      *
      * @param string $visibility
-     * @return $this
      */
-    public function setAccessorVisibility(string $visibility)
+    public function setAccessorVisibility(string $visibility): void
     {
         if (!in_array($visibility, [Model::VISIBILITY_PUBLIC, Model::VISIBILITY_PRIVATE, Model::VISIBILITY_PROTECTED])) {
             $visibility = Model::VISIBILITY_PUBLIC;
         }
 
         $this->accessorVisibility = $visibility;
-
-        return $this;
     }
 
     /**
@@ -98,14 +88,12 @@ trait GeneratorPart
      */
     public function getAccessorVisibility(): string
     {
-        if (null !== $this->accessorVisibility) {
-            return $this->accessorVisibility;
+        if ($this->accessorVisibility === Model::DEFAULT_ACCESSOR_ACCESSIBILITY) {
+            if ($this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getAccessorVisibility')) {
+                return $this->getSuperordinate()->getAccessorVisibility();
+            }
         }
 
-        if ($this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getAccessorVisibility')) {
-            return $this->getSuperordinate()->getAccessorVisibility();
-        }
-
-        return Model::DEFAULT_ACCESSOR_ACCESSIBILITY;
+        return $this->accessorVisibility;
     }
 }

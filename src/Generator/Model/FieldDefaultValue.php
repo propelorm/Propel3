@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -29,19 +28,19 @@ class FieldDefaultValue
     /**
      * @var string The type of value represented by this object (DefaultValue::TYPE_VALUE or DefaultValue::TYPE_EXPR).
      */
-    private $type = FieldDefaultValue::TYPE_VALUE;
+    private string $type = FieldDefaultValue::TYPE_VALUE;
 
     /**
      * Creates a new DefaultValue object.
      *
-     * @param string $value The default value, as specified in the schema.
-     * @param string $type  The type of default value (DefaultValue::TYPE_VALUE or DefaultValue::TYPE_EXPR)
+     * @param mixed $value The default value, as specified in the schema.
+     * @param string $type The type of default value (DefaultValue::TYPE_VALUE or DefaultValue::TYPE_EXPR)
      */
-    public function __construct($value, $type = null)
+    public function __construct($value, string $type = '')
     {
         $this->setValue($value);
 
-        if (null !== $type) {
+        if ('' !== $type) {
             $this->setType($type);
         }
     }
@@ -57,7 +56,7 @@ class FieldDefaultValue
     /**
      * @param string $type The type of default value (DefaultValue::TYPE_VALUE or DefaultValue::TYPE_EXPR)
      */
-    public function setType($type)
+    public function setType(string $type): void
     {
         $this->type = $type;
     }
@@ -83,7 +82,7 @@ class FieldDefaultValue
     /**
      * @param mixed $value The value, as specified in the schema.
      */
-    public function setValue($value)
+    public function setValue($value): void
     {
         $this->value = $value;
     }

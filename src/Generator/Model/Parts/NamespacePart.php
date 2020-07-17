@@ -10,67 +10,58 @@
 
 namespace Propel\Generator\Model\Parts;
 
+use phootwork\lang\Text;
+
 /**
  * Trait NamespacePart
  *
  * @author Thomas Gossmann
+ * @author Cristiano Cinotti
  */
 trait NamespacePart
 {
-    use NamePart;
     use SuperordinatePart;
 
-    /** @var string */
-    protected $namespace;
+    protected Text $namespace;
+    protected Text $name;
 
     /**
-     * @param string $name
-     *
-     * @return $this
+     * @param string|Text $name
      */
-    public function setName(string $name): object
+    public function setName($name): void
     {
-        if (false !== strpos($name, '\\')) {
-            $namespace = explode('\\', trim($name, '\\'));
-            $this->name = array_pop($namespace);
-            $this->namespace = implode('\\', $namespace);
+        $name = new Text($name);
+
+        if ($name->contains('\\')) {
+            $this->namespace = $name->substring(0, $name->lastIndexOf('\\'));
+            $this->name = $name->substring($name->lastIndexOf('\\') + 1);
         } else {
             $this->name = $name;
         }
-        return $this;
     }
 
     /**
      * Sets the namespace
      *
-     * @param string $namespace
-     * @return $this
+     * @param string|Text $namespace
      */
-    public function setNamespace(?string $namespace): object
+    public function setNamespace($namespace): void
     {
-        if (null !== $namespace) {
-            $namespace = rtrim($namespace, '\\');
-        }
-        $this->namespace = $namespace;
-
-        return $this;
+        $namespace = new Text($namespace);
+        $this->namespace = $namespace->trimEnd('\\');
     }
 
     /**
      * Returns the namespace
      *
-     * @return string
+     * @return Text
      */
-    public function getNamespace(): string
+    public function getNamespace(): Text
     {
-        $namespace = $this->namespace;
+        $namespace = $this->namespace ?? $this->namespace = new Text();
 
-        if (null === $namespace && $this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getNamespace')) {
+        if ($namespace->isEmpty() && $this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getNamespace')) {
             $namespace = $this->getSuperordinate()->getNamespace();
-        }
-
-        if (null === $namespace) {
-            $namespace = '';
         }
 
         return $namespace;
@@ -79,17 +70,19 @@ trait NamespacePart
     /**
      * Returns the class name with namespace.
      *
-     * @return string
+     * @return Text
      */
-    public function getFullName(): string
+    public function getFullName(): Text
     {
-        $name = $this->getName();
-        $namespace = $this->getNamespace();
-
-        if ($namespace) {
-            return $namespace . '\\' . $name;
-        } else {
-            return $name;
+        if (!isset($this->namespace) || $this->namespace->isEmpty()) {
+            return $this->name;
         }
+
+        return $this->namespace->ensureEnd('\\')->append($this->name);
+    }
+
+    public function getName(): Text
+    {
+        return $this->name ?? $this->name = new Text();
     }
 }

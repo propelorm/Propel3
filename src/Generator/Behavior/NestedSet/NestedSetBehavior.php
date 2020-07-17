@@ -29,7 +29,7 @@ class NestedSetBehavior extends Behavior
     use ComponentTrait;
     
     // default parameters value
-    protected $defaultParameters = [
+    protected array $defaultParameters = [
         'left_field'       => 'tree_left',
         'right_field'      => 'tree_right',
         'level_field'      => 'tree_level',

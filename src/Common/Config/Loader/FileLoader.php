@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -28,19 +27,15 @@ abstract class FileLoader extends BaseFileLoader
 {
     /**
      * If the configuration array with parameters is resolved.
-     *
-     * @var bool
      */
-    private $resolved = false;
+    private bool $resolved = false;
 
     /**
      * Configuration values array.
      * It contains the configuration values array to manipulate while resolving parameters.
      * It's useful, in particular, resolve() and get() method.
-     *
-     * @var array
      */
-    private $config = [];
+    private array $config = [];
 
     /**
      * Constructor.
@@ -126,8 +121,8 @@ abstract class FileLoader extends BaseFileLoader
      *
      * @return string The resolved string
      *
-     * @throws \Propel\Common\Config\Exception\RuntimeException         if a problem occurs
-     * @throws \Propel\Common\Config\Exception\InvalidArgumentException if a parameter is non-existent
+     * @throws RuntimeException         if a problem occurs
+     * @throws InvalidArgumentException if a parameter is non-existent
      */
     private function resolveString($value, array $resolving = [])
     {
@@ -207,13 +202,13 @@ abstract class FileLoader extends BaseFileLoader
      * @param mixed $property_key The key, in the configuration values array, to return the respective value
      *
      * @return mixed
-     * @throws \Propel\Common\Config\Exception\InvalidArgumentException when non-existent key in configuration array
+     * @throws InvalidArgumentException when non-existent key in configuration array
      */
     private function get($property_key)
     {
         $found = false;
 
-        $ret = $this->getValue($property_key, null, $found);
+        $ret = $this->getValue($property_key, $found);
 
         if (false === $found) {
             throw new InvalidArgumentException("Parameter '$property_key' not found in configuration file.");
@@ -230,9 +225,9 @@ abstract class FileLoader extends BaseFileLoader
      * @param  boolean $found        if the key was found
      * @return mixed   The value or null if not found
      */
-    private function getValue($property_key, $config = null, &$found)
+    private function getValue(string $property_key, bool &$found, array $config = [])
     {
-        if (null === $config) {
+        if ([] === $config) {
             $config = $this->config;
         }
 
@@ -243,7 +238,7 @@ abstract class FileLoader extends BaseFileLoader
                 return $value;
             }
             if (is_array($value)) {
-                $ret = $this->getValue($property_key, $value, $found);
+                $ret = $this->getValue($property_key, $found, $value);
 
                 if (null !== $ret) {
                     return $ret;
@@ -260,7 +255,7 @@ abstract class FileLoader extends BaseFileLoader
      * @param string $value The value to parse
      *
      * @return string|null
-     * @throws \Propel\Common\Config\Exception\InvalidArgumentException if the environment variable is not set
+     * @throws InvalidArgumentException if the environment variable is not set
      */
     private function parseEnvironmentParams(string $value): ?string
     {

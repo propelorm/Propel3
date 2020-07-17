@@ -205,7 +205,7 @@ class ReverseManager extends AbstractManager
     protected function getConnection()
     {
         $generatorConfig = $this->getGeneratorConfig();
-        $database = $generatorConfig->getConfigProperty('reverse.connection');
+        $database = $generatorConfig->get('reverse.connection');
 
         if (null === $database) {
             throw new BuildException('No configured connection. Please add a connection to your configuration file

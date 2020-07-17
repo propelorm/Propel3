@@ -29,7 +29,7 @@ class SluggableBehaviorTest extends TestCase
      */
     protected $configuration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!class_exists('\SluggableBehaviorTest\Entity13')) {
             $schema = <<<XML

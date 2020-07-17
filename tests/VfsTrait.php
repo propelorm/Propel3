@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,8 +7,6 @@
  * @license MIT License
  *
  */
-
-declare(strict_types=1);
 
 namespace Propel\Tests;
 
@@ -23,15 +21,14 @@ use org\bovigo\vfs\vfsStreamFile;
  */
 trait VfsTrait
 {
-    /** @var vfsStreamDirectory */
-    private $root;
+    private vfsStreamDirectory $root;
 
     /**
      * @return vfsStreamDirectory
      */
     public function getRoot(): vfsStreamDirectory
     {
-        if (null === $this->root) {
+        if (!isset($this->root)) {
             $this->root = vfsStream::setup();
         }
 

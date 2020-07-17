@@ -2,19 +2,17 @@
 
 Propel3 is an open-source Object-Relational Mapping (ORM) for modern PHP 7.1+.
 
-
-[![Build Status](https://circleci.com/gh/propelorm/Propel2/tree/master.png?style=shield)](https://circleci.com/gh/propelorm/Propel2/tree/master)
-[![Code Climate](https://codeclimate.com/github/propelorm/Propel2/badges/gpa.svg)](https://codeclimate.com/github/propelorm/Propel2)
-<a href="https://codeclimate.com/github/propelorm/Propel2"><img src="https://codeclimate.com/github/propelorm/Propel2/badges/coverage.svg" /></a>
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/97c839fc8e745f9f8f60/test_coverage)](https://codeclimate.com/github/propelorm/Propel3/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/97c839fc8e745f9f8f60/maintainability)](https://codeclimate.com/github/propelorm/Propel3/maintainability)
 [![PPM Compatible](https://raw.githubusercontent.com/php-pm/ppm-badge/master/ppm-badge.png)](https://github.com/php-pm/php-pm)
 [![Gitter](https://badges.gitter.im/propelorm/Propel.svg)](https://gitter.im/propelorm/Propel)
 
-Version 3 of Propel ORM replaces [Propel2](https://github.com/propelorm/Propel2), which is not maintained anymore.
 Propel3 introduces a data-mapper implementation which separates your entities from the actual persisting logic.
 
 ## Status
 
-This is in current development and is not yet ready to use.
+This is in current development and is not yet ready to use (please see the [TODO](TODO.md) list).
 
 ## Features
 
