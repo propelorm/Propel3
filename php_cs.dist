@@ -1,0 +1,22 @@
+<?php declare(strict_types=1);
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ */
+
+$config = new Susina\CodingStandard\Config();
+$config->getFinder()
+    ->exclude(['tests/Fixtures', 'tests/Resources'])
+    ->in(__DIR__ . '/src')
+    ->in(__DIR__ . '/tests')
+;
+
+// You can remove the following line if you don't run php-cs-fixer on Travis-ci
+$cacheDir = getenv('TRAVIS') ? getenv('HOME') . '/.php-cs-fixer' : __DIR__;
+
+$config->setCacheFile($cacheDir . '/.php_cs.cache');
+
+return $config;

@@ -66,5 +66,13 @@
         "branch-alias" : {
             "dev-master" : "3.0-dev"
         }
+    },
+    "scripts": {
+        "cs": "php-cs-fixer fix -v --diff --dry-run",
+        "cs-fix": "php-cs-fixer fix -v --diff"
+    },
+    "scripts-descriptions": {
+        "cs": "Run code style analysis, without fixing errors",
+        "cs-fix": "Run code style analysis and fix errors"
     }
 }
