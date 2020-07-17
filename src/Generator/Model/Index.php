@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,7 +9,8 @@
 
 namespace Propel\Generator\Model;
 
-use Propel\Common\Collection\Map;
+use phootwork\collection\Map;
+use phootwork\lang\Text;
 use Propel\Generator\Model\Parts\EntityPart;
 use Propel\Generator\Model\Parts\FieldsPart;
 use Propel\Generator\Model\Parts\NamePart;
@@ -26,32 +26,26 @@ use Propel\Generator\Model\Parts\VendorPart;
  */
 class Index
 {
-    use NamePart, EntityPart, FieldsPart, SuperordinatePart, VendorPart;
+    use EntityPart, FieldsPart, NamePart, SuperordinatePart, VendorPart;
 
-    /**
-     * @var bool
-     */
-    protected $autoNaming = false;
+    protected bool $autoNaming = false;
 
     /**
      * @var Map Map of `fieldname => size` to use for indexes creation.
      */
-    protected $fieldSizes;
+    protected Map $fieldSizes;
 
     /**
      * Creates a new Index instance.
      *
      * @param string $name Name of the index
      */
-    public function __construct(string $name = null)
+    public function __construct(string $name = '')
     {
         $this->initFields();
         $this->initVendor();
         $this->fieldSizes = new Map();
-
-        if (null !== $name) {
-            $this->setName($name);
-        }
+        $this->setName($name);
     }
 
     /**
@@ -77,14 +71,14 @@ class Index
     /**
      * Returns the index name.
      *
-     * @return string
+     * @return Text
      */
-    public function getName(): string
+    public function getName(): Text
     {
         $this->doNaming();
 
-        if ($this->entity && $database = $this->entity->getDatabase()) {
-            return substr($this->name, 0, $database->getPlatform()->getMaxFieldNameLength());
+        if (isset($this->entity) && $database = $this->entity->getDatabase()) {
+            return $this->name->substring(0, $database->getPlatform()->getMaxFieldNameLength());
         }
 
         return $this->name;
@@ -92,7 +86,7 @@ class Index
 
     protected function doNaming(): void
     {
-        if (!$this->name || $this->autoNaming) {
+        if ($this->name->isEmpty() || $this->autoNaming) {
             $newName = sprintf('%s_', $this instanceof Unique ? 'u' : 'i');
 
             if (!$this->fields->isEmpty()) {
@@ -109,11 +103,11 @@ class Index
                 $newName .= 'no_fields';
             }
 
-            if ($this->entity) {
-                $newName = $this->getEntity()->getTableName() . '_' . $newName;
+            if ($this->getEntity()) {
+                $newName = $this->getEntity()->getTableName()->append("_$newName");
             }
 
-            $this->name = $newName;
+            $this->name = new Text($newName);
             $this->autoNaming = true;
         }
     }
@@ -137,7 +131,7 @@ class Index
         /** @var Field $field */
         $field = $fieldsArray[$pos];
 
-        if ($field->getName() !== $name) {
+        if ($field->getName()->compare($name) !== 0) {
             return false;
         }
 

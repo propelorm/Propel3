@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,20 +7,17 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Generator\Model;
 
-use Propel\Common\Collection\ArrayList;
-use Propel\Common\Collection\Map;
+use phootwork\collection\ArrayList;
+use phootwork\collection\Set;
+use phootwork\lang\Text;
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Model\Parts\DatabasePart;
 use Propel\Generator\Model\Parts\EntityPart;
 use Propel\Generator\Model\Parts\NamePart;
 use Propel\Generator\Model\Parts\SuperordinatePart;
 use Propel\Generator\Model\Parts\VendorPart;
-use Propel\Generator\Platform\PlatformInterface;
-use Propel\Common\Collection\UniqueList;
 
 /**
  * A class for information about table foreign keys.
@@ -34,91 +30,40 @@ use Propel\Common\Collection\UniqueList;
  */
 class Relation
 {
-    use NamePart, DatabasePart, EntityPart, SuperordinatePart, VendorPart;
+    use DatabasePart, EntityPart, NamePart, SuperordinatePart, VendorPart;
 
-    /**
-     * @var string
-     */
-    private $foreignEntityName;
+    private string $foreignEntityName ='';
 
     /**
      * If foreignEntityName is not given getForeignEntity() uses this entity directly.
      *
      * @var Entity|null
      */
-    private $foreignEntity;
+    private ?Entity $foreignEntity;
 
-    /**
-     * @var string
-     */
-    private $field;
-    private $refField;
-
-    /**
-     * @var string
-     */
-    private $refName;
-
-    /**
-     * @var string
-     */
-    private $defaultJoin;
-
-    /**
-     * @var string
-     */
-    private $onUpdate = '';
-
-    /**
-     * @var string
-     */
-    private $onDelete = '';
-
-    /**
-     * @var UniqueList
-     */
-    private $localFields;
-
-    /**
-     * @var ArrayList
-     */
-    private $foreignFields;
-
-    /**
-     * @var bool
-     */
-    private $skipSql = false;
-
-    /**
-     * @var bool
-     */
-    private $skipCodeGeneration = false;
-
-    /**
-     * @var bool
-     */
-    private $autoNaming = false;
-
-    /**
-     * @var string
-     */
-    private $foreignSchema;
+    private string $field;
+    private string $refField;
+    private string $refName;
+    private string $defaultJoin = 'INNER JOIN';
+    private string $onUpdate = Model::RELATION_NONE;
+    private string $onDelete = Model::RELATION_NONE;
+    private ArrayList $localFields;
+    private ArrayList $foreignFields;
+    private bool $skipSql = false;
+    private bool $skipCodeGeneration = false;
+    private bool $autoNaming = false;
+    private string $foreignSchema;
 
     /**
      * Constructs a new Relation object.
      *
      * @param string $name
      */
-    public function __construct($name = null)
+    public function __construct(string $name = '')
     {
-        if (null !== $name) {
-            $this->setName($name);
-        }
+        $this->setName($name);
 
-        $this->onUpdate = Model::RELATION_NONE;
-        $this->onDelete = Model::RELATION_NONE;
-        $this->defaultJoin = 'INNER JOIN';
-        $this->localFields = new UniqueList();
+        $this->localFields = new ArrayList();
         $this->foreignFields = new ArrayList();
         $this->initVendor();
     }
@@ -134,23 +79,15 @@ class Relation
     /**
      * @return string
      */
-    public function getField(): ?string
+    public function getField(): string
     {
-        $field = $this->field;
-
-        if (!$field) {
-            if ($this->hasName()) {
-                $field = $this->name;
-            }
-        }
-
-        return $field;
+        return $this->field ?? $this->getName()->toString();
     }
 
     /**
      * @param string $field
      */
-    public function setField(string $field)
+    public function setField(string $field): void
     {
         $this->field = $field;
     }
@@ -160,13 +97,13 @@ class Relation
      */
     public function getRefField(): ?string
     {
-        return $this->refField;
+        return $this->refField ?? null;
     }
 
     /**
      * @param string $refField
      */
-    public function setRefField(string $refField)
+    public function setRefField(string $refField): void
     {
         $this->refField = $refField;
     }
@@ -242,10 +179,10 @@ class Relation
      */
     public function hasLocalField(Field $field): bool
     {
-        if ($field = $this->getEntity()->getField($field->getName())) {
-            return $this->localFields->search($field->getName(), function($element, $query) {
-                return $element === $query;
-            });
+        if ($field = $this->getEntity()->getFieldByName($field->getName()->toString())) {
+            return $this->localFields->search($field->getName()->toString(),
+                fn(string $element, string $query): bool => $element === $query
+            );
         }
 
         return false;
@@ -294,9 +231,9 @@ class Relation
     /**
      * Returns the foreign key name.
      *
-     * @return string
+     * @return Text
      */
-    public function getName(): string
+    public function getName(): Text
     {
         $this->doNaming();
 
@@ -308,7 +245,7 @@ class Relation
      */
     public function hasName(): bool
     {
-        return !!$this->name && !$this->autoNaming;
+        return !$this->getName()->isEmpty() && !$this->autoNaming;
     }
 
     /**
@@ -316,20 +253,20 @@ class Relation
      *
      * @param string $name
      */
-    public function setName(string $name)
+    public function setName(string $name = '')
     {
-        $this->autoNaming = !$name; //if no name we activate autoNaming
-        $this->name = $name;
+        $this->autoNaming = ($name === ''); //if no name we activate autoNaming
+        $this->name = new Text($name);
     }
 
     protected function doNaming()
     {
-        if (!$this->name || $this->autoNaming) {
+        if ($this->name->isEmpty() || $this->autoNaming) {
             $newName = 'fk_';
 
             $hash = [];
             if ($this->getForeignEntity()) {
-                $hash[] = $this->getForeignEntity()->getFullTableName();
+                $hash[] = $this->getForeignEntity()->getFullTableName()->toString();
             }
             $hash[] = implode(',', $this->localFields->toArray());
             $hash[] = implode(',', $this->foreignFields->toArray());
@@ -337,7 +274,7 @@ class Relation
             $newName .= substr(md5(strtolower(implode(':', $hash))), 0, 6);
 
             if ($this->getEntity()) {
-                $newName = $this->getEntity()->getTableName() . '_' . $newName;
+                $newName = $this->getEntity()->getTableName()->append("_$newName");
             }
 
             $this->name = $newName;
@@ -392,8 +329,8 @@ class Relation
      */
     public function getForeignEntityName(): ?string
     {
-        if (null === $this->foreignEntityName && null !== $this->foreignEntity) {
-            $this->foreignEntityName = $this->foreignEntity->getFullName();
+        if ('' === $this->foreignEntityName && isset($this->foreignEntity)) {
+            $this->foreignEntityName = $this->foreignEntity->getFullName()->toString();
         }
 
         return $this->foreignEntityName;
@@ -418,7 +355,7 @@ class Relation
     /**
      * @param string $foreignEntityName
      */
-    public function setForeignEntityName(string $foreignEntityName)
+    public function setForeignEntityName(string $foreignEntityName): void
     {
         $this->foreignEntityName = $foreignEntityName;
     }
@@ -430,7 +367,7 @@ class Relation
      */
     public function getForeignEntity(): ?Entity
     {
-        if (null !== $this->foreignEntity) {
+        if (isset($this->foreignEntity)) {
             return $this->foreignEntity;
         }
 
@@ -445,7 +382,7 @@ class Relation
     /**
      * @param null|Entity $foreignEntity
      */
-    public function setForeignEntity(Entity $foreignEntity)
+    public function setForeignEntity(Entity $foreignEntity): void
     {
         $this->foreignEntity = $foreignEntity;
     }
@@ -453,9 +390,9 @@ class Relation
     /**
      * Returns the name of the table the foreign key is in.
      *
-     * @return string
+     * @return Text
      */
-    public function getEntityName(): string
+    public function getEntityName(): Text
     {
         return $this->getEntity()->getName();
     }
@@ -463,9 +400,9 @@ class Relation
     /**
      * Returns the name of the schema the foreign key is in.
      *
-     * @return string
+     * @return Text
      */
-    public function getSchemaName(): string
+    public function getSchemaName(): Text
     {
         return $this->getEntity()->getSchemaName();
     }
@@ -473,8 +410,8 @@ class Relation
     /**
      * Adds a new reference entry to the foreign key.
      *
-     * @param mixed $ref1 A Field object or an associative array or a string
-     * @param mixed $ref2 A Field object or a single string name
+     * @param Field|array|string $ref1 A Field object or an associative array or a string
+     * @param Field|string $ref2 A Field object or a single string name
      */
     public function addReference($ref1, $ref2 = null)
     {
@@ -495,11 +432,11 @@ class Relation
         $local = null;
         $foreign = null;
         if ($ref1 instanceof Field) {
-            $local = $ref1->getName();
+            $local = $ref1->getName()->toString();
         }
 
         if ($ref2 instanceof Field) {
-            $foreign = $ref2->getName();
+            $foreign = $ref2->getName()->toString();
         }
 
         $this->localFields->add($local);
@@ -510,7 +447,7 @@ class Relation
      * Clears the references of this foreign key.
      *
      */
-    public function clearReferences()
+    public function clearReferences(): void
     {
         $this->localFields->clear();
         $this->foreignFields->clear();
@@ -519,9 +456,9 @@ class Relation
     /**
      * Returns an array of local field names.
      *
-     * @return UniqueList
+     * @return ArrayList
      */
-    public function getLocalFields(): UniqueList
+    public function getLocalFields(): ArrayList
     {
         return $this->localFields;
     }
@@ -529,26 +466,24 @@ class Relation
     /**
      * Returns an array of local field objects.
      *
-     * @return Field[]
+     * @return ArrayList
      */
-    public function getLocalFieldObjects(): array
+    public function getLocalFieldObjects(): ArrayList
     {
-        $fields = [];
-        foreach ($this->getLocalFields() as $fieldName) {
-            $field = $this->getEntity()->getField($fieldName);
+        return $this->getLocalFields()->map(function (string $fieldName): Field {
+            $field = $this->getEntity()->getFieldByName($fieldName);
             if (null === $field) {
                 throw new BuildException(sprintf(
-                        'Field `%s` in local reference of relation `%s` from `%s` to `%s` not found.',
-                        $fieldName,
-                        $this->getName(),
-                        $this->getEntity()->getName(),
-                        $this->getForeignEntity()->getName()
-                    ));
+                    'Field `%s` in local reference of relation `%s` from `%s` to `%s` not found.',
+                    $fieldName,
+                    $this->getName(),
+                    $this->getEntity()->getName(),
+                    $this->getForeignEntity()->getName()
+                ));
             }
-            $fields[] = $field;
-        }
 
-        return $fields;
+            return $field;
+        });
     }
 
     /**
@@ -560,7 +495,7 @@ class Relation
      */
     public function getLocalField(int $index = 0): Field
     {
-        return $this->getEntity()->getField($this->getLocalFields()->get($index));
+        return $this->getEntity()->getFieldByName($this->getLocalFields()->get($index));
     }
 
     /**
@@ -607,8 +542,8 @@ class Relation
         $foreignFields = $this->getForeignFieldObjects();
         for ($i = 0, $size = $this->localFields->size(); $i < $size; $i++) {
             $mapping[] = [
-                'local' => $this->getEntity()->getField($this->localFields->get($i)),
-                'foreign' => $foreignFields[$i],
+                'local' => $this->getEntity()->getFieldByName($this->localFields->get($i)),
+                'foreign' => $foreignFields->get($i),
             ];
         }
 
@@ -632,7 +567,7 @@ class Relation
         $mapping = [];
         $foreignFields = $this->getForeignFieldObjects();
         for ($i = 0, $size = $this->localFields->size(); $i < $size; $i++) {
-            $mapping[] = [$this->getEntity()->getField($this->localFields->get($i)), $foreignFields[$i]];
+            $mapping[] = [$this->getEntity()->getFieldByName($this->localFields->get($i)), $foreignFields->get($i)];
         }
 
         return $mapping;
@@ -649,7 +584,7 @@ class Relation
     {
         $m = $this->getLocalForeignMapping();
 
-        return isset($m[$local]) ? $m[$local] : null;
+        return $m[$local] ?? null;
     }
 
     /**
@@ -681,14 +616,14 @@ class Relation
      *
      * @return Field[]
      */
-    public function getForeignFieldObjects(): array
+    public function getForeignFieldObjects(): ArrayList
     {
-        $fields = [];
+        $fields = new ArrayList();
         $foreignEntity = $this->getForeignEntity();
         foreach ($this->foreignFields as $fieldName) {
             $field = null;
             if (false !== strpos($fieldName, '.')) {
-                list($relationName, $foreignFieldName) = explode('.', $fieldName);
+                [$relationName, $foreignFieldName] = explode('.', $fieldName);
                 $foreignRelation = $this->getForeignEntity()->getRelation($relationName);
                 if (!$foreignRelation) {
                     throw new BuildException(sprintf(
@@ -713,7 +648,7 @@ class Relation
 //                    }
 //                }
             } else {
-                $field = $foreignEntity->getField($fieldName);
+                $field = $foreignEntity->getFieldByName($fieldName);
             }
 
             if (null === $field) {
@@ -725,7 +660,7 @@ class Relation
                     $this->getForeignEntity()->getName()
                 ));
             }
-            $fields[] = $field;
+            $fields->add($field);
         }
 
         return $fields;
@@ -740,7 +675,7 @@ class Relation
      */
     public function getForeignField(int $index = 0): Field
     {
-        return $this->getForeignEntity()->getField($this->foreignFields->get($index));
+        return $this->getForeignEntity()->getFieldByName($this->foreignFields->get($index));
     }
 
     /**
@@ -751,7 +686,7 @@ class Relation
     public function isLocalFieldsRequired(): bool
     {
         foreach ($this->localFields as $fieldName) {
-            if (!$this->getEntity()->getField($fieldName)->isNotNull()) {
+            if (!$this->getEntity()->getFieldByName($fieldName)->isNotNull()) {
                 return false;
             }
         }
@@ -767,7 +702,7 @@ class Relation
     public function isAtLeastOneLocalFieldRequired(): bool
     {
         foreach ($this->localFields as $fieldName) {
-            if ($this->getEntity()->getField($fieldName)->isNotNull()) {
+            if ($this->getEntity()->getFieldByName($fieldName)->isNotNull()) {
                 return true;
             }
         }
@@ -809,7 +744,7 @@ class Relation
 
         $foreignCols = [];
         foreach ($this->localFields as $colName) {
-            $foreignCols[] = $foreignEntity->getField($lfmap[$colName])->getName();
+            $foreignCols[] = $foreignEntity->getFieldByName($lfmap[$colName])->getName();
         }
 
         return ((count($foreignPKCols) === count($foreignCols))
@@ -849,7 +784,7 @@ class Relation
      *
      * @param boolean $skip
      */
-    public function setSkipSql(bool $skip)
+    public function setSkipSql(bool $skip): void
     {
         $this->skipSql = $skip;
     }
@@ -877,7 +812,7 @@ class Relation
      */
     public function isMatchedByInverseFK(): bool
     {
-        return (Boolean)$this->getInverseFK();
+        return $this->getInverseFK() !== null;
     }
 
     public function getInverseFK(): ?Relation
@@ -938,13 +873,13 @@ class Relation
 
         $foreignPKCols = [];
         foreach ($foreignEntity->getPrimaryKey() as $fPKCol) {
-            $foreignPKCols[$fPKCol->getName()] = true;
+            $foreignPKCols[$fPKCol->getName()->toString()] = true;
         }
 
         $foreignCols = [];
         foreach ($this->getLocalField() as $colName) {
             if ($foreignPKCols[$lfmap[$colName]]) {
-                $foreignCols[] = $foreignEntity->getField($lfmap[$colName]);
+                $foreignCols[] = $foreignEntity->getFieldByName($lfmap[$colName]);
             }
         }
 
@@ -954,20 +889,11 @@ class Relation
     /**
      * Returns all local fields which are also a primary key of the local table.
      *
-     * @return Field[]
+     * @return ArrayList
      */
-    public function getLocalPrimaryKeys(): array
+    public function getLocalPrimaryKeys(): ArrayList
     {
-        $cols = [];
-        $localCols = $this->getLocalFieldObjects();
-
-        foreach ($localCols as $localCol) {
-            if ($localCol->isPrimaryKey()) {
-                $cols[] = $localCol;
-            }
-        }
-
-        return $cols;
+        return $this->getForeignFieldObjects()->filter(fn(Field $elem): bool => $elem->isPrimaryKey());
     }
 
     /**
@@ -977,9 +903,7 @@ class Relation
      */
     public function isAtLeastOneLocalPrimaryKey(): bool
     {
-        $cols = $this->getLocalPrimaryKeys();
-
-        return 0 !== count($cols);
+        return !$this->getLocalPrimaryKeys()->isEmpty();
     }
 
     public function setForeignSchema(string $foreignSchema): void
@@ -987,7 +911,7 @@ class Relation
         $this->foreignSchema = $foreignSchema;
     }
 
-    public function getForeignSchema()
+    public function getForeignSchema(): string
     {
         return $this->foreignSchema;
     }

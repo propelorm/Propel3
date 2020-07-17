@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,14 +7,14 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Tests\Generator\Model;
 
+use phootwork\lang\Text;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Platform\PgsqlPlatform;
 use Propel\Generator\Model\Model;
+use function DeepCopy\deep_copy;
 
 /**
  * Unit test suite for Database model class.
@@ -28,10 +27,10 @@ class DatabaseTest extends ModelTestCase
     {
         $database = new Database('bookstore');
 
-        $this->assertSame('bookstore', $database->getName());
+        $this->assertSame('bookstore', (string) $database->getName());
         $this->assertSame(Model::DEFAULT_STRING_FORMAT, $database->getStringFormat());
         $this->assertSame(Model::DEFAULT_ID_METHOD, $database->getIdMethod());
-        $this->assertEmpty($database->getScope());
+        $this->assertTrue($database->getScope()->isEmpty());
         $this->assertNull($database->getSchema());
         $this->assertNull($database->getDomain('BOOLEAN'));
         $this->assertNull($database->getGeneratorConfig());
@@ -58,8 +57,8 @@ class DatabaseTest extends ModelTestCase
          $behavior = $this->getBehaviorMock('foo');
 
          $database = new Database();
+         $database->addBehavior($behavior);
 
-         $this->assertInstanceOf('Propel\Generator\Model\Database', $database->addBehavior($behavior), 'Fluent api');
          $this->assertInstanceOf('Propel\Generator\Model\Behavior', $database->getBehavior('foo'));
          $this->assertSame($behavior, $database->getBehavior('foo'));
          $this->assertTrue($database->hasBehavior('foo'));
@@ -93,7 +92,7 @@ class DatabaseTest extends ModelTestCase
          $behavior = $database->getNextEntityBehavior();
 
          $this->assertInstanceOf('Propel\Generator\Model\Behavior', $behavior);
-         $this->assertSame('bar', $behavior->getName());
+         $this->assertSame('bar', (string) $behavior->getName());
      }
 
      public function testCantGetNextEntityBehavior()
@@ -187,11 +186,10 @@ class DatabaseTest extends ModelTestCase
         $this->assertNull($database->getDomain('baz'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testSetInvalidDefaultStringFormat()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $database = new Database();
         $database->setStringFormat('FOO');
     }
@@ -262,7 +260,7 @@ class DatabaseTest extends ModelTestCase
     {
         $db = new Database();
         $entity = $this->getEntityMock('First', ['tableName' => 'first_table', 'namespace' => 'my\\namespace']);
-        $entity->expects($this->any())->method('getFullTableName')->willReturn('mySchema.first_table');
+        $entity->expects($this->any())->method('getFullTableName')->willReturn(Text::create('mySchema.first_table'));
         $db->addEntity($entity);
 
         $this->assertTrue($db->hasEntityByFullName('my\\namespace\\First'));
@@ -295,11 +293,12 @@ class DatabaseTest extends ModelTestCase
         $db->addEntities($entities);
 
         $this->assertCount(5, $db->getEntities());
-        $this->assertEquals($entities, $db->getEntities());
+        $this->assertEquals($entities, $db->getEntities()->toArray());
     }
 
     public function testClone()
     {
+        //no more clone method: use `myclabs/deep-copy` instead
         $generatorConfig = $this->getMockBuilder('Propel\\Generator\\Config\\GeneratorConfig')
             ->disableOriginalConstructor()
             ->getMock();
@@ -314,7 +313,7 @@ class DatabaseTest extends ModelTestCase
         $db->setSchema($this->getSchemaMock());
         $db->addVendor($vendor);
 
-        $clone = clone $db;
+        $clone = deep_copy($db);
 
         $this->assertEquals($db, $clone, 'The clone object is equal.');
         $this->assertNotSame($db, $clone, 'The clone object is not the same.');

@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -11,11 +10,10 @@
 namespace Propel\Tests\Generator\Model;
 
 use org\bovigo\vfs\vfsStream;
-use Propel\Generator\Exception\SchemaException;
+use Propel\Generator\Exception\BehaviorNotFoundException;
 use Propel\Generator\Model\Behavior;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Schema\SchemaReader;
-use Propel\Tests\Helpers\MultipleBehavior;
 
 /**
  * Tests for Behavior class
@@ -29,7 +27,7 @@ class BehaviorTest extends ModelTestCase
         $b = new Behavior();
         $this->assertEquals('', $b->getName(), 'Behavior name is null string by default');
         $b->setName('foo');
-        $this->assertEquals($b->getName(), 'foo', 'setName() sets the name, and getName() gets it');
+        $this->assertEquals('foo', $b->getName(), 'setName() sets the name, and getName() gets it');
     }
 
     public function testEntity()
@@ -45,22 +43,18 @@ class BehaviorTest extends ModelTestCase
     public function testParameters()
     {
         $b = new Behavior();
-        $this->assertEquals($b->getParameters(), [], 'Behavior parameters is an empty array by default');
+        $this->assertEquals([], $b->getParameters()->toArray(), 'Behavior parameters is an empty array by default');
         $b->addParameter(['name' => 'foo', 'value' => 'bar']);
-        $this->assertEquals($b->getParameters(), ['foo' => 'bar'], 'addParameter() sets a parameter from an associative array');
+        $this->assertEquals(['foo' => 'bar'], $b->getParameters()->toArray(), 'addParameter() sets a parameter from an associative array');
         $b->addParameter(['name' => 'foo2', 'value' => 'bar2']);
-        $this->assertEquals($b->getParameters(), ['foo' => 'bar', 'foo2' => 'bar2'], 'addParameter() adds a parameter from an associative array');
+        $this->assertEquals(['foo' => 'bar', 'foo2' => 'bar2'], $b->getParameters()->toArray(), 'addParameter() adds a parameter from an associative array');
         $b->addParameter(['name' => 'foo', 'value' => 'bar3']);
-        $this->assertEquals($b->getParameters(), ['foo' => 'bar3', 'foo2' => 'bar2'], 'addParameter() changes a parameter from an associative array');
-        $this->assertEquals($b->getParameter('foo'), 'bar3', 'getParameter() retrieves a parameter value by name');
+        $this->assertEquals(['foo' => 'bar3', 'foo2' => 'bar2'], $b->getParameters()->toArray(), 'addParameter() changes a parameter from an associative array');
+        $this->assertEquals('bar3', $b->getParameter('foo'), 'getParameter() retrieves a parameter value by name');
         $b->setParameters(['foo3' => 'bar3', 'foo4' => 'bar4']);
-        $this->assertEquals($b->getParameters(), ['foo3' => 'bar3', 'foo4' => 'bar4'], 'setParameters() changes the whole parameter array');
+        $this->assertEquals(['foo3' => 'bar3', 'foo4' => 'bar4'], $b->getParameters()->toArray(), 'setParameters() changes the whole parameter array');
     }
 
-    /**
-     * test if the tables get the package name from the properties file
-     *
-     */
     public function testSchemaReader()
     {
         $schemaReader = new SchemaReader();
@@ -88,16 +82,15 @@ EOF;
         $this->assertEquals('Entity1', $behavior->getEntity()->getName(), 'SchemaReader sets the behavior entity correctly');
         $this->assertEquals(
             ['create_field' => 'created_on', 'update_field' => 'updated_on', 'disable_created_at' => false, 'disable_updated_at' => false],
-            $behavior->getParameters(),
+            $behavior->getParameters()->toArray(),
             'SchemaReader sets the behavior parameters correctly'
         );
     }
 
-    /**
-     * @expectedException \Propel\Generator\Exception\BehaviorNotFoundException
-     */
     public function testUnknownBehavior()
     {
+        $this->expectException(BehaviorNotFoundException::class);
+
         $schemaReader = new SchemaReader();
         $content = <<<EOF
 <database name="test1">
@@ -169,6 +162,6 @@ EOF;
         $appData = $schemaReader->parse($schema->url());
         $entity = $appData->getDatabase('test1')->getEntityByName('Table1');
         $behavior = $entity->getBehavior('timestampable');
-        $this->assertEquals($entity->getField('created_on'), $behavior->getFieldForParameter('create_field'), 'getFieldForParameter() returns the configured field for behavior based on a parameter name');
+        $this->assertEquals($entity->getFieldByName('created_on'), $behavior->getFieldForParameter('create_field'), 'getFieldForParameter() returns the configured field for behavior based on a parameter name');
     }
 }

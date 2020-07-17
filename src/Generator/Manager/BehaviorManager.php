@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,19 +8,18 @@
  *
  */
 
-declare(strict_types=1);
-
 namespace Propel\Generator\Manager;
 
+use phootwork\collection\Map;
 use phootwork\json\Json;
 use phootwork\json\JsonException;
+use phootwork\lang\Text;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Propel\Generator\Config\GeneratorConfigInterface;
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Model\Behavior;
 use Propel\Generator\Exception\BehaviorNotFoundException;
-use Propel\Generator\Model\NamingTool;
 
 /**
  * Behavior manager to locate and instantiate behaviors
@@ -32,44 +31,25 @@ class BehaviorManager
 {
     const BEHAVIOR_PACKAGE_TYPE = 'propel-behavior';
     
-    private $behaviors = null;
-    
-    private $composerDir = null;
+    private Map $behaviors; //@todo is this property useful?
+    private string $composerDir = '';
 
-    /**
-     * Creates a new behavior manager
-     *
-     * @var GeneratorConfigInterface
-     */
-    private $generatorConfig = null;
-    
     public function __construct(GeneratorConfigInterface $config = null)
     {
-        $this->setGeneratorConfig($config);
-    }
-    
-    /**
-     * Sets the generator config
-     *
-     * @param GeneratorConfigInterface $config build config
-     */
-    public function setGeneratorConfig(GeneratorConfigInterface $config = null)
-    {
-        $this->generatorConfig = $config;
-        $this->composerDir = null;
-        $this->behaviors = null;
-        
-        if (null !== $config) {
-            $this->composerDir = $config->get()['paths']['composerDir'];
+        if ($config !== null) {
+            $this->composerDir = $config->get('paths.composerDir') ?? '';
         }
+        $this->behaviors =new Map();
     }
-    
+
     /**
      * Instantiates a behavior from a given name
      *
      * @param string $name
-     * @throws BuildException
+     *
      * @return Behavior
+     * @throws JsonException
+     * @throws BuildException
      */
     public function create(string $name): Behavior
     {
@@ -85,16 +65,18 @@ class BehaviorManager
         }
         return $behavior;
     }
-    
+
     /**
      * Searches a composer file
      *
+     * @param string $fileName
+     *
      * @return SplFileInfo the found composer file or null if composer file isn't found
      */
-    private function findComposerFile($fileName)
+    private function findComposerFile(string $fileName): ?SplFileInfo
     {
-        if (null !== $this->composerDir) {
-            $filePath = $this->composerDir . '/' . $fileName;
+        if ('' !== $this->composerDir) {
+            $filePath = "{$this->composerDir}/$fileName";
             
             if (file_exists($filePath)) {
                 return new SplFileInfo($filePath, dirname($filePath), dirname($filePath));
@@ -147,21 +129,20 @@ class BehaviorManager
             __DIR__ . '/../../../../'            // propel development environment
         ];
     }
-    
+
     /**
      * Returns the loaded behaviors and loads them if not done before
      *
-     * @return array behaviors
+     * @return Map behaviors
+     * @throws JsonException
      */
-    public function getBehaviors()
+    public function getBehaviors(): Map
     {
-        if (null === $this->behaviors) {
+        if (!isset($this->behaviors)) {
             // find behaviors in composer.lock file
             $lock = $this->findComposerLock();
             
-            if (null === $lock) {
-                $this->behaviors = [];
-            } else {
+            if (null !== $lock) {
                 $this->behaviors = $this->loadBehaviors($lock);
             }
             
@@ -184,10 +165,10 @@ class BehaviorManager
      * Returns the class name for a given behavior name
      *
      * @param  string                    $name The behavior name (e.g. timetampable)
-     * @throws BehaviorNotFoundException when the behavior cannot be found
+     * @throws BehaviorNotFoundException|JsonException when the behavior cannot be found
      * @return string                    the class name
      */
-    public function getClassname($name)
+    public function getClassname(string $name): string
     {
         if (false !== strpos($name, '\\')) {
             $class = $name;
@@ -196,7 +177,7 @@ class BehaviorManager
             
             if (!class_exists($class)) {
                 $behaviors = $this->getBehaviors();
-                if (array_key_exists($name, $behaviors)) {
+                if ($behaviors->has($name)) {
                     $class = $behaviors[$name]['class'];
                 }
             }
@@ -216,9 +197,9 @@ class BehaviorManager
      * @param  string $name The behavior name (ie: timestampable)
      * @return string The behavior fully qualified class name
      */
-    private function getCoreBehavior($name)
+    private function getCoreBehavior(string $name): string
     {
-        $phpName = NamingTool::toStudlyCase($name);
+        $phpName = Text::create($name)->toStudlyCase()->toString();
         
         return sprintf('\\Propel\\Generator\\Behavior\\%s\\%sBehavior', $phpName, $phpName);
     }
@@ -227,25 +208,22 @@ class BehaviorManager
      * Finds all behaviors by parsing composer.lock file
      *
      * @param SplFileInfo $composerLock
-     * @return array
+     * @return Map
      * @throws JsonException
      */
-    private function loadBehaviors($composerLock): array
+    private function loadBehaviors(SplFileInfo $composerLock = null): Map
     {
-        $behaviors = [];
-        
-        if (null === $composerLock) {
-            return $behaviors;
-        }
-        
-        $json = Json::decode($composerLock->getContents(), true);
-        
-        if (isset($json['packages'])) {
-            foreach ($json['packages'] as $package) {
-                $behavior = $this->loadBehavior($package);
-                
-                if (null !== $behavior) {
-                    $behaviors[$behavior['name']] = $behavior;
+        $behaviors =new Map();
+        if (null !== $composerLock) {
+            $json = Json::decode($composerLock->getContents());
+
+            if (isset($json['packages'])) {
+                foreach ($json['packages'] as $package) {
+                    $behavior = $this->loadBehavior($package);
+
+                    if (null !== $behavior) {
+                        $behaviors->set($behavior['name'], $behavior);
+                    }
                 }
             }
         }
@@ -260,7 +238,7 @@ class BehaviorManager
      * @throws BuildException
      * @return array          behavior data
      */
-    private function loadBehavior($package)
+    private function loadBehavior(array $package): array
     {
         if (isset($package['type']) && $package['type'] == self::BEHAVIOR_PACKAGE_TYPE) {
             
@@ -280,6 +258,6 @@ class BehaviorManager
             }
         }
         
-        return null;
+        return [];
     }
 }

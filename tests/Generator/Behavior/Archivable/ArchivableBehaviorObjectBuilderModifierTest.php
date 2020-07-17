@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Propel package.
@@ -22,7 +22,7 @@ use Propel\Tests\TestCase;
  */
 class ArchivableBehaviorObjectBuilderModifierTest extends TestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         $schema = <<<EOF
 <database name="archivable_behavior_test_10" activeRecord="true">
@@ -77,20 +77,20 @@ EOF;
         QuickBuilder::buildSchema($schema);
     }
 
-    public function testHasGetArchiveMethod()
+    public function testHasGetArchiveMethod(): void
     {
         $this->assertTrue(method_exists('\Base\BaseArchivableTest10Repository', 'getArchive'));
     }
 
 
-    public function testGetArchiveReturnsNullOnNewObjects()
+    public function testGetArchiveReturnsNullOnNewObjects(): void
     {
         $repo = QuickBuilder::$configuration->getRepository('ArchivableTest10');
         $a = new \ArchivableTest10();
         $this->assertNull($repo->getArchive($a));
     }
 
-    public function testGetArchiveReturnsNullWhenNoArchiveIsFound()
+    public function testGetArchiveReturnsNullWhenNoArchiveIsFound(): void
     {
         $a = new \ArchivableTest10();
         $a->setTitle('foo');
@@ -99,7 +99,7 @@ EOF;
         $this->assertNull($a->getArchive());
     }
 
-    public function testGetArchiveReturnsExistingArchive()
+    public function testGetArchiveReturnsExistingArchive(): void
     {
         $a = new \ArchivableTest10();
         $a->setTitle('foo');

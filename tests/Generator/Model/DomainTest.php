@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -11,6 +10,8 @@
 namespace Propel\Tests\Generator\Model;
 
 use Propel\Generator\Model\Domain;
+use Propel\Generator\Model\FieldDefaultValue;
+use function DeepCopy\deep_copy;
 
 /**
  * Unit test suite for the Domain model class.
@@ -19,7 +20,7 @@ use Propel\Generator\Model\Domain;
  */
 class DomainTest extends ModelTestCase
 {
-    public function testCreateNewDomain()
+    public function testCreateNewDomain(): void
     {
         $domain = new Domain('FLOAT', 'DOUBLE', 10, 2);
 
@@ -29,7 +30,7 @@ class DomainTest extends ModelTestCase
         $this->assertSame(2, $domain->getScale());
     }
 
-    public function testSetDatabase()
+    public function testSetDatabase(): void
     {
         $domain = new Domain();
         $domain->setDatabase($this->getDatabaseMock('bookstore'));
@@ -37,7 +38,7 @@ class DomainTest extends ModelTestCase
         $this->assertInstanceOf('Propel\Generator\Model\Database', $domain->getDatabase());
     }
 
-    public function testReplaceMappingAndSqlTypes()
+    public function testReplaceMappingAndSqlTypes(): void
     {
         $value = $this->getFieldDefaultValueMock();
 
@@ -51,14 +52,14 @@ class DomainTest extends ModelTestCase
         $this->assertInstanceOf('Propel\Generator\Model\FieldDefaultValue', $value);
     }
 
-    public function testGetNoPhpDefaultValue()
+    public function testGetNoPhpDefaultValue(): void
     {
         $domain = new Domain();
 
         $this->assertNull($domain->getPhpDefaultValue());
     }
 
-    public function testGetPhpDefaultValue()
+    public function testGetPhpDefaultValue(): void
     {
         $value = $this->getFieldDefaultValueMock();
         $value
@@ -77,7 +78,7 @@ class DomainTest extends ModelTestCase
      * @dataProvider provideBooleanValues
      *
      */
-    public function testGetBooleanValue($mappingType, $booleanAsString, $expected)
+    public function testGetBooleanValue($mappingType, $booleanAsString, $expected): void
     {
         $value = $this->getFieldDefaultValueMock();
         $value
@@ -92,7 +93,7 @@ class DomainTest extends ModelTestCase
         $this->assertSame($expected, $domain->getPhpDefaultValue());
     }
 
-    public function provideBooleanValues()
+    public function provideBooleanValues(): array
     {
         return [
             ['BOOLEAN', 1, true],
@@ -110,7 +111,7 @@ class DomainTest extends ModelTestCase
         ];
     }
 
-    public function testGetPhpDefaultValueArray()
+    public function testGetPhpDefaultValueArray(): void
     {
         $value = $this->getFieldDefaultValueMock();
         $value
@@ -122,10 +123,10 @@ class DomainTest extends ModelTestCase
         $domain = new Domain('ARRAY');
         $domain->setDefaultValue($value);
 
-        $this->assertSame('||foo | bar | baz | foobar||', $domain->getPhpDefaultValue());
+        $this->assertSame('||foo | bar | baz | foobar||', $domain->getPhpDefaultValue()->toString());
     }
 
-    public function testGetPhpDefaultValueArrayNull()
+    public function testGetPhpDefaultValueArrayNull(): void
     {
         $value = $this->getFieldDefaultValueMock();
         $value
@@ -140,7 +141,7 @@ class DomainTest extends ModelTestCase
         $this->assertNull($domain->getPhpDefaultValue());
     }
 
-    public function testGetPhpDefaultValueArrayDelimiter()
+    public function testGetPhpDefaultValueArrayDelimiter(): void
     {
         $value = $this->getFieldDefaultValueMock();
         $value
@@ -155,7 +156,7 @@ class DomainTest extends ModelTestCase
         $this->assertNull($domain->getPhpDefaultValue());
     }
 
-    public function testCantGetPhpDefaultValue()
+    public function testCantGetPhpDefaultValue(): void
     {
         $value = $this->getFieldDefaultValueMock();
         $value
@@ -175,14 +176,14 @@ class DomainTest extends ModelTestCase
      * @dataProvider provideSizeDefinitions
      *
      */
-    public function testGetSizeDefinition($size, $scale, $definition)
+    public function testGetSizeDefinition($size, $scale, $definition): void
     {
         $domain = new Domain('FLOAT', 'DOUBLE', $size, $scale);
 
         $this->assertSame($definition, $domain->getSizeDefinition());
     }
 
-    public function provideSizeDefinitions()
+    public function provideSizeDefinitions(): array
     {
         return [
             [10, null, '(10)'],
@@ -191,7 +192,7 @@ class DomainTest extends ModelTestCase
         ];
     }
 
-    public function testCopyDomain()
+    public function testCopyDomain(): void
     {
         $value = $this->getFieldDefaultValueMock();
 
@@ -211,34 +212,36 @@ class DomainTest extends ModelTestCase
         $this->assertSame('DOUBLE', $newDomain->getSqlType());
         $this->assertSame(10, $newDomain->getSize());
         $this->assertSame(2, $newDomain->getScale());
-        $this->assertSame('Mapping between FLOAT and DOUBLE', $newDomain->getName());
+        $this->assertSame('Mapping between FLOAT and DOUBLE', $newDomain->getName()->toString());
         $this->assertSame('Some description', $newDomain->getDescription());
         $this->assertInstanceOf('Propel\Generator\Model\FieldDefaultValue', $value);
     }
 
     public function testCloneWithDefaultValue()
     {
+        //Clone not supported. Use myclabs/deep-copy instead
         $value = $this->getFieldDefaultValueMock();
 
         $domain = new Domain();
         $domain->setDefaultValue($value);
 
-        $clonedDoman = clone $domain;
+        $clonedDomain = deep_copy($domain);
 
-        $this->assertEquals($domain, $clonedDoman);
-        $this->assertNotSame($domain, $clonedDoman);
+        $this->assertEquals($domain, $clonedDomain);
+        $this->assertNotSame($domain, $clonedDomain);
     }
 
-    public function testCloneWithoutDefaultValue()
+    public function testCloneWithoutDefaultValue(): void
     {
+        //Clone not supported. Use myclabs/deep-copy instead
         $domain = new Domain();
-        $clonedDoman = clone $domain;
+        $clonedDomain = deep_copy($domain);
 
-        $this->assertEquals($domain, $clonedDoman);
-        $this->assertNotSame($domain, $clonedDoman);
+        $this->assertEquals($domain, $clonedDomain);
+        $this->assertNotSame($domain, $clonedDomain);
     }
 
-    private function getFieldDefaultValueMock()
+    private function getFieldDefaultValueMock(): FieldDefaultValue
     {
         $value = $this
             ->getMockBuilder('Propel\Generator\Model\FieldDefaultValue')

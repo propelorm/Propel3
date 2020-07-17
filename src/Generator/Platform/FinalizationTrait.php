@@ -14,7 +14,6 @@ namespace Propel\Generator\Platform;
 
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Model\Database;
-use Propel\Generator\Model\Domain;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\Index;
@@ -135,7 +134,7 @@ trait FinalizationTrait
             $entity->getDatabase()->getEntityByFullName($relation->getForeignEntityName())
         ;
         $referrers = $foreignEntity->getReferrers();
-        if (null === $referrers || !in_array($relation, $referrers, true)) {
+        if (null === $referrers || !$referrers->contains($relation)) {
             $foreignEntity->addReferrer($relation);
         }
 

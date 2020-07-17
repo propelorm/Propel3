@@ -228,7 +228,7 @@ abstract class AbstractSchemaParser implements SchemaParserInterface, SqlSchemaP
      *
      * @return \Propel\Generator\Platform\PlatformInterface
      */
-    public function getPlatform()
+    public function getPlatform(): PlatformInterface
     {
         if (null === $this->platform) {
             $this->platform = $this->getGeneratorConfig()->createPlatformForDatabase();

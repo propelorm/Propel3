@@ -27,7 +27,7 @@ use Propel\Generator\Model\ModelFactory;
 class ConcreteInheritanceParentBehavior extends Behavior
 {
     // default parameters value
-    protected $defaultParameters = [
+    protected array $defaultParameters = [
         'descendant_field' => 'descendantClass'
     ];
 

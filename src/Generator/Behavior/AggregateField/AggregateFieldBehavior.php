@@ -27,7 +27,7 @@ class AggregateFieldBehavior extends Behavior
     use ComponentTrait;
 
     // default parameters value
-    protected $defaultParameters = [
+    protected array $defaultParameters = [
         'name' => null,
         'expression' => null,
         'condition' => null,

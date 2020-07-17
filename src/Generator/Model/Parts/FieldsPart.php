@@ -9,7 +9,8 @@
 
 namespace Propel\Generator\Model\Parts;
 
-use Propel\Common\Collection\Set;
+use phootwork\collection\Set;
+use phootwork\lang\Text;
 use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Field;
@@ -22,14 +23,13 @@ use Propel\Generator\Model\Field;
  */
 trait FieldsPart
 {
-    /**
-     * @var Set
-     */
-    protected $fields;
+    protected Set $fields;
 
-    public function initFields()
+    abstract protected function getEntity(): ?Entity;
+
+    public function initFields(): void
     {
-        $this->fields =new Set([], Field::class);
+        $this->fields = new Set();
     }
 
     /**
@@ -41,9 +41,7 @@ trait FieldsPart
      */
     public function getFieldByName(string $name): ?Field
     {
-        return $this->fields->find(function(Field $element) use ($name){
-            return $element->getName() === $name;
-        });
+        return $this->fields->find($name, fn(Field $element, string $query): bool => $element->getName()->toString() === $query);
     }
 
     /**
@@ -55,9 +53,8 @@ trait FieldsPart
      */
     public function getFieldByLowercaseName(string $name): ?Field
     {
-        return $this->fields->find(function(Field $element) use ($name){
-            return strtolower($element->getName()) === strtolower($name);
-        });
+        return $this->fields->find($name,
+            fn(Field $element, string $query): bool => $element->getName()->toLowerCase() === strtolower($query));
     }
 
     /**
@@ -68,7 +65,7 @@ trait FieldsPart
      *
      * @throws EngineException If the field is already added
      */
-    public function addField(Field $field)
+    public function addField(Field $field): void
     {
         if (null !== $this->getEntity()) {
             $field->setEntity($this->getEntity());
@@ -81,55 +78,38 @@ trait FieldsPart
      *
      * @param Field[] $fields An array of Field instance
      */
-    public function addFields(array $fields)
+    public function addFields(array $fields): void
     {
-        foreach ($fields as $field) {
-            $this->addField($field);
+        if (null !== $this->getEntity()) {
+            foreach ($fields as $field) {
+                $field->setEntity($this->getEntity());
+            }
         }
+        $this->fields->add(...$fields);
     }
 
     /**
      * Returns whether or not the entity has a field.
      *
-     * @param Field|string $field The Field object or its name
+     * @param Field $field The Field object or its name
      *
      * @return bool
      */
-    public function hasField($field): bool
+    public function hasField(Field $field): bool
     {
-        if ($field instanceof Field) {
-            return $this->fields->contains($field);
-        }
-
-        return (bool) $this->getFieldByName($field);
+        return $this->fields->contains($field);
     }
 
     /**
-     * Returns the Field object with the specified name.
+     * Returns whether or not the entity has a field.
      *
-     * @param string $name The name of the field (e.g. 'my_field')
+     * @param string $field The Field object or its name
      *
-     * @return Field
+     * @return bool
      */
-    public function getField(string $name): Field
+    public function hasFieldByName(string $field): bool
     {
-        if (!$this->hasField($name)) {
-            $fieldsList = '';
-            $this->fields->each(function (Field $element) use ($fieldsList) {
-                $fieldsList .= $element->getName() . ', ';
-            });
-            $fieldsList = substr($fieldsList, 0, -2);
-
-            throw new \InvalidArgumentException(sprintf(
-                "Field `%s` not found in %s `%s` [%s]",
-                $name,
-                get_class($this),
-                $this->getName(),
-                $fieldsList)
-            );
-        }
-
-        return $this->getFieldByName($name);
+        return $this->getFieldByName($field) !== null;
     }
 
     /**
@@ -145,17 +125,13 @@ trait FieldsPart
     /**
      * Removes a field from the fields collection.
      *
-     * @param  Field|string $field The Field or its name
+     * @param  Field $field The Field or its name
      *
      * @throws EngineException
      */
-    public function removeField($field)
+    public function removeField(Field $field): void
     {
-        if (is_string($field)) {
-            $field = $this->getField($field);
-        }
-
-        if (null === $field || !$this->fields->contains($field)) {
+        if (!$this->fields->contains($field)) {
             throw new EngineException(sprintf('No field named %s found in entity %s.', $field->getName(), $this->getName()));
         }
 
@@ -170,5 +146,15 @@ trait FieldsPart
 
             // @FIXME: also remove indexes on this field?
         }
+    }
+
+    public function removeFieldByName(string $name): void
+    {
+        $field = $this->getFieldByName($name);
+        if (null === $field) {
+            throw new EngineException(sprintf('No field named %s found in entity %s.', $name, $this->getName()));
+        }
+
+        $this->removeField($field);
     }
 }

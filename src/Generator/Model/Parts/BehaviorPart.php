@@ -9,22 +9,27 @@
 
 namespace Propel\Generator\Model\Parts;
 
+use phootwork\collection\Map;
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Model\Behavior;
-use Propel\Common\Collection\Map;
 
-/**
- * BehaviorableTrait use it on every model that can hold behaviors
- *
- */
 trait BehaviorPart
 {
-    /** @var Map */
-    protected $behaviors;
+    protected Map $behaviors;
+
+    /**
+     * @param Behavior $behavior
+     */
+    abstract protected function registerBehavior(Behavior $behavior): void;
+
+    /**
+     * @param Behavior $behavior
+     */
+    abstract protected function unregisterBehavior(Behavior $behavior): void;
 
     protected function initBehaviors()
     {
-        $this->behaviors = new Map([], Behavior::class);
+        $this->behaviors = new Map();
     }
 
     /**
@@ -32,10 +37,8 @@ trait BehaviorPart
      *
      * @param Behavior $behavior
      * @throws BuildException when the added behavior is not an instance of \Propel\Generator\Model\Behavior
-
-     * @return $this
      */
-    public function addBehavior(Behavior $behavior)
+    public function addBehavior(Behavior $behavior): void
     {
         // the new behavior is already registered
         if ($this->hasBehavior($behavior->getId()) && $behavior->allowMultiple()) {
@@ -56,32 +59,17 @@ trait BehaviorPart
 
         $this->registerBehavior($behavior);
         $this->behaviors->set($behavior->getId(), $behavior);
-
-        return $this;
     }
-
-    /**
-     * @param Behavior $behavior
-     */
-    abstract protected function registerBehavior(Behavior $behavior);
 
     /**
      * Removes the behavior
      * @param Behavior $behavior
-     * @return $this
      */
-    public function removeBehavior(Behavior $behavior)
+    public function removeBehavior(Behavior $behavior): void
     {
         $this->unregisterBehavior($behavior);
         $this->behaviors->remove($behavior->getId());
-
-        return $this;
     }
-
-    /**
-     * @param Behavior $behavior
-     */
-    abstract protected function unregisterBehavior(Behavior $behavior);
 
     /**
      * Returns the list of behaviors.
@@ -99,7 +87,7 @@ trait BehaviorPart
      * @param string $id the behavior id
      * @return bool True if the behavior exists
      */
-    public function hasBehavior($id): bool
+    public function hasBehavior(string $id): bool
     {
         return $this->behaviors->has($id);
     }
@@ -112,10 +100,6 @@ trait BehaviorPart
      */
     public function getBehavior($id): ?Behavior
     {
-        if ($this->hasBehavior($id)) {
-            return $this->behaviors->get($id);
-        }
-
-        return null;
+        return $this->behaviors->get($id);
     }
 }

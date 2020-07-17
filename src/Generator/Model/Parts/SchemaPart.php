@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -6,8 +6,6 @@
  *
  * @license MIT License
  */
-
-declare(strict_types=1);
 
 namespace Propel\Generator\Model\Parts;
 
@@ -20,39 +18,22 @@ use Propel\Generator\Model\Schema;
  */
 trait SchemaPart
 {
-    /** @var Schema */
-    protected $schema;
+    protected Schema $schema;
 
     /**
      * @param Schema $schema
-     *
-     * @return mixed
      */
-    abstract protected function registerSchema(Schema $schema);
-
-    /**
-     * @param Schema $schema
-     *
-     * @return mixed
-     */
-    abstract protected function unregisterSchema(Schema $schema);
+    abstract protected function registerSchema(Schema $schema): void;
 
     /**
      * Sets the parent schema (will make this an external schema)
      *
      * @param Schema $schema
-     * @return $this
      */
-    public function setSchema(Schema $schema)
+    public function setSchema(Schema $schema): void
     {
         $this->schema = $schema;
-        if ($schema) {
-            $this->registerSchema($schema);
-        } else {
-            $this->unregisterSchema($schema);
-        }
-
-        return $this;
+        $this->registerSchema($schema);
     }
 
     /**
@@ -62,6 +43,6 @@ trait SchemaPart
      */
     public function getSchema(): ?Schema
     {
-        return $this->schema;
+        return $this->schema ?? null;
     }
 }

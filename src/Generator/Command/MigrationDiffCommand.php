@@ -99,8 +99,8 @@ class MigrationDiffCommand extends AbstractCommand
         }
 
         $manager->setConnections($connections);
-        $manager->setMigrationTable($generatorConfig->getConfigProperty('migrations.tableName'));
-        $manager->setWorkingDirectory($generatorConfig->getSection('paths')['migrationDir']);
+        $manager->setMigrationTable($generatorConfig->get('migrations.tableName'));
+        $manager->setWorkingDirectory($generatorConfig->get('paths.migrationDir'));
 
         if ($manager->hasPendingMigrations()) {
             throw new RuntimeException('Uncommitted migrations have been found ; you should either execute or delete them before rerunning the \'diff\' task');

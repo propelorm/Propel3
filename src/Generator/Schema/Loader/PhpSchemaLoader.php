@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,11 +7,10 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Generator\Schema\Loader;
 
 use phootwork\file\File;
+use phootwork\lang\Text;
 use Propel\Generator\Schema\Exception\InputOutputException;
 use Propel\Generator\Schema\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Loader\FileLoader;
@@ -41,10 +40,10 @@ class PhpSchemaLoader extends FileLoader
      * @return array
      *
      * @throws \InvalidArgumentException                                   if schema file not found
-     * @throws \Propel\Generator\Schema\Exception\InvalidArgumentException if invalid file content
-     * @throws \Propel\Generator\Schema\Exception\InputOutputException     if schema file is not readable
+     * @throws InvalidArgumentException if invalid file content
+     * @throws InputOutputException     if schema file is not readable
      */
-    public function load($file, $type = null)
+    public function load($file, string $type = null): array
     {
         $path = $this->locator->locate($file);
 
@@ -73,11 +72,10 @@ class PhpSchemaLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null): bool
+    public function supports($resource, string $type = null): bool
     {
-        $file = new File($resource);
-        $extension = $file->getExtension();
+        $resource = new Text($resource);
 
-        return ('php' === $extension) || ('inc') === $extension;
+        return $resource->endsWith('.php') || $resource->endsWith('.inc');
     }
 }

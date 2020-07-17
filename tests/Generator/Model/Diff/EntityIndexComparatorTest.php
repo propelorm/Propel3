@@ -1,13 +1,13 @@
-<?php
-
-/*
- *	$Id: EntityTest.php 1891 2010-08-09 15:03:18Z francois $
+<?php declare(strict_types=1);
+/**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * @license MIT License
+ *
  */
+
 namespace Propel\Tests\Generator\Model\Diff;
 
 use Propel\Generator\Model\Field;
@@ -26,22 +26,19 @@ use \Propel\Tests\TestCase;
  */
 class EntityIndexComparatorTest extends TestCase
 {
-    /**
-     * @var MysqlPlatform
-     */
-    protected $platform;
+    protected MysqlPlatform $platform;
 
-    public function setUp()
+    public function setup(): void
     {
         $this->platform = new MysqlPlatform();
     }
 
-    public function testCompareSameIndices()
+    public function testCompareSameIndices(): void
     {
         $t1 = new Entity();
         $c1 = new Field('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c1->getDomain()->replaceScale(2);
+        $c1->getDomain()->setScale(2);
         $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
@@ -49,10 +46,11 @@ class EntityIndexComparatorTest extends TestCase
         $i1 = new Index('Foo_Index');
         $i1->addField($c1);
         $t1->addIndex($i1);
+
         $t2 = new Entity();
         $c2 = new Field('Foo');
         $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c2->getDomain()->replaceScale(2);
+        $c2->getDomain()->setScale(2);
         $c2->getDomain()->setSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new FieldDefaultValue(123, FieldDefaultValue::TYPE_VALUE));
@@ -64,7 +62,7 @@ class EntityIndexComparatorTest extends TestCase
         $this->assertNull(EntityComparator::computeDiff($t1, $t2));
     }
 
-    public function testCompareNotSameIndices()
+    public function testCompareNotSameIndices(): void
     {
         $t1 = new Entity();
         $c1 = new Field('Foo');
@@ -93,7 +91,7 @@ class EntityIndexComparatorTest extends TestCase
         $this->assertTrue($diff instanceof EntityDiff);
     }
 
-    public function testCompareAddedIndices()
+    public function testCompareAddedIndices(): void
     {
         $t1 = new Entity();
         $t2 = new Entity();
@@ -118,7 +116,7 @@ class EntityIndexComparatorTest extends TestCase
         $this->assertEquals(['Foo_Index' => $i2], $tableDiff->getAddedIndices()->toArray());
     }
 
-    public function testCompareRemovedIndices()
+    public function testCompareRemovedIndices(): void
     {
         $t1 = new Entity();
         $c1 = new Field('Bar');
@@ -143,7 +141,7 @@ class EntityIndexComparatorTest extends TestCase
         $this->assertEquals(['Bar_Index' => $i1], $tableDiff->getRemovedIndices()->toArray());
     }
 
-    public function testCompareModifiedIndices()
+    public function testCompareModifiedIndices(): void
     {
         $t1 = new Entity();
         $c1 = new Field('Foo');

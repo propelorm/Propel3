@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,8 +6,6 @@
  *
  * @license MIT License
  */
-
-declare(strict_types=1);
 
 namespace Propel\Tests\Generator\Model;
 
@@ -21,7 +18,7 @@ use Propel\Generator\Model\Index;
  */
 class IndexTest extends ModelTestCase
 {
-    public function testCreateNamedIndex()
+    public function testCreateNamedIndex(): void
     {
         $index = new Index('foo_idx');
         $index->setEntity($this->getEntityMock('db_books'));
@@ -29,7 +26,7 @@ class IndexTest extends ModelTestCase
         $this->assertEquals('foo_idx', $index->getName());
         $this->assertFalse($index->isUnique());
         $this->assertInstanceOf('Propel\Generator\Model\Entity', $index->getEntity());
-        $this->assertSame('db_books', $index->getEntity()->getName());
+        $this->assertEquals('db_books', $index->getEntity()->getName());
         $this->assertCount(0, $index->getFields());
         $this->assertTrue($index->getFields()->isEmpty());
     }
@@ -38,7 +35,7 @@ class IndexTest extends ModelTestCase
      * @dataProvider provideEntitySpecificAttributes
      *
      */
-    public function testCreateDefaultIndexName($tableName, $maxFieldNameLength, $indexName)
+    public function testCreateDefaultIndexName($tableName, $maxFieldNameLength, $indexName): void
     {
         $platform = $this->getPlatformMock(true, ['max_field_name_length' => $maxFieldNameLength]);
         $database = $this->getDatabaseMock('bookstore', ['platform' => $platform]);
@@ -52,10 +49,10 @@ class IndexTest extends ModelTestCase
         $index = new Index();
         $index->setEntity($table);
 
-        $this->assertSame($indexName, $index->getName());
+        $this->assertEquals($indexName, $index->getName());
     }
 
-    public function provideEntitySpecificAttributes()
+    public function provideEntitySpecificAttributes(): array
     {
         return [
             [ 'books', 64, 'books_i_no_fields' ],
@@ -63,7 +60,7 @@ class IndexTest extends ModelTestCase
         ];
     }
 
-    public function testAddIndexedFields()
+    public function testAddIndexedFields(): void
     {
         $columns = [
             $this->getFieldMock('foo', [ 'size' => 100 ]),
@@ -77,12 +74,12 @@ class IndexTest extends ModelTestCase
 
         $this->assertFalse($index->getFields()->isEmpty());
         $this->assertCount(3, $index->getFields());
-        $this->assertSame(100, $index->getField('foo')->getSize());
-        $this->assertSame(5, $index->getField('bar')->getSize());
-        $this->assertEquals(0, $index->getField('baz')->getSize());
+        $this->assertSame(100, $index->getFieldByName('foo')->getSize());
+        $this->assertSame(5, $index->getFieldByName('bar')->getSize());
+        $this->assertEquals(0, $index->getFieldByName('baz')->getSize());
     }
 
-    public function testNoFieldAtFirstPosition()
+    public function testNoFieldAtFirstPosition(): void
     {
         $index = new Index();
 
@@ -92,24 +89,24 @@ class IndexTest extends ModelTestCase
     /**
      * @dataProvider provideFieldAttributes
      */
-    public function testNoFieldAtPositionCaseSensitivity($name, $case)
+    public function testNoFieldAtPositionCaseSensitivity($name): void
     {
         $index = new Index();
         $index->setEntity($this->getEntityMock('db_books'));
         $index->addField($this->getFieldMock('foo', [ 'size' => 5 ]));
 
-        $this->assertFalse($index->hasFieldAtPosition(0, $name, 5, $case));
+        $this->assertFalse($index->hasFieldAtPosition(0, $name, 5));
     }
 
-    public function provideFieldAttributes()
+    public function provideFieldAttributes(): array
     {
         return [
-            [ 'bar', false ],
-            [ 'BAR', true ],
+            [ 'bar' ],
+            [ 'BAR' ],
         ];
     }
 
-    public function testNoSizedFieldAtPosition()
+    public function testNoSizedFieldAtPosition(): void
     {
         $size = 5;
 
@@ -121,7 +118,7 @@ class IndexTest extends ModelTestCase
         $this->assertFalse($index->hasFieldAtPosition(0, 'foo', $size));
     }
 
-    public function testHasFieldAtFirstPosition()
+    public function testHasFieldAtFirstPosition(): void
     {
         $index = new Index();
         $index->setEntity($this->getEntityMock('db_books'));
@@ -130,7 +127,7 @@ class IndexTest extends ModelTestCase
         $this->assertTrue($index->hasFieldAtPosition(0, 'foo'));
     }
 
-    public function testGetSuperordinate()
+    public function testGetSuperordinate(): void
     {
         $entity = $this->getEntityMock('db_books');
         $index = new Index();

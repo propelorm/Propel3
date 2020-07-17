@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,10 +7,10 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Tests\Generator\Model;
 
+use phootwork\collection\Set;
+use phootwork\lang\Text;
 use Propel\Generator\Model\Relation;
 
 /**
@@ -21,18 +20,18 @@ use Propel\Generator\Model\Relation;
  */
 class RelationTest extends ModelTestCase
 {
-    public function testCreateNewRelation()
+    public function testCreateNewRelation(): void
     {
         $fk = new Relation('book_author');
 
-        $this->assertSame('book_author', $fk->getName());
+        $this->assertEquals('book_author', $fk->getName());
         $this->assertFalse($fk->hasOnUpdate());
         $this->assertFalse($fk->hasOnDelete());
         $this->assertFalse($fk->isComposite());
         $this->assertFalse($fk->isSkipSql());
     }
 
-    public function testRelationIsForeignPrimaryKey()
+    public function testRelationIsForeignPrimaryKey(): void
     {
         $database     = $this->getDatabaseMock('bookstore');
         $platform     = $this->getPlatformMock();
@@ -61,14 +60,14 @@ class RelationTest extends ModelTestCase
 
         $foreignEntity
             ->expects($this->any())
-            ->method('getField')
+            ->method('getFieldByName')
             ->with($this->equalTo('id'))
             ->will($this->returnValue($idField))
         ;
 
         $localEntity
             ->expects($this->any())
-            ->method('getField')
+            ->method('getFieldByName')
             ->with($this->equalTo('author_id'))
             ->will($this->returnValue($authorIdField))
         ;
@@ -87,7 +86,7 @@ class RelationTest extends ModelTestCase
         $this->assertSame($idField, $fk->getForeignField(0));
     }
 
-    public function testRelationDoesNotUseRequiredFields()
+    public function testRelationDoesNotUseRequiredFields(): void
     {
         $column = $this->getFieldMock('author_id');
         $column
@@ -99,7 +98,7 @@ class RelationTest extends ModelTestCase
         $table = $this->getEntityMock('books');
         $table
             ->expects($this->once())
-            ->method('getField')
+            ->method('getFieldByName')
             ->with($this->equalTo('author_id'))
             ->will($this->returnValue($column))
         ;
@@ -111,7 +110,7 @@ class RelationTest extends ModelTestCase
         $this->assertFalse($fk->isLocalFieldsRequired());
     }
 
-    public function testRelationUsesRequiredFields()
+    public function testRelationUsesRequiredFields(): void
     {
         $column = $this->getFieldMock('author_id');
         $column
@@ -123,7 +122,7 @@ class RelationTest extends ModelTestCase
         $table = $this->getEntityMock('books');
         $table
             ->expects($this->once())
-            ->method('getField')
+            ->method('getFieldByName')
             ->with($this->equalTo('author_id'))
             ->will($this->returnValue($column))
         ;
@@ -135,7 +134,7 @@ class RelationTest extends ModelTestCase
         $this->assertTrue($fk->isLocalFieldsRequired());
     }
 
-    public function testCantGetInverseRelation()
+    public function testCantGetInverseRelation(): void
     {
         $database = $this->getDatabaseMock('bookstore');
         $platform = $this->getPlatformMock(false);
@@ -160,7 +159,7 @@ class RelationTest extends ModelTestCase
         $foreignEntity
             ->expects($this->any())
             ->method('getRelations')
-            ->will($this->returnValue([]))
+            ->will($this->returnValue(new Set([])))
         ;
 
         $fk = new Relation();
@@ -168,12 +167,12 @@ class RelationTest extends ModelTestCase
         $fk->addReference('author_id', 'id');
         $fk->setForeignEntityName('authors');
 
-        $this->assertSame('authors', $fk->getForeignEntityName());
+        $this->assertEquals('authors', $fk->getForeignEntityName());
         $this->assertNull($fk->getInverseFK());
         $this->assertFalse($fk->isMatchedByInverseFK());
     }
 
-    public function testGetInverseRelation()
+    public function testGetInverseRelation(): void
     {
         $database = $this->getDatabaseMock('bookstore');
         $platform = $this->getPlatformMock(true);
@@ -198,7 +197,7 @@ class RelationTest extends ModelTestCase
         $foreignEntity
             ->expects($this->any())
             ->method('getRelations')
-            ->will($this->returnValue([$inversedFk]))
+            ->will($this->returnValue(new Set([$inversedFk])))
         ;
 
         $fk = new Relation();
@@ -206,20 +205,20 @@ class RelationTest extends ModelTestCase
         $fk->addReference('author_id', 'id');
         $fk->setForeignEntityName('authors');
 
-        $this->assertSame('authors', $fk->getForeignEntityName());
+        $this->assertEquals('authors', $fk->getForeignEntityName());
         $this->assertInstanceOf('Propel\Generator\Model\Entity', $fk->getForeignEntity());
         $this->assertSame($inversedFk, $fk->getInverseFK());
         $this->assertTrue($fk->isMatchedByInverseFK());
     }
 
-    public function testGetLocalField()
+    public function testGetLocalField(): void
     {
         $column = $this->getFieldMock('id');
 
         $table = $this->getEntityMock('books');
         $table
             ->expects($this->any())
-            ->method('getField')
+            ->method('getFieldByName')
             ->with($this->equalTo('author_id'))
             ->will($this->returnValue($column))
         ;
@@ -232,7 +231,7 @@ class RelationTest extends ModelTestCase
         $this->assertInstanceOf('Propel\Generator\Model\Field', $fk->getLocalField(0));
     }
 
-    public function testRelationIsNotLocalPrimaryKey()
+    public function testRelationIsNotLocalPrimaryKey(): void
     {
         $pks = [$this->getFieldMock('id')];
 
@@ -250,7 +249,7 @@ class RelationTest extends ModelTestCase
         $this->assertFalse($fk->isLocalPrimaryKey());
     }
 
-    public function testRelationIsLocalPrimaryKey()
+    public function testRelationIsLocalPrimaryKey(): void
     {
         $pks = [
             $this->getFieldMock('book_id'),
@@ -272,7 +271,7 @@ class RelationTest extends ModelTestCase
         $this->assertTrue($fk->isLocalPrimaryKey());
     }
 
-    public function testGetOtherRelations()
+    public function testGetOtherRelations(): void
     {
         $fk = new Relation();
 
@@ -284,7 +283,7 @@ class RelationTest extends ModelTestCase
         $table
             ->expects($this->once())
             ->method('getRelations')
-            ->will($this->returnValue($fks))
+            ->will($this->returnValue(new Set($fks)))
         ;
 
         $fk->setEntity($table);
@@ -292,7 +291,7 @@ class RelationTest extends ModelTestCase
         $this->assertCount(2, $fk->getOtherFks());
     }
 
-    public function testClearReferences()
+    public function testClearReferences(): void
     {
         $fk = new Relation();
         $fk->addReference('book_id', 'id');
@@ -303,7 +302,7 @@ class RelationTest extends ModelTestCase
         $this->assertCount(0, $fk->getForeignFields());
     }
 
-    public function testAddMultipleReferences()
+    public function testAddMultipleReferences(): void
     {
         $fk = new Relation();
         $fk->addReference('book_id', 'id');
@@ -313,16 +312,16 @@ class RelationTest extends ModelTestCase
         $this->assertCount(2, $fk->getLocalFields());
         $this->assertCount(2, $fk->getForeignFields());
 
-        $this->assertSame('book_id', $fk->getLocalFields()->get(0));
-        $this->assertSame('id', $fk->getForeignFields()->get(0));
-        $this->assertSame('id', $fk->getMappedForeignField('book_id'));
+        $this->assertEquals('book_id', $fk->getLocalFields()->get(0));
+        $this->assertEquals('id', $fk->getForeignFields()->get(0));
+        $this->assertEquals('id', $fk->getMappedForeignField('book_id'));
 
-        $this->assertSame('author_id', $fk->getLocalFields()->get(1));
-        $this->assertSame('id', $fk->getForeignFields()->get(1));
-        $this->assertSame('id', $fk->getMappedForeignField('author_id'));
+        $this->assertEquals('author_id', $fk->getLocalFields()->get(1));
+        $this->assertEquals('id', $fk->getForeignFields()->get(1));
+        $this->assertEquals('id', $fk->getMappedForeignField('author_id'));
     }
 
-    public function testAddSingleStringReference()
+    public function testAddSingleStringReference(): void
     {
         $fk = new Relation();
         $fk->addReference('author_id', 'id');
@@ -331,10 +330,10 @@ class RelationTest extends ModelTestCase
         $this->assertCount(1, $fk->getLocalFields());
         $this->assertCount(1, $fk->getForeignFields());
 
-        $this->assertSame('author_id', $fk->getMappedLocalField('id'));
+        $this->assertEquals('author_id', $fk->getMappedLocalField('id'));
     }
 
-    public function testAddSingleArrayReference()
+    public function testAddSingleArrayReference(): void
     {
         $reference = ['local' => 'author_id', 'foreign' => 'id'];
 
@@ -348,7 +347,7 @@ class RelationTest extends ModelTestCase
         $this->assertSame($reference['local'], $fk->getMappedLocalField($reference['foreign']));
     }
 
-    public function testAddSingleFieldReference()
+    public function testAddSingleFieldReference(): void
     {
         $fk = new Relation();
         $fk->addReference(
@@ -360,27 +359,27 @@ class RelationTest extends ModelTestCase
         $this->assertCount(1, $fk->getLocalFields());
         $this->assertCount(1, $fk->getForeignFields());
 
-        $this->assertSame('author_id', $fk->getMappedLocalField('id'));
+        $this->assertEquals('author_id', $fk->getMappedLocalField('id'));
     }
 
-    public function testSetEntity()
+    public function testSetEntity(): void
     {
         $table = $this->getEntityMock('book');
         $table
             ->expects($this->once())
             ->method('getSchemaName')
-            ->will($this->returnValue('books'))
+            ->will($this->returnValue(new Text('books')))
         ;
 
         $fk = new Relation();
         $fk->setEntity($table);
 
         $this->assertInstanceOf('Propel\Generator\Model\Entity', $fk->getEntity());
-        $this->assertSame('books', $fk->getSchemaName());
-        $this->assertSame('book', $fk->getEntityName());
+        $this->assertEquals('books', $fk->getSchemaName());
+        $this->assertEquals('book', $fk->getEntityName());
     }
 
-    public function testSetDefaultJoin()
+    public function testSetDefaultJoin(): void
     {
         $fk = new Relation();
         $fk->setDefaultJoin('INNER');
@@ -388,19 +387,19 @@ class RelationTest extends ModelTestCase
         $this->assertSame('INNER', $fk->getDefaultJoin());
     }
 
-    public function testSetNames()
+    public function testSetNames(): void
     {
         $fk = new Relation();
         $fk->setName('book_author');
         $fk->setField('author');
         $fk->setRefField('books');
 
-        $this->assertSame('book_author', $fk->getName());
+        $this->assertEquals('book_author', $fk->getName());
         $this->assertSame('author', $fk->getField());
         $this->assertSame('books', $fk->getRefField());
     }
 
-    public function testSkipSql()
+    public function testSkipSql(): void
     {
         $fk = new Relation();
         $fk->setSkipSql(true);
@@ -408,7 +407,7 @@ class RelationTest extends ModelTestCase
         $this->assertTrue($fk->isSkipSql());
     }
 
-    public function testGetOnActionBehaviors()
+    public function testGetOnActionBehaviors(): void
     {
         $fk = new Relation();
         $fk->setOnUpdate('SETNULL');
@@ -425,14 +424,14 @@ class RelationTest extends ModelTestCase
      * @dataProvider provideOnActionBehaviors
      *
      */
-    public function testNormalizeRelation($behavior, $normalized)
+    public function testNormalizeRelation($behavior, $normalized): void
     {
         $fk = new Relation();
 
         $this->assertSame($normalized, $fk->normalizeFKey($behavior));
     }
 
-    public function provideOnActionBehaviors()
+    public function provideOnActionBehaviors(): array
     {
         return [
             [null, ''],

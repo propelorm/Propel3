@@ -26,7 +26,7 @@ class TestCaseActiveRecord extends BaseTestCase
      */
     protected $configuration;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

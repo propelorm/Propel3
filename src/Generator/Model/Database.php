@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,10 +7,12 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Generator\Model;
 
+use phootwork\collection\ArrayList;
+use phootwork\collection\Map;
+use phootwork\collection\Set;
+use phootwork\lang\Text;
 use Propel\Generator\Model\Parts\ActiveRecordPart;
 use Propel\Generator\Model\Parts\BehaviorPart;
 use Propel\Generator\Model\Parts\GeneratorPart;
@@ -22,9 +24,6 @@ use Propel\Generator\Model\Parts\SqlPart;
 use Propel\Generator\Model\Parts\SuperordinatePart;
 use Propel\Generator\Model\Parts\VendorPart;
 use Propel\Generator\Platform\PlatformInterface;
-use Propel\Common\Collection\ArrayList;
-use Propel\Common\Collection\Map;
-use Propel\Common\Collection\Set;
 use Propel\Generator\Model\Parts\SchemaPart;
 
 /**
@@ -53,16 +52,9 @@ class Database
     use SchemaPart;
     use VendorPart;
 
-    /** @var Map */
-    private $domains;
-
-    /** @var Set */
-    private $entities;
-
-    /**
-     * @var ArrayList
-     */
-    private $sequences;
+    private Map $domains;
+    private Set $entities;
+    private ArrayList $sequences;
 
     /**
      * Constructs a new Database object.
@@ -70,11 +62,9 @@ class Database
      * @param string $name The database's name
      * @param PlatformInterface $platform The database's platform
      */
-    public function __construct(?string $name = null, ?PlatformInterface $platform = null)
+    public function __construct(string $name = '', PlatformInterface $platform = null)
     {
-        if (null !== $name) {
-            $this->setName($name);
-        }
+        $this->setName($name);
 
         if (null !== $platform) {
             $this->setPlatform($platform);
@@ -82,8 +72,8 @@ class Database
 
         // init
         $this->sequences = new ArrayList();
-        $this->domains = new Map([], Domain::class);
-        $this->entities = new Set([], Entity::class);
+        $this->domains = new Map();
+        $this->entities = new Set();
         $this->initBehaviors();
         $this->initSql();
         $this->initVendor();
@@ -93,43 +83,22 @@ class Database
         $this->identifierQuoting = false;
     }
 
-    public function __clone()
-    {
-        $this->domains = clone $this->domains;
-        $this->entities = clone $this->entities;
-        $this->sequences = clone $this->sequences;
-        if (null !== $this->generatorConfig) {
-            $this->generatorConfig = clone $this->generatorConfig;
-        }
-        if (null !== $this->platform) {
-            $this->platform = clone $this->platform;
-        }
-        $this->idMethodParameters = clone $this->idMethodParameters;
-        $this->behaviors = clone $this->behaviors;
-        if (null !== $this->schema) {
-            $this->schema = clone $this->schema;
-        }
-        if (null !== $this->vendor) {
-            $this->vendor = clone $this->vendor;
-        }
-    }
-
     /**
      * @return Schema
      */
     protected function getSuperordinate(): ?Schema
     {
-        return $this->schema;
+        return $this->getSchema();
     }
 
     /**
      * Return the list of all entities.
      *
-     * @return Entity[]
+     * @return Set
      */
-    public function getEntities(): array
+    public function getEntities(): Set
     {
-        return $this->entities->toArray();
+        return $this->entities;
     }
 
     /**
@@ -137,7 +106,7 @@ class Database
      *
      * @return int
      */
-    public function getEntitySize()
+    public function getEntitySize(): int
     {
         return $this->entities->size();
     }
@@ -151,26 +120,17 @@ class Database
      */
     public function countEntities(): int
     {
-        $count = 0;
-        foreach ($this->entities as $entity) {
-            if (!$entity->isReadOnly()) {
-                $count++;
-            }
-        }
-
-        return $count;
+        return $this->entities->findAll(fn(Entity $element) => !$element->isReadOnly())->count();
     }
 
     /**
      * Returns the list of all entities that have a SQL representation.
      *
-     * @return Entity[]
+     * @return Set
      */
-    public function getEntitiesForSql(): array
+    public function getEntitiesForSql(): Set
     {
-        return $this->entities->filter(function (Entity $entity) {
-            return !$entity->isSkipSql();
-        })->toArray();
+        return $this->entities->filter(fn(Entity $entity) => !$entity->isSkipSql());
     }
 
     /**
@@ -189,11 +149,11 @@ class Database
      *
      * @return bool
      */
-    public function hasEntityByName($name): bool
+    public function hasEntityByName(string $name): bool
     {
-        return $this->entities->search($name, function (Entity $entity, $query) {
-            return $entity->getName() === $query;
-        });
+        return $this->entities->search($name,
+            fn(Entity $entity, string $query): bool => $entity->getName()->toString() === $query
+        );
     }
 
     /**
@@ -201,11 +161,11 @@ class Database
      *
      * @return Entity
      */
-    public function getEntityByName($name): ?Entity
+    public function getEntityByName(string $name): ?Entity
     {
-        return $this->entities->find($name, function (Entity $entity, $query) {
-            return $entity->getName() === $query;
-        });
+        return $this->entities->find($name,
+            fn(Entity $entity, string $query): bool => $entity->getName()->toString() === $query
+        );
     }
 
     /**
@@ -213,11 +173,11 @@ class Database
      *
      * @return bool
      */
-    public function hasEntityByFullName($fullName): bool
+    public function hasEntityByFullName(string $fullName): bool
     {
-        return $this->entities->search($fullName, function (Entity $entity, $query) {
-            return $entity->getFullName() === $query;
-        });
+        return $this->entities->search($fullName,
+            fn(Entity $entity, string $query): bool => $entity->getFullName()->toString() === $query
+        );
     }
 
     /**
@@ -225,11 +185,11 @@ class Database
      *
      * @return Entity
      */
-    public function getEntityByFullName($fullName): ?Entity
+    public function getEntityByFullName(string $fullName): ?Entity
     {
-        return $this->entities->find($fullName, function (Entity $entity, $query) {
-            return $entity->getFullName() === $query;
-        });
+        return $this->entities->find($fullName,
+            fn(Entity $entity, string $query): bool => $entity->getFullName()->toString() === $query
+        );
     }
 
     /**
@@ -237,11 +197,11 @@ class Database
      *
      * @return bool
      */
-    public function hasEntityByTableName($tableName): bool
+    public function hasEntityByTableName(string $tableName): bool
     {
-        return (bool) $this->entities->find($tableName, function (Entity $entity, $query) {
-            return $entity->getTableName() === $query;
-        });
+        return $this->entities->search($tableName,
+            fn(Entity $entity, string $query): bool => $entity->getTableName()->toString() === $query
+        );
     }
 
     /**
@@ -249,11 +209,11 @@ class Database
      *
      * @return Entity
      */
-    public function getEntityByTableName($tableName): ?Entity
+    public function getEntityByTableName(string $tableName): ?Entity
     {
-        return $this->entities->find($tableName, function (Entity $entity, $query) {
-            return $entity->getTableName() === $query;
-        });
+        return $this->entities->find($tableName,
+            fn(Entity $entity, string $query): bool => $entity->getTableName()->toString() === $query
+        );
     }
 
     /**
@@ -261,11 +221,11 @@ class Database
      *
      * @return bool
      */
-    public function hasEntityByFullTableName($tableName): bool
+    public function hasEntityByFullTableName(string $tableName): bool
     {
-        return (bool) $this->entities->find($tableName, function (Entity $entity, $query) {
-            return $entity->getFullTableName() === $query;
-        });
+        return $this->entities->search($tableName,
+            fn(Entity $entity, string $query): bool => $entity->getFullTableName()->toString() === $query
+        );
     }
 
     /**
@@ -275,105 +235,73 @@ class Database
      */
     public function getEntityByFullTableName($tableName): ?Entity
     {
-        return $this->entities->find($tableName, function (Entity $entity, $query) {
-            return $entity->getFullTableName() === $query;
-        });
+        return $this->entities->find($tableName,
+            fn(Entity $entity, string $query): bool => $entity->getFullTableName()->toString() === $query
+        );
     }
 
     /**
-     * @TODO is this needed? -> array_map($db->getEntities(), fn {....});
-     * @return string[]
+     * @return Text[]
      */
     public function getEntityNames(): array
     {
-        return $this->entities->map(function (Entity $entity) {
-            return $entity->getName();
-        })->toArray();
+        return $this->entities->map(fn(Entity $entity): Text => $entity->getName())->toArray();
     }
 
     /**
      * Adds a new entity to this database.
      *
      * @param Entity $entity
-     * @return $this
      */
-    public function addEntity(Entity $entity): Database
+    public function addEntity(Entity $entity): void
     {
-        if (!$this->entities->contains($entity)) {
-            $this->entities->add($entity);
+        if ($entity->getDatabase() !== $this) {
             $entity->setDatabase($this);
         }
-
-        return $this;
+        $this->entities->add($entity);
     }
 
-    public function removeEntity(Entity $entity): Database
+    public function removeEntity(Entity $entity): void
     {
         $this->entities->remove($entity);
-
-        return $this;
     }
 
     /**
      * Adds several entities at once.
      *
      * @param Entity[] $entities An array of Entity instances
-     * @return $this
      */
-    public function addEntities(array $entities): Database
+    public function addEntities(array $entities): void
     {
         foreach ($entities as $entity) {
             $this->addEntity($entity);
         }
-        return $this;
     }
 
-    /**
-     * @param string[] $sequences
-     * @return $this
-     */
-    public function setSequences(array $sequences): Database
+    public function setSequences(array $sequences): void
     {
         $this->sequences->clear();
-        $this->sequences->addAll($sequences);
-        return $this;
+        $this->sequences->add(...$sequences);
     }
 
-    /**
-     * @return string[]
-     */
-    public function getSequences(): array
+    public function getSequences(): ArrayList
     {
-        return $this->sequences->toArray();
+        return $this->sequences;
     }
 
-    /**
-     * @param string $sequence
-     * @return $this
-     */
-    public function addSequence(string $sequence): Database
+    public function addSequence(string $sequence): void
     {
         $this->sequences->add($sequence);
-        return $this;
     }
 
-    /**
-     * @param  string $sequence
-     * @return bool
-     */
     public function hasSequence(string $sequence): bool
     {
         return $this->sequences->contains($sequence);
     }
 
-    /**
-     * @param string $sequence
-     * @return $this
-     */
-    public function removeSequence(string $sequence): Database
+    public function removeSequence(string $sequence): void
     {
         $this->sequences->remove($sequence);
-        return $this;
     }
 
 //    /**
@@ -441,7 +369,7 @@ class Database
      *
      * @param Schema $schema The parent schema
      */
-    protected function registerSchema(Schema $schema)
+    protected function registerSchema(Schema $schema): void
     {
         $schema->addDatabase($this);
     }
@@ -460,15 +388,13 @@ class Database
      * Adds a domain object to this database.
      *
      * @param Domain $domain
-     * @return $this
      */
-    public function addDomain(Domain $domain): Database
+    public function addDomain(Domain $domain): void
     {
         if (!$this->domains->contains($domain)) {
             $domain->setDatabase($this);
             $this->domains->set($domain->getName(), $domain);
         }
-        return $this;
     }
 
     /**
@@ -488,7 +414,7 @@ class Database
      *
      * @return Behavior
      */
-    public function getNextEntityBehavior()
+    public function getNextEntityBehavior(): ?Behavior
     {
         // order the behaviors according to Behavior::$entityModificationOrder
         $behaviors = [];
@@ -511,7 +437,7 @@ class Database
     /**
      * @param Behavior $behavior
      */
-    protected function registerBehavior(Behavior $behavior)
+    protected function registerBehavior(Behavior $behavior): void
     {
         $behavior->setDatabase($this);
     }
@@ -519,7 +445,7 @@ class Database
     /**
      * @param Behavior $behavior
      */
-    protected function unregisterBehavior(Behavior $behavior)
+    protected function unregisterBehavior(Behavior $behavior): void
     {
         $behavior->setDatabase(null);
     }
@@ -529,6 +455,8 @@ class Database
         return $this->toSql();
     }
 
+
+    //@todo remove: use a template to render this inside the function that need it
     /**
      * @return string
      */

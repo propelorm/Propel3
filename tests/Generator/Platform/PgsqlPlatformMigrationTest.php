@@ -16,6 +16,7 @@ use Propel\Generator\Model\FieldDefaultValue;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Diff\FieldComparator;
 use Propel\Generator\Platform\PgsqlPlatform;
+use Propel\Generator\Platform\PlatformInterface;
 use Propel\Generator\Schema\SchemaReader;
 
 /**
@@ -29,7 +30,7 @@ class PgsqlPlatformMigrationTest extends PlatformMigrationTestProvider
      *
      * @return PgsqlPlatform
      */
-    protected function getPlatform()
+    protected function getPlatform(): PlatformInterface
     {
         return new PgsqlPlatform();
     }

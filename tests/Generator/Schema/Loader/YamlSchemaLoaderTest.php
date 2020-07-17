@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -11,13 +11,17 @@
 namespace Propel\Tests\Generator\Schema\Loader;
 
 use org\bovigo\vfs\vfsStream;
+use phootwork\file\exception\FileException;
 use Propel\Generator\Schema\Loader\YamlSchemaLoader;
 use Propel\Tests\Generator\Schema\ReaderTestCase;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Yaml\Exception\ParseException;
 
 class YamlSchemaLoaderTest extends ReaderTestCase
 {
-    public function setUp()
+    private YamlSchemaLoader $loader;
+
+    public function setUp(): void
     {
         parent::setUp();
         $this->addYamlSchema();
@@ -39,21 +43,19 @@ class YamlSchemaLoaderTest extends ReaderTestCase
         $this->assertEquals('Book', $actual['database']['entities']['Book']['name']);
     }
 
-    /**
-     * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage The file "vfs://root/inexistent.yaml" does not exist
-     */
     public function testYamlFileDoesNotExist()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The file "vfs://root/inexistent.yaml" does not exist');
+
         $this->loader->load(vfsStream::url('root/inexistent.yaml'));
     }
 
-    /**
-     * @expectedException        Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage The content is not valid yaml.
-     */
     public function testYamlFileHasInvalidContent()
     {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('The content of the schema file `vfs://root/nonvalid.yaml` is not valid yaml.');
+
         $content = <<<EOF
 not yaml content
 only plain
@@ -63,22 +65,20 @@ EOF;
         $this->loader->load(vfsStream::url('root/nonvalid.yaml'));
     }
 
-    /**
-     * @expectedException        Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage The content is not valid yaml.
-     */
     public function testYamlFileIsEmpty()
     {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('The content of the schema file `vfs://root/empty.yaml` is not valid yaml.');
+
         vfsStream::newFile('empty.yaml')->at($this->getRoot())->setContent('');
         $this->loader->load(vfsStream::url('root/empty.yaml'));
     }
 
-    /**
-     * @expectedException phootwork\file\exception\FileException
-     * @expectedExceptionMessage You don't have permissions to access
-     */
     public function testSchemaFileNotReadableThrowsException()
     {
+        $this->expectException(FileException::class);
+        $this->expectExceptionMessage('You don\'t have permissions to access');
+
         $content = <<<EOF
 database:
     entities:

@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -29,13 +28,9 @@ class IntegerType extends AbstractType
      *
      * @return int|null
      */
-    public function databaseToProperty($value, FieldMap $fieldMap):? int
+    public function databaseToProperty($value, FieldMap $fieldMap): ?int
     {
-        if (null === $value) {
-            return null;
-        }
-
-        return (int) $value;
+        return $value === null ? null : (int) $value;
     }
 
     /**

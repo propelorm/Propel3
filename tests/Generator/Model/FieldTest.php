@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,12 +7,11 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Tests\Generator\Model;
 
 use Propel\Common\Types\FieldTypeInterface;
 use Propel\Common\Types\SQL\VarcharType;
+use Propel\Generator\Model\Domain;
 use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\PropelTypes;
@@ -25,15 +23,15 @@ use Propel\Generator\Model\PropelTypes;
  */
 class FieldTest extends ModelTestCase
 {
-    public function testCreateNewField()
+    public function testCreateNewField(): void
     {
         $field = new Field('title');
         $entity = $this->getEntityMock('FakeEntity');
         $field->setEntity($entity);
 
-        $this->assertSame('title', $field->getName());
+        $this->assertSame('title', $field->getName()->toString());
         $this->assertEmpty($field->getAutoIncrementString());
-        $this->assertSame('FIELD_TITLE', $field->getConstantName());
+        $this->assertSame('FIELD_TITLE', $field->getConstantName()->toString());
         $this->assertSame('public', $field->getMutatorVisibility());
         $this->assertSame('public', $field->getAccessorVisibility());
         $this->assertEquals(0, $field->getSize());
@@ -50,7 +48,7 @@ class FieldTest extends ModelTestCase
         $this->assertNull($field->getPlatform());
     }
 
-    public function testGetNullDefaultValueString()
+    public function testGetNullDefaultValueString(): void
     {
         $domain = $this->getDomainMock();
         $domain
@@ -68,7 +66,7 @@ class FieldTest extends ModelTestCase
     /**
      * @dataProvider provideDefaultValues
      */
-    public function testGetDefaultValueString($mappingType, $value, $expected)
+    public function testGetDefaultValueString($mappingType, $value, $expected): void
     {
         $defaultValue = $this
             ->getMockBuilder('Propel\Generator\Model\FieldDefaultValue')
@@ -106,7 +104,7 @@ class FieldTest extends ModelTestCase
         $this->assertSame($expected, $field->getDefaultValueString());
     }
 
-    public function provideDefaultValues()
+    public function provideDefaultValues(): array
     {
         return [
             ['DOUBLE', 3.14, '3.14'],
@@ -118,7 +116,7 @@ class FieldTest extends ModelTestCase
         ];
     }
 
-    public function testAddInheritance()
+    public function testAddInheritance(): void
     {
         $field = new Field();
 
@@ -142,7 +140,7 @@ class FieldTest extends ModelTestCase
         $this->assertCount(0, $field->getChildren());
     }
 
-    public function testIsDefaultSqlTypeFromDomain()
+    public function testIsDefaultSqlTypeFromDomain(): void
     {
         $toCopy = $this->getDomainMock();
         $toCopy
@@ -186,14 +184,14 @@ class FieldTest extends ModelTestCase
         $this->assertTrue($field->isDefaultSqlType($platform));
     }
 
-    public function testIsDefaultSqlType()
+    public function testIsDefaultSqlType(): void
     {
         $field = new Field();
 
         $this->assertTrue($field->isDefaultSqlType());
     }
 
-    public function testGetNotNullString()
+    public function testGetNotNullString(): void
     {
         $platform = $this->getPlatformMock();
         $platform
@@ -215,7 +213,7 @@ class FieldTest extends ModelTestCase
      * @dataProvider providePdoTypes
      *
      */
-    public function testGetPdoType($mappingType, $pdoType)
+    public function testGetPdoType($mappingType, $pdoType): void
     {
         $domain = $this->getDomainMock();
         $domain
@@ -231,7 +229,7 @@ class FieldTest extends ModelTestCase
         $this->assertSame($pdoType, $field->getPDOType());
     }
 
-    public function providePdoTypes()
+    public function providePdoTypes(): array
     {
         return [
             ['CHAR', \PDO::PARAM_STR],
@@ -265,7 +263,7 @@ class FieldTest extends ModelTestCase
         ];
     }
 
-    public function testEnumType()
+    public function testEnumType(): void
     {
         $domain = $this->getDomainMock();
         $domain
@@ -286,7 +284,7 @@ class FieldTest extends ModelTestCase
         $this->assertContains('BAR', $field->getValueSet());
     }
 
-    public function testSetStringValueSet()
+    public function testSetStringValueSet(): void
     {
         $field = new Field();
         $field->setValueSet(' FOO , BAR , BAZ');
@@ -296,7 +294,7 @@ class FieldTest extends ModelTestCase
         $this->assertContains('BAZ', $field->getValueSet());
     }
 
-    public function testPhpObjectType()
+    public function testPhpObjectType(): void
     {
         $domain = $this->getDomainMock();
         $domain
@@ -316,7 +314,7 @@ class FieldTest extends ModelTestCase
     /**
      * @dataProvider provideMappingTemporalTypes
      */
-    public function testTemporalType($mappingType)
+    public function testTemporalType($mappingType): void
     {
         $domain = $this->getDomainMock();
         $domain
@@ -340,7 +338,7 @@ class FieldTest extends ModelTestCase
         $this->assertTrue($field->isTemporalType());
     }
 
-    public function provideMappingTemporalTypes()
+    public function provideMappingTemporalTypes(): array
     {
         return [
             ['DATE'],
@@ -354,7 +352,7 @@ class FieldTest extends ModelTestCase
     /**
      * @dataProvider provideMappingLobTypes
      */
-    public function testLobType($mappingType, $phpType, $isPhpPrimitiveType)
+    public function testLobType($mappingType, $phpType, $isPhpPrimitiveType): void
     {
         $domain = $this->getDomainMock();
         $domain
@@ -378,7 +376,7 @@ class FieldTest extends ModelTestCase
         $this->assertTrue($field->isLobType());
     }
 
-    public function provideMappingLobTypes()
+    public function provideMappingLobTypes(): array
     {
         return [
             ['VARBINARY', 'string', true],
@@ -390,7 +388,7 @@ class FieldTest extends ModelTestCase
     /**
      * @dataProvider provideMappingBooleanTypes
      */
-    public function testBooleanType($mappingType)
+    public function testBooleanType($mappingType):  void
     {
         $domain = $this->getDomainMock();
         $domain
@@ -414,7 +412,7 @@ class FieldTest extends ModelTestCase
         $this->assertTrue($field->isBooleanType());
     }
 
-    public function provideMappingBooleanTypes()
+    public function provideMappingBooleanTypes():  array
     {
         return [
             ['BOOLEAN'],
@@ -425,7 +423,7 @@ class FieldTest extends ModelTestCase
     /**
      * @dataProvider provideMappingNumericTypes
      */
-    public function testNumericType($mappingType, $phpType, $isPrimitiveNumericType)
+    public function testNumericType($mappingType, $phpType, $isPrimitiveNumericType): void
     {
         $domain = $this->getDomainMock();
         $domain
@@ -450,7 +448,7 @@ class FieldTest extends ModelTestCase
         $this->assertTrue($field->isNumericType());
     }
 
-    public function provideMappingNumericTypes()
+    public function provideMappingNumericTypes(): array
     {
         return [
             ['SMALLINT', 'int', true],
@@ -468,7 +466,7 @@ class FieldTest extends ModelTestCase
     /**
      * @dataProvider provideMappingTextTypes
      */
-    public function testTextType($mappingType)
+    public function testTextType($mappingType): void
     {
         $domain = $this->getDomainMock();
         $domain
@@ -492,7 +490,7 @@ class FieldTest extends ModelTestCase
         $this->assertTrue($field->isTextType());
     }
 
-    public function provideMappingTextTypes()
+    public function provideMappingTextTypes(): array
     {
         return [
             ['CHAR'],
@@ -507,7 +505,7 @@ class FieldTest extends ModelTestCase
         ];
     }
 
-    public function testGetSizeDefinition()
+    public function testGetSizeDefinition(): void
     {
         $domain = $this->getDomainMock();
         $domain
@@ -522,7 +520,7 @@ class FieldTest extends ModelTestCase
         $this->assertSame('(10,2)', $field->getSizeDefinition());
     }
 
-    public function testGetConstantName()
+    public function testGetConstantName(): void
     {
         $entity = $this->getEntityMock('Article');
 
@@ -530,29 +528,29 @@ class FieldTest extends ModelTestCase
         $field->setEntity($entity);
         $field->setColumnName('created_at');
 
-        $this->assertSame('created_at', $field->getColumnName());
-        $this->assertSame('FIELD_CREATED_AT', $field->getConstantName());
-        $this->assertSame('ArticleEntityMap::FIELD_CREATED_AT', $field->getFullConstantName());
+        $this->assertEquals('created_at', $field->getColumnName());
+        $this->assertEquals('FIELD_CREATED_AT', $field->getConstantName());
+        $this->assertEquals('ArticleEntityMap::FIELD_CREATED_AT', $field->getFullConstantName());
     }
 
-    public function testSetDefaultPhpName()
+    public function testSetDefaultPhpName(): void
     {
         $field = new Field('createdAt');
 
-        $this->assertSame('createdAt', $field->getName());
-        $this->assertSame('created_at', $field->getColumnName());
+        $this->assertEquals('createdAt', $field->getName());
+        $this->assertEquals('created_at', $field->getColumnName());
     }
 
-    public function testSetCustomPhpName()
+    public function testSetCustomPhpName(): void
     {
         $field = new Field('creeeatedAt');
         $field->setName('createdAt');
 
-        $this->assertSame('createdAt', $field->getName());
-        $this->assertSame('created_at', $field->getColumnName());
+        $this->assertEquals('createdAt', $field->getName());
+        $this->assertEquals('created_at', $field->getColumnName());
     }
 
-    public function testSetDefaultMutatorAndAccessorMethodsVisibility()
+    public function testSetDefaultMutatorAndAccessorMethodsVisibility(): void
     {
         $field = new Field();
         $field->setAccessorVisibility('foo');
@@ -562,7 +560,7 @@ class FieldTest extends ModelTestCase
         $this->assertSame('public', $field->getMutatorVisibility());
     }
 
-    public function testSetMutatorAndAccessorMethodsVisibility()
+    public function testSetMutatorAndAccessorMethodsVisibility(): void
     {
         $field = new Field();
         $field->setAccessorVisibility('private');
@@ -572,7 +570,7 @@ class FieldTest extends ModelTestCase
         $this->assertSame('private', $field->getMutatorVisibility());
     }
 
-    public function testGetPhpDefaultValue()
+    public function testGetPhpDefaultValue(): void
     {
         $domain = $this->getDomainMock();
         $domain
@@ -587,7 +585,7 @@ class FieldTest extends ModelTestCase
         $this->assertTrue($field->getPhpDefaultValue());
     }
 
-    public function testGetAutoIncrementStringThrowsEngineException()
+    public function testGetAutoIncrementStringThrowsEngineException(): void
     {
         $this->expectException('Propel\Generator\Exception\EngineException');
 
@@ -604,7 +602,7 @@ class FieldTest extends ModelTestCase
         $field->getAutoIncrementString();
     }
 
-    public function testGetNativeAutoIncrementString()
+    public function testGetNativeAutoIncrementString(): void
     {
         $platform = $this->getPlatformMock();
         $platform
@@ -627,15 +625,15 @@ class FieldTest extends ModelTestCase
         $this->assertEquals('AUTO_INCREMENT', $field->getAutoIncrementString());
     }
 
-    public function testGetFullName()
+    public function testGetFullName(): void
     {
         $field = new Field('title');
         $field->setEntity($this->getEntityMock('books'));
 
-        $this->assertSame('books.TITLE', $field->getFullName());
+        $this->assertEquals('books.TITLE', $field->getFullName());
     }
 
-    public function testIsPhpArrayType()
+    public function testIsPhpArrayType(): void
     {
         $field = new Field();
         $this->assertFalse($field->isPhpArrayType());
@@ -644,7 +642,7 @@ class FieldTest extends ModelTestCase
         $this->assertTrue($field->isPhpArrayType());
     }
 
-    public function testSetSize()
+    public function testSetSize(): void
     {
         $domain = $this->getDomainMock();
         $domain
@@ -665,7 +663,7 @@ class FieldTest extends ModelTestCase
         $this->assertSame(50, $field->getSize());
     }
 
-    public function testSetScale()
+    public function testSetScale(): void
     {
         $domain = $this->getDomainMock();
         $domain
@@ -686,47 +684,47 @@ class FieldTest extends ModelTestCase
         $this->assertSame(2, $field->getScale());
     }
 
-    public function testGetDefaultDomain()
+    public function testGetDefaultDomain(): void
     {
         $field = new Field();
 
         $this->assertInstanceOf('Propel\Generator\Model\Domain', $field->getDomain());
     }
 
-    public function testGetSingularName()
+    public function testGetSingularName(): void
     {
         $field = new Field('titles');
 
-        $this->assertSame('title', $field->getSingularName());
+        $this->assertEquals('title', $field->getSingularName());
         $this->assertTrue($field->isNamePlural());
     }
 
-    public function testSetEntity()
+    public function testSetEntity(): void
     {
         $field = new Field();
         $field->setEntity($this->getEntityMock('books'));
 
         $this->assertInstanceOf('Propel\Generator\Model\Entity', $field->getEntity());
-        $this->assertSame('books', $field->getEntity()->getName());
+        $this->assertEquals('books', $field->getEntity()->getName());
     }
 
-    public function testSetDomain()
+    public function testSetDomain(): void
     {
         $field = new Field();
         $field->setDomain($this->getDomainMock());
 
-        $this->assertInstanceOf('Propel\Generator\Model\Domain', $field->getDomain());
+        $this->assertInstanceOf(Domain::class, $field->getDomain());
     }
 
-    public function testSetDescription()
+    public function testSetDescription(): void
     {
         $field = new Field();
         $field->setDescription('Some description');
 
-        $this->assertSame('Some description', $field->getDescription());
+        $this->assertEquals('Some description', $field->getDescription());
     }
 
-    public function testSetAutoIncrement()
+    public function testSetAutoIncrement(): void
     {
         $field = new Field();
         $field->setAutoIncrement(true);
@@ -734,7 +732,7 @@ class FieldTest extends ModelTestCase
         $this->assertTrue($field->isAutoIncrement());
     }
 
-    public function testSetPrimaryString()
+    public function testSetPrimaryString(): void
     {
         $field = new Field();
         $field->setPrimaryString(true);
@@ -742,7 +740,7 @@ class FieldTest extends ModelTestCase
         $this->assertTrue($field->isPrimaryString());
     }
 
-    public function testSetNotNull()
+    public function testSetNotNull(): void
     {
         $field = new Field();
         $field->setNotNull(true);
@@ -750,13 +748,13 @@ class FieldTest extends ModelTestCase
         $this->assertTrue($field->isNotNull());
     }
 
-    public function testPhpSingularName()
+    public function testPhpSingularName(): void
     {
         $field = new Field();
         $field->setName('aliases');
 
-        $this->assertEquals($field->getName(), 'aliases');
-        $this->assertEquals($field->getSingularName(), 'aliase');
+        $this->assertEquals('aliases', $field->getName());
+        $this->assertEquals('alias', $field->getSingularName());
 
         $field = new Field();
         $field->setName('Aliases');
@@ -766,13 +764,13 @@ class FieldTest extends ModelTestCase
         $this->assertEquals($field->getSingularName(), 'Alias');
     }
 
-    public function testGetMethodName()
+    public function testGetMethodName(): void
     {
         $field = new Field('title');
         $this->assertEquals('Title', $field->getMethodName());
     }
 
-    public function testSetPhpType()
+    public function testSetPhpType(): void
     {
         $field = new Field('title');
         $field->setType('VARCHAR');
@@ -780,7 +778,7 @@ class FieldTest extends ModelTestCase
         $this->assertEquals('string', $field->getPhpType());
     }
 
-    public function testGetPosition()
+    public function testGetPosition(): void
     {
         $field = new Field('foo');
         $field->setPosition(1);
@@ -788,7 +786,7 @@ class FieldTest extends ModelTestCase
         $this->assertSame(1, $field->getPosition());
     }
 
-    public function testGetInheritanceType()
+    public function testGetInheritanceType(): void
     {
         $field = new Field('foo');
         $field->setInheritanceType('single');
@@ -796,7 +794,7 @@ class FieldTest extends ModelTestCase
         $this->assertEquals('single', $field->getInheritanceType());
     }
 
-    public function testIsInheritance()
+    public function testIsInheritance(): void
     {
         $field = new Field('foo');
         $field->setInheritanceType('single');
@@ -806,7 +804,7 @@ class FieldTest extends ModelTestCase
         $this->assertFalse($field->isInheritance());
     }
 
-    public function testSetPrimaryKey()
+    public function testSetPrimaryKey(): void
     {
         $field= new Field('foo');
         $this->assertFalse($field->isPrimaryKey());
@@ -815,7 +813,7 @@ class FieldTest extends ModelTestCase
         $this->assertTrue($field->isPrimaryKey());
     }
 
-    public function testGetRelations()
+    public function testGetRelations(): void
     {
         $entity = new Entity('book');
         $field = new Field('author_id');
@@ -828,10 +826,10 @@ class FieldTest extends ModelTestCase
         $entity->addRelation($relation);
 
         $this->assertTrue($field->isRelation());
-        $this->assertSame([$relation], $field->getRelations());
+        $this->assertSame([$relation], $field->getRelations()->toArray());
     }
 
-    public function testHasMultipleFk()
+    public function testHasMultipleFk(): void
     {
         $entity = new Entity('book');
         $field = new Field('author_id');
@@ -853,7 +851,7 @@ class FieldTest extends ModelTestCase
         $this->assertTrue($field->hasMultipleFK());
     }
 
-    public function testGetFieldType()
+    public function testGetFieldType(): void
     {
         $generatorConfig = $this
             ->getMockBuilder('Propel\Generator\Config\GeneratorConfig')

@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,8 +6,6 @@
  *
  * @license MIT License
  */
-
-declare(strict_types=1);
 
 namespace Propel\Tests\Generator\Model;
 
@@ -21,7 +18,7 @@ use \Propel\Tests\TestCase;
  */
 class FieldDefaultValueTest extends TestCase
 {
-    public function equalsProvider()
+    public function equalsProvider(): array
     {
         return [
             [new FieldDefaultValue('foo', 'bar'), new FieldDefaultValue('foo', 'bar'), true],
@@ -35,7 +32,7 @@ class FieldDefaultValueTest extends TestCase
     /**
      * @dataProvider equalsProvider
      */
-    public function testEquals($def1, $def2, $test)
+    public function testEquals($def1, $def2, $test): void
     {
         if ($test) {
             $this->assertTrue($def1->equals($def2));
@@ -44,7 +41,7 @@ class FieldDefaultValueTest extends TestCase
         }
     }
 
-    public function testIsExpression()
+    public function testIsExpression(): void
     {
         $default = new FieldDefaultValue('SUM', FieldDefaultValue::TYPE_EXPR);
         $this->assertTrue($default->isExpression());

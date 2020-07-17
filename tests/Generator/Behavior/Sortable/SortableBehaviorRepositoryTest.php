@@ -17,7 +17,7 @@ namespace Propel\Tests\Generator\Behavior\Sortable;
  */
 class SortableBehaviorObjectBuilderModificationTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

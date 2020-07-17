@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,11 +7,11 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Generator\Model\Diff;
 
-use Propel\Common\Collection\Map;
+use phootwork\collection\Map;
+use phootwork\json\Json;
+use phootwork\json\JsonException;
 use Propel\Generator\Model\Field;
 
 /**
@@ -27,21 +26,21 @@ class FieldDiff
      *
      * @var Map
      */
-    protected $changedProperties;
+    protected Map $changedProperties;
 
     /**
      * The original column definition.
      *
      * @var Field
      */
-    protected $fromField;
+    protected Field $fromField;
 
     /**
      * The modified column definition.
      *
      * @var Field
      */
-    protected $toField;
+    protected Field $toField;
 
     /**
      * Constructor.
@@ -150,6 +149,7 @@ class FieldDiff
      * Returns the string representation of the difference.
      *
      * @return string
+     * @throws JsonException
      */
     public function __toString()
     {
@@ -157,7 +157,7 @@ class FieldDiff
         $ret .= sprintf("      %s:\n", $this->fromField->getFullName());
         $ret .= "        modifiedProperties:\n";
         foreach ($this->changedProperties as $key => $value) {
-            $ret .= sprintf("          %s: %s\n", $key, json_encode($value));
+            $ret .= sprintf("          %s: %s\n", $key, Json::encode($value));
         }
 
         return $ret;

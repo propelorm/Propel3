@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,8 +6,6 @@
  *
  * @license MIT License
  */
-
-declare(strict_types=1);
 
 namespace Propel\Tests\Generator\Model;
 
@@ -22,7 +19,7 @@ use Propel\Tests\TestCase;
  */
 class VendorInfoTest extends TestCase
 {
-    public function testSetupObject()
+    public function testSetupObject(): void
     {
         $info = new Vendor();
         $info->setType('foo');
@@ -30,7 +27,7 @@ class VendorInfoTest extends TestCase
         $this->assertSame('foo', $info->getType());
     }
 
-    public function testSetUpObjectWithParameters()
+    public function testSetUpObjectWithParameters(): void
     {
         $info = new Vendor('foo', ['bar' => 'baz']);
 
@@ -39,7 +36,7 @@ class VendorInfoTest extends TestCase
         $this->assertEquals('baz', $info->getParameter('bar'));
     }
 
-    public function testGetSetType()
+    public function testGetSetType(): void
     {
         $info = new Vendor('foo');
 
@@ -47,7 +44,7 @@ class VendorInfoTest extends TestCase
         $this->assertTrue($info->isEmpty());
     }
 
-    public function testSetParameter()
+    public function testSetParameter(): void
     {
         $info = new Vendor();
         $info->setParameter('foo', 'bar');
@@ -57,7 +54,7 @@ class VendorInfoTest extends TestCase
         $this->assertSame('bar', $info->getParameter('foo'));
     }
 
-    public function testSetParameters()
+    public function testSetParameters(): void
     {
         $info = new Vendor();
         $info->setParameters(['foo' => 'bar', 'baz' => 'bat']);
@@ -67,7 +64,7 @@ class VendorInfoTest extends TestCase
         $this->assertArrayHasKey('baz', $info->getParameters());
     }
 
-    public function testMergeVendorInfo()
+    public function testMergeVendorInfo(): void
     {
         $current = new Vendor('mysql');
         $current->setParameters(['foo' => 'bar', 'baz' => 'bat']);

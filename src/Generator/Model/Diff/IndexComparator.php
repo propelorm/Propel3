@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,8 +6,6 @@
  *
  * @license MIT License
  */
-
-declare(strict_types=1);
 
 namespace Propel\Generator\Model\Diff;
 
@@ -34,7 +31,7 @@ class IndexComparator
         $fromIndexFields = $fromIndex->getFields();
         $i = 0;
         foreach ($fromIndexFields as $indexField) {
-            if (!$toIndex->hasFieldAtPosition($i, $indexField->getName(), $indexField->getSize())) {
+            if (!$toIndex->hasFieldAtPosition($i, (string) $indexField->getName(), $indexField->getSize())) {
                 return true;
             }
             $i++;
@@ -44,7 +41,7 @@ class IndexComparator
         $toIndexFields = $toIndex->getFields();
         $i = 0;
         foreach ($toIndexFields as $indexField) {
-            if (!$fromIndex->hasFieldAtPosition($i, $indexField->getName(), $indexField->getSize())) {
+            if (!$fromIndex->hasFieldAtPosition($i, (string) $indexField->getName(), $indexField->getSize())) {
                 return true;
             }
             $i++;

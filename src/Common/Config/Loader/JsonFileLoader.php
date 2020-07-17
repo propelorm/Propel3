@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,9 +9,11 @@
 
 namespace Propel\Common\Config\Loader;
 
+use phootwork\file\exception\FileException;
+use phootwork\file\File;
 use phootwork\json\Json;
-use Propel\Common\Config\Exception\InputOutputException;
-use Propel\Common\Config\Exception\InvalidArgumentException;
+use phootwork\json\JsonException;
+use phootwork\lang\Text;
 
 /**
  * JsonFileLoader loads configuration parameters from json file.
@@ -24,36 +25,25 @@ class JsonFileLoader extends FileLoader
     /**
      * Loads an Json file.
      *
-     * @param mixed  $file The resource
+     * @param mixed $file The resource
      * @param string $type The resource type
+     *
      * @return array
      *
      * @throws \InvalidArgumentException  if configuration file not found
-     * @throws \Propel\Common\Config\Exception\InvalidArgumentException   if invalid json file
-     * @throws \Propel\Common\Config\Exception\InputOutputException       if configuration file is not readable
-     * @throws \phootwork\json\JsonException if something goes wrong while parsing json content
+     * @throws JsonException if something goes wrong while parsing json content
+     * @throws FileException if configuration file is not readable
      */
-    public function load($file, $type = null): array
+    public function load($file, string $type = null): array
     {
-        $path = $this->locator->locate($file);
-
-        if (!is_readable($path)) {
-            throw new InputOutputException("You don't have permissions to access configuration file $file.");
-        }
-
-        $json = file_get_contents($path);
-
-        if (false === $json) {
-            throw new InvalidArgumentException('Error while reading configuration file');
-        }
+        $file = new File($this->locator->locate($file));
+        $json = $file->read();
 
         if ('' === $json) {
             return [];
         }
 
-        $content = $this->resolveParams(Json::decode($json)); //Resolve parameter placeholders (%name%)
-
-        return $content;
+        return $json->isEmpty() ? [] : $this->resolveParams(Json::decode((string) $json));
     }
 
     /**
@@ -64,15 +54,10 @@ class JsonFileLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null): bool
+    public function supports($resource, ?string $type = null): bool
     {
-        $info = pathinfo($resource);
-        $extension = $info['extension'];
+        $resource = new Text($resource);
 
-        if ('dist' === $extension) {
-            $extension = pathinfo($info['filename'], PATHINFO_EXTENSION);
-        }
-
-        return is_string($resource) && ('json' === $extension);
+        return $resource->endsWith('.json') || $resource->endsWith('json.dist');
     }
 }

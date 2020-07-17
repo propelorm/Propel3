@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,21 +7,22 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Tests\Generator\Model;
 
+use phootwork\lang\Text;
+use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Behavior;
 use Propel\Generator\Model\CrossRelation;
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Index;
-use Propel\Generator\Model\Entity;
+use Propel\Generator\Model\Entity as BaseEntity;
 use Propel\Generator\Model\Inheritance;
-use Propel\Generator\Model\NamingTool;
 use Propel\Generator\Model\Relation;
 use Propel\Generator\Model\Unique;
 use Propel\Generator\Platform\SqlitePlatform;
+use Propel\Runtime\Exception\RuntimeException;
+use function DeepCopy\deep_copy;
 
 /**
  * Unit test suite for Entity model class.
@@ -32,18 +32,18 @@ use Propel\Generator\Platform\SqlitePlatform;
  */
 class EntityTest extends ModelTestCase
 {
-    public function testCreateNewEntity()
+    public function testCreateNewEntity(): void
     {
         $entity = new Entity('books');
 
-        $this->assertSame('books', $entity->getName());
+        $this->assertSame('books', $entity->getName()->toString());
         $this->assertFalse($entity->isAllowPkInsert());
         $this->assertFalse($entity->isCrossRef());
         $this->assertFalse($entity->isReloadOnInsert());
         $this->assertFalse($entity->isReloadOnUpdate());
         $this->assertFalse($entity->isSkipSql());
         $this->assertFalse($entity->isReadOnly());
-        $this->assertSame(0, $entity->getNumLazyLoadFields());
+        $this->assertSame(0, $entity->countLazyLoadFields());
         $this->assertEmpty($entity->getChildrenNames());
         $this->assertFalse($entity->hasRelations());
     }
@@ -52,15 +52,15 @@ class EntityTest extends ModelTestCase
      * @dataProvider provideNamespaces
      *
      */
-    public function testSetNamespace($namespace, $expected)
+    public function testSetNamespace($namespace, $expected): void
     {
         $entity = new Entity();
         $entity->setNamespace($namespace);
 
-        $this->assertSame($expected, $entity->getNamespace());
+        $this->assertSame($expected, $entity->getNamespace()->toString());
     }
 
-    public function provideNamespaces()
+    public function provideNamespaces(): array
     {
         return [
             ['\Acme', '\Acme'],
@@ -72,7 +72,7 @@ class EntityTest extends ModelTestCase
         ];
     }
 
-    public function testSetRepository()
+    public function testSetRepository(): void
     {
         $entity = new Entity('Book');
         $entity->setRepository('BookRepository');
@@ -80,7 +80,7 @@ class EntityTest extends ModelTestCase
         $this->assertEquals('BookRepository', $entity->getRepository());
     }
 
-    public function testNames()
+    public function testNames(): void
     {
         $entity = new Entity('Wurst\\Und\\Kaese');
         $this->assertEquals('Kaese', $entity->getName());
@@ -88,25 +88,26 @@ class EntityTest extends ModelTestCase
 
 
         $entity = new Entity();
-        $this->assertEmpty($entity->getName());
+        $this->assertEmpty($entity->getName()->toString());
 
         $entity->setName('Book');
-        $this->assertEquals('Book', $entity->getName());
-        $this->assertEquals('book', $entity->getTableName());
+        $this->assertEquals('Book', $entity->getName()->toString());
+        $this->assertEquals('book', $entity->getTableName()->toString());
 
         $entity->setName('BookAuthor');
-        $this->assertEquals('BookAuthor', $entity->getName());
-        $this->assertEquals('book_author', $entity->getTableName());
+        $entity->setTableName('');
+        $this->assertEquals('BookAuthor', $entity->getName()->toString());
+        $this->assertEquals('book_author', $entity->getTableName()->toString());
 
         $entity->setTableName('book_has_author');
-        $this->assertEquals('BookAuthor', $entity->getName());
-        $this->assertEquals('book_has_author', $entity->getTableName());
+        $this->assertEquals('BookAuthor', $entity->getName()->toString());
+        $this->assertEquals('book_has_author', $entity->getTableName()->toString());
 
         $entity->setScope('bookstore_');
-        $this->assertEquals('bookstore_book_has_author', $entity->getScopedTableName());
+        $this->assertEquals('bookstore_book_has_author', $entity->getScopedTableName()->toString());
 
         $entity->setNamespace('Bookstore');
-        $this->assertEquals('Bookstore\\BookAuthor', $entity->getFullName());
+        $this->assertEquals('Bookstore\\BookAuthor', $entity->getFullName()->toString());
 
         $entity = new Entity();
         $database = new Database();
@@ -114,11 +115,11 @@ class EntityTest extends ModelTestCase
         $database->setNamespace('Bookstore');
         $entity->setDatabase($database);
 
-        $this->assertEquals('Bookstore', $entity->getNamespace());
-        $this->assertEquals('bookings_', $entity->getScope());
+        $this->assertEquals('Bookstore', $entity->getNamespace()->toString());
+        $this->assertEquals('bookings_', $entity->getScope()->toString());
     }
 
-    public function testGetGeneratorConfig()
+    public function testGetGeneratorConfig(): void
     {
         $config = $this->getMockBuilder('Propel\Generator\Config\GeneratorConfig')
             ->disableOriginalConstructor()->getMock();
@@ -136,7 +137,7 @@ class EntityTest extends ModelTestCase
         $this->assertSame($config, $entity->getGeneratorConfig());
     }
 
-    public function testApplyBehaviors()
+    public function testApplyBehaviors(): void
     {
         $behavior = $this->getBehaviorMock('foo');
         $behavior
@@ -167,7 +168,7 @@ class EntityTest extends ModelTestCase
         $entity->applyBehaviors();
     }
 
-    public function testGetAdditionalBuilders()
+    public function testGetAdditionalBuilders(): void
     {
         $additionalBehaviors = [
             $this->getBehaviorMock('foo'),
@@ -186,7 +187,7 @@ class EntityTest extends ModelTestCase
         $this->assertTrue($entity->hasAdditionalBuilders());
     }
 
-    public function testHasNoAdditionalBuilders()
+    public function testHasNoAdditionalBuilders(): void
     {
         $entity = new Entity();
         $entity->addBehavior($this->getBehaviorMock('foo'));
@@ -195,24 +196,23 @@ class EntityTest extends ModelTestCase
         $this->assertFalse($entity->hasAdditionalBuilders());
     }
 
-    public function testGetNameWithoutPlatform()
+    public function testGetNameWithoutPlatform(): void
     {
         $entity = new Entity('books');
 
-        $this->assertSame('books', $entity->getName());
+        $this->assertSame('books', (string) $entity->getName());
     }
 
     /**
      * @dataProvider provideSchemaNames
      *
      */
-    public function testGetNameWithPlatform($supportsSchemas, $schemaName, $expectedName)
+    public function testGetNameWithPlatform($supportsSchemas, $schemaName, $expectedName): void
     {
         $platform = $this->getPlatformMock($supportsSchemas);
         $platform
-            ->expects($supportsSchemas ? $this->once() : $this->never())
             ->method('getSchemaDelimiter')
-            ->will($this->returnValue('.'))
+            ->will($this->returnValue($supportsSchemas ? '.' : ''))
         ;
 
         $database = $this->getDatabaseMock($schemaName, [
@@ -232,48 +232,46 @@ class EntityTest extends ModelTestCase
         $entity->setDatabase($database);
         $entity->getDatabase()->setSchema($schema);
 
-        $this->assertSame($expectedName, $entity->getFullTableName());
+        $this->assertEquals($expectedName, (string) $entity->getFullTableName());
     }
 
-    public function provideSchemaNames()
+    public function provideSchemaNames(): array
     {
         return [
             [false, 'bookstore', 'books'],
-            [false, null, 'books'],
+            [false, '', 'books'],
             [true, 'bookstore', 'bookstore.books'],
         ];
     }
 
-    public function testGetOverrideSchemaName()
+    public function testGetOverrideSchemaName(): void
     {
         $entity = new Entity();
         $entity->setDatabase($this->getDatabaseMock('bookstore'));
         $entity->setSchemaName('my_schema');
 
-        $this->assertEquals('my_schema', $entity->guessSchemaName());
+        $this->assertEquals('my_schema', $entity->getSchemaName());
     }
 
-    public function testSetDescription()
+    public function testSetDescription(): void
     {
         $entity = new Entity();
 
         $this->assertFalse($entity->hasDescription());
 
         $entity->setDescription('Some description');
-        $this->assertNotNull($entity->getDescription());
-        $this->assertSame('Some description', $entity->getDescription());
+        $this->assertEquals('Some description', (string) $entity->getDescription());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testSetInvalidStringFormat()
+    public function testSetInvalidStringFormat(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $entity = new Entity();
         $entity->setStringFormat('FOO');
     }
 
-    public function testGetStringFormatFromDatabase()
+    public function testGetStringFormatFromDatabase(): void
     {
         $database = $this->getDatabaseMock('bookstore');
         $database
@@ -292,7 +290,7 @@ class EntityTest extends ModelTestCase
      * @dataProvider provideStringFormats
      *
      */
-    public function testGetStringFormat($format)
+    public function testGetStringFormat($format): void
     {
         $entity = new Entity();
         $entity->setStringFormat($format);
@@ -300,7 +298,7 @@ class EntityTest extends ModelTestCase
         $this->assertSame($format, $entity->getStringFormat());
     }
 
-    public function provideStringFormats()
+    public function provideStringFormats(): array
     {
         return [
             ['XML'],
@@ -310,7 +308,7 @@ class EntityTest extends ModelTestCase
         ];
     }
 
-    public function testAddSameFieldTwice()
+    public function testAddSameFieldTwice(): void
     {
         $entity = new Entity('books');
         $field = $this->getFieldMock('created_at', ['phpName' => 'CreatedAt']);
@@ -321,7 +319,7 @@ class EntityTest extends ModelTestCase
         $entity->addField($field);
     }
 
-    public function testGetChildrenNames()
+    public function testGetChildrenNames(): void
     {
         $field = new Field('created_at');
         $field->setInheritanceType('single');
@@ -344,7 +342,7 @@ class EntityTest extends ModelTestCase
         $this->assertSame('Propel\Generator\Model\Inheritance', $names[1]);
     }
 
-    public function testCantGetChildrenNames()
+    public function testCantGetChildrenNames(): void
     {
         $field = $this->getFieldMock('created_at', ['inheritance' => true]);
 
@@ -360,7 +358,7 @@ class EntityTest extends ModelTestCase
         $this->assertEmpty($entity->getChildrenNames());
     }
 
-    public function testAddInheritanceField()
+    public function testAddInheritanceField(): void
     {
         $entity = new Entity('books');
         $field = $this->getFieldMock('created_at', ['inheritance' => true]);
@@ -373,7 +371,7 @@ class EntityTest extends ModelTestCase
         $this->assertTrue($entity->requiresTransactionInPostgres());
     }
 
-    public function testHasBehaviors()
+    public function testHasBehaviors(): void
     {
         $behavior1 = $this->getBehaviorMock('Foo');
         $behavior2 = $this->getBehaviorMock('Bar');
@@ -396,7 +394,7 @@ class EntityTest extends ModelTestCase
         $this->assertSame($behavior3, $entity->getBehavior('Baz'));
     }
 
-    public function testUnregisterBehavior()
+    public function testUnregisterBehavior(): void
     {
         $behavior = new Behavior();
         $behavior->setName('foo');
@@ -410,7 +408,7 @@ class EntityTest extends ModelTestCase
         $this->assertNull($behavior->getEntity());
     }
 
-    public function testAddField()
+    public function testAddField(): void
     {
         $entity = new Entity('books');
         $field = $this->getFieldMock('createdAt');
@@ -418,23 +416,22 @@ class EntityTest extends ModelTestCase
         $this->assertNull($entity->getChildrenField());
         $this->assertTrue($entity->requiresTransactionInPostgres());
         $this->assertTrue($entity->hasField($field));
-        $this->assertSame($field, $entity->getField('createdAt'));
+        $this->assertSame($field, $entity->getFieldByName('createdAt'));
         $this->assertCount(1, $entity->getFields());
-        $this->assertSame(1, $entity->getNumFields());
+        $this->assertSame(1, $entity->countFields());
     }
 
-    /**
-     * @expectedException \Propel\Generator\Exception\EngineException
-     */
-    public function testCantRemoveFieldWhichIsNotInEntity()
+    public function testCantRemoveFieldWhichIsNotInEntity(): void
     {
+        $this->expectException(EngineException::class);
+
         $field1 = $this->getFieldMock('title');
 
         $entity = new Entity('books');
         $entity->removeField($field1);
     }
 
-    public function testRemoveFieldByName()
+    public function testRemoveFieldByName(): void
     {
         $field1 = $this->getFieldMock('id');
         $field2 = $this->getFieldMock('title');
@@ -444,15 +441,15 @@ class EntityTest extends ModelTestCase
         $entity->addField($field1);
         $entity->addField($field2);
         $entity->addField($field3);
-        $entity->removeField('title');
+        $entity->removeFieldByName('title');
 
         $this->assertCount(2, $entity->getFields());
-        $this->assertTrue($entity->hasField('id'));
-        $this->assertTrue($entity->hasField('isbn'));
-        $this->assertFalse($entity->hasField('title'));
+        $this->assertTrue($entity->hasFieldByName('id'));
+        $this->assertTrue($entity->hasFieldByName('isbn'));
+        $this->assertFalse($entity->hasFieldByName('title'));
     }
 
-    public function testRemoveField()
+    public function testRemoveField(): void
     {
         $field1 = $this->getFieldMock('id');
         $field2 = $this->getFieldMock('title');
@@ -465,12 +462,12 @@ class EntityTest extends ModelTestCase
         $entity->removeField($field2);
 
         $this->assertCount(2, $entity->getFields());
-        $this->assertTrue($entity->hasField('id'));
-        $this->assertTrue($entity->hasField('isbn'));
-        $this->assertFalse($entity->hasField('title'));
+        $this->assertTrue($entity->hasField($field1));
+        $this->assertTrue($entity->hasField($field3));
+        $this->assertFalse($entity->hasField($field2));
     }
 
-    public function testGetNumLazyLoadFields()
+    public function testCountLazyLoadFields(): void
     {
         $field1 = $this->getFieldMock('created_at');
         $field2 = $this->getFieldMock('updated_at', ['lazy' => true]);
@@ -482,10 +479,10 @@ class EntityTest extends ModelTestCase
         $entity->addField($field2);
         $entity->addField($field3);
 
-        $this->assertSame(2, $entity->getNumLazyLoadFields());
+        $this->assertSame(2, $entity->countLazyLoadFields());
     }
 
-    public function testHasEnumFields()
+    public function testHasEnumFields(): void
     {
         $field1 = $this->getFieldMock('created_at');
         $field2 = $this->getFieldMock('updated_at');
@@ -511,24 +508,21 @@ class EntityTest extends ModelTestCase
         $this->assertTrue($entity->hasEnumFields());
     }
 
-    public function testCantGetField()
+    public function testCantGetField(): void
     {
         $entity = new Entity('books');
 
-        $this->assertFalse($entity->hasField('FOO', true));
+        $this->assertFalse($entity->hasFieldByName('FOO'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testCantGetFieldException()
+    public function testInexistentFieldReturnNull(): void
     {
         $entity = new Entity('books');
 
-        $this->assertNull($entity->getField('FOO'));
+        $this->assertNull($entity->getFieldByName('FOO'));
     }
 
-    public function testSetAbstract()
+    public function testSetAbstract(): void
     {
         $entity = new Entity();
         $this->assertFalse($entity->isAbstract());
@@ -537,7 +531,7 @@ class EntityTest extends ModelTestCase
         $this->assertTrue($entity->isAbstract());
     }
 
-    public function testAddIndex()
+    public function testAddIndex(): void
     {
         $entity = new Entity();
         $index = new Index();
@@ -550,22 +544,20 @@ class EntityTest extends ModelTestCase
         $this->assertCount(1, $entity->getIndices());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testAddEmptyIndex()
+    public function testAddEmptyIndex(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $entity = new Entity();
         $entity->addIndex(new Index());
 
         $this->assertCount(1, $entity->getIndices());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testAddAlreadyCreatedIndex()
+    public function testAddAlreadyCreatedIndex(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $index = $this->getIndexMock('idx_fake_entity');
         $entity = new Entity();
         $entity->addIndex($index);
@@ -574,7 +566,7 @@ class EntityTest extends ModelTestCase
         $entity->addIndex($index);
     }
 
-    public function testCreateIndex()
+    public function testCreateIndex(): void
     {
         $entity = new Entity();
         $field1 = $this->getFieldMock('id_mock');
@@ -586,7 +578,7 @@ class EntityTest extends ModelTestCase
         $this->assertTrue($entity->isIndex([$field1, $field2]));
     }
 
-    public function testIsIndex()
+    public function testIsIndex(): void
     {
         $entity = new Entity();
         $field1 = new Field('category_id');
@@ -604,10 +596,11 @@ class EntityTest extends ModelTestCase
         $this->assertFalse($entity->isIndex(['asd']));
     }
 
-    public function testRemoveIndex()
+    public function testRemoveIndex(): void
     {
         $entity = new Entity();
-        $index = $this->getIndexMock('idx_fake', ['entity' => $entity]);
+        $field = $this->getFieldMock('field_fake', ['entity' => $entity]);
+        $index = $this->getIndexMock('idx_fake', ['entity' => $entity, 'fields' => [$field]]);
         $entity->addIndex($index);
         $this->assertTrue($entity->hasIndex('idx_fake'));
 
@@ -616,7 +609,7 @@ class EntityTest extends ModelTestCase
         $this->assertFalse($entity->hasIndex('idx_fake'));
     }
 
-    public function testAddUniqueIndex()
+    public function testAddUniqueIndex(): void
     {
         $entity = new Entity();
         $entity->addUnique($this->getUniqueIndexMock('author_unq'));
@@ -624,7 +617,7 @@ class EntityTest extends ModelTestCase
         $this->assertCount(1, $entity->getUnices());
     }
 
-    public function testRemoveUniqueIndex()
+    public function testRemoveUniqueIndex(): void
     {
         $entity = new Entity();
         $unique = $this->getUniqueIndexMock('author_unq', ['entity' => $entity]);
@@ -636,7 +629,7 @@ class EntityTest extends ModelTestCase
         $this->assertCount(0, $entity->getUnices());
     }
 
-    public function testIsUnique()
+    public function testIsUnique(): void
     {
         $entity = new Entity();
         $field1 = $this->getFieldMock('category_id');
@@ -655,7 +648,7 @@ class EntityTest extends ModelTestCase
         $this->assertTrue($entity->isUnique([$field2, $field1]));
     }
 
-    public function testIsUniqueWhenUniqueField()
+    public function testIsUniqueWhenUniqueField(): void
     {
         $entity = new Entity();
         $field = $this->getFieldMock('unique_id',['entity' => $entity, 'unique' => true]);
@@ -663,7 +656,7 @@ class EntityTest extends ModelTestCase
         $this->assertTrue($entity->isUnique([$field]));
     }
 
-    public function testIsUniquePrimaryKey()
+    public function testIsUniquePrimaryKey(): void
     {
         $entity = new Entity();
         $field = $this->getFieldMock('id', ['primary' => true, 'entity' => $entity]);
@@ -673,7 +666,7 @@ class EntityTest extends ModelTestCase
         $this->assertTrue($entity->isUnique([$field]));
     }
 
-    public function testisUniqueWithCompositePrimaryKey()
+    public function testisUniqueWithCompositePrimaryKey(): void
     {
         $entity = new Entity();
         $field1 = $this->getFieldMock('author_id', ['primary' => true, 'entity' => $entity]);
@@ -687,7 +680,7 @@ class EntityTest extends ModelTestCase
         $this->assertFalse($entity->isUnique([$field2, $field3]));
     }
 
-    public function testGetCompositePrimaryKey()
+    public function testGetCompositePrimaryKey(): void
     {
         $field1 = $this->getFieldMock('book_id', ['primary' => true]);
         $field2 = $this->getFieldMock('author_id', ['primary' => true]);
@@ -707,7 +700,7 @@ class EntityTest extends ModelTestCase
         $this->assertSame($field1, $entity->getFirstPrimaryKeyField());
     }
 
-    public function testGetSinglePrimaryKey()
+    public function testGetSinglePrimaryKey(): void
     {
         $field1 = $this->getFieldMock('id', ['primary' => true]);
         $field2 = $this->getFieldMock('title');
@@ -727,7 +720,7 @@ class EntityTest extends ModelTestCase
         $this->assertSame($field1, $entity->getFirstPrimaryKeyField());
     }
 
-    public function testGetNoPrimaryKey()
+    public function testGetNoPrimaryKey(): void
     {
         $field1 = $this->getFieldMock('id');
         $field2 = $this->getFieldMock('title');
@@ -747,7 +740,7 @@ class EntityTest extends ModelTestCase
         $this->assertNull($entity->getFirstPrimaryKeyField());
     }
 
-    public function testGetAutoIncrementPrimaryKey()
+    public function testGetAutoIncrementPrimaryKey(): void
     {
         $field1 = $this->getFieldMock('id', [
             'primary' => true,
@@ -769,7 +762,7 @@ class EntityTest extends ModelTestCase
         $this->assertSame($field1, $entity->getAutoIncrementPrimaryKey());
     }
 
-    public function testAddIdMethodParameter()
+    public function testAddIdMethodParameter(): void
     {
         $parameter = $this
             ->getMockBuilder('Propel\Generator\Model\IdMethodParameter')
@@ -787,7 +780,7 @@ class EntityTest extends ModelTestCase
         $this->assertCount(1, $entity->getIdMethodParameters());
     }
 
-    public function testAddReferrerRelation()
+    public function testAddReferrerRelation(): void
     {
         $entity = new Entity('books');
         $entity->addReferrer($this->getRelationMock());
@@ -795,7 +788,7 @@ class EntityTest extends ModelTestCase
         $this->assertCount(1, $entity->getReferrers());
     }
 
-    public function testAddRelation()
+    public function testAddRelation(): void
     {
         $fk = $this->getRelationMock('fk_author_id', [
             'target' => 'authors',
@@ -810,7 +803,7 @@ class EntityTest extends ModelTestCase
         }));
     }
 
-    public function testAddRelations()
+    public function testAddRelations(): void
     {
         $authorRel = $this->getRelationMock('author_id', ['target' => 'Authors']);
         $publisherRel = $this->getRelationMock('publisher_id', ['target' => 'Publishers']);
@@ -823,7 +816,7 @@ class EntityTest extends ModelTestCase
         $this->assertSame($publisherRel, $entity->getRelation('publisher_id'));
     }
 
-    public function testGetRelationsReferencingEntity()
+    public function testGetRelationsReferencingEntity(): void
     {
         $fk1 = $this->getRelationMock('fk1', ['target' => 'authors']);
         $fk2 = $this->getRelationMock('fk2', ['target' => 'categories']);
@@ -837,7 +830,7 @@ class EntityTest extends ModelTestCase
         $this->assertCount(2, $entity->getRelationsReferencingEntity('authors'));
     }
 
-    public function testGetFieldRelations()
+    public function testGetFieldRelations(): void
     {
         $fk1 = $this->getRelationMock('fk1', [
             'local_fields' => ['foo', 'author_id', 'bar']
@@ -855,7 +848,7 @@ class EntityTest extends ModelTestCase
         $this->assertContains($fk1, $entity->getFieldRelations('author_id'));
     }
 
-    public function testSetAlias()
+    public function testSetAlias(): void
     {
         $entity = new Entity('books');
 
@@ -863,10 +856,10 @@ class EntityTest extends ModelTestCase
 
         $entity->setAlias('Book');
         $this->assertTrue($entity->isAlias());
-        $this->assertSame('Book', $entity->getAlias());
+        $this->assertSame('Book', $entity->getAlias()->toString());
     }
 
-    public function testSetContainsForeignPK()
+    public function testSetContainsForeignPK(): void
     {
         $entity = new Entity();
 
@@ -874,7 +867,7 @@ class EntityTest extends ModelTestCase
         $this->assertTrue($entity->getContainsForeignPK());
     }
 
-    public function testSetCrossReference()
+    public function testSetCrossReference(): void
     {
         $entity = new Entity('books');
 
@@ -886,7 +879,7 @@ class EntityTest extends ModelTestCase
         $this->assertTrue($entity->isCrossRef());
     }
 
-    public function testSetSkipSql()
+    public function testSetSkipSql(): void
     {
         $entity = new Entity('books');
         $entity->setSkipSql(true);
@@ -894,7 +887,7 @@ class EntityTest extends ModelTestCase
         $this->assertTrue($entity->isSkipSql());
     }
 
-    public function testSetForReferenceOnly()
+    public function testSetForReferenceOnly(): void
     {
         $entity = new Entity('books');
         $entity->setForReferenceOnly(true);
@@ -902,7 +895,7 @@ class EntityTest extends ModelTestCase
         $this->assertTrue($entity->isForReferenceOnly());
     }
 
-    public function testSetDatabaseWhenEntityBelongsToDifferentDatabase()
+    public function testSetDatabaseWhenEntityBelongsToDifferentDatabase(): void
     {
         $db1 = new Database('bookstore1');
         $db2 =new Database('bookstore2');
@@ -913,17 +906,17 @@ class EntityTest extends ModelTestCase
         $this->assertSame($db2, $entity->getDatabase());
     }
 
-    public function testGetAutoincrementFieldNames()
+    public function testGetAutoincrementFieldNames(): void
     {
         $entity= new Entity();
         $field1 = $this->getFieldMock('author_id', ['entity' => $entity, 'auto_increment' => true]);
         $field2 = $this->getFieldMock('book_id', ['entity' => $entity, 'auto_increment' => true]);
         $entity->addFields([$field1, $field2]);
 
-        $this->assertEquals(['author_id', 'book_id'], $entity->getAutoIncrementFieldNames());
+        $this->assertEquals(['author_id', 'book_id'], $entity->getAutoIncrementFieldNames()->toArray());
     }
 
-    public function testHasAutoincrement()
+    public function testHasAutoincrement(): void
     {
         $entity1 = new Entity();
         $field1 = $this->getFieldMock('id', ['auto_increment' => true, 'entity' => $entity1]);
@@ -938,7 +931,7 @@ class EntityTest extends ModelTestCase
         $this->assertFalse($entity2->hasAutoIncrement());
     }
 
-    public function testQuoteIdentifier()
+    public function testQuoteIdentifier(): void
     {
         $database = $this->getDatabaseMock('test_db', ['platform' => new SqlitePlatform()]);
         $entity = new Entity();
@@ -948,7 +941,7 @@ class EntityTest extends ModelTestCase
         $this->assertEquals('[text]', $entity->quoteIdentifier('text'));
     }
 
-    public function testNoQuoteIdentifier()
+    public function testNoQuoteIdentifier(): void
     {
         $database = $this->getDatabaseMock('test_db', ['platform' => new SqlitePlatform()]);
         $entity = new Entity();
@@ -958,7 +951,7 @@ class EntityTest extends ModelTestCase
         $this->assertEquals('text', $entity->quoteIdentifier('text'));
     }
 
-    public function testGetIdentifierQuoting()
+    public function testGetIdentifierQuoting(): void
     {
         $entity = new Entity();
         $this->assertNull($entity->getIdentifierQuoting());
@@ -966,34 +959,35 @@ class EntityTest extends ModelTestCase
         $this->assertTrue($entity->getIdentifierQuoting());
     }
 
-    /**
-     * @expectedException \Propel\Runtime\Exception\RuntimeException
-     */
-    public function testQuoteIdentifierNoPlatform()
+    public function testQuoteIdentifierNoPlatform(): void
     {
+        $this->expectException(RuntimeException::class);
+
         $entity = new Entity();
         $database = $this->getDatabaseMock('test_db');
         $entity->setDatabase($database);
         $entity->quoteIdentifier('text');
     }
 
-    public function testClone()
+    public function testClone(): void
     {
+        //__clone() not supported anymore. Use myclabs/deep-copy instead
         $entity = new Entity('Book');
         $entity->addField($this->getFieldMock('id', ['entity' => $entity, 'primary' => true, 'auto_increment' => true]));
         $entity->addField($this->getFieldMock('title', ['entity' => $entity]));
         $entity->addField($this->getFieldMock('children', ['entity' => $entity, 'inheritance' => true]));
         $entity->addRelation($this->getRelationMock('Rel1', ['entity' => $entity]));
 
-        $clone = clone $entity;
+        $clone = deep_copy($entity);
 
         $this->assertEquals($entity, $clone, 'Entities are equals');
         $this->assertNotSame($entity, $clone, 'Entities are different objects');
         $this->assertEquals($entity->getFields(), $clone->getFields(), 'Field sets are equals');
         $this->assertNotSame($entity->getFields(), $clone->getFields(), 'Field sets are not the same object');
 
+        /** @var Field $field */
         foreach ($entity->getFields() as $field) {
-            $cloneField = $clone->getFieldByName($field->getName());
+            $cloneField = $clone->getFieldByName($field->getName()->toString());
             $this->assertNotNull($cloneField, 'Cloned set contains the given field');
             $this->assertNotSame($field, $cloneField, 'Fields are different objects');
         }
@@ -1004,7 +998,7 @@ class EntityTest extends ModelTestCase
         $this->assertNotSame($entity->getRelation('Rel1'), $clone->getRelation('Rel1'));
     }
 
-    public function testGetCrossRelation()
+    public function testGetCrossRelation(): void
     {
         $user = new Entity('User');
         $user->addField($this->getFieldMock('id', ['entity' => $user, 'primary' => true, 'required' => true]));
@@ -1036,7 +1030,7 @@ class EntityTest extends ModelTestCase
         $crossRels = $user->getCrossRelations();
 
         $this->assertCount(1, $crossRels);
-        $this->assertInstanceOf(CrossRelation::class, $crossRels[0]);
+        $this->assertTrue($crossRels->search(fn($elem): bool => $elem instanceof CrossRelation));
         $this->assertTrue($user->hasCrossRelations());
         $this->assertTrue($role->hasCrossRelations());
     }
@@ -1048,14 +1042,14 @@ class EntityTest extends ModelTestCase
      * @param  array  $options An array of options
      * @return Field
      */
-    protected function getFieldMock($name, array $options = [])
+    protected function getFieldMock(string $name, array $options = []): Field
     {
         $defaults = [
             'primary' => false,
             'auto_increment' => false,
             'inheritance' => false,
             'lazy' => false,
-            'phpName' => NamingTool::toStudlyCase($name),
+            'phpName' => Text::create($name)->toStudlyCase()->toString(),
             'pg_transaction' => true,
             'unique' => false,
             'required' => false
@@ -1117,5 +1111,22 @@ class EntityTest extends ModelTestCase
         ;
 
         return $field;
+    }
+}
+
+class Entity extends BaseEntity
+{
+    /**
+     * Executes behavior entity modifiers.
+     * This is only for testing purposes. Model\Database calls already `modifyEntity` on each behavior.
+     */
+    public function applyBehaviors(): void
+    {
+        foreach ($this->behaviors as $behavior) {
+            if (!$behavior->isEntityModified()) {
+                $behavior->getEntityModifier()->modifyEntity();
+                $behavior->setEntityModified(true);
+            }
+        }
     }
 }

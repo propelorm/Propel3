@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,7 +9,7 @@
 
 namespace Propel\Common\Types;
 
-use gossi\codegen\model\PhpMethod;
+use Susina\Codegen\Model\PhpMethod;
 use Propel\Generator\Model\Field;
 use Propel\Runtime\Map\FieldMap;
 

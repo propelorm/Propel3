@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,6 +9,9 @@
 
 namespace Propel\Tests\Generator\Model;
 
+use phootwork\collection\ArrayList;
+use phootwork\collection\Set;
+use phootwork\lang\Text;
 use Propel\Generator\Model\Behavior;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Domain;
@@ -20,7 +22,6 @@ use Propel\Generator\Model\Relation;
 use Propel\Generator\Model\Schema;
 use Propel\Generator\Model\Unique;
 use Propel\Generator\Platform\PlatformInterface;
-use Propel\Common\Collection\UniqueList;
 use Propel\Tests\TestCase;
 use Propel\Tests\VfsTrait;
 
@@ -41,7 +42,7 @@ abstract class ModelTestCase extends TestCase
      *
      * @return Behavior
      */
-    protected function getBehaviorMock($name, array $options = []): Behavior
+    protected function getBehaviorMock(string $name, array $options = []): Behavior
     {
         $defaults = [
             'additional_builders' => [],
@@ -65,7 +66,7 @@ abstract class ModelTestCase extends TestCase
         $behavior
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($name))
+            ->will($this->returnValue(Text::create($name)))
         ;
 
         $behavior
@@ -108,7 +109,7 @@ abstract class ModelTestCase extends TestCase
      * @param  array      $options An array of options
      * @return Relation
      */
-    protected function getRelationMock($name = null, array $options = [])
+    protected function getRelationMock(string $name = null, array $options = []): Relation
     {
         $defaults = [
             'target' => '',
@@ -128,7 +129,7 @@ abstract class ModelTestCase extends TestCase
         $fk
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($name))
+            ->will($this->returnValue(Text::create($name)))
         ;
 
         $fk
@@ -146,7 +147,7 @@ abstract class ModelTestCase extends TestCase
         $fk
             ->expects($this->any())
             ->method('getLocalFields')
-            ->will($this->returnValue(new UniqueList($options['local_fields'])))
+            ->will($this->returnValue(new ArrayList($options['local_fields'])))
         ;
 
         $fk
@@ -165,10 +166,11 @@ abstract class ModelTestCase extends TestCase
      * @param  array  $options An array of options
      * @return Index
      */
-    protected function getIndexMock($name = null, array $options = [])
+    protected function getIndexMock(string $name = null, array $options = []): Index
     {
         $defaults = [
-            'entity' => null
+            'entity' => null,
+            'fields' => []
         ];
 
         $options = array_merge($defaults, $options);
@@ -185,13 +187,19 @@ abstract class ModelTestCase extends TestCase
         $index
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($name))
+            ->will($this->returnValue(Text::create($name)))
         ;
         $index
             ->expects($this->any())
             ->method('getEntity')
             ->will($this->returnValue($options['entity']))
         ;
+        $index
+            ->expects($this->any())
+            ->method('getFields')
+            ->will($this->returnValue(new Set($options['fields'])))
+        ;
+
 
         return $index;
     }
@@ -203,7 +211,7 @@ abstract class ModelTestCase extends TestCase
      * @param  array  $options An array of options
      * @return Unique
      */
-    protected function getUniqueIndexMock($name = null, array $options = [])
+    protected function getUniqueIndexMock(string $name = null, array $options = []): Unique
     {
         $defaults = [
             'entity' => null
@@ -223,7 +231,7 @@ abstract class ModelTestCase extends TestCase
         $unique
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($name))
+            ->will($this->returnValue(Text::create($name)))
         ;
         $unique
             ->expects($this->any())
@@ -241,7 +249,7 @@ abstract class ModelTestCase extends TestCase
      * @param  array  $options An array of options
      * @return Schema
      */
-    protected function getSchemaMock($name = null, array $options = [])
+    protected function getSchemaMock(string $name = null, array $options = []): Schema
     {
         $defaults = [
             'generator_config' => null,
@@ -257,7 +265,7 @@ abstract class ModelTestCase extends TestCase
         $schema
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($name))
+            ->will($this->returnValue(Text::create($name)))
         ;
         $schema
             ->expects($this->any())
@@ -276,7 +284,7 @@ abstract class ModelTestCase extends TestCase
      * @param  string            $schemaDelimiter
      * @return PlatformInterface
      */
-    protected function getPlatformMock($supportsSchemas = true, array $options = [], $schemaDelimiter = '.')
+    protected function getPlatformMock(bool $supportsSchemas = true, array $options = [], string $schemaDelimiter = '.'): PlatformInterface
     {
         $defaults = [
             'max_field_name_length' => null,
@@ -318,7 +326,7 @@ abstract class ModelTestCase extends TestCase
      * @param  array  $options An array of options
      * @return Domain
      */
-    protected function getDomainMock($name = null, array $options = [])
+    protected function getDomainMock(string $name = null, array $options = []): Domain
     {
         $defaults = [];
 
@@ -333,7 +341,7 @@ abstract class ModelTestCase extends TestCase
         $domain
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($name))
+            ->will($this->returnValue(Text::create($name)))
         ;
 
         return $domain;
@@ -346,7 +354,7 @@ abstract class ModelTestCase extends TestCase
      * @param  array  $options An array of options
      * @return Entity
      */
-    protected function getEntityMock($name, array $options = [])
+    protected function getEntityMock(string $name, array $options = []): Entity
     {
         $defaults = [
             'name' => $name,
@@ -369,19 +377,19 @@ abstract class ModelTestCase extends TestCase
         $entity
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($name))
+            ->will($this->returnValue(Text::create($name)))
         ;
 
         $entity
             ->expects($this->any())
             ->method('getFullName')
-            ->will($this->returnValue($options['namespace'] . '\\' . $name))
+            ->will($this->returnValue(Text::create("{$options['namespace']}\\$name")))
         ;
 
         $entity
             ->expects($this->any())
             ->method('getTableName')
-            ->will($this->returnValue($options['tableName']))
+            ->will($this->returnValue(Text::create($options['tableName'])))
         ;
 
         $entity
@@ -420,6 +428,18 @@ abstract class ModelTestCase extends TestCase
             ->will($this->returnValue($options['database']))
         ;
 
+        $entity
+            ->expects($this->any())
+            ->method('getMutatorVisibility')
+            ->will($this->returnValue('public'))
+        ;
+
+        $entity
+            ->expects($this->any())
+            ->method('getAccessorVisibility')
+            ->will($this->returnValue('public'))
+        ;
+
         return $entity;
     }
 
@@ -430,7 +450,7 @@ abstract class ModelTestCase extends TestCase
      * @param  array    $options An array of options
      * @return Database
      */
-    protected function getDatabaseMock($name, array $options = [])
+    protected function getDatabaseMock(string $name, array $options = []): Database
     {
         $defaults = [
             'platform' => null,
@@ -446,7 +466,7 @@ abstract class ModelTestCase extends TestCase
         $database
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($name))
+            ->will($this->returnValue(Text::create($name)))
         ;
         $database
             ->expects($this->any())
@@ -464,7 +484,7 @@ abstract class ModelTestCase extends TestCase
      * @param  array  $options An array of options
      * @return Field
      */
-    protected function getFieldMock($name, array $options = [])
+    protected function getFieldMock(string $name, array $options = []): Field
     {
         $defaults = [
             'size'       => null,
@@ -482,7 +502,7 @@ abstract class ModelTestCase extends TestCase
         $field
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($name))
+            ->will($this->returnValue(Text::create($name)))
         ;
 
         $field

@@ -9,6 +9,8 @@
 
 namespace Propel\Generator\Model\Parts;
 
+use phootwork\lang\Text;
+
 /**
  * Trait NamePart
  *
@@ -16,29 +18,21 @@ namespace Propel\Generator\Model\Parts;
  */
 trait NamePart
 {
-    /**
-     * @var string
-     */
-    protected $name = '';
+    protected Text $name;
 
     /**
      * Returns the class name without namespace.
-     *
-     * @return string
      */
-    public function getName(): string
+    public function getName(): Text
     {
-        return $this->name;
+        return $this->name ?? $this->name = new Text();
     }
 
     /**
-     * @param string $name
-     * @return $this
+     * @param string|Text $name
      */
-    public function setName(string $name)
+    public function setName($name): void
     {
-        $this->name = $name;
-
-        return $this;
+        $this->name = new Text($name);
     }
 }

@@ -30,7 +30,7 @@ class SluggableBehavior extends Behavior
 {
     use ComponentTrait;
 
-    protected $defaultParameters = [
+    protected array $defaultParameters = [
         'slug_field' => 'slug',
         'slug_pattern' => '',
         'replace_pattern' => '/\W+/',
@@ -54,7 +54,7 @@ class SluggableBehavior extends Behavior
             throw new BuildException('Sluggable behavior requires the entity has one primary string at least when no slug_pattern is set, to calculate the slug.');
         }
 
-        if (!$entity->hasField($this->getParameter('slug_field'))) {
+        if (!$entity->hasFieldByName($this->getParameter('slug_field'))) {
             $entity->addField($modelFactory->createField(
                 [
                     'name' => $this->getParameter('slug_field'),
@@ -70,9 +70,9 @@ class SluggableBehavior extends Behavior
             $unique->setName(
                 ($entity->getSchemaName() ? "{$entity->getSchemaName()}_" : '') . $entity->getTableName() . '_slug'
             );
-            $unique->addField($entity->getField($this->getParameter('slug_field')));
+            $unique->addField($entity->getFieldByName($this->getParameter('slug_field')));
             if ($this->getParameter('scope_field')) {
-                $unique->addField($entity->getField($this->getParameter('scope_field')));
+                $unique->addField($entity->getFieldByName($this->getParameter('scope_field')));
             }
             $entity->addUnique($unique);
         }

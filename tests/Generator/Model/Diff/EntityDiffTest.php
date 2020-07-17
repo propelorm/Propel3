@@ -1,8 +1,16 @@
-<?php
+<?php declare(strict_types=1);
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ *
+ */
 
 namespace Propel\Tests\Generator\Model\Diff;
 
-use Propel\Common\Collection\Map;
+use phootwork\collection\Map;
 use Propel\Generator\Model\Field;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Diff\FieldDiff;

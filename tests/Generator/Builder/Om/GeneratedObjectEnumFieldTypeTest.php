@@ -24,7 +24,7 @@ class GeneratedObjectEnumFieldTypeTest extends TestCase
     /** @var  Configuration */
     private $con;
 
-    public function setUp()
+    public function setUp(): void
     {
         if (!class_exists('ComplexFieldTypeEntity3')) {
             $schema = <<<EOF

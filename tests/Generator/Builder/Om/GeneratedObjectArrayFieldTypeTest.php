@@ -27,7 +27,7 @@ class GeneratedObjectArrayFieldTypeTest extends TestCase
     /** @var  Configuration */
     private $con;
 
-    public function setUp()
+    public function setUp(): void
     {
         if (!class_exists('MyNameSpace\\ComplexFieldTypeEntity2')) {
             $schema = <<<EOF

@@ -28,7 +28,7 @@ class GeneratedObjectObjectColumnTypeTest extends TestCase
      */
     protected $configuration;
 
-    public function setup()
+    public function setUp(): void
     {
         if (!class_exists('ComplexColumnTypeEntity1')) {
             $schema = <<<EOF

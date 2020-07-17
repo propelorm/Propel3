@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -11,6 +10,9 @@
 namespace Propel\Tests\Common\Config\Loader;
 
 use org\bovigo\vfs\vfsStream;
+use phootwork\file\exception\FileException;
+use Propel\Common\Config\Exception\InputOutputException;
+use Propel\Common\Config\Exception\InvalidArgumentException;
 use Propel\Common\Config\FileLocator;
 use Propel\Common\Config\Loader\XmlFileLoader;
 use Propel\Tests\TestCase;
@@ -21,15 +23,15 @@ class XmlFileLoaderTest extends TestCase
     use VfsTrait;
 
     /** @var XmlFileLoader */
-    protected $loader;
+    protected XmlFileLoader $loader;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->loader = new XmlFileLoader(new FileLocator([$this->getRoot()->url()]));
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $this->assertTrue($this->loader->supports('foo.xml'), '->supports() returns true if the resource is loadable');
         $this->assertTrue($this->loader->supports('foo.xml.dist'), '->supports() returns true if the resource is loadable');
@@ -54,21 +56,19 @@ XML;
         $this->assertEquals('baz', $test['bar']);
     }
 
-    /**
-     * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage The file "inexistent.xml" does not exist (in:
-     */
     public function testXmlFileDoesNotExist()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("The file \"inexistent.xml\" does not exist (in:");
+
         $this->loader->load('inexistent.xml');
     }
 
-    /**
-     * @expectedException        Propel\Common\Config\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid xml content
-     */
-    public function testXmlFileHasInvalidContent()
+    public function testXmlFileHasInvalidContent(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid xml content");
+
         $content = <<<EOF
 not xml content
 only plain
@@ -87,12 +87,11 @@ EOF;
         $this->assertEquals([], $actual);
     }
 
-    /**
-     * @expectedException Propel\Common\Config\Exception\InputOutputException
-     * @expectedExceptionMessage You don't have permissions to access configuration file vfs://root/notreadable.xml.
-     */
     public function testXmlFileNotReadableThrowsException()
     {
+        $this->expectException(FileException::class);
+        $this->expectExceptionMessage("You don't have permissions to access notreadable.xml file");
+
         $content = <<< XML
 <?xml version='1.0' standalone='yes'?>
 <properties>

@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,8 +6,6 @@
  *
  * @license MIT License
  */
-
-declare(strict_types=1);
 
 namespace Propel\Generator\Model;
 
@@ -21,20 +18,11 @@ namespace Propel\Generator\Model;
  */
 class Inheritance
 {
-    /** @var string */
-    private $key;
-
-    /** @var string */
-    private $className;
-
-    /** @var string */
-    private $package;
-
-    /** @var string */
-    private $ancestor;
-
-    /** @var Field */
-    private $field;
+    private string $key;
+    private string $className;
+    private string $package;
+    private string $ancestor;
+    private Field $field;
 
     /**
      * Returns a key name.

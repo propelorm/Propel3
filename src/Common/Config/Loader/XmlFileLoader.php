@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,7 +9,12 @@
 
 namespace Propel\Common\Config\Loader;
 
+use phootwork\file\exception\FileException;
+use phootwork\file\File;
+use phootwork\lang\Text;
 use Propel\Common\Config\Exception\InputOutputException;
+use Propel\Common\Config\Exception\InvalidArgumentException;
+use Propel\Common\Config\Exception\XmlParseException;
 use Propel\Common\Config\XmlToArrayConverter;
 
 /**
@@ -23,27 +27,21 @@ class XmlFileLoader extends FileLoader
     /**
      * Loads an Xml file.
      *
-     * @param mixed  $file The resource
+     * @param mixed $file The resource
      * @param string $type The resource type
+     *
      * @return array
      *
-     * @throws \InvalidArgumentException                                if configuration file not found
-     * @throws \Propel\Common\Config\Exception\InputOutputException     if configuration file is not readable
-     * @throws \Propel\Common\Config\Exception\InvalidArgumentException if invalid xml file
-     * @throws \Propel\Common\Config\Exception\XmlParseException        if something went wrong while parsing xml file
+     * @throws \InvalidArgumentException if configuration file not found
+     * @throws XmlParseException if something went wrong while parsing xml file
+     * @throws FileException if the file is not readable
      */
-    public function load($file, $type = null): array
+    public function load($file, string $type = null): array
     {
-        $path = $this->locator->locate($file);
+        $file = new File($this->locator->locate($file));
+        $content = XmlToArrayConverter::convert($file->read());
 
-        if (!is_readable($path)) {
-            throw new InputOutputException("You don't have permissions to access configuration file $file.");
-        }
-
-        $content = XmlToArrayConverter::convert($path);
-        $content = $this->resolveParams($content); //Resolve parameter placeholders (%name%)
-
-        return $content;
+        return $this->resolveParams($content);
     }
 
     /**
@@ -54,15 +52,10 @@ class XmlFileLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null): bool
+    public function supports($resource, ?string $type = null): bool
     {
-        $info = pathinfo($resource);
-        $extension = $info['extension'];
+        $resource = new Text($resource);
 
-        if ('dist' === $extension) {
-            $extension = pathinfo($info['filename'], PATHINFO_EXTENSION);
-        }
-
-        return is_string($resource) && ('xml' === $extension);
+        return $resource->endsWith('.xml') || $resource->endsWith('.xml.dist');
     }
 }

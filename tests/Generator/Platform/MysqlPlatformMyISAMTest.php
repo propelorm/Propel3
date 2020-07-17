@@ -19,6 +19,7 @@ use Propel\Generator\Model\Entity;
 use Propel\Generator\Model\Model;
 use Propel\Generator\Model\Vendor;
 use Propel\Generator\Platform\MysqlPlatform;
+use Propel\Generator\Platform\PlatformInterface;
 use Propel\Generator\Schema\SchemaReader;
 use Propel\Tests\VfsTrait;
 
@@ -36,7 +37,7 @@ class MysqlPlatformMyISAMTest extends PlatformTestProvider
      *
      * @return MysqlPlatform
      */
-    protected function getPlatform(): MysqlPlatform
+    protected function getPlatform(): PlatformInterface
     {
         if (null === $this->platform) {
             $this->platform = new MysqlPlatform();

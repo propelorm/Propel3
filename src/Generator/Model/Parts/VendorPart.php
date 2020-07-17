@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,8 +9,8 @@
 
 namespace Propel\Generator\Model\Parts;
 
+use phootwork\collection\Map;
 use Propel\Generator\Model\Vendor;
-use Propel\Common\Collection\Map;
 
 /**
  * Trait VendorPart
@@ -20,27 +19,21 @@ use Propel\Common\Collection\Map;
  */
 trait VendorPart
 {
-    /**
-     * @var Map
-     */
-    protected $vendor;
+    protected Map $vendor;
 
     protected function initVendor()
     {
-        $this->vendor = new Map([], Vendor::class);
+        $this->vendor = new Map();
     }
 
     /**
      * Adds vendor information to the current model
      *
      * @param Vendor $vendor
-     * @return $this
      */
-    public function addVendor(Vendor $vendor)
+    public function addVendor(Vendor $vendor): void
     {
         $this->vendor->set($vendor->getType(), $vendor);
-
-        return $this;
     }
 
     /**

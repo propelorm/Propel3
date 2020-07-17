@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,10 +9,10 @@
 
 namespace Propel\Generator\Model\Parts;
 
+use phootwork\collection\Set;
 use Propel\Generator\Model\IdMethodParameter;
 use Propel\Generator\Model\Model;
 use Propel\Generator\Platform\PlatformInterface;
-use Propel\Common\Collection\Set;
 
 /**
  * Trait SqlPart
@@ -24,24 +23,15 @@ trait SqlPart
 {
     use SuperordinatePart;
 
-    /** @var bool */
-    protected $heavyIndexing;
-
-    /** @var bool */
-    protected $identifierQuoting;
-
-    /** @var string */
-    protected $stringFormat;
-
-    /** @var string */
-    protected $idMethod;
-
-    /** @var Set */
-    protected $idMethodParameters;
+    protected bool $heavyIndexing;
+    protected bool $identifierQuoting;
+    protected string $stringFormat;
+    protected string $idMethod = '';
+    protected Set $idMethodParameters;
 
     protected function initSql()
     {
-        $this->idMethodParameters = new Set([], IdMethodParameter::class);
+        $this->idMethodParameters = new Set();
     }
 
     /**
@@ -53,13 +43,10 @@ trait SqlPart
      * Sets the method strategy for generating primary keys.
      *
      * @param string $idMethod
-     * @return $this
      */
-    public function setIdMethod(string $idMethod)
+    public function setIdMethod(string $idMethod): void
     {
         $this->idMethod = $idMethod;
-
-        return $this;
     }
 
     /**
@@ -67,12 +54,10 @@ trait SqlPart
      *
      * [HL] changing behavior so that Database default method is returned
      * if no method has been specified for the entity.
-     *
-     * @return string
      */
     public function getIdMethod(): string
     {
-        if (null !== $this->idMethod) {
+        if ('' !== $this->idMethod) {
             return $this->idMethod;
         }
 
@@ -87,14 +72,11 @@ trait SqlPart
      * Adds a new parameter for the strategy that generates primary keys.
      *
      * @param IdMethodParameter $idMethodParameter
-     * @return $this
      */
-    public function addIdMethodParameter(IdMethodParameter $idMethodParameter)
+    public function addIdMethodParameter(IdMethodParameter $idMethodParameter): void
     {
         $idMethodParameter->setEntity($this);
         $this->idMethodParameters->add($idMethodParameter);
-
-        return $this;
     }
 
     /**
@@ -112,30 +94,21 @@ trait SqlPart
      * Removes a parameter for the strategy that generates primary keys.
      *
      * @param IdMethodParameter $idMethodParameter
-     * @return $this
      */
-    public function removeIdMethodParameter(IdMethodParameter $idMethodParameter)
+    public function removeIdMethodParameter(IdMethodParameter $idMethodParameter): void
     {
         $idMethodParameter->setEntity(null);
         $this->idMethodParameters->remove($idMethodParameter);
-
-        return $this;
     }
 
     /**
      * Sets heavy indexing
      *
      * @param bool $heavyIndexing
-     * @return $this
      */
-    public function setHeavyIndexing(?bool $heavyIndexing = null)
+    public function setHeavyIndexing(bool $heavyIndexing = null): void
     {
-        if (null === $heavyIndexing) {
-            $heavyIndexing = true;
-        }
-        $this->heavyIndexing = $heavyIndexing;
-
-        return $this;
+        $this->heavyIndexing = $heavyIndexing ?? true;
     }
 
     /**
@@ -143,7 +116,7 @@ trait SqlPart
      */
     public function isHeavyIndexing(): bool
     {
-        if (null !== $this->heavyIndexing) {
+        if (isset($this->heavyIndexing)) {
             return $this->heavyIndexing;
         }
 
@@ -156,13 +129,10 @@ trait SqlPart
 
     /**
      * @param bool $identifierQuoting
-     * @return $this
      */
-    public function setIdentifierQuoting(bool $identifierQuoting)
+    public function setIdentifierQuoting(bool $identifierQuoting): void
     {
         $this->identifierQuoting = $identifierQuoting;
-
-        return $this;
     }
 
     /**
@@ -175,7 +145,7 @@ trait SqlPart
      */
     public function isIdentifierQuotingEnabled(): bool
     {
-        if (null !== $this->identifierQuoting) {
+        if (isset($this->identifierQuoting)) {
             return $this->identifierQuoting;
         }
 
@@ -187,9 +157,9 @@ trait SqlPart
     /**
      * @return bool|null
      */
-    public function getIdentifierQuoting()
+    public function getIdentifierQuoting(): ?bool
     {
-        return $this->identifierQuoting;
+        return $this->identifierQuoting ?? null;
     }
 
     /**
@@ -225,9 +195,8 @@ trait SqlPart
      * @param  string $format
      *
      * @throws \InvalidArgumentException
-     * @return $this
      */
-    public function setStringFormat(string $format)
+    public function setStringFormat(string $format): void
     {
         $formats = Model::SUPPORTED_STRING_FORMATS;
         $format = strtoupper($format);
@@ -243,8 +212,6 @@ trait SqlPart
         }
 
         $this->stringFormat = $format;
-
-        return $this;
     }
 
     /**
@@ -255,7 +222,7 @@ trait SqlPart
      */
     public function getStringFormat(): string
     {
-        if (null !== $this->stringFormat) {
+        if (isset($this->stringFormat)) {
             return $this->stringFormat;
         }
 

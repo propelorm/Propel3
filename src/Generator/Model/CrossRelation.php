@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,8 +6,6 @@
  *
  * @license MIT License
  */
-
-declare(strict_types=1);
 
 namespace Propel\Generator\Model;
 use Propel\Generator\Model\Parts\EntityPart;
@@ -53,21 +50,21 @@ class CrossRelation
      *
      * @var Entity
      */
-    protected $middleEntity;
+    protected Entity $middleEntity;
 
     /**
      * All other outgoing relations from the middle-entity to other $entities.
      *
      * @var Relation[]
      */
-    protected $relations = [];
+    protected array $relations = [];
 
     /**
      * The incoming foreign key from the middle-entity to this entity.
      *
      * @var Relation
      */
-    protected $incomingRelation;
+    protected Relation $incomingRelation;
 
     /**
      * @param Relation $relation

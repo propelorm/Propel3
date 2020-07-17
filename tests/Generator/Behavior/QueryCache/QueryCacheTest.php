@@ -21,7 +21,7 @@ use Propel\Tests\TestCase;
  */
 class QueryCacheTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!class_exists('\QuerycacheEntity1')) {
             $schema = <<<XML

@@ -18,29 +18,20 @@ trait ActiveRecordPart
 {
     use SuperordinatePart;
 
-    /**
-     * @var bool|null
-     */
-    private $activeRecord;
+    private bool $activeRecord;
 
 
-    /**
-     * @param bool $activeRecord
-     * @return $this
-     */
-    public function setActiveRecord(bool $activeRecord): object
+    public function setActiveRecord(bool $activeRecord): void
     {
         $this->activeRecord = $activeRecord;
-
-        return $this;
     }
 
     /**
      * @return bool
      */
-    public function getActiveRecord(): bool
+    public function isActiveRecord(): bool
     {
-        if (null !== $this->activeRecord) {
+        if (isset($this->activeRecord)) {
             return $this->activeRecord;
         }
 
@@ -52,10 +43,11 @@ trait ActiveRecordPart
     }
 
     /**
+     * @deprecated use isActiveRecord
      * @return bool
      */
-    public function isActiveRecord(): bool
+    public function getActiveRecord(): bool
     {
-        return $this->getActiveRecord();
+        return $this->isActiveRecord();
     }
 }

@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,11 +7,10 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Generator\Model;
 
-use Propel\Common\Collection\Map;
+
+use phootwork\collection\Map;
 
 /**
  * Object to hold vendor specific information.
@@ -55,11 +53,8 @@ class Vendor
     const ORACLE_PK_PCT_INCREASE = 'PKPCTIncrease';
     const ORACLE_PK_TABLESPACE = 'PKTablespace';
 
-    /** @var string */
-    private $type;
-
-    /** @var Map */
-    private $parameters;
+    private string $type;
+    private Map $parameters;
 
     /**
      * Creates a new VendorInfo instance.
@@ -69,14 +64,10 @@ class Vendor
      */
     public function __construct(?string $type = null, array $parameters = [])
     {
-        $this->parameters = new Map();
+        $this->parameters = new Map($parameters);
 
         if (null !== $type) {
             $this->setType($type);
-        }
-
-        if ($parameters) {
-            $this->setParameters($parameters);
         }
     }
 
@@ -84,13 +75,10 @@ class Vendor
      * Sets the RDBMS type for this vendor specific information.
      *
      * @param string $type
-     * @return $this
      */
-    public function setType(string $type): Vendor
+    public function setType(string $type): void
     {
         $this->type = $type;
-
-        return $this;
     }
 
     /**
@@ -108,13 +96,10 @@ class Vendor
      *
      * @param string $name The parameter name
      * @param mixed $value The parameter value
-     * @return $this
      */
-    public function setParameter(string $name, $value): Vendor
+    public function setParameter(string $name, $value): void
     {
         $this->parameters->set($name, $value);
-
-        return $this;
     }
 
     /**
@@ -154,11 +139,11 @@ class Vendor
      * Returns an associative array of parameters for
      * vendor specific information.
      *
-     * @return array
+     * @return Map
      */
-    public function getParameters(): array
+    public function getParameters(): Map
     {
-        return $this->parameters->toArray();
+        return $this->parameters;
     }
 
     /**
@@ -179,7 +164,7 @@ class Vendor
      */
     public function getMergedVendorInfo(Vendor $info): Vendor
     {
-        $params = array_merge($this->parameters->toArray(), $info->getParameters());
+        $params = array_merge($this->parameters->toArray(), $info->getParameters()->toArray());
 
         $newInfo = new Vendor($this->type);
         $newInfo->setParameters($params);
